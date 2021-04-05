@@ -38,9 +38,29 @@ For Windows: [Download Tex Live](https://www.tug.org/texlive/acquire-netinstall.
 Now we need to organize your contents a bit so as to make life easier for the editors!
 
 - Make a new file `packages.tex` in your `openreview` folder, where you add all your import lines in Latex. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/openreview/packages.tex)). Import this file in your main tex file.
-- Convert your main content in a `content.tex` file in the `openreview` folder, and import it in your `main.tex` file. Feel free to re-organize your latex code in different files, as long as everything can be imported in `content.tex`.
-- Test that compilation is working.
-- Now, head over to the `journal` folder in your paper folder, and edit the `content.tex` such that it is importing the correct `../openreview/content.tex` file.
+- Convert your main content in a `content.tex` file in the `openreview` folder, and import it in your `main.tex` file. Feel free to re-organize your latex code in different files, as long as everything can be imported in `content.tex`. Your `main.tex` file could look like following:
+
+    ``` tex
+    \documentclass{article}[12pt]
+    \input{packages.tex}
+    \title{Your title}
+    \author{Your authors}
+    \begin{document}
+    \maketitle
+    \input{content.tex}
+    \end{document}
+    ```
+
+
+- [Optional] Test that the compilation is working. 
+- Now, head over to the `journal` folder in your paper folder, and edit the `content.tex` such that it is importing the correct `../openreview/content.tex` file. Your `content.tex` file could look like this:
+
+    ``` tex 
+    \input{../openreview/content.tex}
+    ```
+
+    **Note**: It is possible to face compilation issues in imports if you have extra packages/commands. In such case, feel free to copy your main tex contents in the `content.tex` appropriately.
+
 - Edit the `article.tex` file to include your `packages.tex` file before `\begin{document}`. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/journal/article.tex#L3))
 - If you have an appendix, import it in `article.tex` after `\printbibliography` line. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/journal/article.tex#L14))
 
