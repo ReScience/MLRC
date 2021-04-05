@@ -70,7 +70,7 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 
 ### Step 4: Compile locally
 
-In the `journal` folder of your paper, run `make` to compile. You should get the output `article.pdf` to be nicely formatted in ReScience format.
+In the `journal` folder of your paper, first remove the default `metadata.tex` file. Then, run `make` to compile. You should get the output `article.pdf` to be nicely formatted in the ReScience styles.
 
 ### Step 5: Submit a PR
 
@@ -80,13 +80,10 @@ Once your compilation is ready, open a Pull Request (PR) to the repository with 
 
 While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
 
+## For Editors
 
-## Papers
-
-## Editorial
-
-- TODO
+- To build all folders, run `./build_all.sh`
 
 ## Contact
 
-- Koustuv Sinha (@koustuvsinha)
+- Koustuv Sinha (@koustuvsinha) [Mail](mailto:koustuv.sinha@mail.mcgill.ca)
