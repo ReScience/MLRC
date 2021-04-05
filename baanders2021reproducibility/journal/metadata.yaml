@@ -5,57 +5,39 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[RE] Deep Fair Clustering for Visual Learning"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Tobias Teule
+    orcid: 
+    email: Tobiasteule@gmai.com
+    affiliations: 1,*
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: 
+    orcid: 
+    email: 
+    affiliations:      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
+    name:    University of Amsterdam
+    address: Amsterdam, Netherlands
     
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
-
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: rescience c, rescience x,python, Deep clustering
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/topteulen/UVA-FACT
   - doi: 
   - swh: 
 
@@ -66,22 +48,21 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite: Li, Peizhao, Han Zhao, and Hongfu Liu. "Deep fair clustering for visual learning." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020. # Full textual citation
+ - bib: Li_2020_CVPR  # Bibtex key (if any) in your bibliography file
+ - url: https://openaccess.thecvf.com/content_CVPR_2020/papers/Li_Deep_Fair_Clustering_for_Visual_Learning_CVPR_2020_paper.pdf  # URL to the PDF, try to link to a non-paywall version
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "Deep Fair Clustering (DFC) aims to provide a clustering algorithm that is fair, clustering-favourable, and which can be used on high-dimensional and large-scale data. In existing frameworks there is a trade-off between clustering quality and fairness. In this report we aim to reproduce a selection of the results of DFC; using two of four datasets and all four metrics that were used in the original paper, namely accuracy, Normalized Mutual Information (NMI), balance and entropy. We use the authors’ implementation and check whether it is consistent with the description in the paper. As extensions to the original paper we look into the effects of 1) using no pretrained cluster centers, 2) using different divergence functions as clustering regularizers and 3) using non-binary/corrupted sensitive attributes.
+
+The open source code of the authors has been used. The datasets and data-preprocessing has been done with our code, since the authors did not provide the datasets in their code. Also the pretrained Variational Autoencoder (VAE) dataset had to be re-implemented for the Color Reverse MNIST . For the extensions we wrote extra functions. For measuring the influence of discarding the pretrained cluster centers, the code was already provided by the authors.
+
+For the MNIST-USPS dataset, we report similar accuracy and NMI values that are within 1.2% and 0.5% of the values reported in the original paper. However, the balance and entropy differed significantly, where our results were within 73.1% and 30.3% of the original values respectively. For the Color Reverse MNIST dataset, we report similar values on accuracy, balance and entropy, which are within 5.3%, 2.6% and 0.2% respectively. Only the value of the NMI differed significantly, name within 12.9% of the original value In general, our results still support the main claim of the original paper, even though on some metrics the results differ significantly.
+
+The open source code of the authors was beneficial; it was well structured and ordered into multiple files. Furthermore, the code to use randomly initialized instead of pretrained cluster centers was already provided.
+
+First of all, the main difficulty in reproducing the paper was caused by the coding style; due to the lack of comments it was difficult to get a good understanding of the code. Secondly, we were required to download the data ourselves. However, these filenames and labels did not correspond to the included txt-files by the authors. Therefore, the model did not learn and we regenerated train_mnist.txt and train_usps.txt. Finally, the authors only included pretrained models for the MNIST-USPS dataset. As a consequence, we had to pre-train some parts of the DFC algorithm for the Color Reverse MNIST dataset."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -95,10 +76,10 @@ type: Editorial
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: AI
 
 # Coding language (main one only if several)
-language:
+language: python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +87,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=DXVAJGohUKs
 
 contributors:
   - name:
