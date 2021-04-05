@@ -52,7 +52,7 @@ Now we need to organize your contents a bit so as to make life easier for the ed
     ```
 
 
-- [Optional] Test that the compilation is working. 
+- [Optional] Test that the `openreview` compilation is working. Since the contents of `openreview` is isolated, you can test this in the [Overleaf template](https://www.overleaf.com/project/5f4e72de7681920001b208f9) directly. 
 - Now, head over to the `journal` folder in your paper folder, and edit the `content.tex` such that it is importing the correct `../openreview/content.tex` file. Your `content.tex` file could look like this:
 
     ``` tex 
