@@ -13,5 +13,4 @@ for key in $KEYS; do
     make > build.log
     echo "Build complete"
     cd ../..
-    break
 done
