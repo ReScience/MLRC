@@ -1,1 +1,1 @@
-../../yaml-to-markdown.py
+../../template/yaml-to-markdown.py

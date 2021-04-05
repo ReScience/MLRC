@@ -1,1 +1,1 @@
-../../yaml-to-latex.py
+../../template/yaml-to-latex.py

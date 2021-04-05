@@ -7,7 +7,11 @@ for key in $KEYS; do
     echo "Building ${key}"
     cd $key/journal/
     make clean
+    # Remove the existing metadata.tex for \codeSWH to be generated
+    # metadata.tex will be generated from metadata.yaml using yaml-to-latex.py
+    rm metadata.tex
     make > build.log
     echo "Build complete"
     cd ../..
+    break
 done

@@ -1,1 +1,1 @@
-../../yaml-to-bibtex.py
+../../template/yaml-to-bibtex.py
