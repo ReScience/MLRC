@@ -1,0 +1,30 @@
+% Explain the claims from the paper you picked for the reproduction study and briefly motivate your choice. We recommend picking the claim that is the central contribution of the paper. To find what this contribution is, try to summarize the most important result of the paper in 1-2 sentences, e.g. "This paper introduces a new activation function X that outperforms a similar activation function Y on tasks Z,V,W". 
+
+% Make the scope as specific as possible. It should be something that can be supported or rejected by your data. For example, this scope is too broad and lacks precise outcome (what is "strong performance"?): "Contextual embedding models have shown strong performance on a number of tasks across NLP. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This scope is better because it's more specific and has an outcome that can be either supported or rejected based on your work: "Finetuning Pretrained BERT on SST-2 will have higher accuracy than an LSTM trained with GloVe embeddings."
+% 2.1 Addressed claims from the original paper
+
+% Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+\section{Scope of reproducibility}
+The main claim of the paper is that the proposed architecture is able to "learn the Hamiltonian dynamics of simple physical systems from high-dimensional observations without restrictive domain assumptions". This means that the architecture is capable of learning an abstract position and momentum in latent space from RGB images. Then, with the help of an integrator, the architecture will be capable of reconstructing the system evolution. Modifying the integrator time-step will result in a slow-motion or fast-forward evolution.
+Moreover, the architecture can generate previously unseen system evolutions through sampling. Briefly, we will evaluate the following claims:
+\begin{itemize}
+    \item The architecture reconstructs RGB frames of a physical system evolution with an error comparable to \cite{hgn}.
+    \item The architecture can generate new samples qualitatively similar to the originals.
+    \item The timescale of the predicted evolution can be tuned as an integrator parameter without significant degradation of the resulting video sequence.    
+\end{itemize}
+
+%We re-implement said architecture and attempt to learn the dynamics of a pendulum, a mass-spring, an n-gravitational body system, and a double pendulum.
+%Figure \ref{fig:datasets} shows video rollout examples for each implemented environment.
+%Experiments rely on a training dataset created by randomly sampling some valid initial conditions of the studied system and unrolling a 30-frame video sequence of its evolution (see Section \ref{sec:reproduction}).
+%Once the model is trained, we can employ it to predict the evolution of the system from the given sequence; both forward and/or backward in time.
+%The system can produce rollouts at different speeds by simply modifying the time step of the integrator.
+
+%We achieve comparable results to those of \cite{hgn} (see Section \ref{sec:reproduction}) and provide further insights by testing the approach on new environments and with principled architectural changes (see Section \ref{sec:additional_experiments}).
