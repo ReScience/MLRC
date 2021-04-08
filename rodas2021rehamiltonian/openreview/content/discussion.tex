@@ -1,0 +1,53 @@
+\section{Discussion}
+\label{sec:disc}
+% Give your judgement on if you feel the evidence you got from running the code supports the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+% Summary
+We were able to implement and train an Hamiltonian Generative Network with similar reconstruction performance of the ones of the original paper  ($30\%$ average absolute relative error wrt to their reported values when treating it as an autoencoder). These results show that the network is capable of exploiting the Hamiltonian equations to learn dynamics of a physical system from RGB images. However, the value of the resulting Hamiltonian does not remain constant throughout the system evolution. 
+% \todo{Carles, Oleguer, check that what I write here makes sense}
+This means that the network is learning something that is different from the Hamiltonian equations described in Section \ref{sec:data}.
+%It is worth to note that there is an infinite number of equations whose partial derivatives in $q$ and $p$ match those of Eq. \ref{eq:hamilton}. In particular, a constant could be added to all Hamiltonian equations of Section \ref{sec:data} without changing the derivatives used by the integrators. Therefore, at each time-step the Hamiltonian network could predict any of these equations, explaining the high variance in the Hamiltonian values.   
+
+To make the variational sampling work, we tried performing a grid search on the Geco\cite{geco} hyperparameters and using a fixed Lagrange multiplier as in \cite{beta-vae}. However, despite our best efforts, the samples produced by the variational model have very poor quality. This is generally due to the difficulty in minimizing both KL divergence and reconstruction loss. 
+
+%To better evaluate the system, we provided further experiments giving a better grasp of the possibilities the Hamiltonian paradigm opens when using ANNs to learn about dynamical systems.
+% Future work
+We believe that further experiments are needed to understand better the behavior of the system and to improve it. Future work could include further testing on each network architecture, probably smaller networks would also be able to encode the needed information. Another next step is to try the approach on more challenging (and realistic-looking) environments. In addition, it would be interesting to tackle the transfer learning capabilities of such architecture between different environments. How re-usable each network is? How much faster the system is able to learn the new dynamics? Finally, another field which could benefit from this research is model-based reinforcement learning.
+A generative approach from which to sample example rollouts could be very useful for training agents without the need of directly interacting with the environment.
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+Once we implemented the code it resulted quite easy to perform multiple experiments on different environments, architectures and hyper-parameters due to the code's modularity and flexibility.
+We can define the the previously mentioned experiments and most common testing behaviors from a set of yaml files which can then be modified from command-line arguments.
+While this required extra planning and work at the beginning it really payed off when debugging and evaluating in later stages. 
+
+\subsection{What was difficult} \label{sec:challenge}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+The main challenge we encountered is finding the correct tools to debug a model composed of so many interconnected networks.
+The fact that it has a variational component with a dynamic Lagrange multiplier term makes it especially tricky to train.
+Furthermore, no public implementation existed and some details and parameters were missing in the original paper leading to some necessary assumptions or parameter searches.
+
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+We first tried to understand and re-implement the code by ourselves.
+Nevertheless, at some point we had gathered a significant set of doubts and we decided to email them to the original authors, which they answered with great detail.
+From that point onwards, we sent a couple more set of doubts, also receiving answers.\\
+
+Most of our doubts were about network architecture clarifications (either of unclear or missing descriptions from the original paper), and loss function evaluation.
+Furthermore, they provided us with some of their environment images so we could more easily make our environments as similar as possible.
+
+\subsection{Improving reproducibility}
+Having worked in re-implementing the whole original work, we feel it is important to share our experience as well as providing a recommendation on how it could be made more easily reproducible.
+First, having the environments data or code to generate it available online would save the effort and, most importantly, it would constitute a baseline against which to compare future work.
+Secondly, publishing all the hyperparameters and more details of the networks architecture would make the whole work much easier to reproduce and require less training attempts, especially for what concerns GECO.
+
+
+\section*{Acknowledgements}
+We thank Stathi Fotiadis for voluntarily contributing with a GECO \cite{geco} implementation draft to the public \href{https://github.com/CampusAI/Hamiltonian-Generative-Networks}{repo} and his useful feedback on code structuring. We thank the KTH Robotics, Perception, and Learning (RPL) Lab for the computational resources provided to us.
+In addition, we would like to thank the original authors for providing further details on the implementation.

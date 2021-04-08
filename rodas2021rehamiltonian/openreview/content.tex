@@ -1,0 +1,50 @@
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+The main objective of the paper is to "learn the Hamiltonian dynamics of simple physical systems from high-dimensional observations without restrictive domain assumptions".
+To do so, the authors train a generative model that reconstructs an inputted sequence of images of the evolution of some physical system.
+For instance, they learn the dynamics of a pendulum, a body-spring system, and 2,3-bodies.
+In addition to these environments, we further expand the testing on two new environments and we explore architecture tweaks looking for performance gains.
+
+\subsection*{Methodology}
+We implement the project with Python using Pytorch \cite{pytorch} as a deep learning library.
+Previous to ours, there was no public implementation of this work.
+Thus, we had to write the code of the simulated environments, the deep models, and the training process.
+The code can be found in this repository: \href{https://github.com/CampusAI/Hamiltonian-Generative-Networks}{https://github.com/CampusAI/Hamiltonian-Generative-Networks}
+A single training takes around 4 hours and 1910MB of GPU memory (NVIDIA GeForce RTX2080Ti).
+
+
+\subsection*{Results}
+We found the model's input-output data slightly unclear in the original paper.
+First, it seems that the model reconstructs the same sequence that has been inputted.
+Nevertheless, further discussion with the authors seems to indicate that they input the first few frames to the network and reconstructed the rest of the rollout.
+We test both approaches and analyze the results.
+We generally obtain comparable results to those of the original authors when just reconstructing the input sequence ($30\%$ average absolute relative error w.r.t. to their reported values) and worse results when trying to reconstruct unseen frames ($107\%$ error).
+In this report, we include our intuition on possible reasons that would explain these observations.
+
+
+\subsection*{What was easy}
+The architecture of the model and training procedure was easy to understand from the paper.
+Besides, creating simulation environments similar to those of the original authors was also straightforward. 
+
+\subsection*{What was difficult}
+While the overall model architecture and data generation were easy to understand, we encountered the optimization to be especially tricky to perform.
+In particular, finding a good balance between the reconstruction loss and KL divergence loss was challenging.
+We implemented GECO \cite{geco} to dynamically adapt the Lagrange multiplier but it proved to be surprisingly brittle to its hyper-parameters, resulting in very unstable behavior.
+We were unable to identify the cause of the problem and ended up training with simpler techniques such as using a fixed Lagrange multiplier as presented in \cite{beta-vae}.
+
+\subsection*{Communication with original authors}
+We exchanged around 6 emails with doubts and answers with the original authors.
+
+
+\newpage
+
+\input{content/intro}
+
+\input{content/scope}
+
+\input{content/methodology}
+
+\input{content/result}
+
+\input{content/discussion}

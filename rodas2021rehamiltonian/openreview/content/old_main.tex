@@ -1,0 +1,157 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[]{neurips_2019}
+
+\usepackage{makecell}
+\usepackage{tabularx}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}% hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{mwe} % For dummy images
+\usepackage{subcaption}
+
+\usepackage{bm}
+\usepackage{todonotes}
+
+\title{Re-Hamiltonian Generative Networks}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\makeatletter
+\newcommand{\printfnsymbol}[1]{%
+  \textsuperscript{\@fnsymbol{#1}}%
+}
+\makeatother
+
+\author{%
+  Carles Balsells Rodas \thanks{Equal contribution.}\\
+  KTH Royal Institute of Technology\\
+  \texttt{carlesbr@kth.se}\\
+   \And
+   Oleguer Canal Anton \printfnsymbol{1}\\
+   KTH Royal Institute of Technology \\
+  % Address \\
+   \texttt{oleguer@kth.se} \\
+   \And
+   Federico Taschin \printfnsymbol{1}\\
+   KTH Royal Institute of Technology \\
+  % Address \\
+   \texttt{taschin@kth.se} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsection*{Scope of Reproducibility}
+
+% State the main claim of the original paper you are trying to reproduce. We recommend picking the central claim of the paper. 
+The main objective of the paper is to "learn the Hamiltonian dynamics of simple physical systems from high-dimensional observations without restrictive domain assumptions".
+To do so, the authors train a generative model that reconstructs an inputted sequence of images of the evolution of some physical system.
+For instance, they learn the dynamics of a pendulum, a body-spring system, and 2,3-bodies.
+In addition to these environments, we further expand the testing on two new environments and we explore architecture tweaks looking for performance gains.
+
+\subsection*{Methodology}
+
+% Briefly describe what you did and which resources did you use. E.g. Did you use author's code, did you re-implement parts of the pipeline, how much time did it take to produce the results, what hardware you were using and how long it took to train/evaluate. 
+We implement the project with Python using Pytorch \cite{pytorch} as a deep learning library.
+Previous to ours, there was no public implementation of this work.
+Thus, we had to write the code of the simulated environments, the deep models, and the training process.
+The code can be found in this repository: \href{https://github.com/CampusAI/Hamiltonian-Generative-Networks}{https://github.com/CampusAI/Hamiltonian-Generative-Networks}
+A single training takes around 4 hours and 1910MB of GPU memory (NVIDIA GeForce RTX2080Ti).
+
+
+\subsection*{Results}
+
+% Start with your overall conclusion - where was your study successful and where not successful. Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, that upholds the paper's conclusion that it performs much better than baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement call to decide if your results support the original claim of the paper. 
+We found the model's input-output data slightly unclear in the original paper.
+First, it seems that the model reconstructs the same sequence that has been inputted.
+Nevertheless, further discussion with the authors seems to indicate that they input the first few frames to the network and reconstructed the rest of the rollout.
+We test both approaches and analyze the results.
+We generally obtain comparable results to those of the original authors when just reconstructing the input sequence ($30\%$ average absolute relative error w.r.t. to their reported values) and worse results when trying to reconstruct unseen frames ($107\%$ error).
+In this report, we include our intuition on possible reasons that would explain these observations.
+
+
+\subsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. E.g. was it easy to run the author's code, or easy to re-implement their method based on the description in the paper. The goal of this section is to summarize to the reader which parts of the original paper they could easily apply to their problem. 
+The architecture of the model and training procedure was easy to understand from the paper.
+Besides, creating simulation environments similar to those of the original authors was also straightforward. 
+
+\subsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify. 
+While the overall model architecture and data generation were easy to understand, we encountered the optimization to be especially tricky to perform.
+In particular, finding a good balance between the reconstruction loss and KL divergence loss was challenging.
+We implemented GECO \cite{geco} to dynamically adapt the Lagrange multiplier but it proved to be surprisingly brittle to its hyper-parameters, resulting in very unstable behavior.
+We were unable to identify the cause of the problem and ended up training with simpler techniques such as using a fixed Lagrange multiplier as presented in \cite{beta-vae}.
+
+\subsection*{Communication with original authors}
+
+We exchanged around 6 emails with doubts and answers with the original authors.
+
+
+\newpage
+
+% \textit{\textbf{
+% The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% }}
+
+\input{intro}
+
+\input{scope}
+
+\input{methodology}
+
+\input{result}
+
+\input{discussion}
+
+
+\bibliographystyle{plain}
+\small
+\bibliography{reflist}
+
+\end{document}
