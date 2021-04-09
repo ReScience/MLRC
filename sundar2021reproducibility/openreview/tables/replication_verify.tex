@@ -1,0 +1,33 @@
+\begin{table}[t]
+    \captionsetup{aboveskip=\tableaboveskip,belowskip=\tablebelowskip}
+    \caption{\textbf{Test accuracy of reference and our implementations on CIFAR-10,} tabulated for three different sparsities. Note that the runs listed here do not use a separate validation set while training.}
+    \label{tab:replication_verify}
+    \centering
+
+    \begin{tabular}{ c ccc ccc }
+    \toprule
+    \textbf{Method}& 
+    \multicolumn{3}{c}{\textbf{Ours}} & \multicolumn{3}{c}{\textbf{Original}} \\
+    \midrule
+    {Dense} & 
+    \multicolumn{3}{c}{94.6} & \multicolumn{3}{c}{94.1} \\
+    \midrule
+    {} & 
+    \makecell{$1-s=0.1$}  & \makecell{$1-s=0.2$} & \makecell{$1-s=0.5$} &
+    \makecell{$1-s=0.1$}  & \makecell{$1-s=0.2$} & \makecell{$1-s=0.5$} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    Static (ERK) & 
+    91.6 & 93.2 & 94.3 &  
+    91.6 & 92.9 & 94.2 \\
+    
+    Pruning & 
+    93.2 & 93.6 & 94.3 & 
+    93.3 & 93.5 & 94.1 \\
+    
+    RigL (ERK) & 
+    93.2 & 93.8 & 94.4 & 
+    93.1 & 93.8 & 94.3 \\
+    \bottomrule
+
+    \end{tabular}
+\end{table}

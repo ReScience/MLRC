@@ -1,0 +1,21 @@
+\subsection{ResNet-50 on CIFAR100}\label{cifar-100-results}
+
+\begin{tabularx}{\textwidth}[hb]{*{2}{>{\centering\arraybackslash}X}}
+    \centering
+    \captionsetup{labelformat=andfigure,width=1.2\linewidth,aboveskip=7pt,belowskip=0pt}
+    \captionlistentry[figure]{entry for figure}
+    \label{fig:cifar100-main-results}
+    
+    \captionof{table}{\textbf{Benchmarking sparse ResNet-50s on CIFAR-100,} tabulated by performance and cost \textbf{(below)}, and plotted across densities \textbf{(right)}. In each group below, \textit{RigL} outperforms or matches existing sparse-to-sparse and dense-to-sparse methods. Notably, \textit{RigL}\textsubscript{$3\times$} at 90\% sparsity and \textit{RigL}\textsubscript{$2\times$} at 80\% sparsity surpass iterative pruning with similar FLOP consumption. \textit{RigL}\textsubscript{$2\times$} (ERK) further improves performance but requires a larger training budget. }
+    \input{../openreview/tables/cifar100.tex}
+    \label{tab:cifar100-main-results}  
+&
+    \input{../openreview/figs/cifar100_main.tex}
+\end{tabularx}
+
+We see similar trends when training sparse variants of ResNet-50 on the CIFAR-100 dataset (Table \ref{tab:cifar100-main-results}, metrics reported as in Section \ref{cifar-10-results}). We also include a comparison against sparse networks trained with the Lottery Ticket Hypothesis (\citet{frankle2018lottery}) in Table \ref{tab:cifar100-main-results}---we obtain tickets with a commensurate performance for sparsities lower than 80\%. Finally, the choice of initialization scheme affects the performance and FLOP consumption by a greater extent than the method used itself, with the exception of SNFS (groups 1 and 2 in Table \ref{tab:cifar100-main-results}). 
+
+% Such networks are trained twice: once to prune the dense model, and then after re-initializing with the obtained mask. Finally, concurring with \citet{rigl}, multiple sparse methods generalize better than the dense baseline with just half the parameters, indicating the regularization aspect of sparse networks (Figure \ref{fig:cifar100-main-results}, bottom).  
+
+% ERK initialization improves performance across all sparse methods, especially at higher sparsities. 
+
