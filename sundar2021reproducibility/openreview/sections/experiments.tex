@@ -1,0 +1,34 @@
+\section{Experimental Settings}
+
+\subsection{Model descriptions}
+\jdcomment{Include a clear description of the mathematical setting, algorithm, and/or model. For each model or algorithm, be sure to include 1) the number of parameters (this is similar to space complexity), and 2) some measure of average runtime (this is similar to time complexity) on what hardware you have (for example, average time to predict labels for 100 instances from dataset X, on GPU Y, with batch size Z).}
+
+For experiments on CIFAR-10 (\citet{Krizhevsky09learningmultiple}), we use a Wide Residual Network (\citet{Wide_ResNet_BMVC2016_87}) with depth 22 and width multiplier 2, abbreviated as WRN-22-2. For experiments on CIFAR-100 (\citet{Krizhevsky09learningmultiple}), we use a modified variant of ResNet-50 (\citet{He_2016_CVPR}), with the initial $7\times 7$ convolution replaced by two $3 \times 3$ convolutions (architecture details provided in the supplementary material). 
+
+\subsection{Datasets and Training descriptions}
+\jdcomment{For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train/dev/test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).}
+
+We conduct our experiments on the CIFAR-10 and CIFAR-100 image classification datasets. For CIFAR-10, we use a train/val/test split of 45k/5k/10k samples. In comparison, the authors use no dedicated validation set, with 50k samples and 10k samples comprising the train set and test set, respectively. This causes a slight performance discrepancy between our reproduction and the metrics reported by the authors (dense baseline has a test accuracy of 93.4\% vs 94.1\% reported). However, our replication matches the paper's performance when 50k samples are used for the train set (Table \ref{tab:replication_verify}). We use a validation split of 10k samples for CIFAR-100 as well.
+
+\input{../openreview/tables/replication_verify.tex}
+
+On both datasets, we train models for 250 epochs each, optimized by SGD with momentum.  Our training pipeline uses standard data augmentation, which includes random flips and crops. When training on CIFAR-100, we additionally include a learning rate warmup for 2 epochs and label smoothening of 0.1 (\citet{goyal2017accurate}). We also initialize the last batch normalization layer (\citet{ioffe2015batch}) in each BottleNeck block to 0, following \citet{He_2019_CVPR}.
+
+\subsection{Hyperparameters}
+\jdcomment{Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results). Describe how you set the hyperparameters and what was the source for their value (e.g. paper, code or your guess).}
+
+\textit{RigL} includes two additional hyperparameters ($\alpha, \Delta T$) in comparison to regular dense network training. In Sections \ref{cifar-10-results} and \ref{cifar-100-results}, we set $\alpha=0.3, \Delta T = 100$, based on the original paper. Optimizer specific hyperparameters---learning rate, learning rate schedule, and momentum---are also set according to the original paper. In Section \ref{hyperparameter-tuning}, we tune these hyperparameters with Optuna (\citet{optuna_2019}). We also examine whether indivdually tuning the learning rate for each sparsity value offers any significant benefit.
+
+\subsection{Baseline implementations}
+\jdcomment{Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+Provide a link to your code.} 
+
+We compare \textit{RigL} against various baselines in our experiments: SET (\citet{Mocanu2018SET}), SNFS (\citet{dettmers2020sparse}), and Magnitude-based Iterative-pruning (\citet{to_prune_or_not}). We also compare against two weaker baselines, viz., \textit{Static Sparse} training and \textit{Small-Dense} networks. The latter has the same structure as the dense model but uses fewer channels in convolutional layers to lower parameter count. We implement iterative pruning with the pruning interval kept same as the masking interval for a fair comparison. 
+
+\subsection{Computational requirements}
+\jdcomment{Provide information on computational requirements for each of your experiments. For example, the total number of CPU/GPU hours and amount of memory used for each experiment (note: you'll have to record this as you run your experiments, so it's better to think about it ahead of time). Consider the perspective of a reader who wants to use the approach described in the paper -- list what they would find useful to understand what resources they would need.
+\sout{Include a description of the hardware used, such as the GPU or CPU the experiments were run on.
+You'll need to think about this ahead of time, and write your code in a way that captures this information so you can later add it to this section.}}
+
+We run our experiments on a SLURM cluster node---equipped with 4 NVIDIA GTX1080 GPUs and a 32 core Intel CPU. Each experiment on CIFAR-10 and CIFAR-100 consumes about 1.6 GB and 7 GB of VRAM respectively and is run for 3 random seeds to capture performance variance. We require about 6 and 8 days of total compute time to produce all results, including hyper-parameter sweeps and extended experiments, on CIFAR-10 and CIFAR-100 respectively.

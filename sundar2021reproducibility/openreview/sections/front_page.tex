@@ -1,0 +1,43 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsection*{Scope of Reproducibility}
+
+% State the main claim\jdcomment{(s)} of the original paper you are trying to reproduce. We recommend picking the central claim\jdcomment{(s)} of the paper. \jdcomment{For those that are familiar, this can be framed as scientific hypotheses (i.e. falsifiable, clear how evidence will support the hypothesis, etc.).}
+
+% For a fixed parameter count and compute budget, the proposed algorithm, \textit{RigL} directly trains sparse networks with constant Floating Point Operations (FLOPs) throughout training, while matching the performance of existing dense-to-sparse training techniques. The technique obtains state-of-the-art performance on a variety of tasks, including image classification and character-level language-modelling.
+
+For a fixed parameter count and compute budget, the proposed algorithm (\textit{RigL}) claims to directly train sparse networks that match or exceed the performance of existing dense-to-sparse training techniques (such as pruning). \textit{RigL} does so while requiring constant Floating Point Operations (FLOPs) throughout training. The technique obtains state-of-the-art performance on a variety of tasks, including image classification and character-level language-modelling.
+
+\subsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. Did you use author's code? Did you re-implement parts of the pipeline? How much time did it take to produce the results? What hardware you were using and how long did it take (e.g. GPU hours) to train/evaluate? 
+
+We implement \textit{RigL} from scratch in Pytorch using boolean masks to simulate unstructured sparsity. We rely on the description provided in the original paper, and referred to the authors' code for only specific implementation detail such as handling overflow in ERK initialization. We evaluate sparse training using \textit{RigL} for WideResNet-22-2 on CIFAR-10 and ResNet-50 on CIFAR-100, requiring 2 hours and 6 hours respectively per training run on a GTX 1080 GPU.
+
+\subsection*{Results}
+
+% Start with your overall conclusion - where \jdcomment{did your study reproduce results from the original paper, and where did your results differ?} \sout{was your study successful and where not successful.} Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+We reproduce \textit{RigL}'s performance on CIFAR-10 within 0.1\% of the reported value. On both CIFAR-10/100, the central claim holds---given a fixed training budget, \textit{RigL} surpasses existing dynamic-sparse training methods over a range of target sparsities. By training longer, the performance can match or exceed iterative pruning, while consuming constant FLOPs throughout training. We also show that there is little benefit in tuning \textit{RigL}'s hyper-parameters for every sparsity, initialization pair---the reference choice of hyperparameters is often close to optimal performance. 
+
+Going beyond the original paper, we find that the optimal initialization scheme depends on the training constraint. While the Erdos-Renyi-Kernel distribution outperforms Random distribution for a fixed parameter count, for a fixed FLOP count, the latter performs better. Finally, redistributing layer-wise sparsity while training can bridge the performance gap between the two initialization schemes, but increases computational cost.
+
+\subsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The authors provide code for most of the experiments presented in the paper. The code was easy to run and allowed us to verify the correctness of our re-implementation. The paper also provided a thorough and clear description of the proposed algorithm without any obvious errors or confusing exposition. 
+
+\subsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify. 
+
+Tuning hyperparameters involved multiple random seeds and took longer than anticipated. Verifying the correctness of a few baselines was tricky and required ensuring that the optimizer's gradient (or momentum) buffers were sparse (or dense) as specified by the algorithm. Compute limits restricted us from evaluating on larger datasets such as Imagenet.
+
+\subsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+
+We had responsive communication with the original authors, which helped clarify a few implementation and evaluation details, particularly regarding the FLOP counting procedure.

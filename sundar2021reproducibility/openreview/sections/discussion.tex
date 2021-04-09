@@ -1,0 +1,33 @@
+\section{Discussion}
+
+\vscomment{Conclusions should synthesize the results of your paper and separate what is significant from what is not. Ideally, they should add new information and observations that put your results in perspective. Here's a simple test: if somebody reads your conclusions before reading the rest of your paper, will they fully understand them? If the answer is ``yes,'' there's probably something wrong. A good conclusion says things that become significant after the paper has been read. A good conclusion gives perspective to sights that haven't yet been seen at the introduction. A conclusion is about the implications of what the reader has learned. Of course, a conclusion is also an excellent place for conjectures, wish lists, and open problems.}
+
+\jdcomment{Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.}
+
+Evaluated on image classification, the central claims of \citet{rigl} hold true---\textit{RigL} outperforms existing sparse-to-sparse training methods and can also surpass other dense-to-sparse training methods with extended training. \textit{RigL} is fairly robust to its choice of hyperparameters, as they can be set independent of sparsity or initialization. We find that the choice of initialization has a greater impact on the final performance and compute requirement than the method itself. Considering the performance boost obtained by redistribution, proposing distributions that attain maximum performance given a FLOP budget could be an interesting future direction.
+
+% Finally, our early experiments show that adapting \textit{RigL} to promote structured sparsity can obtain practical speedups in existing hardware accelerators. 
+
+For computational reasons, our scope is restricted to small datasets such as CIFAR-10/100. \textit{RigL}'s applicability outside image classification---in Computer Vision and beyond (machine translation etc.) is not covered here.
+
+\paragraph{What was easy}
+\jdcomment{Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). }
+
+The authors' code covered most of the experiments in their paper and helped us validate the correctness of our replicated codebase. Additionally, the original paper is quite complete, straightforward to follow, and lacked any major errors.
+
+\paragraph{What was difficult}
+\jdcomment{List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow".}
+
+Implementation details such as whether momentum buffers were accumulated sparsely or densely had a substantial impact on the performance of SNFS. Finding the right $\epsilon$ for ERK initialization required handling of edge cases---when a layer's capacity is exceeded. Hyperparameter tuning $(\alpha, \Delta T)$ involved multiple seeds and was compute-intensive.
+
+% \paragraph{Discrepancies} SNFS redistributes layer-wise density during training, and hence its inference FLOPs do not scale proportional to density, i.e.,  $f_s \neq f_d * (1 - s)$. Similarly, Pruning inference FLOPs do not scale with density.
+
+\paragraph{Communication with original authors}
+
+\jdcomment{Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. }
+
+We acknowledge and thank the original authors for their responsive communication, which helped clarify a great deal of implementation and evaluation specifics. Particularly, FLOP counting for various methods while taking into account the changing sparsity distribution. We also discussed experiments extending the original paper---as to whether the authors had carried out a similar study before.

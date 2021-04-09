@@ -13,12 +13,12 @@ authors:
   - name: Varun Sundar
     orcid: 0000-0002-8261-3630
     email: vsundar4@wisc.edu
-    affiliations: 1, *
+    affiliations: 1,*
     
-  - name: Nicolas P. Rougier
+  - name: Rajat Vadiraj Dwaraknath
     orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 2      # * is for contact author
+    email: rajatvd@stanford.edu
+    affiliations: 2,      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
@@ -26,7 +26,7 @@ authors:
 affiliations:
   - code:    1
     name:    University of Wisconsin Madison
-    address: Orléans, France
+    address: Wisconsin, USA
     
   - code:    2
     name:    Synchrotron SOLEIL, Division Expériences
@@ -34,7 +34,7 @@ affiliations:
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: rescience c, rescience x, python, pytorch, sparse-networks
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
@@ -43,7 +43,7 @@ keywords: rescience c, rescience x
 code:
   - url: https://github.com/varun19299/rigl-reproducibility
   - doi: 
-  - swh: 
+  - swh: swh:1:dir:0707870fafa16ef60dc64071e1aed482e373e75f
 
 # Data URL and DOI (optional if no data)
 data:
@@ -52,22 +52,28 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite: "Utku Evci, Trevor Gale, Jacob Menick, Pablo Samuel Castro, and Erich Elsen. 
+ Rigging the lottery: Making all tickets winners. 
+ In Proceedings of Machine Learning and Systems (ICML), July 2020."
+# Full textual citation
+ - bib: rigl  # Bibtex key (if any) in your bibliography file
+ - url: https://arxiv.org/pdf/1911.11134.pdf # URL to the PDF, try to link to a non-paywall version
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "RigL , a sparse training algorithm, 
+claims to directly train sparse networks that match or exceed the performance of existing dense-to-sparse training techniques (such as pruning) 
+for a fixed parameter count and compute budget. 
+We implement RigL from scratch in Pytorch and reproduce its performance on CIFAR-10 within 0.1% of the reported value. 
+On both CIFAR-10/100, the central claim holds---given a fixed training budget, 
+RigL surpasses existing dynamic-sparse training methods over a range of target sparsities. 
+By training longer, the performance can match or exceed iterative pruning, while consuming constant FLOPs throughout training. 
+We also show that there is little benefit in tuning RigL's hyper-parameters for every sparsity, initialization pair---the reference choice of hyperparameters is often close to optimal performance. 
+Going beyond the original paper, we find that the optimal initialization scheme depends on the training constraint. 
+While the Erdos-Renyi-Kernel distribution outperforms the Uniform distribution for a fixed parameter count, 
+for a fixed FLOP count, the latter performs better. 
+Finally, redistributing layer-wise sparsity while training can bridge 
+the performance gap between the two initialization schemes, but increases computational cost."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -98,7 +104,7 @@ contributors:
   - name:
     orcid: 
     role: editor
-  - name:
+  - name: Anonymous Reviewers
     orcid:
     role: reviewer
   - name:

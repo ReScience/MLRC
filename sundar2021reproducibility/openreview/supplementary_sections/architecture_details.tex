@@ -1,0 +1,49 @@
+\section{Architecture Specific Details---ResNet-50 on CIFAR100}
+
+\begin{table}[ht]
+\captionsetup{aboveskip=\tableaboveskip,belowskip=\tablebelowskip}
+\caption{\textbf{ResNet-50 architecture used on CIFAR100}. Building blocks are shown in brackets, with the numbers of blocks stacked. Downsampling is performed by conv3\_1, conv4\_1, and conv5\_1 with a stride of 2.
+}
+\label{tab:architecture}
+\centering
+\begin{tabular}{c c c}
+    \toprule
+    Layer Name & Output Size & ResNet-50 \\
+    \midrule
+    
+    conv1 & 32$\times$32 & {3$\times$3, 64, no stride}\\
+    \midrule
+    
+    \multirow{3}{*}{conv2\_x} & \multirow{3}{*}{32$\times$32} 
+    & \blockb{256}{64}{3} \\
+    &  &  \\
+    &  &  \\
+    \midrule
+    
+    \multirow{3}{*}{conv3\_x} &  \multirow{3}{*}{16$\times$16}  
+    & \blockb{512}{128}{4} \\
+    &  &  \\
+    &  &  \\
+    \midrule
+    
+    \multirow{3}{*}{conv4\_x} & \multirow{3}{*}{8$\times$8}  
+    & \blockb{1024}{256}{6} \\
+      &  &  \\
+      &  &  \\
+    \midrule
+    
+    \multirow{3}{*}{conv5\_x} & \multirow{3}{*}{4$\times$4}  
+    & \blockb{2048}{512}{3} \\
+      &  &   \\
+      &  &   \\
+    \midrule
+    
+    & 1$\times$1  & {average pool, 100-d fc, softmax} \\
+    \midrule
+    
+    \multicolumn{2}{c}{FLOPs} & 2.59e9 \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+We use a variant of the originally proposed ResNet architecture (\citet{He_2016_CVPR}). Particularly, we replace the initial $7 \times 7$ conv layer with a $3 \times 3$ conv layer. Here, ``conv layer'' refers to convolution followed by batchnorm (\citet{ioffe2015batch}) and ReLU activation. This is intended to not excessively downsample the image---CIFAR-100 (\citet{Krizhevsky09learningmultiple}) has images of dimensions $32 \times 32$, compared to Imagenet's (\citet{ILSVRC15}) $224 \times 224$. Each block used (conv2\_x, conv3\_x, etc.) is a bottleneck block, and uses the conv-batchnorm-ReLU ordering. 
