@@ -16,9 +16,10 @@ jobs:
       - uses: xu-cheng/texlive-action/full@v1
         with:
           run: |
-            wget https://bootstrap.pypa.io/get-pip.py get-pip.py
-            python get-pip.py
-            python -m pip install --upgrade pip
-            python -m pip install pyyaml
+            apk add --update --no-cache python3
+            ln -sf python3 /usr/bin/python
+            python3 -m ensurepip
+            pip3 install --no-cache --upgrade pip setuptools
+            pip3 install pyyaml
             apk add make
             ./build_all.sh
