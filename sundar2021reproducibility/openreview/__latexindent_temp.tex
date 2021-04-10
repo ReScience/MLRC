@@ -1,12 +1,109 @@
-\input{./sections/front_page.tex}
-\input{./sections/introduction.tex}
-\input{./sections/scope.tex}
-\input{./sections/methodology.tex}
-\input{./sections/experiments.tex}
-\input{./sections/results.tex}
-\input{./sections/results_beyond.tex}
-\input{./sections/discussion.tex}
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{neurips_2019}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{caption}
+
+% \DeclareCaptionLabelFormat{andtable}{#1~#2  \&  \tablename~\thetable}
+\DeclareCaptionLabelFormat{andfigure}{#1~#2  \&  \figurename~\thefigure}
+
+% Table and figure side by side
+\usepackage{tabularx}
+\usepackage[export]{adjustbox}
+
+\usepackage{multirow}
+\usepackage{comment}
+\usepackage{makecell}
+\usepackage{amsmath}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}      % images
+\usepackage[english]{babel}
+\bibliographystyle{plainnat}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[normalem]{ulem}
+\newif{\ifhidecomments}
+
+% set \hidecommentsfalse to see comments
+\hidecommentstrue
+% \hidecommentsfalse
+\ifhidecomments
+    \newcommand{\jdcomment}[1]{}
+    \newcommand{\vscomment}[1]{} 
+    % \newcommand{\vscomment}[1]{\textcolor{red}{[#1 ({\bf Varun})]}} 
+    \newcommand{\resolved}[1]{}
+\else
+    \newcommand{\jdcomment}[1]{\textcolor{teal}{[#1 ({\bf Organisers})]}} 
+    \newcommand{\vscomment}[1]{\textcolor{red}{[#1 ({\bf Varun})]}} 
+    \newcommand{\resolved}[1]{} 
+\fi
+
+% Table & figure caption spacing
+\newcommand{\tableaboveskip}{7pt}
+\newcommand{\tablebelowskip}{0pt}
+\newcommand{\figureaboveskip}{0pt}
+\newcommand{\figurebelowskip}{7pt}
+
+% ResNet-50 table
+\newcommand{\blocka}[2]{\multirow{3}{*}{\(\left[\begin{array}{c}\text{3$\times$3, #1}\\[-.1em] \text{3$\times$3, #1} \end{array}\right]\)$\times$#2}
+}
+
+\newcommand{\blockb}[3]{\multirow{3}{*}{\(\left[\begin{array}{c}\text{1$\times$1, #2}\\[-.1em] \text{3$\times$3, #2}\\[-.1em] \text{1$\times$1, #1}\end{array}\right]\)$\times$#3}
+}
+
+
+\title{[Supplementary] \\Reproducibility Report \\Rigging the Lottery: Making All Tickets Winners}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  Varun Sundar \\
+  University of Wisconsin Madison\\
+  \texttt{vsundar4@wisc.edu} \\
+  % examples of more authors
+   \And
+   Rajat Vadiraj Dwaraknath \\
+   Stanford University \\
+   \texttt{rajatvd@gmail.com} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\input{appendix.tex}
 
 \medskip
 
-\bibliography{ref}
+% \bibliography{ref}
+\input{supplementary.bbl}
+
+\end{document}

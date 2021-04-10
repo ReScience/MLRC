@@ -1,3 +1,4 @@
+% COMMENT for Rescience-C
 % if you need to pass options to natbib, use, e.g.:
 %     \PassOptionsToPackage{numbers, compress}{natbib}
 % before loading neurips_2019
@@ -7,13 +8,13 @@
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
 % [preprint] option:
-    % \usepackage[preprint]{./neurips_2019}
+%     \usepackage[preprint]{neurips_2019}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
-% \usepackage[final]{neurips_2019}
+%\usepackage[final]{neurips_2019} % Remove for ReScience
 
 % to avoid loading the natbib package, add option nonatbib:
-%     \usepackage[nonatbib]{neurips_2019}
+% \usepackage[nonatbib, final]{neurips_2019}
 
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
@@ -22,7 +23,6 @@
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{caption}
 
-% \DeclareCaptionLabelFormat{andtable}{#1~#2  \&  \tablename~\thetable}
 \DeclareCaptionLabelFormat{andfigure}{#1~#2  \&  \figurename~\thefigure}
 
 % Table and figure side by side
@@ -40,17 +40,16 @@
 \usepackage[english]{babel}
 \bibliographystyle{plainnat}
 
-\usepackage[dvipsnames]{xcolor}
 \usepackage[normalem]{ulem}
 \newif{\ifhidecomments}
 
+% HIDE Comments for Rescience-C
 % set \hidecommentsfalse to see comments
 \hidecommentstrue
 % \hidecommentsfalse
 \ifhidecomments
     \newcommand{\jdcomment}[1]{}
     \newcommand{\vscomment}[1]{} 
-    % \newcommand{\vscomment}[1]{\textcolor{red}{[#1 ({\bf Varun})]}} 
     \newcommand{\resolved}[1]{}
 \else
     \newcommand{\jdcomment}[1]{\textcolor{teal}{[#1 ({\bf Organisers})]}} 
