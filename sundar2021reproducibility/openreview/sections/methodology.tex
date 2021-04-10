@@ -1,11 +1,9 @@
 \section{Methodology}
 
-\jdcomment{Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.}
-
 The authors provide publicly accessible code\footnote{\href{https://github.com/google-research/rigl}{https://github.com/google-research/rigl}} written in Tensorflow (\citet{abadi2016tensorflow}). To gain a better understanding of various implementation aspects, we opt to replicate \textit{RigL} in Pytorch (\citet{Pytorch}). Our implementation extends the open-source code\footnote{\href{https://github.com/TimDettmers/sparse_learning}{https://github.com/TimDettmers/sparse\_learning}} of \citet{dettmers2020sparse} which uses a boolean mask to simulate unstructured sparsity. Our source code is publicly accessible on Github\footnote{\href{https://github.com/varun19299/rigl-reproducibility}{https://github.com/varun19299/rigl-reproducibility}} with training plots available on WandB\footnote{\href{https://wandb.ai/ml-reprod-2020}{https://wandb.ai/ml-reprod-2020}} (\citet{wandb}).
 
 
-\paragraph{Mask Initialization} For a network with $L$ layers and total parameters $N$, we associate each layer with a random boolean mask of sparsity $s_l, \; l \in [L]$. The overall sparsity of the network is given by $S=\frac{\sum_l s_l N_l}{N}$, where $N_l$ is the parameter count of layer $l$. Sparsities $s_l$ are determined by the one of the following mask initialization strategies:
+\subsubsection{Mask Initialization}}For a network with $L$ layers and total parameters $N$, we associate each layer with a random boolean mask of sparsity $s_l, \; l \in [L]$. The overall sparsity of the network is given by $S=\frac{\sum_l s_l N_l}{N}$, where $N_l$ is the parameter count of layer $l$. Sparsities $s_l$ are determined by the one of the following mask initialization strategies:
 
 \begin{itemize}
     \item \textbf{Uniform:} Each layer has the same sparsity, i.e., $s_l = S \; \forall l$. Similar to the original authors, we keep the first layer dense in this initialization.
@@ -17,9 +15,9 @@ The authors provide publicly accessible code\footnote{\href{https://github.com/g
 
 We do not sparsify either bias or normalization layers, since these have a negligible effect on total parameter count.
 
-\paragraph{Mask Updates} Every $\Delta T$ training steps, certain connections are discarded, and an equal number are grown. Unlike SNFS (\citet{dettmers2020sparse}), there is no redistribution of layer-wise sparsity, resulting in constant FLOPs throughout training.
+\subsubsection{Mask Updates} Every $\Delta T$ training steps, certain connections are discarded, and an equal number are grown. Unlike SNFS (\citet{dettmers2020sparse}), there is no redistribution of layer-wise sparsity, resulting in constant FLOPs throughout training.
 
-\paragraph{Pruning Strategy} Similar to SET and SNFS, \textit{RigL} prunes $f$ fraction of smallest magnitude weights in each layer.  As detailed below, the fraction $f$ is decayed across mask update steps, by cosine annealing:
+\subsubsection{Pruning Strategy} Similar to SET and SNFS, \textit{RigL} prunes $f$ fraction of smallest magnitude weights in each layer.  As detailed below, the fraction $f$ is decayed across mask update steps, by cosine annealing:
 
 \begin{equation}
         f(t) = \frac{\alpha}{2} \left(1 + \cos \left(\frac{t\pi}{T_\text{end}} \right) \right)
@@ -27,5 +25,5 @@ We do not sparsify either bias or normalization layers, since these have a negli
 
 where, $\alpha$ is the initial pruning rate and $T_\text{end}$ is the training step after which mask updates are ceased.
 
-\paragraph{Growth Strategy} \textit{RigL}'s novelty lies in how connections are grown: during every mask update, $k$ connections having the largest absolute gradients among current inactive weights (previously zero + pruned) are activated. Here, $k$ is chosen to be the number of connections dropped in the prune step. This requires access to dense gradients at each mask update step. Since gradients are not accumulated (unlike SNFS), \textit{RigL} does not require access to dense gradients at \textit{every} step. Following the paper, we initialize newly activated weights to zero.
+\subsubsection{Growth Strategy} \textit{RigL}'s novelty lies in how connections are grown: during every mask update, $k$ connections having the largest absolute gradients among current inactive weights (previously zero + pruned) are activated. Here, $k$ is chosen to be the number of connections dropped in the prune step. This requires access to dense gradients at each mask update step. Since gradients are not accumulated (unlike SNFS), \textit{RigL} does not require access to dense gradients at \textit{every} step. Following the paper, we initialize newly activated weights to zero.
 
