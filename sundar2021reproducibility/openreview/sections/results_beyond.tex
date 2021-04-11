@@ -11,13 +11,9 @@ While ERK initialization outperforms Random initialization consistently for a gi
 
 \input{../openreview/tables/effect_redistribution.tex}
 
-One of the main differences of \textit{RigL} over SNFS is the lack of layer-wise redistribution during training. We examine if using a redistribution criterion can be beneficial and bridge the performance gap between Random and ERK initialization. Following \citet{dettmers2020sparse}, during every mask update, we reallocate layer-wise density proportional to its average sparse gradient or momentum (\textit{RigL}-SG, \textit{RigL}-SM).
+One of the main differences of \textit{RigL} over SNFS is the lack of layer-wise redistribution during training. We examine if using a redistribution criterion can be beneficial and bridge the performance gap between Random and ERK initialization. Following \citet{dettmers2020sparse}, during every mask update, we reallocate layer-wise density proportional to its average sparse gradient or momentum (\textit{RigL}-SG, \textit{RigL}-SM).\\
  
-Table \ref{tab:effect-redistribution} shows that redistribution significantly improves \textit{RigL} (Random), but not \textit{RigL} (ERK). We additionally plot the FLOP requirement against training steps and the final sparsity distribution in Figure \ref{fig:density-dist-evolution}. The layer-wise sparsity distribution largely becomes constant within a few epochs. The final distribution is similar, but more ``extreme'' than ERK---wherever ERK exceeds/falls short of Random, redistribution does so by a greater extent.
-
-% Like ERK, redistribution allocates higher densities for $1 \times 1$ convolutions (\textit{convShortcut} in Figure \ref{fig:density-dist-evolution}), resulting in increased FLOP consumption. 
-
-% Figure \ref{fig:density-dist-evolution} illustrates this for 80\% sparse \textit{RigL}-SG and \textit{RigL}-SM on CIFAR-100 (both randomly initialized). 
+Table \ref{tab:effect-redistribution} shows that redistribution significantly improves \textit{RigL} (Random), but not \textit{RigL} (ERK). We additionally plot the FLOP requirement against training steps and the final sparsity distribution in Figure \ref{fig:density-dist-evolution}. The layer-wise sparsity distribution largely becomes constant within a few epochs. The final distribution is similar, but more ``extreme'' than ERK---wherever ERK exceeds/falls short of Random, redistribution does so by a greater extent.\\
 
 By allocating higher densities to $1 \times 1$ convolutions (\textit{convShortcut} in Figure \ref{fig:density-dist-evolution}), redistribution significantly increases the FLOP requirement---and hence, is not a preferred alternative to ERK. Surprisingly, initializing \textit{RigL} with the final sparsity distribution in a manner similar to the Lottery Ticket Hypothesis results in subpar performance (group 3, Table \ref{tab:effect-redistribution}). 
 

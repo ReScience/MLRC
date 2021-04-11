@@ -2,7 +2,7 @@
 
 \begin{tabularx}{\textwidth}[hb]{*{2}{>{\centering\arraybackslash}X}}
     \centering
-    \captionsetup{labelformat=andfigure,width=1\linewidth,aboveskip=7pt,belowskip=0pt}
+    \captionsetup{labelformat=andfigure,width=1.1\linewidth,aboveskip=7pt,belowskip=0pt}
     \captionlistentry[figure]{entry for figure}
     \label{fig:cifar100-main-results}
     
@@ -14,8 +14,4 @@
 \end{tabularx}
 
 We see similar trends when training sparse variants of ResNet-50 on the CIFAR-100 dataset (Table \ref{tab:cifar100-main-results}, metrics reported as in Section \ref{cifar-10-results}). We also include a comparison against sparse networks trained with the Lottery Ticket Hypothesis (\citet{frankle2018lottery}) in Table \ref{tab:cifar100-main-results}---we obtain tickets with a commensurate performance for sparsities lower than 80\%. Finally, the choice of initialization scheme affects the performance and FLOP consumption by a greater extent than the method used itself, with the exception of SNFS (groups 1 and 2 in Table \ref{tab:cifar100-main-results}). 
-
-% Such networks are trained twice: once to prune the dense model, and then after re-initializing with the obtained mask. Finally, concurring with \citet{rigl}, multiple sparse methods generalize better than the dense baseline with just half the parameters, indicating the regularization aspect of sparse networks (Figure \ref{fig:cifar100-main-results}, bottom).  
-
-% ERK initialization improves performance across all sparse methods, especially at higher sparsities. 
 

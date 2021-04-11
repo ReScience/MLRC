@@ -1,29 +1,9 @@
-\section{FLOP Counting Procedure}
+\section{Dynamic Structured Sparsity}\label{structured-sparsity}
 
-Following \citet{rigl}, we base our counting procedure on the Micronet Challenge\footnote{https://micronet-challenge.github.io/}, which was conducted as a part of NeurIPS 2019. Support for unstructured sparsity is assumed while computing the number of additions and multiplication operations. The sum of these two gives us the theoretical FLOPs for a single forward pass through the model. 
+\input{../openreview/supplementary_sections/table_structured_sparsity.tex}
 
-Concretely, let the FLOPs required for a forward pass through a dense model be $f_d$ and the corresponding for a sparse model (or small-dense model) be $f_s$. Then, the FLOPs for training a dense model are $3f_d$---since the backward pass involves computing gradients with respect to each weight and activation. $f_s$ can be computed for a model given its sparsity distribution via the counting procedure. The FLOPs required to train a sparse model depend on the technique used, as detailed below.
+Present hardware accelerators lack efficient implementations for unstructured sparsity. As a result, in practice, the reduced FLOP requirement of sparse methods rarely translate to wall-clock improvements. In comparison, there are efficient implementations available for structured (or block) sparsity which reach theoretical speedups (\citet{gray2017gpu,Vooturi_2019_ICCV}).\\
 
-% Below, we detail the procedure for computing inference and train FLOPs of specific methods.
+Motivated by this, we try modifying \textit{RigL} to explicitly work on structured sparsity. We promote channel sparsity for convolutional layers and keep fully connected layers dense. Mask update steps also operate at the channel level, based on \textit{RigL}'s growth and pruning criterion. We name this method as \textit{RigL}-struct. Such an approach is enticing, as we can remove masked-out channels, and obtain practical speedups on accelerators without needing support for unstructured sparsity.\\
 
-\subsection{Inference FLOPs}
-
-% As mentioned above, we determine the inference FLOPs of each model given its layer-wise sparsity distribution (specified by the boolean masks). Below we highlight the 
-
-\subsubsection{Small-Dense, RigL, SET, Static} These methods involve constant layer-wise sparsity throughout training, hence the FLOP count can be determined during any step. The FLOP count for Random initialized models are $(1-s)$ times the Dense FLOPs.
-
-\subsubsection{SNFS, Pruning} Both methods involve varying layer-wise sparsity during training, and hence non-constant FLOP consumption. The final weights are used to determine inference FLOPs in this case.
-
-\subsection{Train FLOPs}
-
-\subsubsection{Small-Dense, Static} Dense gradients are not required by these models, and hence have a train FLOP count of $3f_s$.
-
-\subsubsection{SET} Dense gradients are not required, and random growth can be implemented quite efficiently. Thus, the train FLOP count is $3f_s$.
-
-\subsubsection{RigL} Dense gradients are required only every $\Delta T$ steps, hence the corresponding train FLOP count is: $\frac{3\Delta Tf_s + 2f_s + f_d }{\Delta T + 1}$. We note that since $\Delta T$ is typically set between 100--1000, the preceding expression is quite close to $3f_s$.
-
-\subsubsection{SNFS} Dense gradients are required at each training step, resulting in $2f_s + f_d$ FLOPs consumed at each step. Since the sparse FLOP count varies as we train, the average FLOP count is: $2\mathbb{E}[f_{s,t}] + f_d$, where $f_{s,t}$ is the sparse inference FLOPs at train step $t$.
-
-\subsubsection{Pruning} Does not require dense gradients, but the sparsity increases smoothly from $0\%$ to the target value as we train. The FLOP consumption here is $3\mathbb{E}[f_{s,t}]$, , where $f_{s,t}$ is the sparse inference FLOPs at train step $t$.
-
-To determine $\mathbb{E}[f_{s,t}]$, we compute a running average of the FLOP consumption after every epoch. Notably, we find that the inference cost of Pruning is often close to a Random initialized sparse network, while SNFS, regardless of initiazation, is compute-intensive.
+Unfortunately, \textit{RigL}-struct does not preserve the performance of originally proposed \textit{RigL} (Table \ref{tab:structured-sparsity}). In fact, it performs only as good as Small-Dense models, which negates the motivation behind such an experiment---Small-Dense models already achieve the intended speedups.
