@@ -92,6 +92,11 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 
 In the `journal` folder of your paper, first remove the default `metadata.tex` file. Then, run `make` to compile. You should get the output `article.pdf` to be nicely formatted in the ReScience styles.
 
+#### :warning: Common Compilation Issues
+
+- Please do not import `xcolor` in your `packages.tex`, as rescience.cls already imports this package
+- Please remove the import of `fontenc` from your `packages.tex`. ReScience uses custom fonts, which breaks when fontenc is loaded on top of it. (Check [#4](https://github.com/ReScience/RC-2020/issues/4) for more discussion)
+
 ### Step 5: Submit a PR
 
 Once your compilation is ready, open a Pull Request (PR) to the repository with your files. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
