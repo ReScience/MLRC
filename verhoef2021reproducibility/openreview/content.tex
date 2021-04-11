@@ -10,10 +10,10 @@ It has been shown \citep{jain-wallace-2019-attention} that the weights in attent
 \end{itemize}
 
 \subsubsection{Methodology}The paper includes a link to a repository with the code used to generate its results. We follow four investigative routes:
-(i) \underline{Replication}: we rerun experiments on datasets from the paper in order to replicate the results, and add the results that are missing in the paper; 
-(ii) \underline{Code review}: we scrutinize the code to validate its correctness;
-(iii) \underline{Evaluation methodology}: we extend the set of evaluation metrics used in the paper with the LIME method, in an attempt to resolve inconclusive results;
-(iv) \underline{Generalization to other architectures}: we test whether the authors' claims apply to variations of the base model (more complex forms of attention and a BiLSTM encoder).
+(i) \textit{Replication}: we rerun experiments on datasets from the paper in order to replicate the results, and add the results that are missing in the paper; 
+(ii) \textit{Code review}: we scrutinize the code to validate its correctness;
+(iii) \textit{Evaluation methodology}: we extend the set of evaluation metrics used in the paper with the LIME method, in an attempt to resolve inconclusive results;
+(iv) \textit{Generalization to other architectures}: we test whether the authors' claims apply to variations of the base model (more complex forms of attention and a BiLSTM encoder).
 
 \subsubsection{Results}We confirm that the Orthogonal and Diversity LSTM achieve similar accuracies as the Vanilla LSTM, while lowering conicity. However, we cannot reproduce the results of several of the experiments in the paper that underlie their claim of better transparency. In addition, a close inspection of the code base reveals some potentially problematic inconsistencies. Despite this, under certain conditions, we do confirm that the Orthogonal and Diversity LSTM can be useful methods to increase transparency. 
 How to formulate these conditions more generally remains unclear and deserves further research.
@@ -509,7 +509,7 @@ However, on other metrics and across datasets, the picture is mixed like we saw 
 Our reproduction shows that enforcing low conicity between the hidden states of an LSTM encoder does not guarantee improved transparency in the studied datasets, at least not on the metrics used by \citet{mohankumar_towards_2020}. We find the authors' claim about improved transparency not generally applicable and under certain conditions their methods even hurt accuracy.
 Still, the Diversity LSTM and Orthogonal LSTM do lead to improved metrics on some datasets, and the human evaluation \citet{mohankumar_towards_2020} conducted shows strong preference for the Diversity LSTM over Vanilla LSTM. This raises the question under what conditions these methods should be applied. 
 
-\subsubsection{Conditions underlying effectiveness} One pattern that seems to emerge is that the benefits of orthogonalizing or diversity training are most apparent for the relatively simpler SS tasks. The potential to improve faithfulness of the weights might be high in those cases as it not a given that attention weights carry any meaning for these task. 
+\subsubsection{Conditions underlying effectiveness} One pattern that seems to emerge is that the benefits of orthogonalizing or diversity training are most apparent for the relatively simpler SS tasks. The potential to improve faithfulness of the weights might be high in those cases as it not a given that attention weights carry any meaning for these tasks. 
 
 \begin{table}[ht]
     \scriptsize
