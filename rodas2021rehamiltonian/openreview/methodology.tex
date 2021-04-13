@@ -49,14 +49,14 @@ In addition, we trained a version of the model with a fixed Lagrange multiplier.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{pictures/HGN_Architecture.png}
+\includegraphics[width=\textwidth]{../openreview/pictures/HGN_Architecture.png}
 \caption{HGN network architecture to find the final abstract position and momentum ($\bm{q}_k$, $\bm{p}_k$) from the input sequence. Tensors are represented in blue and operations in black. The encoder takes as input a sequence of $k+1$ frames concatenated along channels and samples the latent variable $\bm{z} \sim q_{\phi}(\bm{z} \vert \bm{x}_0, ..., \bm{x}_k)$ with the reparametrization trick. The transformer network converts $\bm{z}$ into the state $\bm{s}_k = (\bm{q}_k, \bm{p}_k)$ from which the system evolution will be predicted.}
 \label{fig:initial_cond}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{pictures/rollout_architecture.png}
+\includegraphics[width=\textwidth]{../openreview/pictures/rollout_architecture.png}
 \caption{Recurrent part of the HGN architecture. Blue cubes represent tensors. The integrator takes the position and momentum for each time-step, computes $\mathcal{H}(\bm{q}_t, \bm{p}_t)$ and computes the abstract state in the next time-step $\bm{s}_{t+1} = (\bm{q}_{t+1}, \bm{p}_{k+1})$ for $t\ge k$ exploiting the Hamiltonian equations of \ref{eq:hamilton}. The decoder takes the abstract position $\bm{q}_{t}$ and decodes it into the original image $\bm{x}_t$.}
 \label{fig:unroll}
 \end{figure}
@@ -79,7 +79,7 @@ The procedure for data generation is analogous to the one used by \cite{hnn}. Gi
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{pictures/data/new_dataset_image.png}
+    \includegraphics[width=\textwidth]{../openreview/pictures/data/new_dataset_image.png}
     \caption{Representation and samples from the different physical systems considered in our experiments. Notice that differing from \cite{hgn}, we also consider a damped mass-spring system and a double pendulum.}
     \label{fig:datasets}
 \end{figure}
