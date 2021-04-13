@@ -30,7 +30,7 @@ For Windows: [Download Tex Live](https://www.tug.org/texlive/acquire-netinstall.
 
 ### Step 1: Copy the camera-ready latex content in `openreview` folder
 
-- Fork this repository and clone it locally
+- Fork this repository and clone it locally (**Note**: clone recursively using `--recurse-submodules` or `--recursive` flag)
 - Add the latex content of your paper in the `openreview` folder of your paper citekey. (You can check your correct folder from [accepted.bib](accepted.bib))
 
 ### Step 2: Organize your latex code
@@ -52,7 +52,7 @@ Now we need to organize your contents a bit so as to make life easier for the ed
     ```
 
 
-- [Optional] Test that the `openreview` compilation is working. Since the contents of `openreview` is isolated, you can test this in the [Overleaf template](https://www.overleaf.com/project/5f4e72de7681920001b208f9) directly. 
+- [Optional] Test that the `openreview` compilation is working. Since the contents of `openreview` is isolated, you can test this in the [Overleaf template](https://www.overleaf.com/read/bmzfqzrkdnfg) directly. 
 - Now, head over to the `journal` folder in your paper folder, and edit the `content.tex` such that it is importing the correct `../openreview/content.tex` file. Your `content.tex` file could look like this:
 
     ``` tex 
@@ -92,13 +92,20 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 
 In the `journal` folder of your paper, first remove the default `metadata.tex` file. Then, run `make` to compile. You should get the output `article.pdf` to be nicely formatted in the ReScience styles.
 
+#### :warning: Common Compilation Issues
+
+- Please do not import `xcolor` in your `packages.tex`, as rescience.cls already imports this package
+- Please remove the import of `fontenc` from your `packages.tex`. ReScience uses custom fonts, which breaks when fontenc is loaded on top of it. (Check [#4](https://github.com/ReScience/RC-2020/issues/4) for more discussion)
+
 ### Step 5: Submit a PR
 
 Once your compilation is ready, open a Pull Request (PR) to the repository with your files. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
 
 ### Troubleshooting
 
-While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
+While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
+
+**New: CI with Github Actions**: We have now setup a continuous integration with Github Actions to run after every push and PR. Once you submit your PR, you can check the build logs from the PR right itself (currently we build all projects together, so search the log with the name of your folder). Thanks to [Xavier Bouthillier](https://github.com/bouthilx) for helping to set it up! 
 
 ## For Editors
 

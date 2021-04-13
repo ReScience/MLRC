@@ -6,6 +6,7 @@ KEYS=$(cat accepted.bib | sed -n "s/[^{]*@inproceedings{\([^,]*\).*/\1/p")
 for key in $KEYS; do
     echo "Building ${key}"
     cd $key/journal/
+    echo $(pwd)
     make clean
     # Remove the existing metadata.tex for \codeSWH to be generated
     # metadata.tex will be generated from metadata.yaml using yaml-to-latex.py
