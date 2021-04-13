@@ -1,0 +1,25 @@
+on: [push,pull_request]
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: xu-cheng/texlive-action/full@v1
+        with:
+          run: |
+            apk add --update --no-cache python3
+            ln -sf python3 /usr/bin/python
+            python3 -m ensurepip
+            pip3 install --no-cache --upgrade pip setuptools
+            pip3 install pyyaml
+            apk add make
+            ./build_all.sh
