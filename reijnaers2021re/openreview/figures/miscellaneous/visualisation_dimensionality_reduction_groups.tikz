@@ -1,0 +1,63 @@
+\begin{tikzpicture}
+  \definecolor{oblue}{rgb}{0.4, 0.6, 0.8}
+
+  \begin{axis}[
+    enlargelimits=0.2,
+  ]
+
+    \addplot+[
+      scatter/classes={a={blue}, b={red}, c={oblue}},
+      scatter,
+      mark=*,
+      only marks,scatter src=explicit symbolic,nodes near coords*={\Label},
+      visualization depends on={value \thisrow{label} \as \Label}
+    ]
+    table[meta=class]
+    {
+      x y class label
+      0.5 0.2 a {1 ($\boldsymbol{X}_{initial}$)} 
+      0.2 0.1 a 2
+      0.3 0.3 b {3 ($\boldsymbol{X}_{target}$)}
+      0.25 0.35 a 4
+      0.2 0.25 c 1'
+    };
+     
+    \draw[red,->,>=stealth,black] (axis cs:0.505,0.195) to[out=-20,in=-70] (axis cs:0.205,0.245);
+    \node [label={[label distance=1cm, rotate=-10]40:translation $t(\boldsymbol{X}_{initial})$}] {};
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \definecolor{oblue}{rgb}{0.4, 0.6, 0.8}
+  \node [anchor=west] (note) at (0,2) {\Large dimensionality reduction ($r: \mathbb{R}^2 \to \mathbb{R}^1 $)};
+  \node [anchor=west] (graph) at (-2,3) {};
+  \draw [-latex, thick, black] (graph) to[out=0, in=-120] (2.1,-0.5);
+  
+  \begin{axis}[
+    xmin=0, xmax=22,
+    axis x line=bottom,
+    hide y axis,    
+    ymin=0, ymax=5
+  ]
+
+    \addplot+[
+      scatter/classes={a={blue}, b={red}, c={oblue}},
+      scatter,
+      mark=*,
+      only marks,
+      scatter src=explicit symbolic,nodes near coords*={\Label},
+      visualization depends on={value \thisrow{label} \as \Label}
+    ]
+    table[meta=class]
+    {
+      x y class label
+      2 0 a 4
+      4.3 0 a 2
+      7.4 0 b 3
+      8.2 0 c 1'
+      14 0 a 1
+    }; 
+
+    \draw[red,->,>=stealth,black] (axis cs:14,0.5) to[out=20,in=70] (axis cs:8,0.5);
+    \node [label={[label distance=1.5cm]35:map: $r(t(\boldsymbol{X}_{initial})) \approx r(\boldsymbol{X}_{target})$}] {};
+  \end{axis}
+\end{tikzpicture}
