@@ -5,59 +5,53 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Explaining Groups of Points in Low-Dimensional Representations"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Damiaan J. W. Reijnaers
+    orcid: 0000-0001-8693-1057
+    email: info@damiaanreijnaers.nl
+    affiliations: 1,*
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Daniël B. van de Pavert
+    orcid: 0000-0001-5108-7730
+    email: daniel.vandepavert@student.uva.nl
+    affiliations: 1
+    
+  - name: Giguru Scheuer
+    orcid: 0000-0002-4767-194X
+    email: giguru.scheuer@student.uva.nl
+    affiliations: 1
+    
+  - name: Liang Huang
+    orcid: 0000-0003-3013-8193
+    email: liang.huang@student.uva.nl
+    affiliations: 1
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+    name:    Faculty of Science, University of Amsterdam
+    address: Science Park 904, 1098 XH Amsterdam, the Netherlands
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: rescience c, rescience x, python, counterfactual explanations,
+          transitive global translations, dimensionality reduction,
+          explainable artificial intelligence
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
-  - doi: 
-  - swh: 
+  - url: https://github.com/damiaanr/fact-ai
+  - doi: 10.5281/zenodo.4686025
+  - swh: swh:1:dir:df71f3541f882bfb2474dc177b8eaba31f905d9d
 
 # Data URL and DOI (optional if no data)
 data:
@@ -66,22 +60,47 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: Plumb, G. and Terhorst, J. and Sankararaman, S. and Talwalkar, A.. (2020). Explaining Groups of Points in Low-Dimensional Representations. Proceedings of the 37th International Conference on Machine Learning, in Proceedings of Machine Learning Research 119:7762-7771. Available from http://proceedings.mlr.press/v119/plumb20a.html.
+ - bib:  plumb2020explaining
+ - url:  http://proceedings.mlr.press/v119/plumb20a/plumb20a.pdf
+ - doi:  
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "In this paper we present an analysis and elaboration of (Plumb et 
+           al., 2020), in which an algorithm is posed for the purpose of 
+           finding human-understandable explanations in terms of given 
+           explainable features of input data for differences between groups
+           of points occurring in a lower-dimensional representation of that
+           input data. We have upgraded the original code provided by the
+           author such that it is compatible with recent versions of popular
+           deep learning frameworks, namely the TensorFlow 2.x- and PyTorch
+           1.7.x-libraries. Furthermore, we have created our own implementation
+           of the algorithm in which we have incorporated additional
+           experiments in order to evaluate the algorithm’s relevance in the
+           scope of different dimensionality reduction techniques and
+           differently structured data. We have performed the same experiments
+           as described in the original paper using both the upgraded version
+           of the code provided by the author and our own implementation taking
+           the authors' code and paper as references. The results presented in 
+           the original paper were reproducible, both by using the provided
+           code and our own implementation. Our additional experiments have
+           highlighted several limitations of the explanatory algorithm in
+           question: the algorithm severely relies on the shape and variance of
+           the clusters present in the data (and, if applicable, the method
+           used to label these clusters), and highly non-linear dimensionality
+           reduction algorithms perform worse in terms of explainability. The 
+           authors have provided an implementation that cleanly separates
+           different experiments on different datasets and the core functional
+           methodology. As a result of this separation, given a working
+           environment, one could easily reproduce the experiments performed
+           in the original paper. Minor difficulties were experienced in
+           setting up the required environment for running the code provided
+           by Plumb et al. locally (i.e. trivial changes in the code such as
+           the usage of absolute paths and obtaining external dependencies).
+           Evidently, it was time-consuming to rewrite all corresponding code,
+           including the architecture for the variational auto-encoder provided
+           by an external package, scvis 0.1.0. No communication with the
+           original authors was required to reproduce their work."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +110,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020, Explainable Artificial Intelligence
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +125,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=hq3TxQK5cox
 
 contributors:
   - name:
