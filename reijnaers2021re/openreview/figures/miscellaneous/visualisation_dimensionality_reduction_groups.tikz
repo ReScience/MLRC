@@ -30,10 +30,10 @@
   \definecolor{oblue}{rgb}{0.4, 0.6, 0.8}
   \node [anchor=west] (note) at (0,2) {\Large dimensionality reduction ($r: \mathbb{R}^2 \to \mathbb{R}^1 $)};
   \node [anchor=west] (graph) at (-2,3) {};
-  \draw [-latex, thick, black] (graph) to[out=0, in=-120] (2.1,-0.5);
+  \draw [-latex, thick, black] (graph) to[out=0, in=-120] (2.25,-0.2);
   
   \begin{axis}[
-    xmin=0, xmax=22,
+    xmin=0, xmax=0.5,
     axis x line=bottom,
     hide y axis,    
     ymin=0, ymax=5
@@ -50,14 +50,14 @@
     table[meta=class]
     {
       x y class label
-      2 0 a 4
-      4.3 0 a 2
-      7.4 0 b 3
-      8.2 0 c 1'
-      14 0 a 1
+      0.05 0 a 4
+      0.1075 0 a 2
+      0.185 0 b 3
+      0.205 0 c 1'
+      0.35 0 a 1
     }; 
 
-    \draw[red,->,>=stealth,black] (axis cs:14,0.5) to[out=20,in=70] (axis cs:8,0.5);
+    \draw[red,->,>=stealth,black] (axis cs:0.35,0.5) to[out=20,in=70] (axis cs:0.2,0.5);
     \node [label={[label distance=1.5cm]35:map: $r(t(\boldsymbol{X}_{initial})) \approx r(\boldsymbol{X}_{target})$}] {};
   \end{axis}
 \end{tikzpicture}
