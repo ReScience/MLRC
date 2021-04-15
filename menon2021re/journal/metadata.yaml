@@ -5,47 +5,32 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Learning Memory Guided Normality for Anomaly Detection"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Kevin Stephen
+    orcid: 0000-0003-0002-9578
+    email: kevinstephen99@gmail.com
+    affiliations: 1
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Varun Menon
+    orcid: 0000-0002-4580-9183
+    email: vk2148@nyu.edu
+    affiliations: 2,*      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
+    name:    Pune Institute of Computer Technology
+    address: Pune, India
     
   - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
-
+    name:    Courant Institute of Mathematical Sciences
+    address: New York University
 
 # List of keywords (adding the programming language might be a good idea)
 keywords: rescience c, rescience x
@@ -55,8 +40,8 @@ keywords: rescience c, rescience x
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
-  - doi: 
+  - url: https:/github.com/alchemi5t/MNADrc
+  - doi: 10.5281/zenodo.4681515
   - swh: 
 
 # Data URL and DOI (optional if no data)
@@ -66,22 +51,33 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
+ - cite: "Park, H., Noh, J., & Ham, B. (2020). Learning memory-guided normality for anomaly detection. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 14360-14369"
  - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - url:  https://openaccess.thecvf.com/content_CVPR_2020/papers/Park_Learning_Memory-Guided_Normality_for_Anomaly_Detection_CVPR_2020_paper.pdf
+ - doi:  https://doi.org/10.1109/CVPR42600.2020.01438
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "Scope of Reproducibility
+The authors have introduced a novel method for unsupervised anomaly detection that utilises a newly introduced “Memory Module” in their paper [1]. We validate the authors’ claim that this helps improve performance by helping the network learn prototypical patterns, and uses the learnt memory to reduce the representation capacity of Convolutional Neural Networks. Further, we validate the efficacy of two losses introduced by the authors, “Separateness Loss” and “Compactness Loss” presented to increase the discriminative power of the memory items and the deeply learned features. We test the efficacy with the help of t-SNE plots of the memory items.
+
+Methodology
+The authors provide a codebase available at https://github.com/cvlab-yonsei/MNAD with scripts for the Prediction task. We reused the available code to build scripts for the Reconstruction task and variants with and without memory. The completed codebase for all tasks available at https://anonymous.4open.science/r/40136d86-adcb-44cf-8f71-b70ad55a1bde/.
+
+Results
+We obtain results that are within a 3% range of the reported results for all datasets other than on the ShanghaiTech dataset[2]. The anomalous run stuck out since the Non Memory of the same run could score markedly better than the Memory variant. This led us to investigate the behaviour of the memory module and found valuable insights which are presented in Section 5.
+
+What was easy
+• The authors provide codes to run the Prediction task with memory.
+• The ideas presented in the paper were clear and easy to understand.
+• The datasets were easily available, with the exception of the ShanghaiTech dataset[2].
+
+What was difficult
+• After training the model on the ShanghaiTech dataset[2], we found that the “Memory” variants of the model had issues as described in Sections 4 and 5. We investigated the behaviour of the memory module and introduced additional supervision to solve the problem.
+• We required hyperparameter optimization to hit the reported scores.
+• The paper also lacked information as to which parts of the pipeline were actually to be credited for the improvement in performance, as discussed in Section 5.
+
+Communication with original authors
+The codebase has scripts only for the Prediction task Memory variant of the benchmarks. We reused portions of the codebase to create the other variants. We then validated our modifications with the authors. We also communicated the discrepancies we saw in parts of the results and the authors asked us to wait until they update their repository with the missing scripts."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +87,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: Computer Vision and Pattern Recognition
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +102,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=vvLWTXkJ2Zv
 
 contributors:
   - name:
