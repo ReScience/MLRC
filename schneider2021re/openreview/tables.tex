@@ -1,0 +1,104 @@
+\newcolumntype{x}{l}
+\newcolumntype{X}{>{\scriptsize}l}
+\newcolumntype{y}{r}
+\newcolumntype{Y}{>{\scriptsize}r}
+\newcolumntype{v}[1]{>{\raggedright\hspace{0pt}}p{#1}}
+\newcolumntype{V}[1]{>{\scriptsize\raggedright\hspace{0pt}}p{#1}}
+
+\newcommand{\tabCompareTAECode}{
+  \begin{tabular}{@{}Xyyy@{}}
+    \toprule
+    \multicolumn{1}{@{}X}{Model variant}  & \multicolumn{2}{X}{Overall accuracy} & \multicolumn{1}{X@{}}{Number of parameters} \\
+        \cmidrule(lr){2-3}
+      & \multicolumn{1}{X}{checkpoint} & \multicolumn{1}{X}{trained} &  \\
+        \cmidrule(r){1-1} \cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(l){4-4} %\addlinespace
+    TAE 
+    \parencite{Garnot20:SIT}        & 94.19    & \bfseries 94.26 & \num{164116}           \\\addlinespace
+    TAE with $\FC_v$  
+    \parencite{Vaswani17:Attention} & ---      & 94.24           & \bfseries \num{131476} \\%\addlinespace
+    \bottomrule
+  \end{tabular}
+}
+
+\newcommand{\tabCompareTAE}{%
+% Die place specifiers  [htpb] sollte man nur nutzen, wenn man sie wirklich braucht, sonst gibt es schnell Probleme
+\begin{table}
+  % den optionalen Eintrag hier kan man sich sparen, im Paper gibt's ja eh kein Abb-Verz.
+  \caption{Comparison original TAE and TAE with $\FC_v$}
+  \label{tab:tae_vs_taeT}
+  \centering
+  \tabCompareTAECode
+\end{table}  
+}
+
+\newcommand{\tabCrossDataCode}{%
+  \begin{tabular}{@{}Xyy@{}}
+    \toprule
+    \multicolumn{1}{@{}X}{Model variant} & \multicolumn{2}{X@{}}{Overall accuracy} \\
+                                           \cmidrule(l){2-3}
+                                         & \multicolumn{1}{X}{checkpoint} & \multicolumn{1}{X@{}}{trained} \\
+    \cmidrule(r){1-1} \cmidrule(lr){2-2} \cmidrule(l){3-3}
+    TAE 
+    \parencite{Garnot20:SIT}             & 61.75           & 61.65  \\\addlinespace
+    TAE with $\FC_v$  
+    \parencite{Vaswani17:Attention}      &                 & \bfseries 62.03\\
+    \bottomrule
+  \end{tabular}
+}
+
+\newcommand{\tabCrossData}{
+\begin{table}
+  \caption{Accuracy trained on FR-\tilename{T31TFM}, tested on SI-\tilename{T33TWM} (Region SI034)}
+  \label{tab:cross_data}
+  \centering
+  \tabCrossDataCode
+\end{table}
+}
+
+\newcommand{\tabCompareTAECrossData}{%
+\begin{table}
+  \caption{%
+    Covering several experiments, \subref{tab:tae_vs_taeT_subtable} and \subref{tab:cross_data_subtable} show the results of the presented temporal attention encoder (TAE) and our adaptation of it with the additional fully-connected layer $\FC_v$, respectively. 
+    We therefore hoped to give an impression of the performance of the models under different circumstances and also the impact of the architectural change we evaluated in \cref{sec:transformer}.}
+  \label{tab:tae_vs_taeT_and_cross_data}
+  \centering
+  \subcaptionbox{%
+    Comparison of the original TAE and its adaption with $\FC_v$.
+    The overall accuracy on FR-\tilename{T31TFM} for the approach of \citeauthor{Garnot20:SIT} is given twice: 
+    once it was obtained from the checkpoint provided by the authors and once by training from scratch. 
+    The last column indicates how many trainable parameters each of the network variants comprises.\label{tab:tae_vs_taeT_subtable}}
+                {\tabCompareTAECode}\hfill
+  \subcaptionbox{%
+    Analogous to \subref{tab:tae_vs_taeT_subtable}, both versions of the models were trained on FR-\tilename{T31TFM}, but this time tested on the unseen region SI034 of the SI-\tilename{T33TWM} dataset. 
+    This practice is often referred to as cross-dataset evaluation.\label{tab:cross_data_subtable}}
+                {\tabCrossDataCode}
+\end{table}
+}
+
+\newcommand{\tabResultsTrainedRegionalCode}{%
+  \begin{tabular}{@{}Xyyyy@{}}
+    \toprule
+    \multicolumn{1}{@{}X}{Model variant} 
+    & \multicolumn{2}{X}{top-20-F classes} & \multicolumn{2}{X@{}}{top-20-S classes} \\
+    \cmidrule(lr){2-3} \cmidrule(l){4-5}
+    & \multicolumn{1}{X}{random split}  & \multicolumn{1}{X}{regional split} 
+    & \multicolumn{1}{X}{random split}  & \multicolumn{1}{X@{}}{regional split}\\
+    \cmidrule(r){1-1} \cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(l){5-5}
+    \addlinespace
+    TAE 
+    \parencite{Garnot20:SIT}         & 90.92          & 89.80           & 87.42          & 83.84 \\
+    TAE with $\FC_v$  
+    \parencite{Vaswani17:Attention}  & 90.88          & 89.50           & 87.50          & 83.86 \\
+    \addlinespace
+    \bottomrule
+  \end{tabular}
+}
+
+\newcommand{\tabResultsTrainedRegional}{%
+\begin{table}[t]
+  \caption[Table2]{Results of the proposed method and our adapted version of it when being trained on SI-\tilename{T33TWM}. Generally, we evaluated four different scenarios where we used two different label files with each time two different ways of splitting the test set from the training set. The labels either represented the top 20 crop type classes found in the FR-\tilename{T31TFM} dataset (top-20-F) or the top 20 classes from the region of SI-\tilename{T33TWM} (top-20-S). As we set the parcels from one region of Slovenia aside, we were able to evaluate the methods not only on the proposed randomly drawn, but also on a regionally separated test set. It is necessary to recollect that with the stated top-20-F classes the entire dataset has less crop types to classify, which is illustrated in \cref{fig_top20F_for_S}.}
+  \label{tab:trained_on_ours_plus_regional}
+  \centering
+  \tabResultsTrainedRegionalCode
+\end{table}
+}

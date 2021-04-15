@@ -1,0 +1,26 @@
+\pgfplotstablesort[
+  col sep=comma, 
+  sort cmp=float >,
+  sort key={Absolute Occurrence}, 
+]
+{\datatablesorted}
+{./data/F_top20F.txt}%
+% {/home/koerner/doc/papers/2020_RC/Reproducibility_Challenge_2020/data/F_top20F.txt}%
+%
+\begin{tikzpicture}
+  \begin{axis}[
+    width=.5\linewidth,
+    width=.35\linewidth,
+    height=4cm,
+    crop bar,
+    ymode = log, log origin=infty, log ticks with fixed point, 
+    ymax=1, ymin=.5e-3,
+    xtick=data,
+    xticklabels from table={\datatablesorted}{Crop Name},
+    ylabel style={inner sep=0pt},
+]
+    \addplot[freq bar, fill=fireorange] table [x expr=\coordindex, y={Relative Occurrence}]{\datatablesorted};
+    \addlegendentry{France}
+  \end{axis}
+%  \draw (current bounding box.north west) rectangle (current bounding box.south east);
+\end{tikzpicture}%

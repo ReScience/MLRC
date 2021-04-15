@@ -1,0 +1,27 @@
+\pgfplotstablesort[
+  col sep=comma, 
+  sort cmp=float >,
+  sort key={Absolute Occurrence}, 
+]
+{\datatablesorted}%
+{./data/S_top20S.txt}%
+% {/home/koerner/doc/papers/2020_RC/Reproducibility_Challenge_2020/data/S_top20S.txt}%
+%
+\begin{tikzpicture}%[trim axis left,trim axis right]
+  \begin{axis}[
+    width=.35\linewidth,
+    height=4cm,
+    crop bar,
+    ymode = log, log origin=infty, log ticks with fixed point, 
+    ymax=1, ymin=.5e-3,
+    xtick=data,
+    xticklabels from table={\datatablesorted}{Crop Name},
+    yticklabels=\empty,
+    xlabel=\empty, xlabel style={overlay},
+    ylabel=\empty, ylabel style={overlay},
+]
+    \addplot[freq bar, fill=bluechill] table [x expr=\coordindex, y={Relative Occurrence}]{\datatablesorted};
+    \addlegendentry{Slovenia}
+  \end{axis}
+% \draw (current bounding box.north east) rectangle (current bounding box.south west); % just for debugging
+\end{tikzpicture}%
