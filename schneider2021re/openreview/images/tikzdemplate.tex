@@ -1,0 +1,129 @@
+﻿\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[nonatbib]{neurips_2019}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts,amsmath}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{pifont}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[normalem]{ulem}
+\newif{\ifhidecomments}
+\usepackage{tumcolors}
+\usepackage{tumabbrev}
+
+
+\usepackage[
+  binary-units=true,
+  detect-all,
+]{siunitx}
+
+%\input{notation.tex}
+
+\usepackage{tikz,pgf}
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+\usetikzlibrary{positioning}
+
+\usepackage{pgfplotstable}
+
+\input{pgfstyles.pgf}
+
+
+\usepackage{subcaption}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Blbliography
+\usepackage[
+  backend=biber,
+%  bibstyle=ieee,
+%  citestyle=numeric-comp,
+  sortcites=true,
+  %   sorting=ydnt,
+  maxnames=3,
+  minnames=1,
+  maxbibnames=99,
+  hyperref=true,
+  %   style=ieee,
+  style=authoryear-comp,
+%     style=apa,
+%  dashed=false,
+  url=false,
+  isbn=false,
+%  doi=false,
+%  backref=false,
+  uniquename=false,
+]{biblatex}
+
+\DeclareNameAlias{sortname}{first-last}
+
+\let\etal\undefined
+\makeatletter
+\newcommand*{\etal}{%
+  \@ifnextchar{.}
+  {\textit{et\,al}}
+  {\@ifnextchar{,}
+    {\textit{et\,al}.}
+    {\textit{et\,al}.\,}}%
+}
+\makeatother
+\renewcommand*{\nameyeardelim}{\addcomma\addspace}
+\DefineBibliographyStrings{english}{%
+  andothers = {\etal\isdot}
+}
+
+\addbibresource{bib/bib.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[capitalize]{cleveref}
+\usepackage{csquotes}
+
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{multirow}
+
+\newcolumntype{x}{l}
+\newcolumntype{X}{>{\scriptsize}l}
+\newcolumntype{v}[1]{>{\raggedright\hspace{0pt}}p{#1}}
+\newcolumntype{V}[1]{>{\scriptsize\raggedright\hspace{0pt}}p{#1}}
+\usepackage{rotating}
+\newcommand{\minitab}[2][l]{\begin{tabular}{#1}#2\end{tabular}}
+
+
+\usepackage{eurosym}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%\begin{figure}
+\hrulefill\\
+<>
+%\caption{Test figure}
+\hrulefill
+%\end{figure}
+
+\end{document}

@@ -1,0 +1,72 @@
+\newcommand{\figArchitecture}{%
+\begin{figure}[t]
+  \centering
+  \subcaptionbox{The temporal attention encoder according to the presented paper, where the values $v$ are not calculated specifically, but the sum of $e$ and $p$ is directly passed through to the dot product.\label{fig:tae_transformer_garnot}}{\input{images/att1.pgf}}
+  \subcaptionbox{Our adaption of the temporal attention encoder with the additional fully-connected layer $\FC_v$, as mentioned in \citetitle{Vaswani17:Attention} by \textcite{Vaswani17:Attention}.\label{fig:tae_transformer_Adapted}}{\input{images/att2.pgf}}
+  \caption{%
+    Illustration of the architectural difference between \subref{fig:tae_transformer_garnot} the proposed temporal attention encoder and \subref{fig:tae_transformer_Adapted} the extended version of it presented in this study.
+    While \citeauthor{Garnot20:SIT} approached satellite image time series classification with a lightweight adaption of the Transformer architecture \parencite{Vaswani17:Attention}, we kept the original third fully-connected layer $\FC_v$.
+    The additional building blocks of the surveyed method---namely the encoder, positional encoding, attention, and final $\MLP$---remained unchanged.
+    This schematic representation does not include the multi-head attention, which mainly influences the \emph{attention} module and would increase the complexity unnecessarily.
+  }
+  \label{fig:tae_transformer}
+\end{figure}
+}
+
+\newcommand{\figMapSlo}{%
+\begin{figure}
+  \centering
+  \includegraphics[width=7.5cm]{images/map_slo3}
+  \caption{%
+    Schematic illustration of the additional SI-\tilename{T33TWM} dataset located in Slovenia with reference crop parcels mainly covering the north-eastern part of the country.
+    While the blue areas are used to evaluate the train and test procedure proposed by \citeauthor{Garnot20:SIT}, the yellow area was set aside in advance.
+    This way, we ensured to have an extra regionally differentiated test set that does not suffer from the issue of spatial autocorrelation.
+  }
+  \label{fig:map_slo}
+\end{figure}
+}
+
+\newcommand{\figDatasetStatistics}{%
+\newsavebox{\imagebox}%
+\begin{figure}[t]
+  \centering
+  \savebox{\imagebox}{\input{images/dataset_statistics_slovenia.pgf}}%
+  \begin{subfigure}[t]{.32\linewidth}
+    \centering
+    \raisebox{\dimexpr\ht\imagebox-\height}{%
+      \input{images/dataset_statistics_france.pgf}%
+    }%
+    \caption{%
+      The relative class occurrence of the crop types in the FR-\tilename{T31TFM} dataset provided by the authors of the reproduced paper.
+    }
+    \label{fig:fr_top_20_bar}
+  \end{subfigure}%
+  \hfill%
+  \begin{subfigure}[t]{.32\linewidth}
+    \centering\raisebox{\dimexpr\ht\imagebox-\height}{%
+      \input{images/dataset_statistics_slovenia.pgf}%
+    }%
+    \caption{%
+      The class distribution of 20 most frequent classes of the newly constructed SI-\tilename{T33TWM} dataset.\label{fig:sl_top_20_bar}
+    }
+  \end{subfigure}%
+  \hfill%
+  \begin{subfigure}[t]{.32\linewidth}
+    \centering\raisebox{\dimexpr\ht\imagebox-\height}{%
+      \input{images/dataset_statistics_france_slovenia.pgf}%
+    }%
+    \caption{%
+      A comparison of the in \subref{fig:fr_top_20_bar} shown class distribution and the relative occurrence of these classes in the new SI-\tilename{T33TWM} dataset. 
+      This shows that training and testing on the SI-\tilename{T33TWM} while using the top-20-F labels will lead to fewer classes in total.\label{fig_top20F_for_S}
+    }
+    \label{fig_top20F_for_S}
+  \end{subfigure}
+
+  \caption{%
+    Statistics on the different datasets used in this study. 
+    As the data harmonisation was done by hand, the class names of one dataset might include differently named crop types from the other dataset and vice versa. 
+    We point out that the relative occurrence is indicated in $\log$-scale, highlighting the strong class imbalance towards meadow.
+  }
+  \label{fig:dataset_stats}
+\end{figure}
+}
