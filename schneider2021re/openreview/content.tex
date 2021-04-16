@@ -221,7 +221,7 @@ The necessary normalisation parameters had likewise to be calculated manually, a
 Contrasting the description given in the paper under investigation, the sequential order of components within this geometry feature vector differed in a way that its second element appeared not to be the \emph{pixel count} $\NPixels$ but rather, as we assume from looking at the original dataset, the area of the bounding box.
 Considering the labels, we prepared two versions: 
 One file with the previously stated top-20 crop classes from the original dataset, called top-20-F, and another one containing the top-20 classes from our alternatively chosen region, analogously named top-20-S and illustrated in \cref{fig:sl_top_20_bar}.
-Since the crop cultivation in Slovenia differs from France, several classes of the original top-20-F were not represented in the new dataset, as shown in \cref{fig_top20F_for_S}.
+Since the crop cultivation in Slovenia differs from France, several classes of the original top-20-F were not represented in the new dataset, as shown in \cref{fig:top20F_for_S}.
 This appears to render the classification on top-20-F an easier problem than on top-20-S.
 \Cref{sec:testset} will provide more background regarding the split of the dataset and to one of the particular difficulties inherent to geospatial data, which is why we put one region aside in advance.
 This way, we were able to evaluate the performance of the method also on regionally unseen data.
@@ -267,16 +267,16 @@ On the one hand, we will discuss the insights we have gained by reproducing the 
 
 \subsection{Reproducibility of the method}
 
-When reimplementing the full architecture, we found that, despite having all parameters at hand, it would have been helpful to have access to more information concerning the data preprocessing and organisation, as well as to the adaption of the original Transformer model, to achieve performance similar to that reported by the authors.
+When reimplementing the full architecture, we found that, despite having all parameters at hand, it would have been helpful to have access to more information concerning the data preprocessing and organisation, as well as to the adaption of the original Transformer model \parencite{Vaswani17:Attention}, to achieve performance similar to that reported by the authors.
 From our perspective, we cannot tell whether or not better \python programming skills would have been beneficial and if someone with more experience with the multi-head attention would have been able to understand and implement the method right away.
 In any case, the authors certainly developed a coherent methodology and, by providing the corresponding code alongside with the paper, have ensured that all interested parties can clearly follow their ideas.
 
 As a result of our misinterpretation of the Transformer adaptation proposed by \citeauthor{Garnot20:SIT}, we came across an alternative approach that performed comparably well as the one from the paper, but requiring only \SI{80}{\percent} of its parameters.
-When we asked the authors about this observation, we concluded that we all had different opinions on the most obvious derivative of the method developed by \citeauthor{Vaswani17:Attention} applied to the problem of satellite time series classification.
+When we asked the authors about this observation, we concluded that we all had different opinions on the most obvious derivative of the method developed by \textcite{Vaswani17:Attention} applied to the problem of satellite time series classification.
 Upon request, the authors of the Transformer paper confirmed that keeping the fully-connected layer $\FC_v$ has proven to be helpful and acknowledged the validity of our approach.
 Under these circumstances, it is not straightforwardly answerable whether the implicit claim of having the Transformer adapted in the papers' way can be supported.
 
-However, it can be said that the well-documented code and clean GitHub repository contributed strongly to our understanding of the method and helped us answer most of our comprehension question.
+However, it can be said that the well-documented code and clean \GitHub repository contributed strongly to our understanding of the method and helped us answer most of our comprehension question.
 Since this all is publicly available, a reproduction of the presented method based on that implementation is possible.
 
 
