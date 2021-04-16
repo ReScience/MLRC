@@ -113,7 +113,7 @@ Following the original paper, we used $L_{1}$ loss for training our model on rea
 \centering
 \caption{Details of our model implementation.}
 \label{tab:long}
-\begin{tabular}{P|P|P|P|P}
+\begin{tabular}{c|c|c|c|c}
 \textbf{Module Name}    & \textbf{Kernel Size} & \textbf{\# of Channels} & \textbf{Stride} & \textbf{Non-linearity} \\ \hline
 Conv1                   & $1\times1$           & 3 $\rightarrow$ 32      & 1               & Leaky ReLU(0.2)        \\
 ResBlock1               & $3\times3$           & 32 $\rightarrow$32      & 1               & Leaky ReLU(0.2)        \\
@@ -150,7 +150,7 @@ ConvOut                 & $3\times3$           & 35 $\rightarrow$ 3      & 1    
 
  \subsection{Datasets}
 %For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
-The original paper uses SIDD Medium \cite{SIDD_2018_CVPR} and RENOIR \cite{BLP:journals/corr/AnayaB14} datasets during training for denoising real noisy images and reports the qualitative and quantitative results on DND \cite{8099777} and SIDD validation \cite{SIDD_2018_CVPR} datasets. Since the author's code only provides the data loader for synthetic image datasets, we have integrated our SIDD validation data loader implementation and the DND test script provided by TU Darmstadt \cite{8099777} to our pipeline. For synthetic noise removal, additive white Gaussian noise with standard deviation of 30, 50 and 70 have been added to DIV2K dataset \cite{Agustsson_2017_CVPR_Workshops}, which consists 800 high resolution images. To validate the performance of SADNet on synthetic noise removal task, the models are tested on BSD68 \cite{937655} and Kodak24 datasets processed with the same noise addition mechanism.
+The original paper uses SIDD Medium \cite{SIDD_2018_CVPR} and RENOIR \cite{renoir} datasets during training for denoising real noisy images and reports the qualitative and quantitative results on DND \cite{8099777} and SIDD validation \cite{SIDD_2018_CVPR} datasets. Since the author's code only provides the data loader for synthetic image datasets, we have integrated our SIDD validation data loader implementation and the DND test script provided by TU Darmstadt \cite{8099777} to our pipeline. For synthetic noise removal, additive white Gaussian noise with standard deviation of 30, 50 and 70 have been added to DIV2K dataset \cite{Agustsson_2017_CVPR_Workshops}, which consists 800 high resolution images. To validate the performance of SADNet on synthetic noise removal task, the models are tested on BSD68 \cite{937655} and Kodak24 datasets processed with the same noise addition mechanism.
  
 Both test and validation data for all settings are composed of high resolution images. Therefore, they are fed to the model as 128x128 patches cropped by fixed coordinates, as described in the paper. We have applied $90\degree$ rotation, horizontal and vertical flipping to the images during training, following the practice in the paper.
 
@@ -167,7 +167,7 @@ In our replication study, we used the ADAM optimizer \cite{kingma:adam} with $ \
 \centering
   \caption{Quantitative results on SIDD sRGB validation dataset. Compared methods: CBM3D \cite{4378954}, CDnCNN-B \cite{zhang2017beyond}, CBDNet \cite{Guo2019Cbdnet}, PD \cite{Zhou_Jiao_Huang_Wang_Wang_Shi_Huang_2020}, RIDNet \cite{anwar2019ridnet}, SADNet \cite{10.1007/978-3-030-58577-8_11}.}
 \resizebox{\linewidth}{!}{
-        \begin{tabular}{PPPPPPPP}
+        \begin{tabular}{cccccccc}
             \hline
             \textbf{Method}  & \textbf{CBM3D}  & \textbf{CDnCNN-B}  & \textbf{CBDNet}  & \textbf{PD}  & \textbf{RIDNet} & \textbf{SADNet} & \textbf{SADNet (ours)} \\
             \hline \hline
@@ -205,7 +205,7 @@ In our replication study, we used the ADAM optimizer \cite{kingma:adam} with $ \
 \subsection{Experimental setup}
 %Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). Provide a link to your code.
 
-In this study, we have followed the same training procedures for all setting, and employed SSIM and PSNR values as performance metrics, as described in the original paper. The parameters for all training settings can be found in the configuration file in our GitHub repository. Our implementation and the trained weights are open-sourced, and can be accessed at \url{https://anonymous.4open.science/r/96f7ac9a-be7b-4d7a-ac10-44da93e6948c/}.
+In this study, we have followed the same training procedures for all setting, and employed SSIM and PSNR values as performance metrics, as described in the original paper. The parameters for all training settings can be found in the configuration file in our GitHub repository. Our implementation and the trained weights are open-sourced, and can be accessed at \url{https://github.com/sami-automatic/SADNet_Replication}.
 
 
 \subsection{Computational requirements}
