@@ -1,0 +1,26 @@
+\documentclass{article}
+
+\usepackage[a4paper, total={6.5in, 8in}]{geometry}
+
+
+\begin{document}
+\section*{Claim: Parameterized Explainer for Graph Neural Network}
+In the paper \textit{Parameterized Explainer for Graph Neural Networks} \cite{luo2020parameterized} the authors propose a novel approach for explaining Graph Neural Network, named \textit{PGExplainer}. According to the authors, and validated by the empirical evaluation, their proposed method outperforms the previous State-Of-The-Art (SOTA) method for explaining graphs \textit{GNNExplainer} \cite{ying2019gnnexplainer}.\\
+\\
+Based on a first impression, the authors use a well founded set of experiments to evaluate the explanations produced by the PGExplainer. The authors consider both a qualitative and quantitative comparison as well as a evaluation of the models efficiency. The results presented by the authors show that PGExplainer outperforms GNNExplainer in all experiments.\\
+\\
+Based on a more in-depth look at their experimental setup, we have however found a few experimental design choices that we believe warrant a second look. Specifically, the authors implemented the PGExplainer method using the Tensorflow library while the GNNExplainer method was implemented using PyTorch. Due to this difference, and there being no clear statement in the paper, we are not certain the evaluated explanations are generated for the same model. This believe is strengthened by the authors choice to not include code of the baseline models, and the reuse of the scores from the GNNExplainer paper in the quantitative evaluation (including some copy-paste mistakes).\\ 
+\\
+As the quality of an explanation is highly dependent on the model it aims to explain, we therefore believe that it will be worthwhile to re-implement the PGExplainer using PyTorch. By doing so, a more direct comparison can be made using the models trained for the GNNExplainer. More specifically, we aim to reevaluate the PGExplainer qualitatively, quantitatively, and its efficiency using a framework that it was not initially designed for. \\
+\\
+We also aim to extend the comparison between PGExplainer and GNNExplainer by;
+\begin{enumerate}
+    \item Evaluating PGExplainer using the \textit{Reddit-Binary} dataset. This is the one dataset used in the GNNExplainer paper that the PGExplainer was not evaluated on.
+    \item Evaluating GNNExplainer using the \textit{BA-2motifs} dataset. This synthetic dataset is newly introduced in the PGExplainer paper and therefore not evaluated earlier for the GNNExplainer. As the authors of the PGExplainer use this dataset specifically for claiming 24.7\% improvement over SOTA, we deem it especially important to redo this evaluation in a unified framework. 
+    \item Evaluating both PGExplainer and GNNExplainer on a new synthetic dataset that was not used for evaluating any of the methods before. 
+\end{enumerate}
+
+\bibliographystyle{abbrv}
+\bibliography{references.bib}
+
+\end{document}

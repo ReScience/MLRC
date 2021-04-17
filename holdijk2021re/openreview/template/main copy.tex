@@ -1,0 +1,197 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+\usepackage{neurips_2019} 
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{neurips_2019}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{comment}
+\usepackage[shortlabels]{enumitem}
+% required for json print
+\usepackage[utf8]{inputenc}
+\usepackage{minted}
+% \usepackage{booktabs}
+\usepackage{multirow}
+\title{[Re] Parameterized Explainer for Graph Neural Network}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+% \author{%
+%   Lars ~Holdijk \\
+%   University of Amsterdam\\
+%   \texttt{lars.holdijk@student.uva.nl} \And
+%   Maarten ~Boon \\
+%   University of Amsterdam\\
+%   \texttt{maarten.boon@student.uva.nl} \And 
+%   Lysander ~de Jong \\
+%   University of Amsterdam\\
+%   \texttt{lysander.dejong@student.uva.nl} \And
+%   Stijn ~Henckens \\
+%   University of Amsterdam\\
+%   \texttt{stijn.henckens@student.uva.nl} \\
+%   % examples of more authors
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+%   % \AND
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+% }
+
+\author{%
+  Maarten ~Boon, Stijn ~Henckens, Lars ~Holdijk, Lysander ~de Jong \\
+  10764399, 10716645, 13072153, 11788674
+}
+
+\begin{document}
+
+\maketitle
+\section*{\centering Reproducibility Summary}
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsection*{Scope of Reproducibility}
+
+In this work we perform a replication study of the paper \textit{Parameterized Explainer for Graph Neural Network}. The replication experiment focuses on three main claims: (1) Is it possible to reimplement the proposed method in a different framework? (2) Do the main claims with respect to the GNNExplainer hold? (3) Is the used evaluation method a valid method for explaining the classification decision by Graph Neural Networks? 
+
+\subsection*{Methodology}
+
+The authors' TensorFlow code was largely used as starting point for our reimplementation in PyTorch. However, large parts of the evaluation setup were missing and differences were found between the listed configurations in the paper and the code. As a result, our codebase contains a large portion of novel code and introduces a different method for tracking experimental configurations. Using the new codebase all experiments are replicated. In addition to this, a short ablation study is performed.
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+
+\subsection*{Results}
+Due to numerous inconsistencies between code and paper, it is not possible to replicate the original results using the paper alone. With help of the original codebase, a number of the original results can be retrieved. The main comparison claim of the paper, to improve over the preceding GNNExplainer, does hold. However, after performing the replication experiments, some questions regarding the validity of the used evaluation setup in the original paper remain. 
+
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsection*{What was easy}
+
+The method proposed by the authors for explaining the Graph Neural Networks is easy to comprehend and intuitive. Re-implementation of the method is straightforward using a modern deep learning framework. The datasets used for the experimental setup were all provided together with their codebase. 
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+\subsection*{What was difficult}
+
+The main difficulty arose from the difference between the experimental configurations discussed in the paper and implemented in the code. There were a number of small inconsistencies (eg. incorrect hyperparameter settings), but also some major ones (eg. using batch-normalization in training mode during evaluation). This issue was worsened by the fractured reporting of configurations in the code. 
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsection*{Communication with original authors}
+Contact was made with the authors on two occasions. During the first exchange the authors confirmed a number of clarifying questions and confirmed that the configurations as presented in the codebase were to be used instead of those provided in the paper. In the second exchange our reservations concerning the used experimental evaluation were conveyed to the authors. The authors did not share our concerns. 
+% Briefly describe how much contact you had with the original authors (if any).
+
+\newpage % Simulate a very long abstract
+\section{Introduction}
+Graph Neural Networks (GNNs) emerged as state-of-the-art models in machine learning, capturing both graph structure and node features through recursively incorporating a graph's previous node information. GNNs are able to deliver state-of-the-art performances in matters such as graph/node classification and link prediction.
+
+As for most Neural Networks, the 'reasoning' towards classification inside GNNs is not intuitive to humans. The authors of the paper \textit{GNNExplainer: Generating Explanations for Graph Neural Networks} \cite{ying2019gnnexplainer} address this problem and try to solve it by introducing \textsc{GNNExplainer}; an optimization task that maximizes the mutual information between a GNN's prediction and a distribution of possible sub-graph structures. The GNNExplainer's algorithm can identify the sub-graph and node structure responsible for a given classification.
+Based on the work done in \cite{ying2019gnnexplainer}, Luo, D. et al. claim to have further developed GNNExplainer in their paper \textit{Parameterized Explainer for Graph Neural Network} \cite{luo2020parameterized}. The paper introduces \textsc{PGExplainer}; a general parameterized explainer that applies to any GNN based models in both transductive and inductive settings. 
+
+The authors of the paper first formulate the learning objective of PGExplainer. Using the same datasets as \cite{ying2019gnnexplainer}, they claim to outperform GNNExplainer up to $24.7\%$ in Area under the ROC Curve (AUC) \cite{Hanley1982roc-auc} score. Furthermore the authors state that PGExplainer can speed up computations up to $108$ times faster than GNNExplainer. These and further claims made in the PGExplainer paper will be evaluated in this report by replicating and extending the performed evaluation in a replication study.
+
+\paragraph{Scope of reproducibility}\label{sec:scope}
+The focus of our reproducibility study is on the experimental comparison between the PGExplainer and the preceding GNNExplainer. The authors of the original PGExplainer paper include a number of other benchmarks in their evaluation, but focus their comparison primarily on the GNNExplainer. For this reason it makes sense for us to do the same. 
+
+In contrast to the original paper, we will base our entire comparison on reimplementations of both methods. In the original paper, the authors partly copy the results from the GNNExplainer and partly use their own re-implementation to obtain the GNNExplainer scores. In communication the authors stated that the decision to partly copy the results was made due to lackluster results in their own re-implementation. As the quality of an explanation is highly dependent on the model it aims to explain, we believe that it would be beneficial to re-implement both methods in the same framework and perform their evaluation on equal footing. We will use PyTorch as the framework for doing so. 
+
+For the reimplementation of the PGExplainer the authors' own TensorFlow-based codebase provided in their paper will be used as the main starting-point. However, during inspection of the codebase, we found that there are a number of significant differences between the configurations used for both the trained models that we wish to explain and the PGExplainer itself between what is described in the paper and what is actually implemented in the code. After discussing with the authors, the conclusion was reached that the configurations used in the code should serve as the starting point for the replication. Part of our reproduction experiment will focus on validating if these are indeed the correct configurations. 
+In short, our replication experiment aims to validate the following aspects of the original paper.
+
+\begin{enumerate}[(a)]
+    \item Given the original codebase and configuration files provided therein, is it possible to reimplement the PGExplainer method using a different framework? And if so, are the provided configurations sufficient to obtain the presented quantitative, qualitative and efficiency results. 
+    \item The authors claim that their PGExplaimer greatly improves over the previously proposed GNNExplainer. We aim to validate that this claim holds with both methods evaluated using the same framework and evaluation. 
+    \item Evaluation of explanation methods is notoriously hard. We wish to validate if the evaluation method used in the original paper is a sound approach for doing so.
+\end{enumerate}
+
+% we reimplement the PGExplainer using PyTorch. By doing so, a more direct comparison can be made using the models trained for the GNNExplainer. More specifically, we aim to reproduce and verify PGExplainer results, reevaluating the PGExplainer qualitatively, quantitatively, and its efficiency using a framework that it was not initially designed for.
+
+% In this work we check the reproducibility of the PGExplainer paper on two levels. First, we perform a \textit{simple} replication experiments of the evaluation performed in the paper itself. During inspection of the code base, we found that there are a number of significant difference between the configurations used for both the trained models that we wish to explain and the PGExplainer itself between what is described in the paper and what is actually implemented in the code. After discussing with the authors, the conclusion was reached that the configurations used in the code should serve as the starting point for the reproducibility check. During the replication experiment, we wish to validate that the configurations provided by the code base can be trusted. 
+
+% The second objective is to perform an extended reproduction check. While re-implementing the evaluation of the PGExplainer, a number of undefined strong assumptions were observed that could significantly impact the models evaluation. For example, the evaluation is only performed over a subset of the available samples. Most of which are part of the training set. During the extended reproduction check, we validate that the improvements seen in the paper are not a result of these assumptions. 
+
+% Additionally, the extended reproducibility check is used to validate the influence of the used frameworks for the evaluation. The authors implemented the PGExplainer method using the TensorFlow \cite{tensorflow2015-whitepaper} library, while the GNNExplainer method is implemented using PyTorch. Due to a lack of the authors' motivation to proceed using TensorFlow instead of PyTorch, we are uncertain about evaluated explanations generated for the same model. This uncertainty is strengthened by the authors choice not to include code of the baseline models, and reuse scores from the GNNExplainer paper in the quantitative evaluation. As the quality of an explanation is highly dependent on the model it aims to explain, we re-implement the PGExplainer using PyTorch. By doing so, a more direct comparison can be made using the models trained for the GNNExplainer. More specifically, we aim to reproduce and verify PGExplainer results, reevaluating the PGExplainer qualitatively, quantitatively, and its efficiency using a framework that it was not initially designed for. 
+
+The remainder of this work will be structured as follows. In the next section we will provide the needed background on the PGExplainer. Following this, we will provide a short overview of the codebase accompanying this reproduction. In section \ref{sec:replication}, we will discuss the original experimental setup in depth and highlight some key components not discussed in the original paper. Section \ref{sec:results} will present the replicated results and compare them to the original paper. Based on the highlighted components in section \ref{sec:replication} and some results presented in section \ref{sec:results}, section \ref{sec6} will raise some question regarding the evaluation setup used. In the last section, we will summarize our replication. 
+
+% The remainder of this work will be structured as follows. In the next section, we will provide the needed background on the PGExplainer. Following this, we will provide a short overview of the code base accompanying this reproducibility check. In section 4 and 5 we will present the replication and extend reproduction check respectively. Each section will include an overview of the experimental setup, the obtained results as well as an discussion of these results. In the last section, the conclusion, we will summarize the reproducibility check and provide an overview of the main issues found. 
+
+\input{sections/PGExplainer}
+\input{sections/Reimplementation}
+\input{sections/methodology}
+\input{sections/Results}
+\input{sections/critique}
+\input{sections/Conclusion}
+
+% \section{Reproducibility}\label{sec:reproducibility} This section shows our re-implementation and describes how we will test the claims described in Section \ref{sec:scope}.
+
+% \subsection{Re-implementation}
+% % Reddit-binary dataset
+
+
+% \subsection{Codebase}
+% Describes the re-implementation in PyTorch and tweaks needed in the code.
+
+% \subsection{Reproduced experimental setup}
+% Describes the reproducibility experiments, including the extra evaluations, and the used computer specs, etc.
+
+% \section{Results and evaluation}\label{sec:results}
+% This section presents the results obtained after reproduction and evaluates the results. This section also shows the results of the claims that were tested.
+
+% \subsection{Comparative evaluation}
+
+% \subsection{Additional evaluation \ref{scope3}}
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{references.bib}
+
+\input{sections/supplementary}
+
+\end{document}
+
+

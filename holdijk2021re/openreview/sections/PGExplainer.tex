@@ -1,0 +1,44 @@
+\section{PGExplainer}\label{sec:PGE}
+% In this section we provide a short overview of the main functionality of the PGExplainer. The main goal of this PGExplainer is to determine which subgraph is most influential for a Graph Neural Networks final classification for a given graph. 
+% \subsection{Learning objective}
+The authors start by dividing an input graph $G_o$ in two subgraphs, such that $G_o = G_s + \Delta G$. $G_s$ represents the \textit{explanatory graph} that makes important contributions towards the graph classification, while $\Delta G$ represents the remainder of the initial graph. The main task therefore is to find the optimal subgraph $G_s$. This is achieved through Mutual Information ($MI$) maximization:
+\begin{align}
+    \max _{G_{s}} \operatorname{MI}\left(Y_{o}, G_{s}\right)=H\left(Y_{o}\right)-H\left(Y_{o} \mid G=G_{s}\right),
+\end{align}
+Which uses the GNN's classification prediction $Y_o$ and its input $G_o$. The MI maximization is done by deducting the conditional entropy from the marginal entropy. Which is equivalent to minimizing the conditional entropy.
+% Which is equivalent to minimizing the conditional entropy.
+
+To avoid having an exploding exponential amount of candidates, the authors assume the explanatory graphs used are Gilbert random graphs \cite{Gilbert1959}, where selections of edges from the original input graph $G_o$ are conditionally independent to each other. 
+Using relaxation, the learning objective is rewritten as
+\begin{align}
+    \min _{G_{s}} \mathbb{E}_{G_{s}}\left[H\left(Y_{o} \mid G=G_{s}\right)\right] \approx \min _{\Theta} \mathbb{E}_{G_{s} \sim q(\Theta)}\left[H\left(Y_{o} \mid G=G_{s}\right)\right],
+\end{align}
+where $q(\Theta)$ is the distribution of the parameterized explanatory graph. Each graph edge obtains a continuous variable in range $(0, 1)$.
+
+A random graph $\hat{G}_s$ is sampled from edge distributions and fed to the trained GNN model obtaining prediction $\hat{Y}_s$. Following \cite{ying2019gnnexplainer}, the authors modify the conditional entropy with cross-entropy $H(Y_o,\hat{Y}_s)$, where $\hat{Y}_s$ is the prediction of the GNN model with $\hat{G}_s$ as input. Using Monte Carlo approximation, the learning objective becomes
+\begin{align}
+    \min _{\Omega}-\frac{1}{K} \sum_{k=1}^{K} \sum_{c=1}^{C} P_{\Phi}\left(Y=c \mid G=G_{o}\right) \log P_{\Phi}\left(Y=c \mid G=\hat{G}_{s}^{(k)}\right),
+\end{align}
+with $\Phi$ as the parameters in the trained GNN, $K$ as the number of sampled graphs, $C$ as the number of labels and $\hat{G}_s^{(k)}$ the $k$-th sampled graph, parameterized by $\Omega$.
+
+Furthermore, PGExplainer is used to collectively provide explainations for multiple instances $\mathcal{I}$. The authors present the learning objective of this set of instances as follows.
+\begin{align}
+    \min _{\Psi}-\sum_{i \in \mathcal{I}} \sum_{k=1}^{K} \sum_{c=1}^{C} P_{\Phi}\left(Y=c \mid G=G_{o}^{(i)}\right) \log P_{\Phi}\left(Y=c \mid G=\hat{G}_{s}^{(i, k)}\right)
+\end{align}
+Here $\Psi$ are parameters in the explanation network, $G^{(i)}$ the input graph and $\hat{G}^{(i, k)}$ the $k$-th sampled graph for the $i$-th instance.
+Using the above, the authors consider two explainer instances; one for node classification and one for graph classification. Both cases use a MLP parameterized by $\Psi$.
+%returns masks with weighted edges
+
+% \subsection{Original results}
+% We focus in our reevaluation on the comparison between PGExplainer and GNNExplainer. In the original evaluation the authors do consider additional benchmarks;  a gradient-based model (GRAD) \cite{ying2019gnnexplainer}, a graph attention network (ATT) \cite{velivckovic2017graph} and Gradient \cite{pope2019explainability}.
+
+
+% \paragraph{Qualitative evaluation}
+
+% Table \ref{tab:results} also shows the bold printed top-$K$ important edges. Here $K$ is the number of edges inside motifs for synthetic datasets and $10$ for MUTAG. The authors show that all motifs are correctly identified by PGExplainer, while at the same time including important edges missed by GNNExplainer.
+
+% \paragraph{Quantitative evaluation}
+% PGExplainer seems to achieve SOTA performances in all scenarios with accuracy gains up to $13.0\%$ in node classification and $24.7\%$ in graph classification.
+
+% \paragraph{Efficiency evaluation}
+% GNNExplainer has to retrain its model for every explaining instance. Since PGExplainer trains a general parameterized model, the authors claim to achieve a computational speed-up up to $108$ times, compared to the inference time of GNNExplainer (see Table \ref{tab:results}).
