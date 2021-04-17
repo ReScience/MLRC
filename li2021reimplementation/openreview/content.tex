@@ -1,0 +1,20 @@
+
+\begin{abstract}
+FixMatch is a semi-supervised learning method, which achieves comparable results with fully supervised learning by leveraging a limited number of labeled data (pseudo labelling technique) and taking a good use of the unlabeled data (consistency regularization ). 
+In this work, we reimplement FixMatch and achieve reasonably comparable performance with the official implementation, which supports that FixMatch outperforms semi-superivesed learning benchmarks and demonstrates that the author's choices with respect to those ablations were experimentally sound.
+ Next, we investigate the existence of a major problem of FixMatch, \textit{confirmation errors}, by reconstructing the batch structure during the training process. It reveals existing confirmation errors, especially the ones caused by \textit{asymmetric noise} in pseudo labels. 
+To deal with the problem, we apply equal-frequency and confidence entropy regularization to the labeled data and add them in the loss function. Our experimental results on CIFAR-10 show that using either of the entropy regularization in the loss function can reduce the asymmetric noise in pseudo labels and improve the performance of FixMatch in the presence of (pseudo) labels containing (asymmetric) noise. Our code is available at the url: \url{https://github.com/Celiali/FixMatch}.
+\end{abstract}
+
+% \input{essay}
+\input{intro.tex}
+\input{related work.tex}
+\input{methods.tex}
+\input{data.tex}
+\input{exp.tex}
+\input{challenge.tex}
+\input{conclusions.tex}
+\input{ethical.tex}
+% \input{self}
+\bibliography{ref.bib}
+\bibliographystyle{abbrvnat}

@@ -1,0 +1,28 @@
+\section{Introduction} \label{sec:intro}
+\citet{zoubin2020} summarized the reasons for the success of deep learning in his talk given as the chief scientist in Uber. Firstly, with the availability of large datasets, large models can work well. Secondly, training such large models with stochastic descent works surprisingly well. Moreover, staying close to identity (such as ReLU) makes it stable to be trained. The automate differentiation and a large number of open source softwares make it scale well. Therefore, we can see deep learning in many applications, such as computer vision, natural language processing, bioinformatics, etc. 
+
+However, it is not always the case where a huge number of labeled data are available. In some areas, it is difficult, expensive, or even impossible to have a large labeled dataset, such as medical images \citep{kuznetsova2018open}. In this case, it can be difficult to train a Deep Neural Network (DNN) from scratch with the limited labeled data. Luckily, \citet{tajbakhsh2016convolutional} shows that a DNN trained based on a pre-trained DNN, fine-tuning, can outperform the one trained from scratch. Moreover, Semi-Supervised Learning (SSL) is also a common method to deal with the scarcity and often high acquisition cost of labelled data \citep{pmlr-v124-kugelgen20a}. SSL efficiently leverages labeled data and the relation with unlabeled data to train a DNN.
+% Interestingly, among SSL methods, there is a class of methods of which names contain "Match", 
+Among SSL methods, there is a class of "match"-based methods,
+such as FixMatch \citep{sohn2020fixmatch}, MixMatch \citep{berthelot2019mixmatch}, ReMixMatch \citep{kurakin2020remixmatch} and DivideMatch \citep{li2020dividemix}. These methods utilize the consistency regularization, pseudo-labelling and ensembling methods to boost the performance with the use of unlabeled data. In fact, they are leveraging prior knowledge to regularize the training of DNNs.
+In this project, we focus on reproducing and investigating one of such methods, FixMatch \citep{sohn2020fixmatch}.
+
+Nevertheless, SSL is still facing many challenges in theory and in practice. \citet{ben2008does} show that “as long as one does not make any assumptions about the behavior of the
+labels, SSL cannot help much over algorithms that ignore
+the unlabeled data.” Moreover, SSL can actually degrade performance if certain assumptions are not met \citep{chapelle2010semi}. In this line of works, \citet{scholkopf2012causal} consider the problem from a causal modeling perspective and conclude that in fact SSL is impossible when predicting a target variable from its causes (causal learning) but possible from anti-causal learning. Recently, the relation of causality and semi-supervised learning is further explored in \citep{pmlr-v124-kugelgen20a}, i.e., predicting a target variable from both causes and effects at the same time. Moreover, in the light of consistency regularization and pseudo-labelling, a significant issue of the "Match"-based methods is \textit{confirmation error}. 
+It happens especially when noisy samples are in the labeled set. A DNN can keep having lower loss by fitting the noise and be further maintained after training with the wrong pseudo labels of unlabeled data , which keeps the errors in the model and limits its generalization and performance \citep{tarvainenweight}. This problem becomes more serious in the presence of asymmetric noise in the training labels, which roughly speaking tends to label a class of data as another specific class. 
+
+Therefore, in this work, we are not only reimplementing FixMatch, but also investigating whether the pseudo labels made by the DNN contain harmful noise leading to confirmation errors. 
+First, we design a stable and reliable method to examine the existence of confirmation errors and noisy pseudo labels by reconstructing the batch structure.
+Secondly, we find methods to deal with (asymmetric) noise in (pseudo) labels of the training dataset. 
+We reconstruct the batch structure and add an equal-frequency entropy regularization on labeled data to the loss function of FixMatch. 
+Moreover, we also use a confidence entropy regularization on labeled data to avoid the over-confident prediction. 
+It turns out that both entropy regularization is helpful for dealing with the noisy (pseudo) labels (even for the asymmetric noise) and confirmation errors.
+% Finally, we manually add asymmetric noise in the labeled data and compare the performance of baseline FixMatch, FixMathc with equal-frequency entropy regularization and FixMatch with the confidence entropy regularization.
+Our experimental results show that \\
+\begin{enumerate}
+\vspace{-0.5cm}
+    \item our implementation can achieve almost the same performance even better for low-label regimes.
+    \item there exists asymmetric noise in the pseudo labels leading to confirmation errors. With such pseudo labels, the model is biased which in turn leads to more asymmetric noise in pseudo labels.
+    \item FixMatch with equal-frequency entropy regularization and FixMatch with confidence entropy regularization can reduce (asymmetric) noise in the pseudo labels and perform better than the baseline FixMatch in the presence of asymmetric noise in (pseudo) labels .
+\end{enumerate}

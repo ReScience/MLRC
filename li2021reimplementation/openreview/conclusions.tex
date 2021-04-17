@@ -1,0 +1,11 @@
+\section{Conclusion}
+In this work, we study and reimplement FixMatch from scratch. We reproduced essential experiments, included the model performance on CIFAR 10, barely supervised learning, and ablation studies.
+Experimental results show that our implementation achieves similar performance as the original FixMatch results, which supports that FixMatch outperforms semi-superivesed learning benchmarks and that the author's choices with respect to those ablations were experimentally sound. 
+We also confirmed the existence of confirmation errors in pseudo labels by checking the prediction confusion matrix of unlabeled data in different training stages.
+% After that, 
+% We analyze the training procedure and figure out the potential severe confirmation errors. 
+% As a harmful and tricky source of the confirmation errors, asymmetric noise in the (pseudo) labels is thoroughly investigated. 
+We adapted the training batch structure to be composed of equal number of images in each class, which enable us to stably and reliably check the the asymmetric noise in the training phase. 
+% It shows that there exists asymmetric noise in pseudo labels of unlabeled data causing confirmation error. 
+Based on the reconstructed batch structure, we used the equal-frequency and confidence entropy regularization in the loss function, and theoretically show their relation. 
+The experiments indicate that these entropy regularization can reduce the asymmetric noise in pseudo labels and improves the performance of FixMatch in the presence of training labels with asymmetric noise.

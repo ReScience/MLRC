@@ -1,0 +1,50 @@
+\section{Methods}\label{sec:method}
+% The presentation of FixMatch is overall clear, but could be improved by first explaining where/why weak and strong augmentations are used, and then introducing the corresponding loss terms. For instance, consistency regularization suddenly appears in line 4 of page 4. If a reader is not familiar with FixMatch, he/she would be confused by this.
+\subsection{FixMatch} 
+As one of the SSL methods, FixMatch \citep{sohn2020fixmatch} leverages labeled data and introduces prior knowledge about unlabeled data in the training process. For labeled data, FixMatch simply uses the cross entropy loss function for a batch,
+\begin{eqnarray}
+l_s = \frac{1}{B}\sum_{b=1}^B H(y_b, f(\alpha(x_b))),
+\end{eqnarray}
+where $B$ is the number of labeled data in a batch, $x_b$ is a labeled sample, $y_b$ is the label, and $\alpha(\cdot)$ is weak augmentation.
+However, due to limited number of labeled samples, the performance of such DNN is not ideal. Therefore, the question is how to make a good use of the sufficient unlabeled data to improve the performance? Ideally, the performance can be close to the DNN trained with the fully labeled dataset.
+
+FixMatch considers the consistency of model prediction on the unlabeled data with weak and strong augmentation (the augmentation methods are introduced in Sec. \ref{sec:data}). It first uses the model to predict pseudo labels for unlabeled data and then compute the loss of unlabeled data with the pseudo labels and the consistency regularization. The loss function for the unlabeled samples $u_b$ is
+\begin{eqnarray}
+l_{u} = \frac{1}{\mu B}\sum_{b=1}^{\mu B} \mathbf{1}(\max(f(\alpha(u_b)))\geq\tau) H(\hat{y}_b, f(\mathcal{A}({u}_b))),\label{eq:bsl}
+\end{eqnarray}
+where $\mu B$ is the number of unlabeled data in a batch, $\hat{y}_b\coloneqq \arg\max_{y}p(y|\alpha(u_b);\theta_f)$ is the pseudo label of $u_b$, $\theta_f$ is the neural network parameters of function $f$, and $\mathcal{A}(\cdot)$ is the strong augmentation. 
+Note that to make pseudo labels reliable to be used, FixMatch considers the pseudo labels in the loss function only if the prediction has a higher probability than $\tau$. Next, together with the cross entropy loss of labeled data, the loss function of FixMatch is $l_s + \lambda_u l_u$. 
+
+\subsection{Investigation of noisy (pseudo) labels and confirmation errors of FixMatch}
+\paragraph{Nosiy pseudo labels and confirmation errors in FixMatch.} A main issue of "Match"-based SSL methods is confirmation errors. 
+Since FixMatch is trained on batches with both labeled and unlabeled data, it is very likely to make prediction errors at the beginning of the training.
+When the model makes wrong predictions of labeled data, since we have their ground-truth labels, the model can become better with the loss for labeled data. But when it comes to unlabeled samples, since we don't have the ground-truth labels, the model uses the confident pseudo labels as the labels for training. In this case, if the pseudo-labels are noisy, the model can fit such errors and become biased. In the next batch, it can generate more wrong pseudo-labels with higher confidence. Moreover, the consistency regularization can keep reinforcing the model to fit such wrongly labeled data. Finally, it demonstrates a biased model with a poor performance on generalization and robustness. Therefore, noise in the pseudo labels can lead to confirmation errors in FixMatch.
+
+Both asymmetric noise and symmetric noise in pseudo labels can lead to confirmation errors, but in general asymmetric noise is more harmful and harder to deal with. For example, to reduce the impact of symmetric noise and get an unbiased model, one can use ensembling methods like \citep{li2020dividemix} to train multiple DNNs at the same time; however, this can fail in the presence of asymmetric noise. %It would be good to complete this sentence with a motivation/reference.
+In this work, we focus on asymmetric noise and one can simply extend the method to deal with the influence of symmetric noise with ensemble methods. 
+
+\paragraph{Investigation with class-balanced batches.} To check whether there exist confirmation errors, we need to check that during the training process errors are reinforced by the model. Moreover, to see the asymmetric noise in the pseudo labels, we need to check that in the training phase whether FixMatch predicts a certain class of unlabeled data into certain other classes. Thus, these require us to investigate the performance of FixMatch at each batch and check the pseudo labelling performance regarding asymmetric noise in the pseudo labels. However, in \citep{sohn2020fixmatch}, a batch is not necessary to contain all the classes of training dataset and it can contain different classes with different numbers. Therefore, the performance of pseudo labelling regarding asymmetric noise inherits the randomness of batch composition, which makes the investigation conclusion unreliable. 
+
+To deal with this issue, we reconstructed the batch structure which requires each batch to contain an equal number of images for all the classes on both labeled and unlabeled data, called Balanced-Class (BC) batches. With such batches, we can fairly check the performance of pseudo labelling in each batch how many errors are made when the model predicts each class and whether it tends to label a class as other certain classes causing asymmetric noise. Note that without further introducing regularization, BC batches on their own cannot improve the performance of FixMatch, which has indistinguishable results without BC as shown in Sec. \ref{sec:exp_noise}.
+
+Furthermore, we leverage the reconstructed batch structure to regularize the training process for reducing the noise in pseudo labels and improving the performance. With the reconstructed batches, we know that the class of labeled data\footnote{In fact, the class of both labeled and unlabeled data are equally distributed in reconstructed batches, but it is unrealistic to use the prior knowledge about labels of unlabeled data. Although it is fine for "debugging" the training behavior of FixMatch, when aiming at improving the performance of FixMatch, we cannot use the information about labels of unlabeled data, because it is very likely to have unbalanced classes of unlabeled data in practice. Then it makes no sense to regularize the outputs of unlabeled data in the training phase.} is uniformly distributed, thus we can regularize the output of labeled data with the negative entropy loss of the prediction frequency. In this way we force the output of labeled data to be uniformly distributed. Potentially this can regularize the asymmetric noise in the labeled data because the output class distribution is not likely to be uniformly distributed in the presence of asymmetric noise. Consequently, it can reduce the asymmetric noise in pseudo labels because the prediction on both labeled and unlabeled data uses the same network which is unlikely to have different prediction behavior. Therefore, we add an equal-frequency entropy regularization to the loss function, which is
+\begin{eqnarray}
+l' &=& l'_s + \lambda_u l_u \label{eq:eqr},\\
+l'_s &=& l_s - \lambda_{ef} \mathcal{H}(\mathbb{E}_{x_b}[f(\alpha(x_b))]) \nonumber \\
+&=&  l_s + \lambda_{ef} \sum_{j=1}^c\{(\frac{1}{B}\sum_{b=1}^Bf_j(\alpha(x_b))) \log (\frac{1}{B}\sum_{b=1}^B f_j(\alpha(x_b)))\}, \nonumber
+\end{eqnarray}
+where $c$ is the number of classes and $\lambda_{ef}$ is a hyperparameter. We also consider the confidence entropy loss regularization which can avoid over-confident prediction,
+\begin{eqnarray}
+l''_s &=& l_s - \lambda_{ce} \mathbb{E}_{x_b}[\mathcal{H}(f(\alpha(x_b)))] \nonumber \\
+&=&  l_s + \lambda_{ce}
+\frac{1}{B}
+\sum_{b=1}^B\{
+\sum_{j=1}^c f_j(\alpha(x_b)) \log (f_j(\alpha(x_b))\}, \nonumber \\
+l'' &=& l''_s + \lambda_u l_u.\label{eq:cer}
+\end{eqnarray}
+Note that since the loss function \eqref{eq:cer} aims for avoiding over-confident predictions, it seems to be fine to regularize the unlabeled data as well. However, we cannot do that for the same reason as the loss function \eqref{eq:eqr} which has been discussed in the footnote. Because 
+$-\mathcal{H}(\cdot)$ is a convex function, we have the Jensen's inequality
+$$- \mathcal{H}(\mathbb{E}_{x_b}[f(\alpha(x_b))]) \leq - \mathbb{E}_{x_b}[\mathcal{H}(f(\alpha(x_b)))].$$
+In other words, confidence entropy regularization can implicitly regularize the equal frequency of the data labels.
+% , which is not necessary to be true in the unlabeled data in practice. 
+Therefore, with the same reason, we should only apply it to the labeled data of which label distribution is under our control with augmentation.
