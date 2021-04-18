@@ -1,0 +1,116 @@
+\documentclass{article}
+
+%
+%
+%
+
+%
+%
+
+%
+%
+%
+
+%
+\usepackage[square,numbers]{natbib}
+\usepackage[final]{neurips_2019}
+
+%
+%
+
+\input{packages.tex}
+
+\newcommand{\comment}[2]{\todo[inline,caption={}]{\textbf{#1: }#2}}%
+\newcommand{\inlinecomment}[3]{%
+%
+%
+  {\color{#1}#2: #3}}%
+\newcommand\commenter[2]%
+{%
+  \expandafter\newcommand\csname i#1\endcsname[1]{\inlinecomment{#2}{#1}{##1}}
+  \expandafter\newcommand\csname #1\endcsname[1]{\comment{#1}{##1}}
+}
+\commenter{keivan}{green}
+\commenter{ehsan}{red}
+\commenter{klim}{blue}
+\title{Reproducibility Report for "On Warm-Starting Neural Network Training"}
+
+\setcitestyle{numerical,open={[},close={]}}
+
+%
+%
+%
+%
+%
+%
+%
+
+\author{%
+  Klim Kireev\\
+  EPFL \\
+  \And
+  Amirkeivan Mohtashami\\
+  EPFL \\
+  \And
+  Ehsan Pajouheshgar \\
+  EPFL \\
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+}
+
+\begin{document}
+
+\maketitle
+
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+ 
+
+We reproduce the results of the paper "On Warm-Starting Neural Network Training." In many real-world applications, the training data is not readily available and is accumulated over time. As training models from scratch is a time-consuming task, it is preferred to use warm-starting, i.e., using the already existing models as the starting point to obtain faster convergence. This paper investigates the effect of warm-starting on the final model's performance. It identifies a noticeable gap between warm-started and randomly-initialized models, hereafter referenced as \textbf{the warm-starting gap}. Furthermore, they provide a solution to mitigate this side-effect. In addition to reproducing the original paper's results, we propose an alternative solution and assess its effectiveness.
+
+\subsection*{Methodology}
+We reproduced almost every figure and table in the main text and some of those in the appendix. We used our implementation to produce these results. In case of a mismatch of the results, we also investigated the cause and proposed possible explanations. We mainly used GPUs to train our models using infrastructure offered by public clouds and those that were available to us privately. 
+
+\subsection*{Results}
+
+Most of our results closely match the reported results in the original paper. Therefore, we confirm that the warm-starting gap exists in certain settings and that the Shrink-Perturb method successfully reduces or eliminates this gap. However, in some cases, we were not able to completely reproduce their results. By investigating the root of such mismatches, we provide another solution to avoid this gap. In particular, we show that data augmentation also helps to reduce the warm-starting gap.
+
+\subsection*{What was easy}
+
+The experiments described in the paper were based on regular training of neural networks on a portion of widely-used datasets, possibly from a pre-trained model. Therefore implementing each experiment was relatively easy to do. Furthermore, since many of the parameters were reported in the original paper, we did not need much tuning in most experiments. Finally, it is straightforward to implement and use the proposed solution. 
+
+\subsection*{What was difficult}
+
+Though implementing each experiment is relatively simple, the numerosity of experiments proved to be slightly challenging. In particular, each of the online experiments in the original setting requires training a deep network to convergence more than 30 times. In these cases, we sometimes changed the settings, sacrificing granularity to reduce computation time. However, these changes did not affect the interpretability of the final results. 
+\subsection*{Communication with original authors}
+We briefly communicated with the authors to clarify the experiments' details, such as the convergence conditions.
+\input{content.tex}
+
+\bibliographystyle{IEEEtran}
+%
+\bibliography{literature}
+
+\end{document}
+
+

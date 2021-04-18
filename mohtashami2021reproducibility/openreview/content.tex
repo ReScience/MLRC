@@ -19,8 +19,8 @@ Similar to the paper, we start by demonstrating the existence of a generalizatio
 In particular, in the offline setting, we first train our model on half of the training data and then further train the pre-trained model on the whole dataset. We compare the resulting model with a model trained from randomly initialized weights. Figure~\ref{fig:offline-warmup-vs-random-CIFAR-10} depicts the test accuracy of ResNet-18 \cite{he_deep_2016} during training in this setting and matches Figure 1 of the paper. 
 
 
-\begin{wrapfigure}{r}{.45\linewidth}
-    \includegraphics[width=\linewidth]{fig1_test_accuracy.pdf}
+\begin{wrapfigure}{R}{.45\linewidth}
+    \includegraphics[width=\linewidth]{figures/fig1_test_accuracy.pdf}
     \caption{Test accuracy during training a ResNet-18 with SGD with and without warm-starting. The results for the randomly-initialized model has been shifted 200 epochs to overlap the part of training where the warm-started model is trained on the whole dataset. }
     \label{fig:offline-warmup-vs-random-CIFAR-10}
 \end{wrapfigure}
@@ -60,27 +60,38 @@ As in the paper, we optimize the model using Adam optimizer with a learning rate
 However, like the offline experiment, we did not observe the gap for the SVHN dataset (Figure~\ref{fig:fig2-svhn}). Still, we were able to reproduce the gap by increasing the convergence accuracy threshold to $99.9\%$ (Figure~\ref{fig:fig2-svhn-99.9}). Note that 99\% train accuracy is more challenging to achieve on the CIFAR-10 dataset than on SVHN and therefore requires more training, possibly leading to more over-fitting. Increasing the convergence threshold compensates for this difference. 
 
 \setlength{\intextsep}{5pt}%
-\begin{wraptable}[42]{r}{0.45\textwidth}
+\begin{wraptable}{R}{0.45\linewidth}
+
 \renewcommand{\arraystretch}{1.2}
 \centering
-\begin{subtable} {0.45\textwidth}
-\include{table1-resnet}
+\begin{subtable} {\linewidth}
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\input{figures/table1-resnet}
+\end{adjustbox}
 \vspace{5pt}
 \caption{Test accuracies for ResNet-18}
 \vspace{5pt}
 \end{subtable}\\
-\begin{subtable} {0.45\textwidth}
-\include{table1-mlp}
+\begin{subtable} {\linewidth}
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\input{figures/table1-mlp}
+\end{adjustbox}
 \vspace{5pt}
 \caption{Test accuracies for MLP}
 \end{subtable}\\
-\begin{subtable} {0.45\textwidth}
-\include{table1-lr}
+\begin{subtable} {\linewidth}
+\centering
+\begin{adjustbox}{max width=\linewidth}
+\input{figures/table1-lr}
+\end{adjustbox}
 
 \caption{Test accuracies for Logistic Regression}
 \end{subtable}
 \caption{Test accuracies for various datasets and models and optimizer for warm-start training and training from random initialization. We use an MLP with Tanh activation with 3 hidden layers of 100 neurons. A different learning rate was used for cells marked with a star (*). }
 \label{tab:offline-warmup-vs-random}
+\vspace{-30pt}
 \end{wraptable}
 
 This result and the fact that the authors show that the proposed Shrink-Perturb method is similar to an aggressive regularization brings up the question of whether this gap might be a side-effect of over-fitting when training on partial data.  There are various known techniques to prevent overfitting. The original paper investigates the effect of some of these techniques, namely regularization, and early-stopping. We reproduced these experiments and explained the results below.
@@ -89,6 +100,32 @@ This result and the fact that the authors show that the proposed Shrink-Perturb 
 
 
 \textbf{Regularization}: Regularization is commonly used to improve generalization. The original paper explores the effect of various types of regularization. Due to time and resource limitations, we only look into weight decay, which is widely used and is a de-facto standard for training the state-of-the-art models. We repeat the offline setting experiment on CIFAR-10 with a weight decay of $0.1$ on both the pre-training and main training. However, contrary to the original paper's results, we observe that the warm-starting gap decreases when applying weight decay. We also test with weight decay values of $0.01$ and $0.001$. We find out that higher values of weight decay result in lower warm-starting gap. The results are reported in Table~\ref{tab:regularization}, which corresponds to Appendix Table 13 of the original paper.
+
+
+\textbf{Data Augmentation}:~ Data augmentation is widely used to obtain state-of-the-art performance and is known to help generalization \cite{shorten2019survey}, but it is not used in the other experiments of this paper. It is specifically important to check the effect of data augmentation since it is widely used in practice. Therefore we extend the original paper's experiments by investigating the impact of data augmentation. We report our results in Section~\ref{sec:data-augmentation}.
+
+\subsection{Effect of Hyperparametes}
+
+Our results show that in some cases, a generalization gap exists when pre-training our model on a portion of the final dataset. However, when training in the online setting on SVHN, we could only observe this gap with a high enough convergence threshold. The paper investigates the effect of other training hyperparameters, namely learning rate and batch size.
+
+To investigate the effect of learning rate and batch size, we train a ResNet-18 with different values for these hyperparameters. We choose the learning rate from $\{0.1, 0.01, 0.001\}$ and the batch size from $\{128, 64, 32, 16\}$. We iterate over all pairs for these values. For each pair, we train over the full CIFAR-10. We also train a different model over 50\% of the CIFAR-10 dataset and use it to warm-start a model and train it on the whole dataset. We use a different learning rate and batch size, randomly chosen from the sets of values, in the second part of the training, i.e., for training the warm-started model. We repeat each experiment 9 times. Each model is trained to $99\%$ training accuracy. The test accuracy is plotted against training time in Figure \ref{fig:fig3-scatter}, which corresponds with Figure~3 of the paper. Note that the training time for the warm-started model corresponds to the time of the second part of the training. In other words, the time of training on half of the dataset is not included. This is justified because the goal is to assess if warm-starting leads to comparable accuracy while saving training time when a new batch of data arrives. In our results, choosing the right hyperparameters can lead to achieving comparable or even better accuracy, when using warm-starting, faster than training a randomly initialized model. This does not match the results of the paper, where the warm-started models with comparable accuracy take the same amount of training time as the randomly initialized models. While we perform less experiments in the warm-started setting, we perform the same number of experiments with random initialization as described in the original paper's text. However, the number of points in Figure 3 of the original paper corresponding to randomly initialized models, is more than what has been described in the text. We note that performing more randomly initialized experiments might be the reason for the mismatch in our results with the original paper.
+
+
+%
+\begin{table}
+    \renewcommand{\arraystretch}{1.2}
+    \centering
+    \begin{tabular}{c|c|c|c}
+%
+         & 0.1 & 0.01 & 0.001 \\ \hline
+         Random Initialization & 81.44 & 62.73 & 60.42 \\
+         Warm Starting & 81.16 & 61.22 & 58.63 \\ 
+%
+    \end{tabular}
+    \vspace{10pt}
+    \caption{Accuracy of training a ResNet-18 with and without warm-starting for different values of weight decay. }
+    \label{tab:regularization}
+\end{table}
 
 
 \begin{figure}
@@ -118,32 +155,6 @@ This result and the fact that the authors show that the proposed Shrink-Perturb 
     \label{fig2-CIFAR-10-svhn-99}
 
 \end{figure}
-
-\textbf{Data Augmentation}:~ Data augmentation is widely used to obtain state-of-the-art performance and is known to help generalization \cite{shorten2019survey}, but it is not used in the other experiments of this paper. It is specifically important to check the effect of data augmentation since it is widely used in practice. Therefore we extend the original paper's experiments by investigating the impact of data augmentation. We report our results in Section~\ref{sec:data-augmentation}.
-
-\subsection{Effect of Hyperparametes}
-
-Our results show that in some cases, a generalization gap exists when pre-training our model on a portion of the final dataset. However, when training in the online setting on SVHN, we could only observe this gap with a high enough convergence threshold. The paper investigates the effect of other training hyperparameters, namely learning rate and batch size.
-
-To investigate the effect of learning rate and batch size, we train a ResNet-18 with different values for these hyperparameters. We choose the learning rate from $\{0.1, 0.01, 0.001\}$ and the batch size from $\{128, 64, 32, 16\}$. We iterate over all pairs for these values. For each pair, we train over the full CIFAR-10. We also train a different model over 50\% of the CIFAR-10 dataset and use it to warm-start a model and train it on the whole dataset. We use a different learning rate and batch size, randomly chosen from the sets of values, in the second part of the training, i.e., for training the warm-started model. We repeat each experiment 9 times. Each model is trained to $99\%$ training accuracy. The test accuracy is plotted against training time in Figure \ref{fig:fig3-scatter}, which corresponds with Figure~3 of the paper. Note that the training time for the warm-started model corresponds to the time of the second part of the training. In other words, the time of training on half of the dataset is not included. This is justified because the goal is to assess if warm-starting leads to comparable accuracy while saving training time when a new batch of data arrives. In our results, choosing the right hyperparameters can lead to achieving comparable or even better accuracy, when using warm-starting, faster than training a randomly initialized model. This does not match the results of the paper, where the warm-started models with comparable accuracy take the same amount of training time as the randomly initialized models. While we perform less experiments in the warm-started setting, we perform the same number of experiments with random initialization as described in the original paper's text. However, the number of points in Figure 3 of the original paper corresponding to randomly initialized models, is more than what has been described in the text. We note that performing more randomly initialized experiments might be the reason for the mismatch in our results with the original paper.
-
-
-%
-
-\begin{table}
-    \renewcommand{\arraystretch}{1.2}
-    \centering
-    \begin{tabular}{c|c|c|c}
-%
-         & 0.1 & 0.01 & 0.001 \\ \hline
-         Random Initialization & 81.44 & 62.73 & 60.42 \\
-         Warm Starting & 81.16 & 61.22 & 58.63 \\ 
-%
-    \end{tabular}
-    \vspace{10pt}
-    \caption{Accuracy of training a ResNet-18 with and without warm-starting for different values of weight decay. }
-    \label{tab:regularization}
-\end{table}
 
 
 
@@ -175,7 +186,7 @@ In the online setting, we applied the Shrink-Perturb transform every time a new 
 
 \begin{figure}
 \begin{minipage}[t]{.4\linewidth}
-    \includegraphics[width=\linewidth]{fig1_shrink_pertrub_test_accuracy.pdf}
+    \includegraphics[width=\linewidth]{figures/fig1_shrink_pertrub_test_accuracy.pdf}
     \caption{Test accuracy during training a ResNet-18 with SGD with warm starting and Shrink-Perturb and without it}
     \label{fig:fig1_shrink}
 \end{minipage}
@@ -188,7 +199,7 @@ In the online setting, we applied the Shrink-Perturb transform every time a new 
 \end{figure}
 
 
-\begin{wrapfigure}[17]{r}{.4\linewidth}
+\begin{wrapfigure}[17]{R}{.4\linewidth}
     \centering
     \includegraphics[width=\linewidth]{figures/figure6.pdf}
     \caption{Test accuracy of trained models for different shrinkage coefficients $\lambda$.}
