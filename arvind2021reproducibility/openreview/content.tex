@@ -2,8 +2,8 @@
 
 \subsection*{Scope of Reproducibility}
 
-Neural Networks Fail to Learn Periodic Functions and How to Fix It \cite{ziyin2020neural} demonstrates experimentally that standard activations such as \( \ReLU \), \( \tanh \), \( \sigmoid \) and their variants all fail to learn how to extrapolate simple periodic functions. The original paper goes on to propose a new activation, which the authors' name the $\snake$ function. \\
- 
+Neural Networks Fail to Learn Periodic Functions and How to Fix It \cite{ziyin2020neural} demonstrates experimentally that standard activations such as \( \ReLU \), \( \tanh \), \( \sigmoid \) and their variants all fail to learn how to extrapolate simple periodic functions. The original paper goes on to propose a new activation, which the authors name the $\snake$ function. \\
+
 The central claims of the paper are two-fold: (1) The properties of the activation functions are carried over to the neural networks. A \( \tanh \) network will be smooth and extrapolates to a constant function, while \( \ReLU \) extrapolates in a linear way. Standard neural networks with conventional activation functions are insufficient for extrapolating periodic functions. (2) The proposed activation function manages to learn periodic functions while being able to optimize as well as conventional activation functions. While both experimental proof and theoretical justifications are provided for the claims, we shall only be concerned with testing the claims via experimental means.
 
 \subsection*{Methodology}
@@ -26,13 +26,13 @@ Data for the human body temperature experiment was not available. Proper impleme
 
 \subsection*{Communication with original authors}
 
-Liu Ziyin, one of the authors, was contacted to provide the dataset used for the human body temperature experiment, elaborate upon the implementation of variance correction and provide the implementation of RNNs using $ \snake $. Liu provided the GitHub link to the authors' original code for the human body temperature, market index, and extrapolation experiments. The author also provided an explanation on how to implement variance correction. While the code for the RNN implementation using the \(  \snake \) activation was not made public, a screenshot of the same was provided. We thank the author for the assistance.
+Liu Ziyin, one of the authors, was contacted to provide the dataset used for the human body temperature experiment, elaborate upon the implementation of variance correction and provide the implementation of RNNs using $ \snake $. Liu provided the GitHub link to the authors' original code for the human body temperature, market index, and extrapolation experiments. Liu also provided an explanation on how to implement variance correction. While the code for the RNN implementation using the \(  \snake \) activation was not made public, a screenshot of the same was provided. We thank the authors for their assistance.
 
 \section{Introduction}
 
 Deep neural networks are playing an increasingly prominent role in fields as diverse as computer vision \cite{10.1007/978-3-030-11024-6_1}, speech recognition \cite{deng_2016}, and language modeling \cite{melis2017state}. However, while neural networks are excellent tools for interpolating between existing data, standard versions of these networks are not suited for extrapolation beyond the training range. This causes them to struggle at making predictions in problems with a periodic component. Previous attempts at addressing neural networks' inability to learn periodic functions have included using periodic activation functions \cite{fourier_one, zhumekenov2019fourier}. For example, using $\sin(x)$ as the activation function for implicit neural representations has been successful at representing complex natural signals and their derivatives \cite{sitzmann2020implicit}. However in more general cases, experimental results suggest that using $\sin$ as the activation function cannot compete against $ \ReLU $-based activation functions \cite{Ramachandran2017SwishAS, DBLP:conf/icml/NairH10, clevert2016fast, xu2015empirical} on standard tasks \cite{Parascandolo2017TamingTW}. \\
 
-The original paper: (1) studies the extrapolation properties of a neural network beyond a bounded region; (2) shows that neural networks with standard activation functions are insufficient to learn periodic functions outside the bounded region where data points are present; (3) proposes a solution for this problem in the form of a novel activation function and its variants, and showcases its performance on toy examples and real-world tasks. We have tested the claims made in the original paper, replicating both the experiments displaying the failure of standard activation functions to learn periodic functions as well as the results of the novel activation function on toy and real-world tasks. We have also conducted experiments of our own to understand how viable the proposed activation function is at replacing existing standards such as $\ReLU$ and $\tanh$. 
+The original paper: (1) studies the extrapolation properties of a neural network beyond a bounded region; (2) shows that neural networks with standard activation functions are insufficient to learn periodic functions outside the bounded region where data points are present; (3) proposes a solution for this problem in the form of a novel activation function and its variants, and showcases its performance on toy examples and real-world tasks. We have tested the claims made in the original paper, replicating the experiments displaying the failure of standard activation functions to learn periodic functions as well as the results of the novel activation function on toy and real-world tasks. We have also conducted experiments of our own to understand how viable the proposed activation function is at replacing existing standards such as $\ReLU$ and $\tanh$.
 
 \section{Scope of reproducibility}
 
@@ -42,7 +42,7 @@ The authors make two key claims:
     \item The proposed novel activation function can learn periodic functions while maintaining the favorable optimization property of the $ \ReLU $-based activations. The novel activation is referred to as ``$ \snake $'':
 
      \[ snake_{a}(x) := x + \frac{1}{a}sin^{2}(a x) \]
-     
+
      where $a$ is treated as a fixed parameter in initial experiments, and as a learnable parameter in a few experiments. $ \Snake $ is shown to outperform standard activation functions $ \ReLU, \tanh, \LeakyReLU $ \cite{DBLP:conf/icml/NairH10}, as well as more recently proposed functions such as $ \swish $ \cite{Ramachandran2017SwishAS}, and $ \sin $ \cite{sitzmann2020implicit, Parascandolo2017TamingTW}.
 \end{itemize}
 
@@ -51,7 +51,7 @@ Due to the broad and far-reaching consequences of the two claims, the original p
 \section{Methodology}
 
 The code used by the authors had not been made public at the time we started working on re-implementing the paper. That meant we reproduced all the results in the paper from scratch relying on the descriptions of the neural network architecture and a link or description of the dataset.
-The descriptions were brief but sufficient such as ``feedforward neural network with 2 hidden layers, both with 64 neurons'' for the Body Temperature Prediction experiment and ``4-layer feedforward network with $ 1 \rightarrow 64 \rightarrow 64 \rightarrow 1 $ hidden neurons'' for the Financial Data Prediction experiment. 
+The descriptions were brief but sufficient such as ``feedforward neural network with 2 hidden layers, both with 64 neurons'' for the Body Temperature Prediction experiment and ``4-layer feedforward network with $ 1 \rightarrow 64 \rightarrow 64 \rightarrow 1 $ hidden neurons'' for the Financial Data Prediction experiment.
 In the case of experiments that utilized large standard networks such as ResNet18, the PyTorch library implementation of the model was used, with $\snake$ substituted in place of the default activation functions.
 Besides the model implementations, we were also required to make $a$ a learnable parameter in $ \snake $ for a few experiments.
 
@@ -69,8 +69,8 @@ Data for the real-life datasets had to be downloaded:
     \item Average weekly temperature evolution in Minami-Tori-shima, an island south of Tokyo (longitude: 153.98, latitude: 24.28) after April 2008: Downloaded from link provided in the original paper: \url{https://join.fz-juelich.de/access}
     \item Patient body temperature: Made available by the authors upon request
     \item IMDB Reviews Dataset used for our additional sentiment analysis experiment: Downloaded from \url{https://www.kaggle.com/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews}
-    
-    
+
+
 \end{itemize}
 
 \subsection{Hyperparameters}
@@ -83,7 +83,7 @@ The entire codebase has been uploaded to GitHub and is publicly available: \url{
 
 \subsection{Computational requirements}
 
-Many of the experiments, particularly those relating to regressing different functions and datasets, could be run locally on a MacBook Air with an Intel i5 CPU and 8 GB of RAM, not requiring more than a few minutes to train. The more demanding experiments required the use of GPUs. Training a ResNet18 on CIFAR-10 with six activation functions for 100 epochs took roughly 12 hours on a Tesla T4 GPU on Google Colab. Our additional experiments on training a GAN and an LSTM required roughly 2 hours each on the same hardware. 
+Many of the experiments, particularly those relating to regressing different functions and datasets, could be run locally on a MacBook Air with an Intel i5 CPU and 8 GB of RAM, not requiring more than a few minutes to train. The more demanding experiments required the use of GPUs. Training a ResNet18 on CIFAR-10 with six activation functions for 100 epochs took roughly 12 hours on a Tesla T4 GPU on Google Colab. Our additional experiments on training a GAN and an LSTM required roughly 2 hours each on the same hardware.
 
 \section{Results}
 
@@ -143,7 +143,7 @@ The core utility of $ \snake $ is shown via two real-life problems. The two task
 \begin{figure}[h]
   \centering
   \begin{subfigure}{0.45\textwidth}
-    \includegraphics[scale=0.4]{atmos_preds.png} 
+    \includegraphics[scale=0.4]{atmos_preds.png}
   \caption{}
   \label{fig:subim1}
   \end{subfigure}
@@ -171,7 +171,7 @@ The $ \snake $ network correctly learns the periodicity of the atmospheric tempe
 
 \begin{wraptable}{r}{5.5cm}
   \begin{center}
-\begin{tabular}{ |c|c| } 
+\begin{tabular}{ |c|c| }
  \hline
     Method & Test MSE \\
     \hline
@@ -204,7 +204,7 @@ Another regression problem the authors used to demonstrate the working of $ \sna
 The authors, in an additional experiment described in the appendix, use this dataset to gain insights into how the $ \snake $ activation function learns (Fig. \ref{fig:preds_fin}).
 Observing the predictions made at various points in the training process, we notice that at first, the features learned are mostly linear, low frequency features are then learned, and high-frequency features are learned at the later stages of training. \\
 
- The performance of a $ \snake $ feedforward network (two hidden layers of 64 neurons each, $a=30$) and a recurrent neural network (single recurrent layer, 64 features in hidden state), typically used for time-series prediction, are compared in Fig. \ref{fig:rnn_preds}. The task is to learn the function $\sin(0.1x)$, with Gaussian noise $\sigma$ added, for $T$ = 300 timesteps. The first 200 are used for training, while the last 100 are used for testing. 
+ The performance of a $ \snake $ feedforward network (two hidden layers of 64 neurons each, $a=30$) and a recurrent neural network (single recurrent layer, 64 features in hidden state), typically used for time-series prediction, are compared in Fig. \ref{fig:rnn_preds}. The task is to learn the function $\sin(0.1x)$, with Gaussian noise $\sigma$ added, for $T$ = 300 timesteps. The first 200 are used for training, while the last 100 are used for testing.
 
 \begin{figure}[h]
 \centering
@@ -220,7 +220,7 @@ Further, RNNs learn by backpropagation through time (BPTT), which has a prohibit
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{time taken.png}
-\caption{Time taken for a single epoch of training by an RNN and a $ \snake $ feedforward network on $T$ timesteps of $\sin(0.1x)$}
+\caption{Time taken for a single epoch of training an RNN and a $ \snake $ feedforward network on $T$ timesteps of $\sin(0.1x)$}
 \label{fig:rnn_time}
 \end{figure}
 
@@ -234,16 +234,16 @@ In a series of experiments, the authors depict the effect the parameter $a$ has 
 \label{fig:a_effect}
 \end{figure}
 
-It is seen in Fig.\ref{fig:a_effect} that larger $a$ encourages the model to learn features with higher frequency. With $a = 1$, the higher frequency modulation is considered noise, while the $a = 16$ model learns both the signals. This tendency can be taken into account while working with data known to be periodic, with a well-chosen $a$ speeding up training.
+It is seen in Fig. \ref{fig:a_effect} that larger $a$ encourages the model to learn features with higher frequency. With $a = 1$, the higher frequency modulation is considered noise, while the $a = 16$ model learns both the signals. This tendency can be taken into account while working with data known to be periodic, with a well-chosen $a$ speeding up training.
 
 \subsection{Results beyond original paper}
-The original paper demonstrated the ability of neural networks with the $ \snake $ activation function to learn periodic functions and that the performance on everyday tasks like image classification is similar to that of conventional activation functions. We extend this study to more sub-fields of deep learning. \\
+The original paper demonstrated the ability of neural networks with the $ \snake $ activation function to learn periodic functions and that the performance on everyday tasks like image classification is similar to that of neural networks employing conventional activation functions. We extend this study to more sub-fields of deep learning. \\
 
 \begin{figure}[h]
   \centering
   \begin{subfigure}{0.35\textwidth}
   \centering
-  \includegraphics[scale=0.6]{snake_batch_46000.png} 
+  \includegraphics[scale=0.6]{snake_batch_46000.png}
   \caption{}
   \label{fig:subim3}
   \end{subfigure}
@@ -253,16 +253,16 @@ The original paper demonstrated the ability of neural networks with the $ \snake
   \caption{}
   \label{fig:subim4}
   \end{subfigure}
-  
+
   \caption{Samples output by (a) $ \snake $ GAN and (b) $ \LeakyReLU $ GAN after training for 50 epochs}
   \label{fig:gan_outputs}
   \end{figure}
-  
+
   \begin{figure}[h]
     \centering
     \begin{subfigure}{0.45\textwidth}
       \centering
-      \includegraphics[scale=0.4]{snake_gan_loss.png} 
+      \includegraphics[scale=0.4]{snake_gan_loss.png}
       \caption{}
       \label{fig:subim5}
     \end{subfigure}
@@ -278,19 +278,19 @@ The original paper demonstrated the ability of neural networks with the $ \snake
 
 We train a deep convolutional generative adversarial network (DCGAN) \footnote{Code adapted from \url{https://github.com/eriklindernoren/PyTorch-GAN}} \cite{radford2016unsupervised} to generate samples of the MNIST dataset. All the activations in the generator and discriminator sub-networks are replaced with the specified non-linearity. We see that while the initial training is slow for the $ \snake $ GAN (Fig. \ref{fig:subim5}), it eventually generates realistic samples (Fig. \ref{fig:subim3}), which are qualitatively indistinguishable from those output by a typical GAN using the $ \LeakyReLU $ non-linearity (Fig. \ref{fig:subim4}). $a$ was a learnable parameter in this experiment. \\
 
-Finally, we use the $ \snake $ activation function in a Long Short Term Memory (LSTM) network for sentiment analysis 
-\footnote{Code adapted from \url{https://www.kaggle.com/arunmohan003/sentiment-analysis-using-lstm-pytorch} and \url{https://github.com/piEsposito/pytorch-lstm-by-hand}} 
-on the IMDB movie reviews dataset. 
-This is a binary classification problem, attempting to predict whether a movie review is positive or negative. The typical $ \tanh $ activation used to output the value $ h_{t} = o_{t} * \tanh(C_t) $ in an LSTM is replaced by the $ \snake $ activation, so that $h_{t} = o_{t} * \snake(C_{t})$. 
+Finally, we use the $ \snake $ activation function in a Long Short Term Memory (LSTM) network for sentiment analysis
+\footnote{Code adapted from \url{https://www.kaggle.com/arunmohan003/sentiment-analysis-using-lstm-pytorch} and \url{https://github.com/piEsposito/pytorch-lstm-by-hand}}
+on the IMDB movie reviews dataset.
+This is a binary classification problem, attempting to predict whether a movie review is positive or negative. The typical $ \tanh $ activation used to output the value $ h_{t} = o_{t} * \tanh(C_t) $ in an LSTM is replaced by the $ \snake $ activation, so that $h_{t} = o_{t} * \snake(C_{t})$.
 We observed that the $ \snake $ LSTM network did not perform very well on this task (Fig. \ref{fig:lstm_acc}) and convergence was much more gradual. A single epoch of training the $ \snake $ LSTM took twice as long as training the $ \tanh $ LSTM.  Also, in many cases, the $ \snake $ network got stuck in local minima, necessitating a restart of training. \\
 
-A possible explanation for this is that the $ \snake $ function is not bounded like $ \tanh $, causing an increase in the magnitudes of $ h_{t} $ leading to instability. The results of the experiment do not mean that $ \snake $ cannot be used in sequence models, only that the application is not as straightforward as in the previous experiments, and further modifications in the architectures might be necessary. 
+A possible explanation for this is that the $ \snake $ function is not bounded like $ \tanh $, causing an increase in the magnitudes of $ h_{t} $ and leading to instability. The results of the experiment do not mean that $ \snake $ cannot be used in sequence models, only that the application is not as straightforward as in the previous experiments, and further modifications in the architectures might be necessary.
 
 \begin{figure}[h]
   \centering
   \begin{subfigure}{0.45\textwidth}
     \centering
-    \includegraphics[scale=0.35]{acc_snake.png} 
+    \includegraphics[scale=0.35]{acc_snake.png}
     \caption{}
     \label{fig:subim8}
   \end{subfigure}
@@ -316,11 +316,11 @@ A detailed description of the neural network architectures used for experiments 
 
 \subsection{What was difficult}
 
-The original source code was not provided initially and we had to rely on the descriptions of architectures and hyperparameters (which were absent in many cases) and educated guesswork while attempting to replicate the results. 
-Data for the human body temperature experiment was not available. 
-Theoretical justification for variance correction and the results of this variance correction using ResNet101 on CIFAR-10 were provided, but implementation details were not included. 
+The original source code was not provided initially and we had to rely on the descriptions of architectures and hyperparameters (which were absent in many cases) and educated guesswork while attempting to replicate the results.
+Data for the human body temperature experiment was not available.
+Theoretical justification for variance correction and the results of this variance correction using ResNet101 on CIFAR-10 were provided, but implementation details were not included.
 The section on Comparison with RNN on Regressing a Simple Periodic Function simply states that $ \snake $ was deployed on a feedforward network, without any additional details of the hyperparameters used. The dataset for the experiment had to be inferred from the graphs of the results, and since white noise had been added to the data, exact replication of the experimental setup was not possible.
 
 \subsection{Communication with original authors}
 
-Liu Ziyin, one of the authors, was contacted to provide the dataset used for the human body temperature experiment, elaborate upon the implementation of variance correction and provide the implementation of RNNs using $ \snake $. Liu provided the GitHub link to the authors' original code\footnote{Repository link provided: \url{https://github.com/AdenosHermes/NeurIPS_2020_Snake}} for the human body temperature, market index, and extrapolation experiments. The author also provided an explanation on how to implement variance correction. While the code for the RNN implementation using $ \snake $ activation was not made public, a screenshot of the same was provided. The provided code was incomplete and not fully documented but was nonetheless valuable in giving us a rough idea about the hyperparameters used. The provided repository also contains the human body temperature dataset within the codebase, which is not available in the original paper. We thank the author for the assistance.
+Liu Ziyin, one of the authors, was contacted to provide the dataset used for the human body temperature experiment, elaborate upon the implementation of variance correction and provide the implementation of RNNs using $ \snake $. Liu provided the GitHub link to the authors' original code\footnote{Repository link provided: \url{https://github.com/AdenosHermes/NeurIPS_2020_Snake}} for the human body temperature, market index, and extrapolation experiments. Liu also provided an explanation on how to implement variance correction. While the code for the RNN implementation using $ \snake $ activation was not made public, a screenshot of the same was provided. The provided code was incomplete and not fully documented but was nonetheless valuable in giving us a rough idea about the hyperparameters used. The provided repository also contains the human body temperature dataset within the codebase, which is not available in the original paper. We thank the authors for their assistance.
