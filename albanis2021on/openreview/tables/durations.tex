@@ -1,0 +1,24 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+\caption{Time statistics for each experiment. \textcolor{Red}{Red} and \textcolor{Orange}{orange} colors indicate the two (worst, and second worst respectively) most time-consuming experiment per drone model.}
+\label{tab:durations}
+\resizebox{\textwidth}{!}{\begin{tabular}{c|l|ccccc}
+\hline
+Drone &  & \textbf{\begin{tabular}[c]{@{}c@{}}Total \\ Training \\ Duration (hrs)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Model Fwd \\ Duration(s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Model Bwd \\ Duration(s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Optimizer \\ Step (s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Total \\ Test \\ Duration (min)\end{tabular}} \\ \hline
+ & $l_m$ & {\cellcolor{Orange} 14.14} & 0.13 & {\cellcolor{Red} 2.73} & {\cellcolor{Red} 2.89} & 23.75 \\
+ & $l_p$ & {\cellcolor{Orange} 14.13} & 0.13 & {\cellcolor{Red} 2.73} & {\cellcolor{Red} 2.90} & 19.30 \\
+ & EPnP & {\cellcolor{Red} 17.33} & 0.19 & {\cellcolor{Orange} 1.49} & {\cellcolor{Orange} 1.74} & 24.37 \\
+ & HRNet & 11.19 & 0.06 & \textbf{0.003} & \textbf{0.21} & 19.87 \\
+ & Hourglass & \textbf{6.99} & 0.14 & 0.019 & 0.22 & 15.85 \\
+\multirow{-6}{*}{\textit{M2ED}} & HigherHRNet & 10.54 & 0.11 & 0.033 & 0.36 & 23.63 \\ \hline
+\multicolumn{1}{l|}{} &  $l_m$ & {\cellcolor{Orange} 20.78} & 0.13 & {\cellcolor{Orange} 2.72} & {\cellcolor{Orange} 2.9} & 23.82 \\
+\multicolumn{1}{l|}{} & $l_p$ & {\cellcolor{Orange} 20.38} & 0.13 & {\cellcolor{Orange} 2.68} & {\cellcolor{Orange} 2.85} & 19.95 \\
+\multicolumn{1}{l|}{} & EPnP & {\cellcolor{Red} 21.80} & 0.28 & {\cellcolor{Red} 3.80} & {\cellcolor{Red} 4.14} & 19.13 \\
+\multicolumn{1}{l|}{} & HRNet & \textbf{9.69} & 0.13 & 0.029 & 0.38 & 19.88 \\
+\multicolumn{1}{l|}{} & Hourglass & 10.13 & 0.14 & \textbf{0.020} & \textbf{0.22} & 15.62 \\
+\multicolumn{1}{l|}{\multirow{-6}{*}{\textit{Tello}}} & HigherHRNet & 16.10 & 0.14 & 0.032 & 0.4 & 20.50 \\ \hline
+\end{tabular}}
+\end{table}
