@@ -92,16 +92,17 @@ Note that for the multi-head penalties, only the heads from the model's last lay
 \label{sec:datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
 
-The original work features 8 tasks with associated datasets. For the classification models, these are Occupational Prediction, Gender Identity, SST + Wiki, and Reference Letters. For the seq2seq experiments, three synthetic datasets were used; Bigram Flip, Sequence Copy, and Sequence Reverse tasks. Additionally, the Multi30K dataset \sqcitep{elliott2016multi30k} was used for English to German machine translation (MT). All of the datasets were available in the authors' repository except for Reference Letters, with the authors citing privacy concerns. Consequently, we were not able to reproduce this experiment. For Occupation Prediction the authors state that downsampling by a factor of 10 was done for minority classes. As it was not clear from the data provided in the repository if downsampling had already been applied, the authors confirmed via email that this was the case. No further pre-processing was required, besides that already present in the authors' code. Details of the datasets used in our experiments are provided in Table \ref{tab:dataset-table}.
+The original work features 8 tasks with associated datasets. For the classification models, these are Occupational Prediction, Gender Identity, SST + Wiki, and Reference Letters. For the seq2seq experiments, three synthetic datasets were used; Bigram Flip, Sequence Copy, and Sequence Reverse tasks. Additionally, the Multi30K dataset \citep{elliott2016multi30k} was used for English to German machine translation (MT). All of the datasets were available in the authors' repository except for Reference Letters, with the authors citing privacy concerns. Consequently, we were not able to reproduce this experiment. For Occupation Prediction the authors state that downsampling by a factor of 10 was done for minority classes. As it was not clear from the data provided in the repository if downsampling had already been applied, the authors confirmed via email that this was the case. No further pre-processing was required, besides that already present in the authors' code. Details of the datasets used in our experiments are provided in Table \ref{tab:dataset-table}.
 
 \begin{table}
   \caption{Details of datasets.}
   \label{tab:dataset-table}
   \centering
+  	\setlength\tabcolsep{5pt}
 \begin{tabular}{llccccc}
 \toprule
  Task Type               &    Dataset                   & Examples & Train & Val  & Test & Label Dist.\\ \midrule
-Classification & Occupation Prediction &     25185       & 17629         & 2519      & 5037       & 68-32 \\
+Classification & Occupation Pred. &     25185       & 17629         & 2519      & 5037       & 68-32 \\
                & Gender Identity       &    11271       & 9017          & 1127      & 1127       & 50-50   \\
                & SST + Wiki            &    9613        & 6920          & 872       & 1821       & 48-52   \\ \midrule
 Seq-to-Seq     & Bigram Flip           &    300000      &   100000      &  100000   & 100000  &   -       \\
@@ -151,11 +152,10 @@ All experiments were run on the LISA computing cluster provided by SURFsara, whi
   \caption{Breakdown of approximate computational requirements for running experiments per task, for a single seed.}
   \label{tab:computation-table}
   \centering
+   \setlength\tabcolsep{5pt}
   \begin{tabular}{lc|cccc}
     \toprule
-    \multicolumn{1}{c}{Classification}
-    \multicolumn{5}{c}{GPU Hours}
-    \\
+    \multicolumn{2}{c}{Classification} & \multicolumn{4}{c}{GPU Hours} \\
     \cmidrule(r){1-6}
     Model     & Batch size       & Occupation Pred.  & Gender Identity & SST + Wiki \\
     \midrule
@@ -164,11 +164,9 @@ All experiments were run on the LISA computing cluster provided by SURFsara, whi
     BERT     & 32     & 3.1  & 1.5 & 1.2 \\
     BERT(HF)     & 32    & 4.8  & 1.9 & 2.5 \\
     \toprule
-    \multicolumn{1}{c}{Seq-to-Seq}
-    \multicolumn{5}{c}{GPU Hours}
-    \\
+    \multicolumn{2}{c}{Seq-to-Seq} & \multicolumn{4}{c}{GPU Hours} \\
     \cmidrule(r){1-6}
-    Model     & Batch size       & Bigram Flip     & Sequence Copy     & Sequence Reverse     & En-De \\
+    Model     & Batch size       & Bigram Flip     & Seq. Copy     & Seq. Reverse     & En-De \\
     \midrule
     Enc-Dec & 128  & 0.42  & 0.36 & 0.34 & 0.15 \\
     \bottomrule
