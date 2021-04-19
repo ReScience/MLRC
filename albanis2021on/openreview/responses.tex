@@ -1,0 +1,180 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{neurips_2019}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage[colorlinks=True]{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+% for tables
+\usepackage[normalem]{ulem}
+\usepackage{multirow}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{wrapfig,lipsum,booktabs}
+
+\title{On end-to-end 6DOF object pose estimation and robustness to object scale}
+
+\begin{document}
+
+\maketitle
+
+\section{Reviewer\#1}
+\subsection{Review - \textit{Sensible validation of BPnP}}
+
+The report aims to verify the effectiveness of using Backpropogatable PnP (BPNP) on a pose estimation task with drones.
+Following the original paper, the setup uses heatmap regression, from which the object pose is extracted and refined through PnP, given 3D geometry. 
+The incorporation of geometric constraints (e.g. the projection loss from the BPnP [1] paper) is claimed to improve estimation of keypoints.
+
+In addition to BPnP, the report also examines the effect of scale aggregation from the HigherHRNet paper which proposes a scheme to bottom up scheme for aggregation in stacked hourglass type setups for heat map computation. 
+The report goes about doing this through two types of drones of varying sizes - Mavic (larger) and Tello (smaller) using the dataset UAVA which contains ground truth annotations needed (e.g. 6D pose).
+
+BPNP scheme is compared with a reference differentiable implementation (EPnP) via PyTorch3D.
+
+\textcolor{blue}{The report was well written, and the experiments thoughtfully carried out.}
+In general, the numbers show improvements in keypoint estimation after incorporating the the projection losses. 
+The comparison with EPnP is also quite favourable. 
+They also show that the 'faster' version of BPnP reduces computational time without loss of accuracy.
+
+\textbf{Pros}: \textcolor{blue}{Major ideas in paper explained clearly, with cogent implementation results. I would be keen on using BPnP for practical tasks.}
+
+\textbf{Cons}: \textcolor{red}{Hyperparameter sweep tries not touched upon in detail. In particular, how does one chose the weighting parameters? Were any stability issues encountered? I would have liked to see a more varied list of scales as in the original paper rather than just the two drones, and (please correct me if I am not reading it correctly) the numbers are not markedly better/worse across implementations (Table 4).}
+
+[1] BPnP: \url{https://openaccess.thecvf.com/content_CVPR_2020/papers/Chen_End-to-End_Learnable_Geometric_Vision_by_Backpropagating_PnP_Optimization_CVPR_2020_paper.pdf}
+
+\textbf{Rating}: 7: Good paper, accept
+
+\textbf{Confidence}: 4: The reviewer is confident but not absolutely certain that the evaluation is correct
+
+\textbf{Reproducibility Summary}: Report has summary
+
+\textbf{Familiar With The Original Paper}: I have read the original paper
+
+\subsection{\uline{Our Response}}
+
+\textcolor{brown}{
+Thanks for the time spent reviewing our reproduction work.\\
+There were indeed stability issues with respect to the choice of $\beta$. 
+This was explained in Section 5.2, following the reproduction template, but we will also forward link to Section 5.2 from Section 3.3 where the different hyperparameters are described.
+The hyperparameter sweep (greedy heuristic search, L114 of the original document) was not touched upon in detail because, as explained in Section 5.2, most of the results were not meaningful (\textit{i.e.}~training exploding or not converging).\\
+Regarding the scale variation, the drones' distance from the camera varies, ranging from $0.8$m to $3.0$m, meaning that the resulting scale also varies significantly.
+Evidently, for the larger form drone, there is a smaller performance gap than the smaller form one.
+This largely validates the increased performance in smaller scales that HigherHRNet claims.
+Still though, it offers a slight boost in performance even for the larger drone, which further ensures that it is a more appropriate keypoint estimation architecture compared to HRNet and SH.
+}
+
+\iffalse
+\begin{enumerate}
+    \item There were stability issues as we explained in Section 5.2.
+    \item We performed a greedy search as explained in the paper (line 114): Specifically, for BPnP we set $\beta$ value to $1e-5$ after conducting a greedy heuristic search, with values $114$ ranging from $0.001$ to $1e-9$, as the proposed value for $\beta$ coefficient, did not work for our case
+    \item The drone's distance from the camera varies ranging from 0.8m, to 3m, meaning that the resulting scale in the image also varies significantly.
+    \item For the larger form drone there is a smaller discrepancy, but for the smaller form drone the deviation is significantly larger, a fact that validates the increased performance in smaller scales that HigherHRNet claims.
+    Still though, the architecture change from HRNet to HigherHRNet offers a boost in performance -- albeit smaller -- even for the larger form drone.
+\end{enumerate}
+\fi
+
+\section{Reviewer\#2}
+\subsection{Review - \textit{results beyond the original paper}}
+
+Two papers are reproduced here: backpropagatable PnP \& HigherHRNet, for the problem of 6DOF object pose estimation. 
+The results are evaluated in the UAVA dataset. 
+The work contains the mentioned points, including communication with original authors, and discussion of the reults.
+\textcolor{blue}{Overall, the results are meaningful. 
+They even present results beyond the original paper, such as section 4.2.}
+
+\textbf{Rating}: 7: Good paper, accept
+
+\textbf{Confidence}: 3: The reviewer is fairly confident that the evaluation is correct
+
+\textbf{Reproducibility Summary}: Report has summary
+
+\textbf{Familiar With The Original Paper}: I have not read the original paper
+
+\subsection{\uline{Our Response}}
+
+\textcolor{brown}{
+We thank the reviewer for the time spent reviewing our reproduction work.
+There were some concerns raised by the other reviewers that we clarified in the respective threads.
+In the revised report we have also slightly improved the clarity of Figure~1.
+}
+
+\section{Reviewer\#3}
+\subsection{Review - \textit{BPnP for end-to-end 6DOF object pose estimation is a reproducible result}}
+
+\textbf{Reproducibility Summary}: The authors have provided a detailed summary meeting the requirements.
+
+\textbf{Scope of reproducibility}: Yes, the reproducibility report has clearly and concisely stated the scope of reproducibility.
+
+\textbf{Code}: Yes, the authors have re-used the original author's code repository and also tried with another differential PnP (i.e EPnP) module as described in the reproducibility report.
+
+\textbf{Communication with original authors} Yes, the authors connected with one of the BPnP paper's original authors through their Github repo. The authors did not reach out to HigherHRNet paper's original authors.
+
+\textbf{Hyperparameter Search}: Yes, the authors have attempted to reproduce the hyperparameter search, but the  coefficient from the original author's (BPnP)'s code did not work for the authors of the reproducibility report.
+
+\textbf{Ablation Study}: Yes, the authors used an alternative implementation of the BPnP module to review the results and reproducibility. The authors tried ignoring the higher-order derivatives of the BPnP.
+
+\textbf{Discussion on results}: Yes, the reproducibility report contains a brief discussion on the state of reproducibility of the original papers, \textcolor{red}{but does not highlight which parts are easy to reproduce or which parts were harder. They could have mentioned the difficulty with the  parameter here.}
+
+\textbf{Recommendations for reproducibility}: \textcolor{orange}{No, the authors did not provide any recommendation to the original authors for improving reproducibility.}
+
+\textbf{Results beyond the paper}: The authors have tried additional differentiable PnP implementation (EPnP) to verify the claim. 
+\textcolor{blue}{That is a good point.}
+\textcolor{blue}{Another good point is that the authors tried to reduce the complexity and run time of the model using a faster BPnP, then evaluated the results and provided the detail pros and cons of using the technique; bonus point to the authors for that.} 
+\textcolor{blue}{The authors include significantly more quantitative and qualitative results than the original paper.}
+
+\textbf{Overall organization and clarity}: Nicely written and coherent.
+
+\textbf{Pros}: Significantly more quantitative and qualitative results.
+
+\textbf{Con}: \textcolor{red}{The authors highlight the best results in the tables using a red color. A better choice would be green or yellow or just to leave it uncolored.}
+
+\textbf{Rating}: 7: Good paper, accept
+
+\textbf{Confidence}: 4: The reviewer is confident but not absolutely certain that the evaluation is correct
+
+\textbf{Reproducibility Summary}: Report has summary
+
+\textbf{Familiar With The Original Paper}: I have read the original paper
+
+\subsection{\uline{Our Response}}
+
+\textcolor{brown}{
+We thank the reviewer for the time spent reviewing our reproduction work.\\
+As the template had a specific section for the easy parts and the difficulties (Sections 5.1 and 5.2 respectively), we only reported this information there.
+Nonetheless, we will also add them into the results discussion for completeness. \\
+Further, the report does not explicitly provide any recommendation to the original authors for improving their work's reproducibility, but does highlight the pros and cons of using both BPnP and HigherHRNet in relevant contexts.
+It does so by helping the readers understand both the tricky parts, but also the performance gains.
+As a result, it can be used as supplementary material to these works and we will contact the authors upon publication to link to this reproduction should they wish.\\
+Finally, the highlights in the Tables have been improved, and their appearance has been corrected following your advice.
+}
+
+\iffalse
+\begin{enumerate}
+    \item As the template had a specific section for the difficulties (sec 5.2), we only reported the harder parts there, but will also add them into the results discussion for completeness. 
+    \item The report does not explicitly provide any recommendation to the original authors for improving their work's reproducibility, but does highlight the pros and cons of using both BPnP and HigherHRNet in relevant contexts, while also helping the readers understand the tricky parts, but also the performance boost they will offer.
+    As a result, it can be used as supplementary material to these works and we will contact the authors upon publication to link to it should they wish.
+    \item We have corrected the appearance of the tables following your advice.
+\end{enumerate}
+\fi
+
+\end{document}

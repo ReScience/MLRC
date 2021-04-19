@@ -1,0 +1,17 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+\centering
+\caption{BPnP vs EPnP. Following the same approach we trained the decoder part only with $l_h$ for 30 epochs and then continue with $l_m$ for 14 epochs. Light \textcolor{SeaGreen}{green} with \textbf{bold} indicates the best performer.}
+\label{tab:bpnpvsepnp}
+\resizebox{\textwidth}{!}{\begin{tabular}{l|l|llllllll}
+\hline
+Drone &  & \textbf{NPE$\downarrow$} & \textbf{AD$\downarrow$} & \textbf{ACC2$\uparrow$} & \textbf{ACC5$\uparrow$} & \textbf{ADD2$\uparrow$} & \textbf{ADD5$\uparrow$} & \textbf{Proj2$\uparrow$} & \textbf{Proj5$\uparrow$} \\ \hline
+ & BPnP & \cellcolor{MyLightGreen}\textbf{0.014} & \cellcolor{MyLightGreen}\textbf{0.027} & 92.13 & 98.07 & \cellcolor{MyLightGreen}\textbf{81.31} & 93.34 & 99.45 & 99.58 \\
+\multirow{-2}{*}{\textit{M2ED}} & EPnP & \cellcolor{MyLightGreen}\textbf{0.014} & \cellcolor{MyLightGreen}\textbf{0.027} & \cellcolor{MyLightGreen}\textbf{92.89} & \cellcolor{MyLightGreen}\textbf{98.19} & 80.50 & \cellcolor{MyLightGreen}\textbf{93.64} & \cellcolor{MyLightGreen}\textbf{99.52} & \cellcolor{MyLightGreen}\textbf{99.61} \\ \hline
+ & BPnP & \cellcolor{MyLightGreen}\textbf{0.071} & \cellcolor{MyLightGreen}\textbf{0.189} & 43.38 & \cellcolor{MyLightGreen}\textbf{82.11} & 14.88 & 41.47 & \cellcolor{MyLightGreen}\textbf{93.97} & 96.08 \\
+\multirow{-2}{*}{\textit{Tello}} & EPnP & 0.074 & 0.192 & \cellcolor{MyLightGreen}\textbf{46.77} & 81.64 & \cellcolor{MyLightGreen}\textbf{21.07} & \cellcolor{MyLightGreen}\textbf{49.59} & 93.77 & \cellcolor{MyLightGreen}\textbf{96.13} \\ \hline
+\end{tabular}}
+\end{table}

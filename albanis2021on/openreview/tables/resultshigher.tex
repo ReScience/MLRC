@@ -1,0 +1,20 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+\centering
+\caption{HigherHRNet results on the UAVA dataset. We trained all models for 44 epochs and select the best among them for inference. Light \textcolor{SeaGreen}{green} with \textbf{bold} and light \textcolor{Cerulean}{blue} indicate the best and second best performers.}
+\label{tab:results_higher}
+\resizebox{\textwidth}{!}{\begin{tabular}{l|l|llllllll}
+\hline
+drone &  & \textbf{NPE$\downarrow$} & \textbf{AD$\downarrow$} & \textbf{ACC2$\uparrow$} & \textbf{ACC5$\uparrow$} & \textbf{ADD2$\uparrow$} & \textbf{ADD5$\uparrow$} & \textbf{Proj2$\uparrow$} & \textbf{Proj5$\uparrow$} \\ \hline
+ & Hourglass & 0.015 & 0.028 & 89.43 & 96.94 & 78.20 & 90.42 & 96.56 & 99.02 \\
+ & HRNet & 
+ \cellcolor{MyLightGreen}\textbf{0.011} & \cellcolor{MyLightGreen}\textbf{0.020} & \cellcolor{MyLightGreen}\textbf{90.75} & \cellcolor{MyLightGreen}\textbf{98.04} & \cellcolor{MyLightGreen}\textbf{80.52} & \cellcolor{MyLightGreen}\textbf{91.37} & \cellcolor{MyLightGreen}\textbf{97.56} & \cellcolor{MyLightGreen}\textbf{99.49} \\
+\multirow{-3}{*}{\textit{M2ED}} & HigherHRNet & \cellcolor{MyLightGreen}\textbf{0.011} & \cellcolor{MyLightGreen}\textbf{0.020} & \cellcolor{MyLightBlue}89.92 & \cellcolor{MyLightBlue}97.75 & \cellcolor{MyLightBlue}79.58 & \cellcolor{MyLightBlue}90.99 & \cellcolor{MyLightBlue}97.50 & \cellcolor{MyLightBlue}99.44 \\ \hline
+ & Hourglass & \cellcolor{MyLightBlue}0.094 & \cellcolor{MyLightGreen}\textbf{0.214} & 32.19 & \cellcolor{MyLightBlue}75.47 & 14.76 & 38.26 & \cellcolor{MyLightGreen}\textbf{92.23} & \cellcolor{MyLightGreen}\textbf{96.25} \\
+ & HRNet & \cellcolor{MyLightGreen}\textbf{0.091} & \cellcolor{MyLightBlue}0.252 & \cellcolor{MyLightBlue}36.36 & 74.99 & \cellcolor{MyLightBlue}18.27 & \cellcolor{MyLightBlue}43.31 & 89.25 & \cellcolor{MyLightBlue}94.00 \\
+\multirow{-3}{*}{\textit{Tello}} & HigherHRNet & 0.095 & 0.264 & \cellcolor{MyLightGreen}\textbf{42.98} & \cellcolor{MyLightGreen}\textbf{75.69} & \cellcolor{MyLightGreen}\textbf{20.19} & \cellcolor{MyLightGreen}\textbf{46.69} & \cellcolor{MyLightBlue}89.54 & 93.63 \\ \hline
+\end{tabular}}
+\end{table}
