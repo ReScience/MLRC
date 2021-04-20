@@ -4,7 +4,7 @@
 Based on the intuition that attention in neural networks is what the model focuses on, attention is now being used as an explanation for a models' prediction (see \citet{galassi2020attention} for a survey). \citet{pruthi-etal-2020-learning} challenge the usage of attention-based explanation through a series of experiments using classification and sequence-to-sequence (seq2seq) models. They examine the model's use of impermissible tokens, which are user-defined tokens that can introduce bias e.g. gendered pronouns. Across multiple datasets, the authors show that with the impermissible tokens removed the model accuracy drops, implying their usage in prediction. And then by penalising attention paid to the impermissible tokens but keeping them in, they train models that retain full accuracy hence must be using the impermissible tokens, but that does not show attention being paid to the impermissible tokens. As the paper's claims have such significant implications for the use of attention-based explanations, we seek to reproduce their results.
 
 \subsection*{Methodology}
-Using the authors' code, for classifiers we attempt to reproduce their embedding, BiLSTM, and BERT results across the occupation prediction, gender identify, and SST + wiki datasets. Further, we reimplemented BERT using HuggingFace's transformer library \citep{huggingface} with restricted self-attention (information cannot flow between permissible and impermissible tokens). For seq2seq we used the authors' code to reproduce results across bigram flip, sequence copy, sequence reverse, and English-German (En-De) machine translation datasets. We performed refactoring on the authors' code aiming toward a more uniformly usable code style as well as porting across to PyTorch Lightning. All experiments were run in approximately 130 GPU hours on a computing cluster with nodes containing Titan RTX GPUs.
+Using the authors' code, for classifiers we attempt to reproduce their embedding, BiLSTM, and BERT results across the occupation prediction, gender identify, and SST + wiki datasets. Further, we reimplemented BERT using HuggingFace's transformer library \citep{huggingface} with restricted self-attention (information cannot flow between permissible and impermissible tokens). For seq2seq we used the authors' code to reproduce results across Bigram Flip, Sequence Copy, Sequence Reverse, and English-German (En-De) machine translation datasets. We performed refactoring on the authors' code aiming toward a more uniformly usable code style as well as porting across to PyTorch Lightning. All experiments were run in approximately 130 GPU hours on a computing cluster with nodes containing Titan RTX GPUs.
 
 \subsection*{Results}
 We reproduced the authors' results across all models and all available datasets, confirming their findings that attention-based explanations can be manipulated and that models can learn to deceive. We also replicated their BERT results using our reimplemented model. There was only one result not as strongly ($>$ 1 S.D.) in their experimental direction.
@@ -53,9 +53,9 @@ Because neural networks are subsymbolic with knowledge stored numerically, it is
 The core finding of the paper is that attention-based explanations of models can be deceptive by, for instance, hiding the model’s use of gendered pronouns at inference from an auditor. Specifically, the authors show that attention weights can be manipulated during training by penalising the allocation of attention to impermissible tokens, without this affecting model performance. Any resulting attention-based explanation might suggest that the model did not rely on impermissible tokens to make its predictions, when in reality the model still uses these but not through the attention mechanism, thereby making the model ``deceptive''. The key findings can be decomposed into the following claims which we are testing in our research:
 
 \begin{enumerate}
-    \item The attention mass on impermissible tokens can be reduced without significantly affecting the classification accuracy of Embeddings + Attention, BiLSTM + Attention, and BERT + Attention models across several tasks (see Table \ref{tab:classification results}).
+    \item The attention mass on impermissible tokens can be reduced without significantly affecting the classification accuracy of Embeddings + Attention, BiLSTM + Attention, and BERT + Attention models across several tasks (see Tables \ref{tab:classification-results-1} and \ref{tab:classification-results-2}).
     \item The attention mass on impermissible tokens can be reduced without significantly affecting the seq2seq performance on translation as measured by BLEU (see Table \ref{tab:seq-to-seq translation results}).
-    \item The attention mass on impermissible tokens can be reduced without significantly affecting the seq2seq accuracy on synthetic data tasks (see Table \ref{tab:Authors seq-to-seq synth results}).
+    \item The attention mass on impermissible tokens can be reduced without significantly affecting the seq2seq accuracy on synthetic data tasks (see Tables \ref{tab:authors-seq-to-seq-results-1} and  \ref{tab:authors-seq-to-seq-results-2}).
 \end{enumerate}
 
 We chose not to perform the human study, testing whether visualised attention weights could deceive NLP/ML trained and Transformer knowledgeable participants, as we deemed that the small sample size does not add value to the results.
@@ -177,144 +177,151 @@ All experiments were run on the LISA computing cluster provided by SURFsara, whi
 \label{sec:results}
 % Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section.
 
-\begin{table}[]
-    \caption{Classification results from Table 3 in \cite{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced} for all models except BERT(HgFc) which follows cell scheme \textit{author | replicated}. Our values are means over 5 different seeds.}
-    \label{tab:classification results}
-    \centering
-    \begin{tabular}{lcccccccccc}
-    \toprule
-    Model & $\lambda$ & I & \multicolumn{2}{c}{Occupation Pred.} & & \multicolumn{2}{c}{Gender Identity} & & \multicolumn{2}{c}{SST + Wiki} \\ \cline{4-5} \cline{7-8} \cline{10-11}
-                       &                        &                    & \multicolumn{1}{c}{Acc.}              & \multicolumn{1}{c}{A.M.}           &  & \multicolumn{1}{c}{Acc.}             & \multicolumn{1}{c}{A.M.}            & & \multicolumn{1}{c}{Acc.}           & \multicolumn{1}{c}{A.M.}          \\
-      \midrule
-      Embedding   & 0.0 & X & $93.8\pmb{\,|\,}93.4$ & - & & $66.8 \pmb{\,|\,} 71.0$ & - & & $48.9 \pmb{\,|\,} 49.3$ & -
-      \\
-      Embedding   & 0.0 & \checkmark & $96.3 \pmb{\,|\,} 96.5$ & $51.4 \pmb{\,|\,} 56.4$ & & $100 \pmb{\,|\,} 100$ & $99.2 \pmb{\,|\,}90.1$ & & $70.7 \pmb{\,|\,} 68.1$ & $48.4 \pmb{\,|\,} 49.9$
-      \\
-      Embedding   & 0.1 & \checkmark & $96.2\pmb{\,|\,}96.3$ & $4.6\pmb{\,|\,}5.70$ & & $99.4\pmb{\,|\,}99.9$ & $3.4\pmb{\,|\,}8.8$ & & $67.9\pmb{\,|\,}69.5$ & $36.4\pmb{\,|\,}16.9$
-      \\
-      Embedding   & 1.0 & \checkmark & $96.2\pmb{\,|\,}96.1$ & $1.3\pmb{\,|\,}1.50$ & & $99.2\pmb{\,|\,}99.5$ & $0.8\pmb{\,|\,}4.6$ & & $48.4\pmb{\,|\,}51.8$ & $8.70\pmb{\,|\,}12.9$
-      \\
-      \midrule
-      BiLSTM   & 0.0 & X & $93.3\pmb{\,|\,}93.6$& - & & $63.3\pmb{\,|\,}71.1$ & - & & $49.1\pmb{\,|\,}48.9$ & -
-      \\
-      BiLSTM   & 0.0 & \checkmark & $96.4\pmb{\,|\,}96.7$ & $50.3\pmb{\,|\,}44.1$ & & $100\pmb{\,|\,}100$ & $96.8\pmb{\,|\,}95.5$ & & $76.9\pmb{\,|\,}75.9$ & $77.7\pmb{\,|\,}81.5$
-      \\
-      BiLSTM   & 0.1 & \checkmark & $96.4\pmb{\,|\,}96.6$ & $0.08\pmb{\,|\,}3.70$ & & $100\pmb{\,|\,}100$ & $<10^{-6}\pmb{\,|\,}0.07$ & & $60.6\pmb{\,|\,}65.1$ & $0.04\pmb{\,|\,}0.99$
-      \\
-      BiLSTM   & 1.0 & \checkmark & $96.7\pmb{\,|\,}96.5$ & $<10^{-2}\pmb{\,|\,}0.015$ & & $100\pmb{\,|\,}100$ & $<10^{-6}\pmb{\,|\,}0.0047$ & & $61.0\pmb{\,|\,}64.9$ & $0.07\pmb{\,|\,}0.035$
-      \\
-      \midrule
-      BERT   & 0.0 & X & $95.0\pmb{\,|\,}95.8$ & - & & $72.8\pmb{\,|\,}82.3$ & - & & $50.4\pmb{\,|\,}50.2$ & -
-      \\
-      BERT(mean)   & 0.0 & \checkmark & $97.2\pmb{\,|\,}97.1$ & $13.9\pmb{\,|\,}9.10$ & & $100\pmb{\,|\,}99.9$ & $80.8\pmb{\,|\,}55.1$ & & $90.8\pmb{\,|\,}91.8$ & $59.0\pmb{\,|\,}17.4$
-      \\
-      BERT(mean)   & 0.1 & \checkmark & $97.2\pmb{\,|\,}97.3$ & $0.001\pmb{\,|\,}0.007$ & & $99.9\pmb{\,|\,}99.9$ & $<10^{-3}\pmb{\,|\,}0.004$ & & $90.9\pmb{\,|\,}91.5$ & $<10^{-2}\pmb{\,|\,}0.04$
-      \\
-      BERT(mean)   & 1.0 & \checkmark & $97.2\pmb{\,|\,}97.3$ & $<10^{-3}\pmb{\,|\,}0.0007$ & & $99.9\pmb{\,|\,}99.9$ & $<10^{-3}\pmb{\,|\,}0.0003$ & & $90.6\pmb{\,|\,}91.9$ & $<10^{-3}\pmb{\,|\,}0.005$
-      \\
-      \midrule
-      BERT   & 0.0 & X & $95.0\pmb{\,|\,}95.8$ & - & & $72.8\pmb{\,|\,}82.3$ & - & & $50.4\pmb{\,|\,}50.2$ & -
-      \\
-      BERT(max)   & 0.0 & \checkmark & $97.2\pmb{\,|\,}97.1$ & $99.7\pmb{\,|\,}65.5$ & & $100\pmb{\,|\,}99.9$ & $99.7\pmb{\,|\,}99.8$ & & $90.8\pmb{\,|\,}91.8$ & $96.2\pmb{\,|\,}67.4$
-      \\
-      BERT(max)   & 0.1 & \checkmark & $97.1\pmb{\,|\,}97.1$ & $<10^{-3}\pmb{\,|\,}0.007$ & & $99.9\pmb{\,|\,}99.9$ & $<10^{-3}\pmb{\,|\,}0.003$ & & $90.7\pmb{\,|\,}91.9$ & $<10^{-2}\pmb{\,|\,}0.04$
-      \\
-      BERT(max)   & 1.0 & \checkmark & $97.4\pmb{\,|\,}97.2$ & $<10^{-3}\pmb{\,|\,}0.0008$ & & $99.8\pmb{\,|\,}99.9$ & $<10^{-4}\pmb{\,|\,}0.0005$ & & $90.2\pmb{\,|\,}91.8$ & $<10^{-3}\pmb{\,|\,}0.003$
-      \\
-      \midrule
-      BERT(HgFc)   & 0.0 & X & $95.0\pmb{\,|\,}95.2$ & - & & $72.8\pmb{\,|\,}81.2$ & - & & $50.4\pmb{\,|\,}52.8$ & -
-      \\
-      BERT(mean)   & 0.0 & \checkmark & $97.2\pmb{\,|\,}97.1$ & $13.9\pmb{\,|\,}23.16$ & & $100\pmb{\,|\,}99.9$ & $80.8\pmb{\,|\,}57.6$ & & $90.8\pmb{\,|\,}91.2$ & $59.0\pmb{\,|\,}68.66$
-      \\
-      BERT(mean)   & 0.1 & \checkmark & $97.2\pmb{\,|\,}96.8$ & $0.001\pmb{\,|\,}0.006$ & & $99.9\pmb{\,|\,}99.9$ & $<10^{-3}\pmb{\,|\,}0.001$ & & $90.9\pmb{\,|\,}90.7$ & $<10^{-2}\pmb{\,|\,}0.018$
-      \\
-      BERT(mean)   & 1.0 & \checkmark & $97.2\pmb{\,|\,}97.1$ & $<10^{-3}\pmb{\,|\,}0.002$ & & $99.9\pmb{\,|\,}99.8$ & $<10^{-3}\pmb{\,|\,}0.001$ & & $90.6\pmb{\,|\,}85.4$ & $<10^{-3}\pmb{\,|\,}0.019$
-      \\
-      \midrule
-      BERT(HgFc)   & 0.0 & X & $95.0\pmb{\,|\,}95.2$ & - & & $72.8\pmb{\,|\,}81.24$ & - & & $50.4\pmb{\,|\,}52.8$ & -
-      \\
-      BERT(max)   & 0.0 & \checkmark & $97.2\pmb{\,|\,}97.2$ & $99.7\pmb{\,|\,}66,88$ & & $100\pmb{\,|\,}99.9$ & $99.7\pmb{\,|\,}93.7$ & & $90.8\pmb{\,|\,}91.1$ & $96.2\pmb{\,|\,}93.94$
-      \\
-      BERT(max)   & 0.1 & \checkmark & $97.1\pmb{\,|\,}97.0$ & $<10^{-3}\pmb{\,|\,}0.003$ & & $99.9\pmb{\,|\,}99.8$ & $<10^{-3}\pmb{\,|\,}0.006$ & & $90.7\pmb{\,|\,}89.8$ & $<10^{-2}\pmb{\,|\,}0.007$
-      \\
-      BERT(max)   & 1.0 & \checkmark & $97.4\pmb{\,|\,}97.0$ & $<10^{-3}\pmb{\,|\,}0.001$ & & $99.8\pmb{\,|\,}99.9$ & $<10^{-4}\pmb{\,|\,}0.001$ & & $90.2\pmb{\,|\,}86.0$ & $<10^{-3}\pmb{\,|\,}0.0007$
-      \\
-    \bottomrule
-    \end{tabular}
+\begin{table}
+\centering
+\caption{Classification results from Table 3 in \citet{pruthi-etal-2020-learning} for datasets Occupation Prediction and Gender Identity with cell scheme \textit{author | reproduced} for all models except BERT(HgFc) which follows cell scheme \textit{author | replicated}. Our values are means over 5 different seeds.}
+\label{tab:classification-results-1}
+\begin{tabular}{lccccccc} 
+\toprule
+Model      & $\lambda$ & I & \multicolumn{2}{c}{Occupation Prediction}                  &  & \multicolumn{2}{c}{Gender Identity}                    \\ 
+\cline{4-5}\cline{7-8}
+           &           &   & Accuracy                    & Attention Mass                        &  & Accuracy                    & Attention Mass                         \\ 
+\midrule
+Embedding  & 0.0       & X & $93.8\pmb{\,|\,}93.4$   & -                           &  & $66.8 \pmb{\,|\,} 71.0$ & -                            \\
+Embedding  & 0.0       & \checkmark  & $96.3 \pmb{\,|\,} 96.5$ & $51.4 \pmb{\,|\,} 56.4$     &  & $100 \pmb{\,|\,} 100$   & $99.2 \pmb{\,|\,}90.1$       \\
+Embedding  & 0.1       & \checkmark  & $96.2\pmb{\,|\,}96.3$   & $4.6\pmb{\,|\,}5.70$        &  & $99.4\pmb{\,|\,}99.9$   & $3.4\pmb{\,|\,}8.8$          \\
+Embedding  & 1.0       & \checkmark  & $96.2\pmb{\,|\,}96.1$   & $1.3\pmb{\,|\,}1.50$        &  & $99.2\pmb{\,|\,}99.5$   & $0.8\pmb{\,|\,}4.6$          \\ 
+\midrule
+BiLSTM     & 0.0       & X & $93.3\pmb{\,|\,}93.6$   & -                           &  & $63.3\pmb{\,|\,}71.1$   & -                            \\
+BiLSTM     & 0.0       & \checkmark  & $96.4\pmb{\,|\,}96.7$   & $50.3\pmb{\,|\,}44.1$       &  & $100\pmb{\,|\,}100$     & $96.8\pmb{\,|\,}95.5$        \\
+BiLSTM     & 0.1       & \checkmark  & $96.4\pmb{\,|\,}96.6$   & $0.08\pmb{\,|\,}3.70$       &  & $100\pmb{\,|\,}100$     & $<10^{-6}\pmb{\,|\,}0.07$    \\
+BiLSTM     & 1.0       & \checkmark  & $96.7\pmb{\,|\,}96.5$   & $<10^{-2}\pmb{\,|\,}0.015$  &  & $100\pmb{\,|\,}100$     & $<10^{-6}\pmb{\,|\,}0.0047$  \\ 
+\midrule
+BERT       & 0.0       & X & $95.0\pmb{\,|\,}95.8$   & -                           &  & $72.8\pmb{\,|\,}82.3$   & -                            \\
+BERT(mean) & 0.0       & \checkmark  & $97.2\pmb{\,|\,}97.1$   & $13.9\pmb{\,|\,}9.10$       &  & $100\pmb{\,|\,}99.9$    & $80.8\pmb{\,|\,}55.1$        \\
+BERT(mean) & 0.1       & \checkmark  & $97.2\pmb{\,|\,}97.3$   & $0.001\pmb{\,|\,}0.007$     &  & $99.9\pmb{\,|\,}99.9$   & $<10^{-3}\pmb{\,|\,}0.004$   \\
+BERT(mean) & 1.0       & \checkmark  & $97.2\pmb{\,|\,}97.3$   & $<10^{-3}\pmb{\,|\,}0.0007$ &  & $99.9\pmb{\,|\,}99.9$   & $<10^{-3}\pmb{\,|\,}0.0003$  \\ 
+\midrule
+BERT       & 0.0       & X & $95.0\pmb{\,|\,}95.8$   & -                           &  & $72.8\pmb{\,|\,}82.3$   & -                            \\
+BERT(max)  & 0.0       & \checkmark  & $97.2\pmb{\,|\,}97.1$   & $99.7\pmb{\,|\,}65.5$       &  & $100\pmb{\,|\,}99.9$    & $99.7\pmb{\,|\,}99.8$        \\
+BERT(max)  & 0.1       & \checkmark  & $97.1\pmb{\,|\,}97.1$   & $<10^{-3}\pmb{\,|\,}0.007$  &  & $99.9\pmb{\,|\,}99.9$   & $<10^{-3}\pmb{\,|\,}0.003$   \\
+BERT(max)  & 1.0       & \checkmark  & $97.4\pmb{\,|\,}97.2$   & $<10^{-3}\pmb{\,|\,}0.0008$ &  & $99.8\pmb{\,|\,}99.9$   & $<10^{-4}\pmb{\,|\,}0.0005$  \\ 
+\midrule
+BERT(HgFc) & 0.0       & X & $95.0\pmb{\,|\,}95.2$   & -                           &  & $72.8\pmb{\,|\,}81.2$   & -                            \\
+BERT(mean) & 0.0       & \checkmark  & $97.2\pmb{\,|\,}97.1$   & $13.9\pmb{\,|\,}23.16$      &  & $100\pmb{\,|\,}99.9$    & $80.8\pmb{\,|\,}57.6$        \\
+BERT(mean) & 0.1       & \checkmark  & $97.2\pmb{\,|\,}96.8$   & $0.001\pmb{\,|\,}0.006$     &  & $99.9\pmb{\,|\,}99.9$   & $<10^{-3}\pmb{\,|\,}0.001$   \\
+BERT(mean) & 1.0       & \checkmark  & $97.2\pmb{\,|\,}97.1$   & $<10^{-3}\pmb{\,|\,}0.002$  &  & $99.9\pmb{\,|\,}99.8$   & $<10^{-3}\pmb{\,|\,}0.001$   \\ 
+\midrule
+BERT(HgFc) & 0.0       & X & $95.0\pmb{\,|\,}95.2$   & -                           &  & $72.8\pmb{\,|\,}81.24$  & -                            \\
+BERT(max)  & 0.0       & \checkmark  & $97.2\pmb{\,|\,}97.2$   & $99.7\pmb{\,|\,}66,88$      &  & $100\pmb{\,|\,}99.9$    & $99.7\pmb{\,|\,}93.7$        \\
+BERT(max)  & 0.1       & \checkmark  & $97.1\pmb{\,|\,}97.0$   & $<10^{-3}\pmb{\,|\,}0.003$  &  & $99.9\pmb{\,|\,}99.8$   & $<10^{-3}\pmb{\,|\,}0.006$   \\
+BERT(max)  & 1.0       & \checkmark  & $97.4\pmb{\,|\,}97.0$   & $<10^{-3}\pmb{\,|\,}0.001$  &  & $99.8\pmb{\,|\,}99.9$   & $<10^{-4}\pmb{\,|\,}0.001$   \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-\begin{table}[]
-    \caption{Seq2seq synthetic data tasks from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. All values are means over 5 different seeds. Standard deviations are presented in Table \ref{tab:seq-to-seq synth results stdv} of the Appendix.}
-    \label{tab:Authors seq-to-seq synth results}
-    \centering
-    \begin{tabular}{lccccccccc}
-    \toprule
-Attention & $\lambda$ & \multicolumn{2}{c}{Bigram Flip} &  & \multicolumn{2}{c}{Sequence Copy} &  & \multicolumn{2}{c}{Sequence Reverse} \\ \cline{3-4} \cline{6-7} \cline{9-10}
-                           &                        & \multicolumn{1}{c}{Acc.}           & \multicolumn{1}{c}{A.M.}           &  & \multicolumn{1}{c}{Acc.}            & \multicolumn{1}{c}{A.M.}            &  & \multicolumn{1}{c}{Acc.}              & \multicolumn{1}{c}{A.M.}                    \\
-      \midrule
-      Dot-Product   & 0.0 & $100\pmb{\,|\,}100$ & $94.5\pmb{\,|\,}93.9$ & & $99.9\pmb{\,|\,}100$ & $98.8\pmb{\,|\,}94.1$ & & $100.0\pmb{\,|\,}100$ & $94.1\pmb{\,|\,}94.0$
-      \\
-      \midrule
-      Uniform   & 0.0 & $97.8\pmb{\,|\,}95.1$ & $5.2\pmb{\,|\,}4.71$ & & $93.8\pmb{\,|\,}79.3$ & $5.2\pmb{\,|\,}4.73$ & & $88.1\pmb{\,|\,}80.8$ & $4.7\pmb{\,|\,}7.74$
-      \\
-      None   & 0.0 & $96.4\pmb{\,|\,}96.4$ & - & & $84.1\pmb{\,|\,}87.3$ & - & & $84.1\pmb{\,|\,}87.2$ & -
-      \\
-      \midrule
-      Manipulated   & 0.1 & $99.9\pmb{\,|\,}100$ & $24.4\pmb{\,|\,}15.2$ & & $100.0\pmb{\,|\,}100$ & $27.3\pmb{\,|\,}10.7$ & & $100\pmb{\,|\,}100$ & $27.6\pmb{\,|\,}16.3$
-      \\
-      Manipulated   & 1.0 & $99.8\pmb{\,|\,}99.6$ & $0.03\pmb{\,|\,}0.01$ & & $92.9\pmb{\,|\,}99.9$ & $0.02\pmb{\,|\,}0.014$ & & $99.8\pmb{\,|\,}99.9$ & $0.01\pmb{\,|\,}0.014$
-    \\
-    \bottomrule
-    \end{tabular}
+\begin{table}
+\centering
+\caption{Classification results from Table 3 in \citet{pruthi-etal-2020-learning} for dataset SST + Wiki with cell scheme \textit{author | reproduced} for all models except BERT(HgFc) which follows cell scheme \textit{author | replicated}. Our values are means over 5 different seeds.}
+\label{tab:classification-results-2}
+\begin{tabular}{lcccc} 
+\toprule
+Model      & $\lambda$ & I & \multicolumn{2}{c}{SST + Wiki}                         \\ 
+\cline{4-5}
+           &           &   & Accuracy                    & Attention Mass                       \\ 
+\midrule
+Embedding  & 0.0       & X & $48.9 \pmb{\,|\,} 49.3$ & -                            \\
+Embedding  & 0.0       & \checkmark  & $70.7 \pmb{\,|\,} 68.1$ & $48.4 \pmb{\,|\,} 49.9$      \\
+Embedding  & 0.1       & \checkmark  & $67.9\pmb{\,|\,}69.5$   & $36.4\pmb{\,|\,}16.9$        \\
+Embedding  & 1.0       &  \checkmark & $48.4\pmb{\,|\,}51.8$   & $8.70\pmb{\,|\,}12.9$        \\ 
+\midrule
+BiLSTM     & 0.0       & X & $49.1\pmb{\,|\,}48.9$   & -                            \\
+BiLSTM     & 0.0       & \checkmark  & $76.9\pmb{\,|\,}75.9$   & $77.7\pmb{\,|\,}81.5$        \\
+BiLSTM     & 0.1       & \checkmark  & $60.6\pmb{\,|\,}65.1$   & $0.04\pmb{\,|\,}0.99$        \\
+BiLSTM     & 1.0       & \checkmark  & $61.0\pmb{\,|\,}64.9$   & $0.07\pmb{\,|\,}0.035$       \\ 
+\midrule
+BERT       & 0.0       & X & $50.4\pmb{\,|\,}50.2$   & -                            \\
+BERT(mean) & 0.0       &  \checkmark & $90.8\pmb{\,|\,}91.8$   & $59.0\pmb{\,|\,}17.4$        \\
+BERT(mean) & 0.1       &  \checkmark & $90.9\pmb{\,|\,}91.5$   & $<10^{-2}\pmb{\,|\,}0.04$    \\
+BERT(mean) & 1.0       & \checkmark  & $90.6\pmb{\,|\,}91.9$   & $<10^{-3}\pmb{\,|\,}0.005$   \\ 
+\midrule
+BERT       & 0.0       & X & $50.4\pmb{\,|\,}50.2$   & -                            \\
+BERT(max)  & 0.0       & \checkmark  & $90.8\pmb{\,|\,}91.8$   & $96.2\pmb{\,|\,}67.4$        \\
+BERT(max)  & 0.1       &  \checkmark & $90.7\pmb{\,|\,}91.9$   & $<10^{-2}\pmb{\,|\,}0.04$    \\
+BERT(max)  & 1.0       &  \checkmark & $90.2\pmb{\,|\,}91.8$   & $<10^{-3}\pmb{\,|\,}0.003$   \\ 
+\midrule
+BERT(HgFc) & 0.0       & X & $50.4\pmb{\,|\,}52.8$   & -                            \\
+BERT(mean) & 0.0       & \checkmark  & $90.8\pmb{\,|\,}91.2$   & $59.0\pmb{\,|\,}68.66$       \\
+BERT(mean) & 0.1       & \checkmark  & $90.9\pmb{\,|\,}90.7$   & $<10^{-2}\pmb{\,|\,}0.018$   \\
+BERT(mean) & 1.0       & \checkmark  & $90.6\pmb{\,|\,}85.4$   & $<10^{-3}\pmb{\,|\,}0.019$   \\ 
+\midrule
+BERT(HgFc) & 0.0       & X & $50.4\pmb{\,|\,}52.8$   & -                            \\
+BERT(max)  & 0.0       & \checkmark  & $90.8\pmb{\,|\,}91.1$   & $96.2\pmb{\,|\,}93.94$       \\
+BERT(max)  & 0.1       & \checkmark  & $90.7\pmb{\,|\,}89.8$   & $<10^{-2}\pmb{\,|\,}0.007$   \\
+BERT(max)  & 1.0       & \checkmark  & $90.2\pmb{\,|\,}86.0$   & $<10^{-3}\pmb{\,|\,}0.0007$  \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% \begin{table}[]
-%     \caption{Reproductions seq2seq synthetic data tasks from Table 4 in the original paper \citep{pruthi-etal-2020-learning}}
-%     \label{tab:seq-to-seq synth results}
-%     \centering
-%     \begin{tabular}{lccccccccc}
-%     \toprule
-% Attention & $\lambda$ & \multicolumn{2}{c}{Bigram Flip} &  & \multicolumn{2}{c}{Sequence Copy} &  & \multicolumn{2}{c}{Sequence Reverse} \\ \cline{3-4} \cline{6-7} \cline{9-10}
-%                           &                        & \multicolumn{1}{c}{Acc.}           & \multicolumn{1}{c}{A.M.}           &  & \multicolumn{1}{c}{Acc.}            & \multicolumn{1}{c}{A.M.}            &  & \multicolumn{1}{c}{Acc.}              & \multicolumn{1}{c}{A.M.}                    \\
-%       \midrule
-%       Dot-Product   & 0.0 & $100 \pm 0.00$ & $93.9 \pm 0.21$ & & $100 \pm 0.00$ & $94.1 \pm 0.11$ & & $100 \pm 0.00$ & $94.0 \pm 0.13$
-%       \\
-%       \midrule
-%       Uniform   & 0.0 & $95.1 \pm 1.90$ & $4.71 \pm 0.00$ & & $79.3 \pm 4.20$ & $4.73 \pm 0.00$ & & $80.8 \pm 3.40$ & $7.74 \pm 0.00$
-%       \\
-%       None   & 0.0 & $96.4 \pm 0.95$ & - & & $87.3 \pm 6.40$ & - & & $87.2 \pm 3.40$ & -
-%       \\
-%       \midrule
-%       Manipulated   & 0.1 & $100 \pm 0.00$ & $15.2 \pm 7.50$ & & $100 \pm 0.00$ & $10.7 \pm 9.70$ & & $100 \pm 0.00$ & $16.3 \pm 10.0$
-%       \\
-%       Manipulated   & 1.0 & $99.6 \pm 0.67$ & $0.01 \pm 0.03$ & & $99.9 \pm 0.05$ & $0.014 \pm 0.01$ & & $99.9 \pm 0.04$ & $0.014 \pm 0.01$
-%     \\
-%     \bottomrule
-%     \end{tabular}
-% \end{table}
+\begin{table}
+\centering
+\caption{Results for Seq2seq synthetic data tasks Bigram Flip and Sequence Copy from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. All values are means over 5 different seeds. Standard deviations are presented in Tables \ref{tab:seq-to-seq-stdv-1} and \ref{tab:seq-to-seq-stdv-2} of the Appendix.}
+\label{tab:authors-seq-to-seq-results-1}
+\begin{tabular}{lcccccc} 
+\toprule
+Attention   & $\lambda$ & \multicolumn{2}{c}{Bigram Flip}               &  & \multicolumn{2}{c}{Sequence Copy}               \\ 
+\cline{3-4}\cline{6-7}
+            &           & Accuracy                  & Attention Mass                  &  & Accuracy                  & Attention Mass                    \\ 
+\midrule
+Dot-Product & 0.0       & $100\pmb{\,|\,}100$   & $94.5\pmb{\,|\,}93.9$ &  & $99.9\pmb{\,|\,}100$  & $98.8\pmb{\,|\,}94.1$   \\ 
+\midrule
+Uniform     & 0.0       & $97.8\pmb{\,|\,}95.1$ & $5.2\pmb{\,|\,}4.71$  &  & $93.8\pmb{\,|\,}79.3$ & $5.2\pmb{\,|\,}4.73$    \\
+None        & 0.0       & $96.4\pmb{\,|\,}96.4$ & -                     &  & $84.1\pmb{\,|\,}87.3$ & -                       \\ 
+\midrule
+Manipulated & 0.1       & $99.9\pmb{\,|\,}100$  & $24.4\pmb{\,|\,}15.2$ &  & $100.0\pmb{\,|\,}100$ & $27.3\pmb{\,|\,}10.7$   \\
+Manipulated & 1.0       & $99.8\pmb{\,|\,}99.6$ & $0.03\pmb{\,|\,}0.01$ &  & $92.9\pmb{\,|\,}99.9$ & $0.02\pmb{\,|\,}0.014$  \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{table}[]
-    \caption{Reproductions (means over 5 different seeds) En-De MT tasks from Table 4 in \cite{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. The BLEU(NLTK) values are not contained in the original paper, thus replicated. Standard deviations are presented in Table \ref{tab:seq-to-seq translation results stdv} of the Appendix.}
-    \label{tab:seq-to-seq translation results}
-    \centering
-    \begin{tabular}{lccccc}
-    \toprule
-      Attention & $\lambda$  & BLEU (C-MT)  & BLEU (NLTK) & Accuracy & Attention Mass\\
-      \midrule
-      Dot-Product   & 0.0 & $24.42\pmb{\,|\,}24.89$ & $24.89$ & $36.99\pmb{\,|\,}36.75$ & $20.66\pmb{\,|\,}24.52$
-      \\
-      \midrule
-      Uniform   & 0.0 & $18.49\pmb{\,|\,}18.37$ & $18.37$ & $32.31\pmb{\,|\,}31.76$ & $5.96\pmb{\,|\,}5.96$
-      \\
-      None   & 0.0 & $14.89\pmb{\,|\,}15.88$ & $15.88$ & $29.73\pmb{\,|\,}30.36$ & -
-      \\
-      \midrule
-      Manipulated   & 0.1 & $23.69\pmb{\,|\,}24.30$ & $24.30$ & $36.28\pmb{\,|\,}36.49$ & $7.02\pmb{\,|\,}16.77$
-      \\
-      Manipulated   & 1.0 & $20.66\pmb{\,|\,}21.07$ & $21.07$ & $33.82\pmb{\,|\,}33.68$ & $1.16\pmb{\,|\,}1.40$
-    \\
-    \bottomrule
-    \end{tabular}
+\begin{table}
+\centering
+\caption{Results for Seq2seq synthetic task Sequence Reverse from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. All values are means over 5 different seeds. Standard deviations are presented in Tables \ref{tab:seq-to-seq-stdv-1} and \ref{tab:seq-to-seq-stdv-2} of the Appendix.}
+\label{tab:authors-seq-to-seq-results-2}
+\begin{tabular}{lccc} 
+\toprule
+Attention   & $\lambda$ & \multicolumn{2}{c}{Sequence Reverse}            \\ 
+\cline{3-4}
+            &           & Accuracy                  & Attention Mass                  \\ 
+\midrule
+Dot-Product & 0.0       & $100.0\pmb{\,|\,}100$ & $94.1\pmb{\,|\,}94.0$   \\ 
+\midrule
+Uniform     & 0.0       & $88.1\pmb{\,|\,}80.8$ & $4.7\pmb{\,|\,}7.74$    \\
+None        & 0.0       & $84.1\pmb{\,|\,}87.2$ & -                       \\ 
+\midrule
+Manipulated & 0.1       & $100\pmb{\,|\,}100$   & $27.6\pmb{\,|\,}16.3$   \\
+Manipulated & 1.0       & $99.8\pmb{\,|\,}99.9$ & $0.01\pmb{\,|\,}0.014$  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Reproductions (means over 5 different seeds) En-De MT tasks from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. The BLEU(NLTK) values are not contained in the original paper, thus replicated. Standard deviations are presented in Table \ref{tab:seq-to-seq translation results stdv} of the Appendix.}
+\label{tab:seq-to-seq translation results}
+\begin{tabular}{lccccc} 
+\toprule
+Attention   & $\lambda$ & BLEU (C-MT)             & BLEU (NLTK) & Accuracy                & Attention Mass           \\ 
+\midrule
+Dot-Product & 0.0       & $24.42\pmb{\,|\,}24.89$ & $24.89$     & $36.99\pmb{\,|\,}36.75$ & $20.66\pmb{\,|\,}24.52$  \\ 
+\midrule
+Uniform     & 0.0       & $18.49\pmb{\,|\,}18.37$ & $18.37$     & $32.31\pmb{\,|\,}31.76$ & $5.96\pmb{\,|\,}5.96$    \\
+None        & 0.0       & $14.89\pmb{\,|\,}15.88$ & $15.88$     & $29.73\pmb{\,|\,}30.36$ & -                        \\ 
+\midrule
+Manipulated & 0.1       & $23.69\pmb{\,|\,}24.30$ & $24.30$     & $36.28\pmb{\,|\,}36.49$ & $7.02\pmb{\,|\,}16.77$   \\
+Manipulated & 1.0       & $20.66\pmb{\,|\,}21.07$ & $21.07$     & $33.82\pmb{\,|\,}33.68$ & $1.16\pmb{\,|\,}1.40$    \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 % \subsection{Results Reproducing Original Paper}
@@ -323,10 +330,10 @@ Attention & $\lambda$ & \multicolumn{2}{c}{Bigram Flip} &  & \multicolumn{2}{c}{
 % Logically group related results into sections.
 
 \subsection{Classification}
-For the classification results, see Table \ref{tab:classification results}. As can be observed, our results support claim 1, and we were able to reproduce the results from Table 3 in the original paper (excluding the Reference Letters dataset). Furthermore, we replicated the BERT(max) and BERT(mean) results using our implementation. While the results for the BERT replication match the authors' findings closely, there are also some noticeable differences; particularly, for the SST+WIKI task, we can see that for both the \textit{mean} and \textit{max} models for $\lambda = 1.0$, the replication of BERT does not manage to retain its performance, with a drop in accuracy of 4 and 6 percent, respectively.
+For the classification results, see Tables \ref{tab:classification-results-1} and \ref{tab:classification-results-2}. As can be observed, our results support claim 1, and we were able to reproduce the results from Table 3 in the original paper (excluding the Reference Letters dataset). Furthermore, we replicated the BERT(max) and BERT(mean) results using our implementation. While the results for the BERT replication match the authors' findings closely, there are also some noticeable differences; particularly, for the SST+WIKI task, we can see that for both the \textit{mean} and \textit{max} models for $\lambda = 1.0$, the replication of BERT does not manage to retain its performance, with a drop in accuracy of 4 and 6 percent, respectively.
 
 \subsection{Seq2seq}
-The results in Table \ref{tab:Authors seq-to-seq synth results} and Table \ref{tab:seq-to-seq translation results} support claims 2-3, and we were able to reproduce the results from Table 4 in the original paper. Especially the reported mean accuracy by \cite{pruthi-etal-2020-learning} shows no significant difference to our reported values for all seq2seq tasks except for the baseline experiments with uniform and no attention for the tasks sequence copy and sequence reverse. Both have a mean difference of 3-14 \% accuracy regarding the authors' accuracies. \citet{pruthi-etal-2020-learning} did not report accuracies for the translation task in their original paper, but they provided us with additional raw data which also contained the accuracy scores from their experiments. Therefore we also compare accuracies for the En-De MT task.
+The results in Tables \ref{tab:authors-seq-to-seq-results-1}, \ref{tab:authors-seq-to-seq-results-2} and \ref{tab:seq-to-seq translation results} support claims 2-3, and we were able to reproduce the results from Table 4 in the original paper. Especially the reported mean accuracy by \cite{pruthi-etal-2020-learning} shows no significant difference to our reported values for all seq2seq tasks except for the baseline experiments with uniform and no attention for the tasks sequence copy and sequence reverse. Both have a mean difference of 3-14 \% accuracy regarding the authors' accuracies. \citet{pruthi-etal-2020-learning} did not report accuracies for the translation task in their original paper, but they provided us with additional raw data which also contained the accuracy scores from their experiments. Therefore we also compare accuracies for the En-De MT task.
 
 \section{Results Beyond Original Paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
@@ -334,33 +341,53 @@ The results in Table \ref{tab:Authors seq-to-seq synth results} and Table \ref{t
 The authors state that their seq2seq results in Table 4 of the original paper are based on the average of 5 different seeds. Additional to their work we have examined the standard deviations alongside the average for all the results, comparing their results and ours. Further, while the authors do not state whether classification results from Table 3 in their original paper are based on the average of 5 seeds, we have again completed 5 runs of the experiments and provided the average.
 
 \subsection{Under-Parameterised Models}
-In the original paper, the classification results for the Embedding and BiLSTM models for the task on SST+Wiki are outliers because, while the attention mass over the impermissible tokens decreases as $\lambda$ increases, the test accuracy also decreases significantly. The authors speculate that this behavior is due to the models being under-parameterised. We investigated this by training Embedding and BiLSTM models with larger embedding dimensions. In particular, we compared embedding sizes of 128 (original size), 256, and 512. The results are presented in Table \ref{tab:embedding-results}. Increasing the dimensionality of the embedding does not seem to prevent the accuracy from dropping for larger values of $\lambda$. We speculate that the drop in accuracy is due to the way the impermissible tokens are defined for the SST+Wiki dataset. All the words belonging to the SST sentence are labeled as impermissible and will therefore be penalised by the auxiliary loss component. Because the Wikipedia sentence does not provide useful information for the sentiment prediction, the model cannot rely on it and the accuracy reduces as the penalty term increases. This behaviour does not occur for the other datasets because only a few impermissible tokens were selected for the experiments, allowing the model to find other proxy tokens carrying information about the respective classification tasks. For example, words such as "lesbian" or gendered names such as "Mark" were not labeled as impermissible in the Occupation Prediction dataset. An alternative experiment could have been to define the impermissible tokens of the SST+Wiki dataset as the words in the SST sentence with the strongest positive or negative sentiment scores.
+In the original paper, the classification results for the Embedding and BiLSTM models for the task on SST+Wiki are outliers because, while the attention mass over the impermissible tokens decreases as $\lambda$ increases, the test accuracy also decreases significantly. The authors speculate that this behavior is due to the models being under-parameterised. We investigated this by training Embedding and BiLSTM models with larger embedding dimensions. In particular, we compared embedding sizes of 128 (original size), 256, and 512. The results are presented in Tables \ref{tab:embedding-results-1} and \ref{tab:embedding-results-2}. Increasing the dimensionality of the embedding does not seem to prevent the accuracy from dropping for larger values of $\lambda$. We speculate that the drop in accuracy is due to the way the impermissible tokens are defined for the SST+Wiki dataset. All the words belonging to the SST sentence are labeled as impermissible and will therefore be penalised by the auxiliary loss component. Because the Wikipedia sentence does not provide useful information for the sentiment prediction, the model cannot rely on it and the accuracy reduces as the penalty term increases. This behaviour does not occur for the other datasets because only a few impermissible tokens were selected for the experiments, allowing the model to find other proxy tokens carrying information about the respective classification tasks. For example, words such as "lesbian" or gendered names such as "Mark" were not labeled as impermissible in the Occupation Prediction dataset. An alternative experiment could have been to define the impermissible tokens of the SST+Wiki dataset as the words in the SST sentence with the strongest positive or negative sentiment scores.
 
-\begin{table}[h!]
-    \caption{Influence of the embedding size for Embedding and BiLSTM models on the SST + Wiki dataset. The values reported are the means over 5 different seeds and the standard deviations.}
-    \label{tab:embedding-results}
-    \centering
-    \begin{tabular}{lccclllllll}
-    \toprule
-    & & & \multicolumn{8}{c}{Embedding dimension} \\
-    Model & $\lambda$ & I & \multicolumn{2}{c}{128 (original size)} & & \multicolumn{2}{c}{256} & & \multicolumn{2}{c}{512} \\ \cline{4-5} \cline{7-8} \cline{10-11}
-                       &                        &                    & \multicolumn{1}{c}{Acc.}              & \multicolumn{1}{c}{A.M.}           &  & \multicolumn{1}{c}{Acc.}             & \multicolumn{1}{c}{A.M.}            & & \multicolumn{1}{c}{Acc.}           & \multicolumn{1}{c}{A.M.}          \\
-      \midrule
-      Embedding   & 0.0 & \checkmark & $68.1 \pm 1.6$ & $49.9 \pm 2.2$ & & $69.1 \pm 2$ & $50 \pm 1.1$ & & $68.1 \pm 2.4$ & $51.8 \pm 3.2$
-      \\
-      Embedding   & 0.1 & \checkmark & $69.5 \pm 1.4$ & $17 \pm 1$ & & $69.1 \pm 1.6$ & $40.3 \pm 0.48$ & & $68.3 \pm 0.76$ & $41.4 \pm 2.3$
-      \\
-      Embedding   & 1.0 & \checkmark & $51.8 \pm 1.1$ & $12.9 \pm 2$ & & $51 \pm 0.84$ & $12.3 \pm 1.4$ & & $51.8 \pm 2$ & $11.1 \pm 2.2$
-      \\
-      \midrule
-      BiLSTM   & 0.0 & \checkmark & $76.4 \pm 0.8$ & $81.5 \pm 7.5$ & & $76 \pm 2.7$ & $85.5 \pm 3$ & & $76.2 \pm 2.8$ & $76.8 \pm 2.4$
-      \\
-      BiLSTM   & 0.1 & \checkmark & $65.1 \pm 4$ & $0.99 \pm 1.3$ & & $65.4 \pm 4.7$ & $0.94 \pm 0.8$ & & $62.3 \pm 4.1$ & $3.5 \pm 1.9$
-      \\
-      BiLSTM   & 1.0 & \checkmark & $64.9 \pm 3.1$ & $0.035 \pm 0.02$ & & $62.1 \pm 2.5$ & $0.11 \pm 0.09$ & & $57.3 \pm 1.5$ & $0.13 \pm 0.9$
-      \\
-    \bottomrule
-    \end{tabular}
+% \usepackage{booktabs}
+
+
+\begin{table}[b]
+\centering
+\caption{Influence of the embedding size for Embedding and BiLSTM models on the SST + Wiki dataset. The values reported are the means over 5 different seeds and the standard deviations.}
+\label{tab:embedding-results-1}
+\begin{tabular}{lcccllll} 
+\toprule
+          &           &   & \multicolumn{5}{c}{Embedding dimension}                                                             \\
+Model     & $\lambda$ & I & \multicolumn{2}{c}{128 (original size)}   &  & \multicolumn{2}{c}{256}                              \\ 
+\cline{4-5}\cline{7-8}
+          &           &   & Accuracy           & \multicolumn{1}{c}{Attention Mass} &  & \multicolumn{1}{c}{Accuracy} & \multicolumn{1}{c}{Attention Mass}  \\ 
+\midrule
+Embedding & 0.0       &   & $68.1 \pm 1.6$ & $49.9 \pm 2.2$           &  & $69.1 \pm 2$             & $50 \pm 1.1$              \\
+Embedding & 0.1       &   & $69.5 \pm 1.4$ & $17 \pm 1$               &  & $69.1 \pm 1.6$           & $40.3 \pm 0.48$           \\
+Embedding & 1.0       &   & $51.8 \pm 1.1$ & $12.9 \pm 2$             &  & $51 \pm 0.84$            & $12.3 \pm 1.4$            \\ 
+\midrule
+BiLSTM    & 0.0       &   & $76.4 \pm 0.8$ & $81.5 \pm 7.5$           &  & $76 \pm 2.7$             & $85.5 \pm 3$              \\
+BiLSTM    & 0.1       &   & $65.1 \pm 4$   & $0.99 \pm 1.3$           &  & $65.4 \pm 4.7$           & $0.94 \pm 0.8$            \\
+BiLSTM    & 1.0       &   & $64.9 \pm 3.1$ & $0.035 \pm 0.02$         &  & $62.1 \pm 2.5$           & $0.11 \pm 0.09$           \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Influence of the embedding size for Embedding and BiLSTM models on the SST + Wiki dataset. The values reported are the means over 5 different seeds and the standard deviations.}
+\label{tab:embedding-results-2}
+\begin{tabular}{lccll} 
+\toprule
+          &           &   & \multicolumn{2}{c}{Embedding dimension}              \\
+Model     & $\lambda$ & I & \multicolumn{2}{c}{512}                              \\ 
+\cline{4-5}
+          &           &   & \multicolumn{1}{c}{Accuracy} & \multicolumn{1}{c}{Attention Mass}  \\ 
+\midrule
+Embedding & 0.0       &   & $68.1 \pm 2.4$           & $51.8 \pm 3.2$            \\
+Embedding & 0.1       &   & $68.3 \pm 0.76$          & $41.4 \pm 2.3$            \\
+Embedding & 1.0       &   & $51.8 \pm 2$             & $11.1 \pm 2.2$            \\ 
+\midrule
+BiLSTM    & 0.0       &   & $76.2 \pm 2.8$           & $76.8 \pm 2.4$            \\
+BiLSTM    & 0.1       &   & $62.3 \pm 4.1$           & $3.5 \pm 1.9$             \\
+BiLSTM    & 1.0       &   & $57.3 \pm 1.5$           & $0.13 \pm 0.9$            \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{Discussion}
