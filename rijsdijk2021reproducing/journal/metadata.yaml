@@ -5,20 +5,30 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "Reproducing 'Identifying through flows for recovering latent representations'"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
   - name: Hidde Lekanne gezegd Deprez
-    orcid: 
+    orcid: 0000-0001-6729-1517
     email: hiddelekanne@gmail.com
-    affiliations: 1
-    
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+    affiliations: 1, 2
+
+  - name: Geerten Rijsdijk
+    orcid: 0000-0001-8970-049X
+    email: geertenrijsdijk@hotmail.com
+    affiliations: 1, 2
+
+  - name: Bart de Rooij
+    orcid: 0000-0002-6839-1939
+    email: bpderooij@gmail.com
+    affiliations: 1, 2
+
+  - name: Wouter Zwerink
+    orcid: 0000-0002-3014-9741
+    email: zwerinkw@gmail.com
+    affiliations: 1, 2
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
@@ -27,23 +37,22 @@ affiliations:
   - code:    1
     name:    University of Amsterdam
     address: Amsterdam, Netherlands
-    
+
   - code:    2
     name:    Informatics Institute
-    address: Amstedarm, Netherlands
-    
+    address: Amsterdam, Netherlands
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: identifiability, iFlow, iVAE, Normalizing Flows, Python 3
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/
-  - doi: 
-  - swh: 
+  - url: https://github.com/HiddeLekanne/Reproducibility-Challenge-iFlow
+  - doi: 10.5281/zenodo.4704869
+  - swh:
 
 # Data URL and DOI (optional if no data)
 data:
@@ -52,51 +61,64 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: Shen Li, Bryan Hooi, and Gim Hee Lee. “Identifying through Flows for Recovering Latent Representations”. In:arXiv preprint arXiv:1909.12555(2019).
+ - bib:  li2019identifying
+ - url:  https://arxiv.org/pdf/1909.12555.pdf
+ - doi:
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "Scope of Reproducibility
+
+The authors claim to introduce a model for recovering the latent representation of observed data, that outperforms the state-of-the-art method for this task; namely the iVAE model. They claim that iFlow outperforms iVAE both in preservation of the original geometry of source manifold and correlation per dimension of the latent space.
+
+Methodology
+
+To reproduce the results of the paper, the main experiments are reproduced and the figures are recreated. To do so, we largely worked with code from the repository belonging to the original paper. We added plotting functionality as well as various bug fixes and optimisations. Additionally, attempts were made to improve the iVAE by making it more complex and fixing a mistake in its implementation.We also tried to investigate possible correlation between the structure of the dataset and the performance.  All code used is publicly available at https://github.com/HiddeLekanne/Reproducibility-Challenge-iFlow.
+Results
+
+The obtained mean and standard deviation of the MCC over 100 seeds are within 1 percent of the results reported in the paper. The iFlow model obtained a mean MCC score of 0.718 (0.067). Efforts to improve and correct the baseline increased the mean MCC score from 0.483 (0.059) to 0.556 (0.061). The performance, however, remains worse than the performance of iFlow, further supporting the authors’ claim that the iFlow implementation is correct and more effective than iVAE.
+
+What was easy
+
+The GitHub repository associated with the paper provided most necessary code and ran with only minor changes. The code included all model implementations and data generation. The script that was used to obtain results was provided,which allowed us to determine which exact hyperparameters were used with experiments on the iFlow models. Overall,the code was well organised and the structure was easy to follow.
+
+What was difficult
+
+The specific versions of the Python libraries used were unknown, which made it infeasible to achieve the exact results
+from the paper when running on the same seeds. The code used to create figures 1-3 in the original paper was missing and had to be recreated. Furthermore, the long time the models needed to train made experimentation with e.g., different hyperparameters challenging. Finally, the code was largely undocumented.
+
+Communication with original authors
+
+Communication with the authors was attempted but could not be established."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
-  
+
 # Type of the article
 # Type can be:
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: Python 3
 
-  
+
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review: 
-  - url: 
+review:
+  - url: https://openreview.net/forum?id=8jmIpypMzE
 
 contributors:
   - name:
-    orcid: 
+    orcid:
     role: editor
   - name:
     orcid:
@@ -109,7 +131,7 @@ contributors:
 dates:
   - received:  November 1, 2018
   - accepted:
-  - published: 
+  - published:
 
 # This information will be provided by the editor
 article:
