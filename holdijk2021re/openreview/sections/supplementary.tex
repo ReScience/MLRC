@@ -56,7 +56,7 @@ Testing & 1.00 & 0.71 & 0.97 & \multicolumn{1}{c}{0.99} &  \\
 \multicolumn{5}{c}{\textbf{Node Classification}} \\
 \multicolumn{1}{c}{} & \multicolumn{1}{c}{BA-Shapes} & \multicolumn{1}{c}{BA-Community} & \multicolumn{1}{c}{Tree-Cycles} & \multicolumn{1}{c}{Tree-Grid} \\ \hline
 \multicolumn{5}{l}{\textbf{Visualization}} \\ \hline
-Original &  \includegraphics[width=.1\linewidth]../openreview/{imgs/their_image-1.png}
+Original &  \includegraphics[width=.1\linewidth]{../openreview/imgs/their_image-1.png}
 & \includegraphics[width=.1\linewidth]{../openreview/imgs/their_image-2.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/their_image-3.png} & \multicolumn{1}{l}{\includegraphics[width=.1\linewidth]{../openreview/imgs/their_image-4.png}} \\
 No batch-norm &  \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn1_pg.png}
 & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn2_pg.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn3_pg.png} & \multicolumn{1}{l}{\includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn4_pg.png}} \\
@@ -172,7 +172,7 @@ Configuration files are used to provide a stable, flexible and reproducible way 
 The first type of configuration is the model configuration as seen in Fig.\,\ref{fig:model-config-example}, which contains (from top to bottom) the parameters required for training a GNN model. \texttt{dataset} assigns which dataset the model has to train on, \texttt{paper} defines which paper the model is build on (either PG, GNN or TAG), \texttt{lr} is the learning rate, \texttt{epochs} is the amount of epochs used for training and \texttt{clip\_max} is the parameter to which determines at what point the gradient is clipped. Additionally the file includes \texttt{early\_stopping} which defines the amount of epochs with no improvement that are required to enact early stopping of training, \texttt{seed} which defines the seed used for training and \texttt{eval\_enabled} which determines whether the model uses it's eval mode.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{imgs/config-examples/model-config-example.png}
+    \includegraphics[width=0.5\textwidth]{../openreview/imgs/config-examples/model-config-example.png}
     \caption{Example of model config file in JSON format} 
 \label{fig:model-config-example}
 \end{figure}
@@ -182,7 +182,7 @@ The first type of configuration is the model configuration as seen in Fig.\,\ref
 The second type of configuration is the explainer configuration an example of which is shown in Fig.\,\ref{fig:explainer-config-example}, these configuration files contain all parameters required to train an explainer and perform the the replication experiment using them. It includes the following parameters: \texttt{dataset} defines the dataset that the model that is to be explained is trained on. \texttt{model} is the type of model that has to be explainer, \texttt{explainer} is the implementation of the explainer (either PG or GNN). The configuration also contains the learning rate  and number of training epochs (\texttt{lr} and \texttt{epochs} respectively). As well as \texttt{sample\_bias} which determines the sample bias, the parameters \texttt{reg\_size} and \texttt{reg\_ent} that determine the size loss and entropy loss coefficients respectively, the temperatures, \texttt{seeds} the seeds used for training, \texttt{eval\_enabled} if the model uses evaluation mode and \texttt{thres\_snip} and \texttt{thres\_min} which define the thresholds for the interesting and sub-graph edges related to the drawing of the result explanations.  
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{imgs/config-examples/explainer-config-example.png}
+    \includegraphics[width=0.5\textwidth]{../openreview/imgs/config-examples/explainer-config-example.png}
     \caption{Example of explainer configuration file in JSON format} 
 \label{fig:explainer-config-example}
 \end{figure}
