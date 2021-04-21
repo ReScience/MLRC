@@ -1,8 +1,10 @@
 \section{Results}\label{sec:results}
 
-\subsection{Model training \hfill \texttt{[experiment\_models\_training.ipynb]}}
+\subsection{Model training }
 \begin{table}[]
 \centering
+\small
+\scalebox{0.92}{
 \begin{tabular}{cccccccc}
 \toprule
 &\multicolumn{4}{c}{\textbf{Node Classification}} & \multicolumn{2}{c}{\textbf{Graph Classification}} \\
@@ -12,7 +14,7 @@ Training & 0.97 & 0.90 & 0.94 & \multicolumn{1}{c|}{0.96} & 1.00 & 0.82 \\
 Validation & 1.00 & 0.75 & 0.98 & \multicolumn{1}{c|}{0.99} & 1.00 & 0.82 \\
 Testing & 1.00 & 0.72 & 0.94 & \multicolumn{1}{c|}{0.99} & 0.99 & 0.81 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Accuracies of the trained model without batch-normalization. The accuracies are obtained using early stopping. }
 \label{tab:simp_accs}
 \end{table}
@@ -20,11 +22,12 @@ In Tab.~\ref{tab:simp_accs} the final accuracies for all 6 trained models are pr
 
 Logically this difference could be contributed to the difference in the use of batch normalization. Where the original model in the PGExplainer paper did use batch normalization where we do not. However, as the results presented in Tab.\,\ref{tab:accuracies} show, replication with the original batch normalization yields the same reduced accuracies. We hypothesise that therefore the difference might be the result of an undocumented use of weight regularization. We observed that in the original training script the configuration exist to use L2-weight regularization, but it is not used.
 
-\subsubsection{Replicability study \hfill \texttt{[experiment\_replication.ipynb]}}
+\subsubsection{Replicability study}
 \paragraph{Quantitative}
 \begin{table}[h!]
 \centering
-\scalebox{0.95}{
+\normalsize
+\scalebox{0.77}{
 \begin{tabular}{rcccccc}
 \toprule
 \multicolumn{5}{c}{\textbf{Node Classification}} & \multicolumn{2}{c}{\textbf{Graph Classification}} \\
@@ -32,12 +35,8 @@ Logically this difference could be contributed to the difference in the use of b
 \multicolumn{7}{l}{\textbf{Visualization (qualitative)}} \\ \hline
 PGExplainer &  \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn1_pg.png}
 & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn2_pg.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn3_pg.png} & \multicolumn{1}{l|}{\includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn4_pg.png}} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/ba_pg.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/mutag_pg.png} \\ \hline
-% PGExplainer (bad) &  \includegraphics[width=.1\linewidth]{imgs/extension/pg/syn1_bad.png}
-% & \includegraphics[width=.1\linewidth]{imgs/extension/pg/syn2_bad.png} & \includegraphics[width=.1\linewidth]{imgs/extension/pg/syn3_bad.png} & \multicolumn{1}{l|}{\includegraphics[width=.1\linewidth]{imgs/extension/pg/syn4_bad.png}} & \includegraphics[width=.1\linewidth]{imgs/-5.png} & \includegraphics[width=.1\linewidth]{imgs/extension/gnn/mutag_bad.png} \\
 GNNExplainer &  \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn1_gnn.png}
 & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn2_gnn.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn3_gnn.png} & \multicolumn{1}{l|}{\includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/syn4_gnn.png}} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/ba_gnn.png} & \includegraphics[width=.1\linewidth]{../openreview/imgs/simplification/mutag_gnn.png} \\\hline
-% GNNExplainer (bad) &  \includegraphics[width=.1\linewidth]{imgs/extension/gnn/syn1_bad.png}
-% & \includegraphics[width=.1\linewidth]{imgs/extension/gnn/syn2_bad.png} & \includegraphics[width=.1\linewidth]{imgs/extension/gnn/syn3_bad.png} & \multicolumn{1}{l|}{\includegraphics[width=.1\linewidth]{imgs/extension/gnn/syn4_bad.png}} & \includegraphics[width=.1\linewidth]{imgs/-5.png} & \includegraphics[width=.1\linewidth]{imgs/-6.png} \\\hline
 \multicolumn{7}{l}{\textbf{Explanation AUC (quantitative}} \\ \hline
 Original & 0.963 ± 0.011 & 0.945 ± 0.019 & 0.987 ± 0.007 & \multicolumn{1}{l|}{0.907 ± 0.014} & 0.926 ± 0.021 & 0.873 ± 0.013 \\ 
 PGExplainer & 0.999 ± 0.000 & 0.825 ± 0.040 & 0.760 ± 0.014 & \multicolumn{1}{l|}{0.679 ± 0.008} & 0.133 ± 0.046 & 0.843 ± 0.084 \\ 
@@ -58,7 +57,8 @@ Quantitatively there is a large difference in the reported AUC scores and what w
 We believe that the difference seen between the AUC scores originally reported for the two explainers and what we observed during our reproduction might be the result of the undocumented effect of the entropy/size regularizations and used temperature. Based on empirical observations we found that the final AUC score is highly dependent on these three hyperparameters. A small follow-up ablation study presented in Tab.\,\ref{tab:reg} confirms this. 
 
 \begin{table}[]
-\scalebox{0.97}{
+\normalsize
+\scalebox{0.80}{
 \begin{tabular}{@{}c|l|llllll@{}}
 \toprule
 \multicolumn{1}{l|}{\textbf{Reg.}} &       & \multicolumn{6}{c}{\textbf{Size}}                                                                \\ \midrule
@@ -68,10 +68,9 @@ We believe that the difference seen between the AUC scores originally reported f
                                   & 0.1   & 0.761 ± 0.014   & 0.760 ± 0.014   & 0.758 ± 0.015   & 0.565 ± 0.246 & 0.747 ± 0.209 & 0.764 ± 0.214          \\
                                   & 0.01  & 0.761 ± 0.014   & 0.760 ± 0.014   & 0.758 ± 0.015   & 0.551 ± 0.249 & 0.748 ± 0.216 & \textbf{0.776 ± 0.210} \\
                                   & 0.001 & 0.761 ± 0.014   & 0.760 ± 0.014   & 0.758 ± 0.015   & 0.547 ± 0.253 & 0.753 ± 0.216 & 0.763 ± 0.211          \\ \bottomrule
-\end{tabular}
-}
+\end{tabular}}
+\caption{Results of a small ablation study on the effect of the size and entropy regularization on the AUC score. The ablation study is performed using the Tree-Cycles dataset and follows the setup of the quantitative evaluation. It averages over 10 runs. The results show that the regularization has a large effect on both the quantitative quality of the explanations and their consistency. The best score is shown in bold. }
 \label{tab:reg}
-\caption{Results of a small ablation study on the effect of the size and entropy regularization on the AUC score. The ablation study is performed using the Tree-Cycles dataset and follows the setup of the quantitative evaluation. It averages over 10 runs. The results show that the regularization has a large effect on both the quantitative quality of the explanations and their consistency. The best score is shown in bold. \hfill \texttt{[experiment\_ablation.ipynb]}}
 \end{table}
 
 \paragraph{Qualitative}

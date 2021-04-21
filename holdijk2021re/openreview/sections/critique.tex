@@ -6,19 +6,6 @@ In the case of the node classification datasets the definition of the ground-tru
 
 The authors overcome this issue by excluding all nodes outside the motifs from their quantitative evaluation. However, this reduces the explanation task of the node classification datasets to a much simpler problem. For nodes outside the motif, the explanation has to be based on the absence instead of presence of edges. Solving these issues satisfactorily would require a new definition for the ground-truths for graph datasets. For example, in the case of the tree-cycle dataset, one could define the ground-truth of a node outside a motif to be the entire 7-hop subgraph as this would be the minimal number of steps to take before one can conclude that no cycles have been formed. We, however, believe this to be outside the scope of this replication.
 
-% We, however, believe this to be outside the scope of this replication. 
-
-% In appendix Sec.\,\ref{sec:extended_replication} we present a naive re-evaluation of the node classification datasets, where all nodes are include in the quantitative evaluation. The experiment shows a significantly reduced AUC score. 
-
-
-
-% short reevaluation of node-classification datasets where all nodes are included in the 
-
-
-% Defining a ground truth for explanations is however generally not easy, and therefore a number of strict assumptions are made in the paper. First, for the Mutagenicity dataset only explanations for mutagenic graphs are considered. These are in general the \textit{easier} graphs to explain as their classification is defined by the presence of a molecule rather then its absence. In essence, this reduces the explanation to a more simplified task. Second, while for the synthetic graph dataset all classes of graphs are considered (both classes contain a motif), the explanations are generated for a random subset of the \textit{training} samples. The capability of the PGExplainer to explain its decision on new, unseen graphs is therefore not evaluated. The use of training samples for evaluating the explainers capability also holds for the other datasets, both node and graph classification. Third, for node classification, only explanations for nodes that are part of the motif are considered. Similar to the assumption for the Mutagenicity dataset, these are generally the easier nodes to explain. Lastly, only the ground-truth of edges in a 3-hop subgraph of each node is considered. Again, this reduces to a simplified task---the ground-truth does not involve long-distance dependencies. Of these four assumptions, only the first is disclosed in the paper. 
-
-% \paragraph{Explanations of training samples}
-
 
 \paragraph{Qualitative evaluation dependent on knowing size of motif}
 The PGExplainer gives as output a mask that describes for each edge in the graph the probability of it being important for the models classification decision. To turn this into a visualizable explanations the top-$k$ edges are selected from each mask, i.e only the $k$ edges that have the highest influence on the models classification decision are considered part of the explanation. As a result, $k$ is a crucial hyperparameter for obtaining a visual explanation. If $k$ is set too high, the explanation could contain edges that actually only contribute to the final decision marginally. If $k$ is set too low, the explanation could be missing important parts of the graph. This difference in visual explanation quality was also empirically observed in the difference between the original and our explanations for the Mutagenicity dataset. 
@@ -26,11 +13,3 @@ The PGExplainer gives as output a mask that describes for each edge in the graph
 As mentioned in the experimental setup of the qualitative evaluation, the authors, and preceding works, set the value of $k$ in the evaluation based on the amount of edges in the defining motif. However, this is not a possibility outside of the synthetic evaluation datasets. Hence, for real world applicability of the proposed explanation method a different approach has to be found to find $k$. For this reason, we believe that evaluating the quality of the explanations based using $k$ preset to the number of edges in the synthetic dataset is an aspect to reconsider. 
 
 In essence, both the $k$-parameter and the earlier mentioned number of edges selected for the ground-truth can be considered as hyperparameters for the evaluation pipeline. By selecting a specific value for these parameters the evaluation can become biased towards assigning high credibility to explanations that have a specific characteristic. By performing an extensive search over these hyperparameters the results of the explanation evaluation can potentially be improved. In Sec.\,\ref{sec:extended_replication} of the appendix we present a short study on how these hyperparameters can influence the final results of the evaluation. 
-% While the presented study focuses on the inclusion of samples that do not contain a motif, the codebase accompanying the report can easily be extended to evaluate the influence of the $k$-parameter as well. 
-
-% In our replication of the results presented in this report we get these evaluation hyper-parameters consistent with the original evaluation. In Sec.\,\ref{sec:extended_replication} of the appendix we study how these parameters influence the final results of the evaluation. Further study of these hyper-parameters is possible using the provided code. 
-
-
-% For example, using a low value for $k$ the evaluation will be biased towards explanations that assign a high weight to only a small set of edges. In our replication of the results presented in this report we get these evaluation hyper-parameters consistent with the original evaluation. In appendix Sec.\,\ref{sec:extended_replication} we present a naive re-evaluation for the node classification datasets where we change one of these hyper-parameters. 
-
-% The concerns regarding both the $k$-parameter and the earlier mentioned ground-truth edge selection can be considered an issue with the hyper-parameter selection for the evaluation pipeline. To provide an exhaustive evaluation graph explanation models such as the PGExplainer a significant amount of hyper-parameter tuning should be done to determine under which settings the explanation models work best. The 
