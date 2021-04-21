@@ -86,7 +86,7 @@ The training set of CIFAR-10 was used as the primary training dataset. The train
     \addtolength{\rightskip}{-3cm}
     \begin{tabular}{r||c|c|c|c} 
     \hline
-    Dataset & No. samples & No. classes & Image dimensions & Link \\ [0.5ex] 
+    Dataset & Samples & Classes & Dimensions & Link \\ [0.5ex] 
     \hline
     \hline
     CIFAR-10 train & 50000 & 10 & 32x32x3 & \hrref{https://www.cs.toronto.edu/~kriz/cifar.html} \\
@@ -111,7 +111,7 @@ The models were trained with the hyperparameters listed in Table \ref{tab:cifar1
 \addtolength{\rightskip}{-3cm}
 \begin{tabular}{l||c|c|c|c|c|c|c|c|c}
 \hline
-Model & Epochs & Cycle len. &  $\eta_0$ & $\eta_{max}$ & $\eta_{min}$ & Dropout & $T_0$ & Annealing & AUX data \\ [0.5ex] 
+Model & Epochs & Cycle &  $\eta_0$ & $\eta_{max}$ & $\eta_{min}$ & Dropout & $T_0$ & Anneal & AUX data \\ [0.5ex] 
 \hline
 \hline
 DNN & 45 & 30 & 10^{-3} & 10^{-2} & 10^{-6} & 0.5 & - & - & - \\
@@ -134,7 +134,7 @@ Using these models and dataset we ran a number of experiments, as detailed below
 
 \textbf{Out-of-distribution detection:} The OOD-detection task was evaluated with the CIFAR-10 test set as the in-domain set, and the LSUN test set as the out-of-domain set. The AUC-ROC was computed both when total uncertainty and when only knowledge uncertainty is used to make rejection decisions. This experiment tests \hyperlink{claim2}{Claim 2}. 
 
-\textbf{Ensemble size ablation study:} Our examination of the effect of ensemble size goes slightly beyond the original authors. We extend the error analysis to also consider the sensitivity of EnD$^2$ to variations in the underlying ensemble. We began by training a set of 400 VGG16 models on CIFAR-10. Next, we sampled randomly from this set to create 4 different sets, each consisting of 100 models. For each $N \in \{1, 2, 3, 4, 6, 8, 10, 13, 16, 20, 25, 30, 45, 60, 75, 100\}$ we trained four EnD$^2$ models on an ensemble consisting of the first $N$ models in the first of the four sets, corresponding to what was done in the original study. We also trained \textit{one} model on an ensemble consisting of the first $N$ models \textit{for each} of the three remaining sets, capturing the sensitivity of \EnDD \ to changes in the underlying ensemble. All ensemble and \EnDD \ models were then evaluated on the classification task. This experiment tests \hyperlink{claim3}{Claim 3}. 
+\textbf{Ensemble size ablation study:} Our examination of the effect of ensemble size goes slightly beyond the original authors. We extend the error analysis to also consider the sensitivity of EnD$^2$ to variations in the underlying ensemble. We began by training a set of 400 VGG16 models on CIFAR-10. Next, we sampled randomly from this set to create 4 different sets, each consisting of 100 models. \\ For each $N \in \{1, 2, 3, 4, 6, 8, 10, 13, 16, 20, 25, 30, 45, 60, 75, 100\}$ we trained four EnD$^2$ models on an ensemble consisting of the first $N$ models in the first of the four sets, corresponding to what was done in the original study. We also trained \textit{one} model on an ensemble consisting of the first $N$ models \textit{for each} of the three remaining sets, capturing the sensitivity of \EnDD \ to changes in the underlying ensemble. All ensemble and \EnDD \ models were then evaluated on the classification task. This experiment tests \hyperlink{claim3}{Claim 3}. 
 
 \textbf{Temperature ablation study}: We reproduce the temperature ablation study by training \EnDD \ models for various initial temperatures. For each $T \in \{1, 2, 3, 4, 5, 7.5, 10, 15, 20\}$ we trained three \EnDD \ models with initial temperature $T$ on an ensemble consisting of 100 VGG16 models. The \EnDD \ models were then evaluated on the classification task. In this experiment, we have chosen to use a slightly finer spacing between the temperatures than what the original authors used. This experiment tests \hyperlink{claim4}{Claim 4}.
 
