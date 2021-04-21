@@ -1,5 +1,3 @@
-
-
 \section*{\centering Reproducibility Summary}
 
 
@@ -130,7 +128,7 @@ PN & 45 & 30 & 0.5 \cdot 10^{-3} & 0.5 \cdot 10^{-2} & 0.5 \cdot 10^{-6} & 0.7 &
 \end{table}
 
 \subsection{Experimental setup and code}
-Using these models and dataset we ran a number of experiments, as detailed below. The full code is available on \href{https://anonymous.4open.science/r/4ee2c9ef-295f-44e2-8214-f0818b932817/}{https://anonymous.4open.science/r/4ee2c9ef-295f-44e2-8214-f0818b932817/}. Our implementation was made in TensorFlow Keras, as opposed to the original implementation which was made in PyTorch.
+Using these models and dataset we ran a number of experiments, as detailed below. The full code is available on \href{z}{https://anonymous.4open.science/r/4ee2c9ef-295f-44e2-8214-f0818b932817/}. Our implementation was made in TensorFlow Keras, as opposed to the original implementation which was made in PyTorch.
 
 \textbf{Classification:} The classification task was evaluated on the test set of CIFAR-10. We use the same four metrics as in the original paper, ERR, PRR, ECE, and NLL. ERR is the mean classification error. PRR is the prediction rejection area ratio introduced in Appendix B of \cite{malinin2019ensemble}. ECE is the expected calibration error\footnote{We used the open-source implementation in \url{https://github.com/google/uncertainty-metrics}.}. Finally, NLL is the negative log-likelihood. This experiment tests \hyperlink{claim1}{Claim 1}. 
 
@@ -249,7 +247,7 @@ There appears to be a trend of small improvement when the number of models is in
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim = 70 54 100 100, clip, width = 0.85\textwidth]{plots/Figure_8.png}
+    \includegraphics[trim = 70 54 100 100, clip, width = 0.85\textwidth]{../openreview/plots/Figure_8.png}
     \caption{Ensemble size ablation study on CIFAR-10 classification.}
     \label{fig:size-ablation}
 \end{figure}
@@ -265,28 +263,28 @@ Predictions for four images are visualized in Figure \ref{fig:3simplex}. These f
 
 \begin{figure}[h]
     \centering
-    \includegraphics[trim = 55 19 55 50, clip, width = 0.8\textwidth]{plots/Figure_11.png}
+    \includegraphics[trim = 55 19 55 50, clip, width = 0.8\textwidth]{../openreview/plots/Figure_11.png}
     \caption{Temperature ablation study on CIFAR-10 classification.}
     \label{fig:temp-ablation}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 0.8\linewidth]{plots/all_simplex.png}
+    \includegraphics[width = 0.8\linewidth]{../openreview/plots/all_simplex.png}
     \caption{Visualization of ensemble distribution and $\text{EnD}^2$ PDF. The classes are, from left, to top, to right, Deer, Horse and Dog.}
     \label{fig:3simplex}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[trim = 0 0 0 20, clip, width = 1\linewidth]{plots/simplex_in.png}
+    \includegraphics[trim = 0 0 0 20, clip, width = 1\linewidth]{../openreview/plots/simplex_in.png}
     \caption{Random images from in-domain.}
     \label{fig:simplex_in}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[trim = 0 0 0 20, clip, width = 1\linewidth]{plots/simplex_out.png}
+    \includegraphics[trim = 0 0 0 20, clip, width = 1\linewidth]{../openreview/plots/simplex_out.png}
     \caption{Random images from out-of-domain.}
     \label{fig:simplex_out}
 \end{figure}
