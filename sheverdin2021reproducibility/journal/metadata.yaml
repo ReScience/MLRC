@@ -5,47 +5,38 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: [Re] Reproducibility report of "Interpretable Complex-Valued Neural Networks for Privacy Protection"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Alko Knijff
+    orcid: 0000-0002-3118-3677
+    email: alko.knijff@student.uva.nl
+    affiliations: 1
     
-  - name: Nicolas P. Rougier
+  - name: Noud Corten
+    orcid: 0000-0002-0167-3069
+    email: noud.corten@student.uva.nl
+    affiliations: 1
+
+  - name: Arsen Sheverdin
+    orcid: 0000-0002-2033-6674
+    email: arsen.sheverdin@student.uva.nl
+    affiliations: 1
+    
+  - name: Georg Lange
     orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+    email: georg.lange@student.uva.nl
+    affiliations: 1
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
-
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
 
 # List of keywords (adding the programming language might be a good idea)
 keywords: rescience c, rescience x
@@ -55,7 +46,7 @@ keywords: rescience c, rescience x
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/GANA-FACT-AI/gana-fact-ai
   - doi: 
   - swh: 
 
@@ -66,22 +57,27 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite: Liyao Xiang, Haotian Ma, Hao Zhang, Yifan Zhang, Jie Ren, and Quanshi Zhang. 2020. Interpretable complex-valuedneural networks for privacy protection.
+ - bib:  xiang2020interpretable
+ - url:  http://arxiv.org/abs/1505.04597
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "Scope of Reproducibility
+The original work by  Xiang et al. claimed that complex-valued DNNs effectively increase the difficulty of inferring inputs for the adversary attacks compared to the baseline. 
+In addition, Xiang et al. stated that the proposed privacy-protecting complex-valued DNN effectively preserves the accuracy when compared to the baseline.
+
+Methodology
+Since the original paper's code was not published, all of the codebase was written independently from scratch, based solemnly on how it was described in the paper. We mostly used a Nvidia's \textit{RTX 2060 Super} as the GPU and a \textit{AMD Ryzen 3600x} as the CPU.  The runtime of each model was highly dependant on the architecture used. The runtimes for each model can be found in Table 2.
+
+Results
+In contrast to the first claim, we have discovered that for most of the architectures, reconstruction errors for the attacks are quite low, which means that in our models the first claim is not supported. We also found that for most of the models, the classification error is somewhat higher than those provided in the paper. However, these indeed relate to the original work and partially support the second claim of the authors.
+
+What was easy
+Authors of the original paper utilized famous architectures for some of architectures' parts, such as ResNet and LeNet, that were well explained and defined in the literature. In addition, authors, provided formulas on the modified rotation-invariant Complex DNN modules (ReLU, max pooling etc.), implementation of which was relatively straightforward. The paper was based on the openly available datasets. 
+
+What was difficult
+The paper did not provide  any information on the architecture of the critic for the WGAN, along with the architecture of the angle discriminator utilized in inversion attack 1. It also does not  provide any information about crucial hyperparameters, such as the k value used for k-anonimity."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +87,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: English
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +102,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=P30M7d9DyXw
 
 contributors:
   - name:
