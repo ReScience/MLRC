@@ -47,14 +47,6 @@ Deep Neural Networks (DNNs) can process a massive data volume but require great 
  \cite{xiang2020interpretable} extended the standard DNN by encrypting the intermediate layer features using complex-valued DNNs (\cite{DBLP:journals/corr/TrabelsiBSSSMRB17}). The local device encodes the original input into intermediate features. Those features are encrypted and sent to a processing unit, a complex-valued neural net located in the cloud. It does the computationally expensive operations while not being able to infer properties of its input. The result is sent back to the local device and decrypted.
  
  Ideally, the local device is able to decrypt the encoded data using the secret key. However, an adversary shouldn't be able to decrypt the features without the key.  \cite{xiang2020interpretable} achieved this by rotating intermediate layer features into the complex plane using a random angle. The angle acts as a key and can be used to reverse the rotation. The processing unit consists of rotation-invariant operations only. Thus, the local device can reverse the rotation after receiving the results from the processing unit. To make it hard to deduce the angle, a generative adversarial network is trained to alter the intermediate features to introduce obfuscation whilst keeping important information.
- 
-
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.7\linewidth]{\detokenize{../openreview/images/complex-network.png}}
-%     \captionof{figure}{Structure of the complex-valued neural network}
-%     \label{complex-network}
-% \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -249,29 +241,6 @@ From all the networks that were used in \cite{xiang2020interpretable} we impleme
 
 We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The runtime of each model was highly dependant on the architecture used. The runtimes for each model can be found in Table \ref{runtime-table}.
 
-% \begin{table*}[t]
-%     \centering
-%     \scalebox{0.9}{
-%     \begin{tabular}{l||l}
-%     \hline
-%     \textbf{Model} & \textbf{Average Runtime} \\
-%     \hline
-%     LeNet & 48 m \\
-%     % ResNet-20-$a$ & 2h 34m \\
-%     % ResNet-20-$b$ & 2h 28m \\
-%     ResNet-32-$a$ & 2h 29m \\
-%     ResNet-32-$b$ & 2h 41m \\
-%     ResNet-44-$a$ & 3h 15m \\
-%     ResNet-44-$b$ & 3h 08m \\
-%     ResNet-56-$a$ & 3h 34m \\
-%     ResNet-56-$b$ & 3h 23m \\
-%     ResNet-110-$a$ & 3h 20m \\
-%     ResNet-110-$b$ & 3h 12m \\
-%     \end{tabular}
-%     }
-%     \caption{Average runtime for each model}
-%     \label{runtime-table}
-% \end{table*}
 
 \begin{table}[!htb]
     \begin{minipage}{.5\linewidth}
@@ -343,52 +312,20 @@ In this section we show the results that relate to the first claim (\ref{claim1}
 Table \ref{inversion-table} shows the reconstruction errors of multiple different networks with the old implementation when attacked with inversion attack 1 and 2. The table shows that the reconstruction errors of our networks are much lower than the reconstruction errors of the paper's networks. We can therefore say that the first claim is not supported by these networks.
 The reconstructed images that were created by inversion attack 1 on the ResNet-32-$\alpha$ network can be seen in Figure \ref{resnet32}. The reconstructed images look very similar to the original images, further proving that the first claim is not supported.
 
-% \begin{table*}[t]
-%     \centering
-%     \scalebox{0.7}{
-%     \begin{tabular}{l|c|c|c|c}
-%     \hline
-%     \multicolumn{1}{c|}{} & \multicolumn{2}{|c|}{Inversion Attack 1} &  \multicolumn{2}{|c}{Inversion Attack 2} \\
-%     \hline
-%     \textbf{Model} & \textbf{Paper} & \textbf{Reproduced} & \textbf{Paper} & \textbf{Reproduced}\\
-%     \hline
-%     LeNet & 0.2405 & 0.1509 & 0.1027 & 0.1244 \\
-%     ResNet-32-$\alpha$ & 0.2569 & 0.0277 & 0.2412 & 0.0464 \\
-%     ResNet-32-$\beta$ & 0.2515 & 0.0292 & 0.2425 & 0.0323 \\
-%     ResNet-44-$\alpha$ & 0.2746 & 0.0256 & 0.2419 & 0.0293 \\
-%     ResNet-44-$\beta$ & 0.2511 & 0.0190 & 0.2397 & 0.0383 \\
-%     ResNet-56-$\alpha$ & 0.2804 & 0.1031 & 0.2377 & 0.0399 \\
-%     ResNet-56-$\beta$ & 0.2585 & 0.0242 & 0.2358 & 0.0483 \\
-%     ResNet-110-$\alpha$ & 0.3081 & 0.0292 & 0.2495 & 0.0447 \\
-%     ResNet-110-$\beta$ & 0.2582 & 0.0207 & 0.2414 & 0.0321 \\
-%     \end{tabular}
-%     }
-%     \caption{Inversion attack 1 and 2 results}
-%     \label{inversion-table}
-% \end{table*}
-
-% \begin{figure}[!h]
-%     \centering
-%     \includegraphics[width=0.24\textwidth]{../openreview/original images.png}
-%     \includegraphics[width=0.24\textwidth]{../openreview/reconstructed images.png}
-%     \caption{Original images on the left, reconstructed images on the right}
-%     \label{fig:images_resnet_32_a}
-% \end{figure}
-
 \begin{figure}[!tbp]
     \centering
     \begin{subfigure}{.5\textwidth}
       \centering
-      \includegraphics[width=0.45\textwidth]{../openreview/lenet_original.png}
-        \includegraphics[width=0.45\textwidth]{../openreview/lenet_reconstruct.png}
+      \includegraphics[width=0.45\textwidth]{../openreview/images/lenet_original.png}
+        \includegraphics[width=0.45\textwidth]{../openreview/images/lenet_reconstruct.png}
         \captionsetup{labelformat=empty}
         \caption{LeNet-5 architecture}
         \label{lenet5}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \captionsetup{labelformat=empty}
-        \includegraphics[width=0.45\textwidth]{../openreview/original images.png}
-        \includegraphics[width=0.45\textwidth]{../openreview/reconstructed images.png}
+        \includegraphics[width=0.45\textwidth]{../openreview/images/original_images.png}
+        \includegraphics[width=0.45\textwidth]{../openreview/images/reconstructed_images.png}
         \caption{ResNet-32-$\alpha$ architecture}
         \label{resnet32}
     \end{subfigure}
@@ -397,27 +334,6 @@ The reconstructed images that were created by inversion attack 1 on the ResNet-3
     \label{fig:reconstruction}
 \end{figure}
 
-% \begin{figure}[!tbp]
-%   \centering
-%   \begin{minipage}[b]{0.45\textwidth}
-%     \includegraphics[width=0.45\textwidth]{../openreview/lenet_original.png}
-%     \includegraphics[width=0.45\textwidth]{../openreview/lenet_reconstruct.png}
-%     \captionsetup{labelformat=empty}
-%     \caption{LeNet-5 architecture}
-%     \label{lenet5}
-%   \end{minipage}
-%   \hfill
-%   \begin{minipage}[b]{0.45\textwidth}
-%     \captionsetup{labelformat=empty}
-%     \includegraphics[width=0.45\textwidth]{../openreview/original images.png}
-%     \includegraphics[width=0.45\textwidth]{../openreview/reconstructed images.png}
-%     \caption{ResNet-32-$\alpha$ architecture}
-%     \label{resnet32}
-%   \end{minipage}
-%   \caption{Image reconstruction after inversion attack 1. Original images on the left, reconstructed images on the right of each atchitecture}
-%   \label{fig:reconstruction}
-% \end{figure}
-
 
 In Table \ref{inversion-table} we can see the results of attacking our new implementation network with inversion attack 1 and 2. Here we see that the results look a lot more similar and we can therefore say that the first claim is supported under our new implementation. This claim is further supported by Figure \ref{fig:reconstruction} where the reconstructed images can be seen of the new implementation network.
 
@@ -425,34 +341,6 @@ In Table \ref{inversion-table} we can see the results of attacking our new imple
 In this section we show the results that relate to the second claim (\ref{claim2}). 
 Table \ref{accuracy-table} shows the classification errors of the old implementation of our networks. The table shows that our network's classification errors are quite a bit higher than the paper's classification errors. However our network's classification errors are still quite low, which is why the results partially support the second claim.
 In table \ref{accuracy-table} we can see the classification errors of the new implementation of our networks. We see that the classification error is quite similar to the old implementation and therefore also partially supports the second claim.
-
-% \begin{table}
-% 	\begin{minipage}{0.5\linewidth}
-% 		\caption{Student Database}
-% 		\label{table:student}
-% 		\centering
-% 		\begin{tabular}{lrr}
-% 			\toprule
-% 			Student          & h/week & Grade \\
-% 			\midrule
-% 			Ada Lovelace     & 2      & A \\
-% 			Linus Thorvalds  & 8      & A \\
-% 			Bruce Willis     & 12     & F \\
-% 			Richard Stallman & 10     & B \\
-% 			Grace Hopper     & 12     & A \\
-% 			Alan Turing      & 8      & C \\
-% 			Bill Gates       & 6      & D \\
-% 			Steve Jobs       & 4      & E \\
-% 			\bottomrule
-% 		\end{tabular}
-% 	\end{minipage}\hfill
-% 	\begin{minipage}{0.45\linewidth}
-% 		\centering
-% 		\includegraphics[width=40mm]{\detokenize{../openreview/original images.png}}
-% 		\captionof{figure}{2-D scatterplot of the Student Database}
-% 		\label{ }
-% 	\end{minipage}
-% \end{table}
 
 \begin{table}
 	\begin{minipage}{0.5\linewidth}
@@ -484,7 +372,7 @@ In table \ref{accuracy-table} we can see the classification errors of the new im
 	\begin{minipage}{0.45\linewidth}
     	\centering
     	\setlength{\abovecaptionskip}{5pt}
-        \includegraphics[width=0.9\textwidth]{../openreview/images/image_reconstructions.PNG}
+        \includegraphics[width=0.9\textwidth]{../openreview/images/image_reconstructions.png}
         \captionof{figure}{Image reconstructions, trained on Cifar10 and ResNet-22-$\alpha$. a) Original images. b) Model without ReLU at the end of the generator. c) Model with ReLU at the end of the generator. d) Model trained while randomly swapping a and b; The WGAN was not trained, however, the adversary is not able to reconstruct the inputs. Also, the accuracy of the classifier didn't change using this approach.}
         \label{fig:kanonymity}
 	\end{minipage}
@@ -496,37 +384,6 @@ In table \ref{accuracy-table} we can see the classification errors of the new im
     \caption{Training of the adversary model. Random swapping of a and b yields a significantly higher reconstruction error. The models with and without ReLU have similar reconstruction errors, but the model without ReLU needs much longer to train as it introduces better obfuscation.}
     \label{fig:diagram_training}
 \end{figure}
-
-% \begin{table*}[t]
-%     \centering
-%     \scalebox{0.75}{
-%     \begin{tabular}{l|c|c}
-%     \hline
-%     \multicolumn{1}{c|}{} & \multicolumn{2}{|c}{Classification Error} \\
-%     \hline
-%     \textbf{Model} & \textbf{Paper} & \textbf{Reproduced} \\
-%     \hline
-%     LeNet & 17.95 & 59.62 \\
-%     ResNet-32-$\alpha$ & 10.48 & 19.53 \\
-%     ResNet-32-$\beta$ & 11.12 & 25.00 \\
-%     ResNet-44-$\alpha$ & 11.08 & 26.09 \\
-%     ResNet-44-$\beta$ & 10.51 & 26.48 \\
-%     ResNet-56-$\alpha$ & 11.53 & 25.78 \\
-%     ResNet-56-$\beta$ & 11.28 & 28.91 \\
-%     ResNet-110-$\alpha$ & 11.97 & 24.22 \\
-%     ResNet-110-$\beta$ & 11.85 & 28.17 \\
-%     \end{tabular}
-%     }
-%     \caption{Classification Errors of the paper's results (left) and the reproduced results (right)}
-%     \label{accuracy-table}
-% \end{table*}
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=0.3\textwidth]{../openreview/images/swap.png}
-%     \caption{Image reconstructions after randomly swapping a and b. The first two rows show image reconstructions, the last two rows are the corresponding original images. The WGAN was not trained, however, the adversary is not able to reconstruct the inputs. Also, the accuracy of the classifier didn't change using this approach.}
-%     \label{fig:kanonymity}
-% \end{figure}
 
 \subsection{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
@@ -569,28 +426,6 @@ Overall we found \cite{xiang2020interpretable} quite difficult to understand and
     \item Datasets, such as CIFAR-10 (\cite{cifar10}), CIFAR-100 (\cite{cifar100}, CelebA (\cite{CelebA}) are publicly available and are easy to get access to.
     \item Main architecture for the privacy model is based on the existing and well-documented architectures such as ResNet (\cite{DBLP:journals/corr/HeZRS15}), LeNet(\cite{lecun1998gradient}), AlexNet(\cite{AlexNet}) etc.
 \end{itemize}
-
-% \begin{table*}[t]
-%     \centering
-%     \begin{tabular}{l||c}
-%     \hline
-%     \textbf{Model} & \textbf{Average Error} \\
-%     \hline
-%     LeNet & ? \\
-%     % ResNet-20-$\alpha$ & 10.91 & ? & 0.2664 & ? & 0.2420 & ? \\
-%     % ResNet-20-$\beta$ & 12.28 & ? & 0.2424 & ? & 0.2420 & ? \\
-%     ResNet-32-$\alpha$ & 0.0260 \\
-%     ResNet-32-$\beta$ & 0.0265 \\
-%     % ResNet-44-$\alpha$ & 11.08 & ? & 0.2746 & ? & 0.2419 & ? \\
-%     % ResNet-44-$\beta$ & 10.51 & ? & 0.2511 & ? & 0.2397 & ? \\
-%     ResNet-56-$\alpha$ & ? \\
-%     ResNet-56-$\beta$ & ? \\
-%     ResNet-110-$\alpha$ & 0.0320 \\
-%     ResNet-110-$\beta$ & 0.0403 \\
-%     \end{tabular}
-%     \caption{Average error of predicting the angle}
-%     \label{angle-table}
-% \end{table*}
 
 \subsection{What was difficult}
 % List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
