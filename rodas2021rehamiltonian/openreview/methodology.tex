@@ -21,8 +21,9 @@ Given an input sequence: $(\bm{x}_0, ..., \bm{x}_T)$ and a value $k + 1$ of inpu
 \footnote{The formulation of the loss in Eq. \ref{eq:loss} particularly w.r.t. the distribution $q_{\phi}$ is different from that of the paper\cite{hgn} where it was written as $q_{\phi}(\bm{z} \vert \bm{x}_0, ..., \bm{x}_T)$, which initially led us to think that the encoder had access to the whole rollout. Discussion with the authors clarified that the encoder reads only the first $k$ frames. Therefore, we decided to slightly modify the loss notation in order to avoid confusion. Still, we show results with both approaches to get a more complete idea of the differences.}
 to optimize is:
 
-\begin{equation}
-    \mathcal{L} (\phi, \psi, \gamma, \theta; \bm{x}_0, ..., \bm{x}_T) = \frac{1}{T + 1 - k}
+\begin{align}
+\begin{split}
+	\mathcal{L} (\phi, \psi, \gamma, \theta; \bm{x}_0, ..., \bm{x}_T) &= \frac{1}{T + 1 - k}
     \sum_{t=k}^T
     \Big(
     E_{q_\phi (\bm{z} \mid \bm{x}_0, .. \bm{x}_k)}
@@ -30,9 +31,10 @@ to optimize is:
     \log p_{\psi, \gamma, \theta} (\bm{x}_t \mid \bm{q}_t)
     \big]
     \Big)
-    - \Lambda \cdot KL \big(q_\phi(\bm{z}) \mid \mid p(\bm{z})\big)
+	\\ &- \Lambda \cdot KL \big(q_\phi(\bm{z}) \mid \mid p(\bm{z})\big)
+\end{split}
 \label{eq:loss}
-\end{equation}
+\end{align}
 
 Notice that the loss is the combination of two terms:
 first, the error coming from the reconstruction of the images, and second, a term which forces the latent distribution $q_{\phi}$ to be close to a standard Gaussian.
