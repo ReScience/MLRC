@@ -17,23 +17,24 @@ The custom loss function is described in Algorithm 2. This formulation includes 
 
 %A key question is how to create labels corresponding to the inputs $\mathbf{X}$ given that the classes of the training data are known. The author, in the original PN paper \cite{NIPS2018_7936}, proposes choosing a vector $\mathbf{\alpha}$ where all the elements $\alpha_i$ are 1 except for the $i$ corresponding to the correct class, for which $\alpha_i$ should be chosen “large”. The label vector thus contains the parameters of a sharp distribution located close to the i’th corner of a simplex. The prior network is importantly also trained on OOD images where all the $\alpha_i$'s of the corresponding label are set to 1 which corresponds to a flat Dirichlet. The prior network is trained using KL-divergence between the true and predicted Dirichlet.\\ \\
 %EnD$^2$ is a prior network in that it too parameterizes a Dirichlet distribution, however, as opposed to the method discussed above, EnD$^2$ uses a trained ensemble to generate the labels $\mathbf{\alpha}$. The label $\alpha$ corresponding to input image $\mathbf{X}$ is computed as, $\mathbf{\alpha} = e^{\phi}$ , where $\phi$ is the ensemble output corresponding to the image $\mathbf{X}$. Distilling the network into a PN is done by taking $\mathbf{\alpha}$ to be a set of samples from the “true” Dirichlet distribution and minimizing the negative log-likelihood between the ensemble prediction and the PN prediction \textbf{Alg 2}. Importantly this loss function is equivalent to the KL-divergence between the true and predicted Dirichlet. For EnD$^2$ no OOD data is required as ensembles already can differentiate between aleatoric and epistemic uncertainty, it is however shown that using OOD data during the distillation can boost the performance of the prior network. The task of this paper is thus to distil the information of uncertainty present in an ensemble to a single prior network. EnD$^2$ uses temperature annealing to increase the support between the ensemble predictions $\mathbf{\alpha}$ and the predicted Dirichlet $\mathbf{\hat{\alpha}}$ at the start of training. This is done by dividing the output logits of both networks by a constant $T$ i.e. $\alpha_i = e^{z_i/T}$, flattening both distributions. The entire EnD$^2$ training is explained as a pseudocode \textbf{Alg 1}.\\
+
 \begin{algorithm}
-    \SetKwInOut{Input}{Input}
-    \SetKwInOut{Output}{Output}
-    \Input{Ensemble $En$ outputting logits, training data X (same as the ensemble is trained on), (optional) Out of distribution data $X_{OOD}$ }
-    \Output{Trained EnD$^2$ model} \\
-    \If{$X_{OOD}$ not None}{
-    $X = [X, X_{OOD}]$ // append OOD data to training set
-    }
-    $\phi = En.predict(X)$ // exp($\phi$) are the labels for EnD$^2$  \\
-    // $\phi$ is a tensor of logits corresponding to the true distribution, each row corresponds to a model and each column a class. Each matrix corresponds to one image \\
-    $model_{\theta} \leftarrow classifier$ //create a new classifier model with weights $\theta$, with logits as output \\
-    EnD$^2 = argmin_{\theta}\{Loss_{EnD^2}(\phi,model_{\theta}(X)) \}$ //train model backpropagation\\
-    return EnD$^2$
-    \caption{Training algorithm for EnD$^2$ given an ensemble}
-    \label{alg:training}
-    
-\end{algorithm} \\
+  \SetKwInOut{Input}{Input}
+  \SetKwInOut{Output}{Output}
+  \Input{Ensemble $En$ outputting logits, training data X (same as the ensemble is trained on), (optional) Out of distribution data $X_{OOD}$ }
+  \Output{Trained EnD$^2$ model}
+  \If{$X_{OOD}$ not None}{
+  $X = [X, X_{OOD}]$ // append OOD data to training set
+  }
+  $\phi = En.predict(X)$ // exp($\phi$) are the labels for EnD$^2$ 
+  // $\phi$ is a tensor of logits corresponding to the true distribution, each row corresponds to a model and each column a class. Each matrix corresponds to one image \\
+  $model_{\theta} \leftarrow classifier$ //create a new classifier model with weights $\theta$, with logits as output 
+  EnD$^2 = argmin_{\theta}\{Loss_{EnD^2}(\phi,model_{\theta}(X)) \}$ //train model backpropagation
+  return EnD$^2$
+  \caption{Training algorithm for EnD$^2$ given an ensemble}
+  \label{alg:training}
+\end{algorithm}
+
 \begin{algorithm}
     \SetKwInOut{Input}{Input}
     \SetKwInOut{Output}{Output}
@@ -46,7 +47,7 @@ The custom loss function is described in Algorithm 2. This formulation includes 
     M = \#models \\
     N = \#classes \\
     \For{$i\gets1$ \KwTo M}{ 
-    $\alpha_0_i = \sum_j \alpha_{i,j}$ // sum over the classes to produce the precision factor
+    $\alpha_{0_i} = \sum_j \alpha_{i,j}$ // sum over the classes to produce the precision factor
     }
     %$\alpha_0 = sum(exp(\phi))$ 
     $P_{En} = softmax(\phi/T(t))$ // softmax over classes\\
@@ -61,10 +62,8 @@ The custom loss function is described in Algorithm 2. This formulation includes 
     
     \label{alg:loss}
     \caption{loss for EnD$^2$}
-    
-
 \end{algorithm} 
-\\
+
 
 
 \section{Experiments on Synthetic Data}
@@ -110,7 +109,7 @@ All 7 models were trained 20 times, with different random initialisations. To ma
 
 The main goal of this experiment is to visually show the total uncertainty, the data uncertainty and the knowledge uncertainty. They were calculated as specified in \cite{malinin2019ensemble} and \cite{NIPS2018_7936}, for the grid $[-2000, 2000] \times [-2000, 2000]$ at all coordinates divisible by four, for a total of $10^6$ points. 
 
-The full code is available at \href{https://anonymous.4open.science/r/4ee2c9ef-295f-44e2-8214-f0818b932817/}{https://anonymous.4open.science/r/4ee2c9ef-295f-44e2-8214-f0818b932817/}.
+The full code is available at \href{https://github.com/lennelov/endd-reproduce}{https://github.com/lennelov/endd-reproduce}.
 
 
 \subsubsection{Computational requirements}
@@ -127,61 +126,61 @@ In Table \ref{tab:spiral}, the classification accuracy from our experiment and t
     \item using annealing or not when starting at $T = 2.5$ does not affect the final classification accuracy. 
 \end{itemize}
 
- \begin{table}
-\centering
-\caption{Classification error on Spiral Dataset, compared with \cite{malinin2019ensemble}. Error bars are 95\%-confidence intervals assuming normal distribution. Note that our results likely use a different base model and training procedure than the original paper, since it was not specified there.  }
-\addtolength{\leftskip} {-3cm}
-\addtolength{\rightskip}{-3cm}
-\begin{tabular}{r||r|r|r|r|r|r|r|r|r} 
-\hline
-\textbf{ERR$\downarrow$} & 
-IND & 
-ENSM & 
-EnD & 
-$\text{EnD}^2$ & 
-EnD & 
-EnD$^2$ & 
-EnD$^2$ & 
-EnD$^2$ & 
-EnD$^2$ &  \\[-16pt]
-& 
-& 
-& 
-& 
-& 
-$_{\texttt{+AUX}}$ & 
-$_{\texttt{+AUX}}$ & 
-$_{\texttt{+AUX,ANN}}$ & 
-$_{\texttt{+AUX,T=2.5}}$ & 
-$_{\texttt{+AUX20}}$ &  %[0.5ex]
-\hline
-\hline
-Our results & 
-8.20$\scriptstyle \pm 0.67$ &
-2.3$\scriptstyle \pm NA$ &
-3.90$\scriptstyle \pm 0.65$&
-3.86$\scriptstyle \pm 0.70$&
-2.61$\scriptstyle \pm 0.11$&
-4.67$\scriptstyle \pm 3.26$&
-3.30$\scriptstyle \pm 0.59$&
-3.45$\scriptstyle \pm 0.96$&
-5.0$\scriptstyle \pm 1.54$ \\ 
-Paper \cite{malinin2019ensemble} &
-13.21 &
-12.37 &
-12.39 &
-12.47 &
-12.41 &
-12.40 &
-- &
-- &
--\\ 
-\hline
-\end{tabular}
-\\ [1ex] 
-
-\label{tab:spiral}
-\end{table}
+\begin{table}
+  \centering
+  \caption{Classification error on Spiral Dataset, compared with \cite{malinin2019ensemble}. Error bars are 95\%-confidence intervals assuming normal distribution. Note that our results likely use a different base model and training procedure than the original paper, since it was not specified there.  }
+  \addtolength{\leftskip} {-3cm}
+  \addtolength{\rightskip}{-3cm}
+  \begin{tabular}{r||r|r|r|r|r|r|r|r|r} 
+  \hline
+  \textbf{ERR$\downarrow$} & 
+  IND & 
+  ENSM & 
+  EnD & 
+  $\text{EnD}^2$ & 
+  EnD & 
+  EnD$^2$ & 
+  EnD$^2$ & 
+  EnD$^2$ & 
+  EnD$^2$   \\[-7pt]
+  & 
+  & 
+  & 
+  & 
+  & 
+  $_{\texttt{+AUX}}$ & 
+  $_{\texttt{+AUX}}$ & 
+  $_{\texttt{+AUX,ANN}}$ & 
+  $_{\texttt{+AUX,T=2.5}}$ & 
+  $_{\texttt{+AUX20}}$ \\
+  \hline
+  \hline
+  Our results & 
+  8.20$\scriptstyle \pm 0.67$ &
+  2.3$\scriptstyle \pm NA$ &
+  3.90$\scriptstyle \pm 0.65$&
+  3.86$\scriptstyle \pm 0.70$&
+  2.61$\scriptstyle \pm 0.11$&
+  4.67$\scriptstyle \pm 3.26$&
+  3.30$\scriptstyle \pm 0.59$&
+  3.45$\scriptstyle \pm 0.96$&
+  5.0$\scriptstyle \pm 1.54$ \\ 
+  Paper \cite{malinin2019ensemble} &
+  13.21 &
+  12.37 &
+  12.39 &
+  12.47 &
+  12.41 &
+  12.40 &
+  - &
+  - &
+  -\\ 
+  \hline
+  \end{tabular}
+  \\ [1ex] 
+   
+  \label{tab:spiral}
+  \end{table}
 
 \subsubsection{Visualization of uncertainty}
 The total, data and knowledge uncertainty is plotted in Figure \ref{fig:fig3} for a grid of 10$^6$ points. In contrast to the original paper, we fix the scale of the colour bar for better comparability between plots.
