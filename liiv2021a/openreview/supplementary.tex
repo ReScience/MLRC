@@ -26,42 +26,45 @@ The custom loss function is described in Algorithm 2. This formulation includes 
   \If{$X_{OOD}$ not None}{
   $X = [X, X_{OOD}]$ // append OOD data to training set
   }
-  $\phi = En.predict(X)$ // exp($\phi$) are the labels for EnD$^2$ 
+  $\phi = En.predict(X)$ // exp($\phi$) are the labels for EnD$^2$  \\
   // $\phi$ is a tensor of logits corresponding to the true distribution, each row corresponds to a model and each column a class. Each matrix corresponds to one image \\
-  $model_{\theta} \leftarrow classifier$ //create a new classifier model with weights $\theta$, with logits as output 
-  EnD$^2 = argmin_{\theta}\{Loss_{EnD^2}(\phi,model_{\theta}(X)) \}$ //train model backpropagation
+  $model_{\theta} \leftarrow classifier$ //create a new classifier model with weights $\theta$, with logits as output \\
+  EnD$^2 = argmin_{\theta}\{Loss_{EnD^2}(\phi,model_{\theta}(X)) \}$ //train model backpropagation\\
   return EnD$^2$
   \caption{Training algorithm for EnD$^2$ given an ensemble}
   \label{alg:training}
-\end{algorithm}
+
+\end{algorithm} 
 
 \begin{algorithm}
-    \SetKwInOut{Input}{Input}
-    \SetKwInOut{Output}{Output}
-    \Input{Ensemble logits: $\phi$, predicted logits: $z$, temperature: $T=T(t)$, annealing}
-    \Output{cost: $C$}
-    $\epsilon = 10^{-8}$  // Smoothing factor\\
-    $\delta = 1-10^{-3}$ // Central smoothing factor\\
-    
-    $\alpha = e^{z/T(t)}$ // elementwise exponential\\
-    M = \#models \\
-    N = \#classes \\
-    \For{$i\gets1$ \KwTo M}{ 
-    $\alpha_{0_i} = \sum_j \alpha_{i,j}$ // sum over the classes to produce the precision factor
-    }
-    %$\alpha_0 = sum(exp(\phi))$ 
-    $P_{En} = softmax(\phi/T(t))$ // softmax over classes\\
-    $P_{En} = \delta(P_{En} - \frac{1}{N}) + \frac{1}{N}$\\
-    $TIT = \sum_i^N(log(\Gamma(\alpha_i + \epsilon))) - log(\Gamma(
-            \alpha_0 + \epsilon))  $ // target independent term, where $log(\Gamma(x)) = log((x - 1)!)$\\
-    $A = \frac{1}{M}\sum^{M}_i(log(P_{En_i} + \epsilon)$ // mean over ensemble\\
-    $TDT = -\sum_i^{N}((\alpha_i - 1) A_i)$  // target dependent term, sum over classes \\
+  \SetKwInOut{Input}{Input}
+  \SetKwInOut{Output}{Output}
+  \Input{Ensemble logits: $\phi$, predicted logits: $z$, temperature: $T=T(t)$, annealing}
+  \Output{cost: $C$}
+  $\epsilon = 10^{-8}$  // Smoothing factor\\
+  $\delta = 1-10^{-3}$ // Central smoothing factor\\
 
-    return $(TDT +TIT) T(t)^2$
-    
-    
-    \label{alg:loss}
-    \caption{loss for EnD$^2$}
+  $\alpha = e^{z/T(t)}$ // elementwise exponential\\
+  M = \#models \\
+  N = \#classes \\
+  \For{$i\gets1$ \KwTo M}{ 
+  $\alpha_{0,i} = \sum_j \alpha_{i,j}$ // sum over the classes to produce the precision factor
+  }
+  %$\alpha_0 = sum(exp(\phi))$ 
+  $P_{En} = softmax(\phi/T(t))$ // softmax over classes\\
+  $P_{En} = \delta(P_{En} - \frac{1}{N}) + \frac{1}{N}$\\
+  $TIT = \sum_i^N(log(\Gamma(\alpha_i + \epsilon))) - log(\Gamma(
+          \alpha_0 + \epsilon))  $ // target independent term, where $log(\Gamma(x)) = log((x - 1)!)$\\
+  $A = \frac{1}{M}\sum^{M}_i(log(P_{En_i} + \epsilon)$ // mean over ensemble\\
+  $TDT = -\sum_i^{N}((\alpha_i - 1) A_i)$  // target dependent term, sum over classes \\
+
+  return $(TDT +TIT) T(t)^2$
+
+
+  \label{alg:loss}
+  \caption{loss for EnD$^2$}
+
+
 \end{algorithm} 
 
 
@@ -336,10 +339,10 @@ In this section, we report the computational resources used for this reproductio
          \hline 
          Evaluation, \hyperlink{claim1}{claim 1 and 2} & 15 & 51 & 0.53 & 10.94 \\
          \hline
-         Size ablation, training, \hyperlink{claim3}{claim 3} & $112$ & $51$ & $3.97$ & $81.69$ \\
-         Temperature ablation, training, \hyperlink{claim4}{claim 4} & $27$ & $51$ & $0.96$& $19.69$\\
+         Size ablation, \hyperlink{claim3}{claim 3} & $112$ & $51$ & $3.97$ & $81.69$ \\
+         Temperature ablation, \hyperlink{claim4}{claim 4} & $27$ & $51$ & $0.96$& $19.69$\\
          \hline
-         3-class ensemble, training, \hyperlink{claim 5}{claim 5} &100 &5.25 &0.36 &7.51 \\
+         3-class ensemble, \hyperlink{claim 5}{claim 5} &100 &5.25 &0.36 &7.51 \\
          \hline
          \hline
          \textbf{Total} & & & $11.413$ & $235.06$
