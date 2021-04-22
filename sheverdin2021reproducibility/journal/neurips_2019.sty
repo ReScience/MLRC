@@ -52,58 +52,57 @@
 \renewcommand{\rmdefault}{ptm}
 \renewcommand{\sfdefault}{phv}
 
-% Everything below is commented, because it gives 
-% % change this every year for notice string at bottom
-% \newcommand{\@neuripsordinal}{33rd}
-% \newcommand{\@neuripsyear}{2020}
-% \newcommand{\@neuripslocation}{Vancouver, Canada}
+% change this every year for notice string at bottom
+\newcommand{\@neuripsordinal}{33rd}
+\newcommand{\@neuripsyear}{2020}
+\newcommand{\@neuripslocation}{Vancouver, Canada}
 
-% % handle tweaks for camera-ready copy vs. submission copy
-% \if@preprint
-%   \newcommand{\@noticestring}{%
-%     Preprint. Under review.%
-%   }
-% \else
-%   \if@neuripsfinal
-%     \newcommand{\@noticestring}{%
-%       \@neuripsordinal\/ Conference on Neural Information Processing Systems
-%       (NeurIPS \@neuripsyear), \@neuripslocation.%
-%     }
-%   \else
-%     \newcommand{\@noticestring}{%
-%       Submitted to ML Reproducibility Challenge \@neuripsyear. Do not distribute.%
-%     }
+% handle tweaks for camera-ready copy vs. submission copy
+\if@preprint
+  \newcommand{\@noticestring}{%
+    Preprint. Under review.%
+  }
+\else
+  \if@neuripsfinal
+    \newcommand{\@noticestring}{%
+      \@neuripsordinal\/ Conference on Neural Information Processing Systems
+      (NeurIPS \@neuripsyear), \@neuripslocation.%
+    }
+  \else
+    \newcommand{\@noticestring}{%
+      Submitted to ML Reproducibility Challenge \@neuripsyear. Do not distribute.%
+    }
 
-%     % line numbers for submission
-%     \RequirePackage{lineno}
-%     \linenumbers
+    % line numbers for submission
+    \RequirePackage{lineno}
+    \linenumbers
 
-%     % fix incompatibilities between lineno and amsmath, if required, by
-%     % transparently wrapping linenomath environments around amsmath
-%     % environments
-%     \AtBeginDocument{%
-%       \@ifpackageloaded{amsmath}{%
-%         \newcommand*\patchAmsMathEnvironmentForLineno[1]{%
-%           \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
-%           \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
-%           \renewenvironment{#1}%
-%                           {\linenomath\csname old#1\endcsname}%
-%                           {\csname oldend#1\endcsname\endlinenomath}%
-%         }%
-%         \newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
-%           \patchAmsMathEnvironmentForLineno{#1}%
-%           \patchAmsMathEnvironmentForLineno{#1*}%
-%         }%
-%         \patchBothAmsMathEnvironmentsForLineno{equation}%
-%         \patchBothAmsMathEnvironmentsForLineno{align}%
-%         \patchBothAmsMathEnvironmentsForLineno{flalign}%
-%         \patchBothAmsMathEnvironmentsForLineno{alignat}%
-%         \patchBothAmsMathEnvironmentsForLineno{gather}%
-%         \patchBothAmsMathEnvironmentsForLineno{multline}%
-%       }{}
-%     }
-%   \fi
-% \fi
+    % fix incompatibilities between lineno and amsmath, if required, by
+    % transparently wrapping linenomath environments around amsmath
+    % environments
+    \AtBeginDocument{%
+      \@ifpackageloaded{amsmath}{%
+        \newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+          \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+          \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+          \renewenvironment{#1}%
+                           {\linenomath\csname old#1\endcsname}%
+                           {\csname oldend#1\endcsname\endlinenomath}%
+        }%
+        \newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+          \patchAmsMathEnvironmentForLineno{#1}%
+          \patchAmsMathEnvironmentForLineno{#1*}%
+        }%
+        \patchBothAmsMathEnvironmentsForLineno{equation}%
+        \patchBothAmsMathEnvironmentsForLineno{align}%
+        \patchBothAmsMathEnvironmentsForLineno{flalign}%
+        \patchBothAmsMathEnvironmentsForLineno{alignat}%
+        \patchBothAmsMathEnvironmentsForLineno{gather}%
+        \patchBothAmsMathEnvironmentsForLineno{multline}%
+      }{}
+    }
+  \fi
+\fi
 
 % load natbib unless told otherwise
 \if@natbib
