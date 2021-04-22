@@ -17,7 +17,6 @@ Since the original paper's code was not published, all of the codebase was writt
 % Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting the same number is in most cases infeasible, so you'll need to use your judgment to decide if your results support the original claim of the paper.
 In contrast to the first claim, we have discovered that for most of the architectures, reconstruction errors for the attacks are quite low, which means that in our models the first claim is not supported. We also found that for most of the models, the classification error is somewhat higher than those provided in the paper. However, these indeed relate to the original work and partially support the second claim of the authors.
 
-
 \subsection*{What was easy}
 Authors of the original paper utilized famous architectures for some of architectures' parts, such as ResNet and LeNet, that were well explained and defined in the literature. In addition, authors, provided formulas on the modified rotation-invariant Complex DNN modules (ReLU, max pooling etc.), implementation of which was relatively straightforward. The paper was based on the openly available datasets. 
 
@@ -83,7 +82,7 @@ In this paper, we test the following concrete claims:
 \section{Methodology}
 % Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
 
-The paper from \cite{xiang2020interpretable} was replicated \footnote{Our implementation can be found at our GitHub (\cite{github-gana-fact-ai})} by solely using the methods described in their paper, since there was no implementation available online. Our approach involved implementing the models used by \cite{xiang2020interpretable}, which included the ResNet-$\alpha,\beta$-20/32/44/56/110 (\cite{DBLP:journals/corr/HeZRS15}), the LeNet (\cite{lecun1998gradient}), the VGG-16 (\cite{simonyan2015deep}) and the AlexNet (\cite{NIPS2012_c399862d}). Most of these papers had implementations available online, which were adjusted slightly to be able to process complex-valued intermediate layer features. Furthermore, these DNNs had to be disassembled to create the complex-valued DNN structure proposed by \cite{xiang2020interpretable} that consists of an encoder, processing module and decoder.
+The paper from \cite{xiang2020interpretable} was replicated \footnote{Our implementation can be found at our GitHub (\url{https://github.com/GANA-FACT-AI/gana-fact-ai})} by solely using the methods described in their paper, since there was no implementation available online. Our approach involved implementing the models used by \cite{xiang2020interpretable}, which included the ResNet-$\alpha,\beta$-20/32/44/56/110 (\cite{DBLP:journals/corr/HeZRS15}), the LeNet (\cite{lecun1998gradient}), the VGG-16 (\cite{simonyan2015deep}) and the AlexNet (\cite{NIPS2012_c399862d}). Most of these papers had implementations available online, which were adjusted slightly to be able to process complex-valued intermediate layer features. Furthermore, these DNNs had to be disassembled to create the complex-valued DNN structure proposed by \cite{xiang2020interpretable} that consists of an encoder, processing module and decoder.
 
 The encoder is in principle the same as the first few layers of the used DNN, but at the end of the encoder a complex rotation is applied (Eq. \ref{eq_rotate_forward}).
 
@@ -205,7 +204,7 @@ The architecture of processing unit is designed so that after the the features $
     \label{eq4}
 \end{equation}
 
-To keep the equation \label{eq4} true for the Convolutional Linear Layers $\Phi(e^{i \theta} x )$ and $e^{i \theta} \Phi(x)$ should be equal to each other, meaning that for:
+To keep the equation \ref{eq4} true for the Convolutional Linear Layers $\Phi(e^{i \theta} x )$ and $e^{i \theta} \Phi(x)$ should be equal to each other, meaning that for:
 \begin{equation}
     \Phi(e^{i \theta}x) = w  \cdot (e^{i \theta}x) + b  
     \label{eq2}
@@ -216,7 +215,7 @@ To keep the equation \label{eq4} true for the Convolutional Linear Layers $\Phi(
     \label{eq3}
 \end{equation}
 
-Given any $\theta$, we see that the equality would hold only if b = 0, which would mean that no bias term would be needed. Thi is exactly the objective of rotation invariance for our network as it was mentioned in the publication.
+Given any $\theta$, we see that the equality would hold only if b = 0, which would mean that no bias term would be needed. This is exactly the objective of rotation invariance for our network as it was mentioned in the publication.
 
 In the original work, the Critic's architecture was not described, so some assumptions regarding its architecture were made. We found that one linear layer is not sufficient. Thus, we added a convolution, a ResNet block and another convolution.
 Since the LeNet network looks very different from the ResNet networks we decided to change to the critic architecture to look more like the generator of LeNet.
@@ -241,9 +240,8 @@ From all the networks that were used in \cite{xiang2020interpretable} we impleme
 
 We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The runtime of each model was highly dependant on the architecture used. The runtimes for each model can be found in Table \ref{runtime-table}.
 
-
 \begin{table}[!htb]
-    \begin{minipage}{.5\linewidth}
+    \begin{minipage}{.45\linewidth}
     \setlength{\abovecaptionskip}{5pt}
     \caption{Average runtime for each model}
     \centering
@@ -268,7 +266,7 @@ We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The r
     \label{runtime-table}
         
     \end{minipage}%
-    \begin{minipage}{.5\linewidth}
+    \begin{minipage}{.45\linewidth}
     
     \centering
     \setlength{\abovecaptionskip}{5pt}
@@ -334,7 +332,6 @@ The reconstructed images that were created by inversion attack 1 on the ResNet-3
     \label{fig:reconstruction}
 \end{figure}
 
-
 In Table \ref{inversion-table} we can see the results of attacking our new implementation network with inversion attack 1 and 2. Here we see that the results look a lot more similar and we can therefore say that the first claim is supported under our new implementation. This claim is further supported by Figure \ref{fig:reconstruction} where the reconstructed images can be seen of the new implementation network.
 
 \subsubsection{Preservation of accuracy}
@@ -373,7 +370,7 @@ In table \ref{accuracy-table} we can see the classification errors of the new im
     	\centering
     	\setlength{\abovecaptionskip}{5pt}
         \includegraphics[width=0.9\textwidth]{../openreview/images/image_reconstructions.png}
-        \captionof{figure}{Image reconstructions, trained on Cifar10 and ResNet-22-$\alpha$. a) Original images. b) Model without ReLU at the end of the generator. c) Model with ReLU at the end of the generator. d) Model trained while randomly swapping a and b; The WGAN was not trained, however, the adversary is not able to reconstruct the inputs. Also, the accuracy of the classifier didn't change using this approach.}
+        \captionof{figure}{Image reconstructions, trained on CIFAR10 and ResNet-22-$\alpha$. a) Original images. b) Model without ReLU at the end of the generator. c) Model with ReLU at the end of the generator. d) Model trained while randomly swapping a and b; The WGAN was not trained, however, the adversary is not able to reconstruct the inputs. Also, the accuracy of the classifier didn't change using this approach.}
         \label{fig:kanonymity}
 	\end{minipage}
 \end{table}
@@ -407,7 +404,7 @@ All of this evidence suggests that an adversary could be able to reconstruct two
 
 % Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
 
-From the results of the initial implementation of the networks (without removing the relu and adding the swapping of a and b in the generator) we can see that we do not reproduce the results of \cite{xiang2020interpretable}. Our networks don't protect the privacy as the images can be perfectly reconstructed and the properties can be perfectly inferred. Therefore the first claim (\ref{claim1}) is not supported by our results. The classification errors are however quite low and even though they are higher than those from \cite{xiang2020interpretable}, we think that with the right parameters we could have achieved the same classification errors as them. Therefore we do think that the second claim (\ref{claim2}) is supported even though our results only show partial support.
+From the results of the initial implementation of the networks (without removing the ReLU and adding the swapping of a and b in the generator) we can see that we do not reproduce the results of \cite{xiang2020interpretable}. Our networks don't protect the privacy as the images can be perfectly reconstructed and the properties can be perfectly inferred. Therefore the first claim (\ref{claim1}) is not supported by our results. The classification errors are however quite low and even though they are higher than those from \cite{xiang2020interpretable}, we think that with the right parameters we could have achieved the same classification errors as them. Therefore we do think that the second claim (\ref{claim2}) is supported even though our results only show partial support.
 
 The splitting of the networks in \cite{xiang2020interpretable} is questionable. The whole idea of the paper is to have a processing unit running on the cloud so small IoT devices do not have to deal with the computational load themselves. This of course introduces privacy concerns, which the paper aims to address. However when we look at the way \cite{xiang2020interpretable} splits the networks into three parts, we see that a lot of computational effort is being put on the encoder and decoder networks. When we look at how they split the ResNet networks for example, approximately only one third of the computational effort is put on the processing unit. If this way of splitting is the only way the privacy can be protected, then it is questionable whether networks like this can actually be used on IoT devices. Also, the local device has to keep the dataset during inference in order to sample $b$. However, IoT devices lack storage capacity which could lead to major difficulties in practice.
 
@@ -415,6 +412,7 @@ The way \cite{xiang2020interpretable} show their results of the inference attack
 
 The choice of the U-Net as the adversary is unclear to us. We don't see any value in first upsampling the features followed by downsampling them in the first part of the U-Net. In addition, the input of the U-Net has no important low-level features as they are upscaled, so the value of the skip connections is questionable to us. We think it'd be sufficient if the adversary consists of a simple decoder that reconstructs images by upsampling and applying convolutions.
 
+\newpage
 \subsection{What was easy}
 % Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
 
@@ -445,5 +443,5 @@ Description of the inversion attacks (1) and (2) mentioned in section 4.3 were n
 
 % \section*{References}
 % \newpage
-% \bibliographystyle{abbrv}
-% \bibliography{bibliography.bib}
+% \bibliographystyle{plainnat}
+% \bibliography{bibliography}
