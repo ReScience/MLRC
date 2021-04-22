@@ -1,0 +1,62 @@
+
+\section{Reproducing the \emph{standard} baseline and the biased category pairs} \label{sec:baseline}
+
+The first step in reproducing the original paper is doing ``stage 1" training. This stage involves training a \emph{standard} multi-label classifier with the binary cross entropy loss on the COCO-Stuff, DeepFashion, and AwA datasets. We describe how we obtained and processed the datasets in Appendix~\ref{sec:datasets}. The \textit{standard} model is used to identify the biased categories and serves as a starting point for all ``stage 2" methods, i.e., the proposed \emph{CAM-based} and \emph{feature-split} methods and 7 other strong baselines introduced in Section~\ref{sec:stage2}.
+
+\subsection{Implementation and training details} \label{sec:baselineimplementation}
+
+According to the original paper, all models use ResNet-50~\cite{He2015} pre-trained on ImageNet~\cite{imagenet_cvpr09} as a backbone and are optimized with stochastic gradient descent (SGD) and a batch size of 200. Each \emph{standard} model is optimized with an initial learning rate of 0.1, later dropped to 0.01 following a standard step decay process. The input images are randomly resize-cropped to 224$\times$224 and randomly flipped horizontally during training. We also received additional details from the authors that SGD is used with a momentum of 0.9 and no weight decay. The COCO-Stuff \emph{standard} model is trained for 100 epochs with the learning rate reduced from 0.1 to 0.01 after epoch 60. The DeepFashion \emph{standard} model is trained for 50 epochs with the learning rate reduced after epoch 30. The AwA \emph{standard} model is trained for 20 epochs with the learning rate reduced after epoch 10.\\
+\\
+After training with the paper's hyperparameters, we found that our reproduced \textit{standard} models for COCO-Stuff and AwA were consistently underperforming against the results in the paper. Thus, we also tried varying the learning rate, weight decay, and the epoch at which the learning rate is dropped to achieve the best possible results. Further details can be found in Appendix~\ref{sec:hyperparametersearch}. On both COCO-Stuff and AwA, our hyperparameter search ended up reconfirming the original paper's hyperparameters as the optimal ones; for DeepFashion, we were able to find a significant improvement. The original, reproduced and tuned results are shown in Table~\ref{tab:baseline}, following explanations of biased categories identification (Section~\ref{sec:biasedcategories}) and evaluation details (Section~\ref{sec:evaluation}).
+
+
+\subsection{Biased categories identification} \label{sec:biasedcategories}
+
+The paper identifies the top-20 ($b$, $c$) pairs of biased categories for each dataset, where $b$ is the category suffering from contextual bias incurred by $c$, the associated context category. This identification is crucial as it concretely defines the contextual bias the paper aims to tackle, and influences the training of the ``stage 2" models and evaluation of all models.\\
+\\
+The paper defines \emph{bias} between two categories $b$ and $z$ as the ratio between the average prediction probabilities of $b$ when it occurs with and without $z$. Note that this definition of bias requires a trained model, unlike the more common definition of bias that only requires co-occurrence counts in a dataset~\cite{zhao_MALS_EMNLP2017}. Following the paper description, we used a \emph{standard} model trained on an 80-20 split for COCO-Stuff and one trained on the full training set for DeepFashion and AwA. For each category $b$ in a given dataset, we calculated the bias between $b$ and its frequently co-occuring categories, and defined category $c$ as the context category that most biases $b$, i.e. has the highest bias value. Bias is calculated on the 20 split for COCO-Stuff, the validation set for DeepFashion, and the test set for AwA.\footnote{We received additional information from the original authors that they restricted their COCO-Stuff biased categories to the 80 object categories and performed manual cleaning of the DeepFashion ($b$, $c$) pairs.} After the bias calculation, we identified 20 ($b$, $c$) pairs with the highest bias values. The paper emphasizes that this definition of bias is directional; it only captures the bias c incurs on b and not the other way around. \\
+\\
+We compare our pairs to the paper's in Tables~\ref{tab:coco-data} (COCO-Stuff),~\ref{tab:deepfashion-data} (DeepFashion), and ~\ref{tab:awa-data} (AwA) in the Appendix. Out of 20 biased categories, 2 of ours differed from the paper's for COCO-Stuff, 10 differed for DeepFashion, and 2 differed for AwA. The variability is expected, as bias is defined as a ratio of a trained model's average prediction probabilities which will vary across different models. Nonetheless, we found our pairs to also be reasonable, as our biased categories occur frequently with their context categories and rarely without them. See Appendix~\ref{sec:biasedcategoriesapp} for details. 
+
+% \setlength{\textfloatsep}{10pt}
+\begin{table}[b!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|cc|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{Dataset} & \multirow{2}{*}{Model} & \multicolumn{2}{c|}{Exclusive}  &  \multicolumn{2}{c|}{Co-occur}  &  \multicolumn{2}{c|}{Non-biased} & \multirow{2}{*}{All} \\
+\cline{3-8}
+& & Paper BC & Our BC & Paper BC & Our BC & Paper BC & Our BC & \\
+\hline
+\multirow{2}{*}{COCO-Stuff} & Paper &\textbf{24.5} & - & \textbf{66.2} & - & \textbf{75.4} & - & \textbf{57.2} \\
+ & Ours (paper params$^*$) & 23.9 & 20.6 & 65.0 & 63.7 & 72.3 & 72.9 & 55.7 \\
+\hline
+\multirow{3}{*}{DeepFashion} & Paper & 4.9 & - & 17.8 & - & - & - & - \\
+ & Ours (paper params) &  5.6 & 5.0 & 19.2 & 15.0  & - & - & -  \\
+ & Ours (tuned params) &  \textbf{7.0} &  6.3 &\textbf{22.8} & 18.4  & - & - & - \\
+\hline
+\multirow{2}{*}{AwA} & Paper & 19.4 & -& \textbf{72.2} &-  & - & - & - \\
+ & Ours (paper params$^*$) & \textbf{19.5} & 21.7 & 69.0 & 69.9 & - & -& -  \\
+\hline
+\end{tabular}
+}
+%\vspace{0.1cm}
+\caption{Reproduced \emph{standard} baseline results on three datasets. We evaluate the models on different subsets of categories/images  (``exclusive" and ``co-occur" distributions for the 20 biased categories and the entire test set for non-biased and all categories; Section~\ref{sec:evaluation}), both using the paper's and our identified biased category (BC) pairs. *On COCO-Stuff and AwA, hyperparameter tuning did not improve on the original paper's hyperparameters.}
+\label{tab:baseline}
+\end{table}
+
+\subsection{Evaluation details} \label{sec:evaluation}
+
+The paper does not specify image preprocessing or model selection. Following common practice, we resize an image so that its smaller edge is 256 and then apply one of two 224$\times$224 cropping methods: a center-crop or a ten-crop. Both are deterministic procedures. We observed that results with center-crop are consistently better and closer to the paper's results, hence for all experiments, we report results using center-crop. In our email communications, the authors also specified that they use the model at the end of training as the final model. We confirmed that this is a reasonable model selection method after trying three other selection methods, described in Appendix~\ref{sec:epochselection}.\\
+\\
+We emphasize that model evaluation is dependent on the identified biased category pairs. For each ($b$, $c$) pair, the test set can be divided into three sets: \emph{co-occurring} images that contain both $b$ and $c$, \emph{exclusive} images that contain $b$ but not $c$, and \emph{other} images that do not contain $b$. Then for each ($b$, $c$) pair, the paper constructs two test distributions: 1) the ``exclusive" distribution containing \emph{exclusive} and \emph{other} images and 2) the ``co-occur" distribution containing \emph{co-occurring} and \emph{other} images. We suspect that \emph{other} images are included in both distributions because otherwise, both distributions would have small sizes and only consist of positive images where $b$ occurs, disabling the mAP calculation.\\
+\\
+The test distribution sizes can be calculated from the co-occurring and exclusive image counts in Tables~\ref{tab:coco-data},~\ref{tab:deepfashion-data},~\ref{tab:awa-data} in the Appendix. As an example, for the (ski, person) pair in COCO-Stuff, there are 984 \emph{co-occuring}, 9 \emph{exclusive}, and 39,511 \emph{other} images in the test set. Hence, there are 9+39,511=39,520 images in the ``exclusive" distribution and 984+39,511=40,495 images in the ``co-occur" distribution. For COCO-Stuff, we also report results on the entire test set (40,504 images) for 60 non-biased object categories and for all 171 categories, following the paper.\\
+\\
+For COCO-Stuff and AwA, we calculate the average precision (AP) for each biased category $b$, and report the mean AP (mAP) for each test distribution. For DeepFashion, we calculate the per-category top-3 recall and report the mean value for each test distribution. Higher values indicate a better classifier for both metrics. 
+
+
+\subsection{Results} \label{sec:baselineresults}
+
+In Table~\ref{tab:baseline}, we report the original, reproduced, and tuned results with the paper's and our 20 most biased category pairs. Evaluated on the paper's pairs, our best COCO-Stuff model underperforms the paper's by 1-3\%, our best DeepFashion model outperforms by 2-5\%, and our best AwA underperforms on the ``co-occur" distribution by 3.2\% and matches the ``exclusive" distribution within 0.1\%. When we evaluate the same models on our biased category pairs, we get similar results for the AwA model, slightly worse results for the DeepFashion model, and significantly worse results for the COCO-Stuff model. Due to this big drop in performance for COCO-Stuff, which we suspect is caused by the discrepancy in the identified biased category pairs, we choose to use the paper's pairs for training and evaluation in the subsequent sections. Overall, we conclude that the paper's \emph{standard} baseline results are reproducible as we were able to train models within a reasonable margin of error.
+
