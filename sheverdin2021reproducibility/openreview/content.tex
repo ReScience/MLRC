@@ -157,7 +157,7 @@ During inference attacks a classifier is trained on either similar raw images (i
 \subsection{Datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
 
-\citet{xiang2020interpretable} used CIFAR-10/100 (\citet{cifar10}, \citet{cifar100}) to train the ResNets and LeNet, CUB-200 (\citet{WelinderEtal2010}) to train VGG-16 and CelebA (\citet{CelebA}) for AlexNet. Since we did not implement VGG-16 and AlexNet, we only used the CIFAR-10/100 datasets using the train/test split described in Table \ref{dataset}. Each split was halved to create two smaller datasets used for training/testing either the privacymodel or the adversary attacker. Before training, all datasets were normalized. 
+\citet{xiang2020interpretable} used CIFAR-10/100 (\citet{cifar10-cifar100}) to train the ResNets and LeNet, CUB-200 (\citet{WelinderEtal2010}) to train VGG-16 and CelebA (\citet{CelebA}) for AlexNet. Since we did not implement VGG-16 and AlexNet, we only used the CIFAR-10/100 datasets using the train/test split described in Table \ref{dataset}. Each split was halved to create two smaller datasets used for training/testing either the privacymodel or the adversary attacker. Before training, all datasets were normalized. 
 
 \begin{table*}[t]
     \centering
@@ -473,7 +473,7 @@ The choice of the U-Net as the adversary is unclear to us. We don't see any valu
 Overall we found \citet{xiang2020interpretable} quite difficult to understand and reproduce, but what did make it a lot easier was the different implementations that were already online. For most networks that they used we found an implementation online that we could use and especially the complex neural network implementations were very useful. 
 
 \begin{itemize}
-    \item Datasets, such as CIFAR-10 (\citet{cifar10}), CIFAR-100 \\ (\citet{cifar100}, CelebA (\citet{CelebA}) are publicly available and are easy to get access to.
+    \item Datasets, such as CIFAR-10/100 (\citet{cifar10-cifar100}) and CelebA (\citet{CelebA}) are publicly available and are easy to get access to.
     \item Main architecture for the privacy model is based on the existing and well documented architectures such as ResNet (\citet{DBLP:journals/corr/HeZRS15}), LeNet (\citet{lecun1998gradient}), AlexNet (\citet{AlexNet}), etc.
 \end{itemize}
 
