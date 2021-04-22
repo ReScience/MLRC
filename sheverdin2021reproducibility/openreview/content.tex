@@ -5,8 +5,8 @@
 \subsection*{Scope of Reproducibility}
 % State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
 % This is meant to place the work in context and to tell a reader the objective of the reproduction.
-The original work by  \cite{xiang2020interpretable} claimed (1) that complex-valued DNNs effectively increase the difficulty of inferring inputs for the adversary attacks compared to the baseline. 
-In addition, \cite{xiang2020interpretable} stated that the (2) proposed privacy-protecting complex-valued DNN effectively preserves the accuracy when compared to the baseline.
+The original work by  \citet{xiang2020interpretable} claimed (1) that complex-valued DNNs effectively increase the difficulty of inferring inputs for the adversary attacks compared to the baseline. 
+In addition, \citet{xiang2020interpretable} stated that the (2) proposed privacy-protecting complex-valued DNN effectively preserves the accuracy when compared to the baseline.
 
 \subsection*{Methodology}
 
@@ -41,11 +41,11 @@ We did not contact the original authors of the publication.
 
 Deep Neural Networks (DNNs) can process a massive data volume but require great computing power to process this data. Therefore it is an interesting option for small devices like smartphones or IoT devices to use a cloud operator for these computationally expensive tasks. Although this is an efficient way to process data, the cloud operator is susceptible to privacy threats. A potential attacker could reconstruct or infer private properties of the data. Possible solutions are subject of current research.
 
-\cite{xiang2020interpretable} proposed a possible solution using encryption and complex-valued neural networks to address this problem. They showed that their approach increases the difficulty of inferring inputs or properties from intermediate layer features. Our paper aims at reproducing their findings.
+\citet{xiang2020interpretable} proposed a possible solution using encryption and complex-valued neural networks to address this problem. They showed that their approach increases the difficulty of inferring inputs or properties from intermediate layer features. Our paper aims at reproducing their findings.
 
- \cite{xiang2020interpretable} extended the standard DNN by encrypting the intermediate layer features using complex-valued DNNs (\cite{DBLP:journals/corr/TrabelsiBSSSMRB17}). The local device encodes the original input into intermediate features. Those features are encrypted and sent to a processing unit, a complex-valued neural net located in the cloud. It does the computationally expensive operations while not being able to infer properties of its input. The result is sent back to the local device and decrypted.
+ \citet{xiang2020interpretable} extended the standard DNN by encrypting the intermediate layer features using complex-valued DNNs (\citet{DBLP:journals/corr/TrabelsiBSSSMRB17}). The local device encodes the original input into intermediate features. Those features are encrypted and sent to a processing unit, a complex-valued neural net located in the cloud. It does the computationally expensive operations while not being able to infer properties of its input. The result is sent back to the local device and decrypted.
  
- Ideally, the local device is able to decrypt the encoded data using the secret key. However, an adversary shouldn't be able to decrypt the features without the key.  \cite{xiang2020interpretable} achieved this by rotating intermediate layer features into the complex plane using a random angle. The angle acts as a key and can be used to reverse the rotation. The processing unit consists of rotation-invariant operations only. Thus, the local device can reverse the rotation after receiving the results from the processing unit. To make it hard to deduce the angle, a generative adversarial network is trained to alter the intermediate features to introduce obfuscation whilst keeping important information.
+ Ideally, the local device is able to decrypt the encoded data using the secret key. However, an adversary shouldn't be able to decrypt the features without the key.  \citet{xiang2020interpretable} achieved this by rotating intermediate layer features into the complex plane using a random angle. The angle acts as a key and can be used to reverse the rotation. The processing unit consists of rotation-invariant operations only. Thus, the local device can reverse the rotation after receiving the results from the processing unit. To make it hard to deduce the angle, a generative adversarial network is trained to alter the intermediate features to introduce obfuscation whilst keeping important information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,13 +66,13 @@ Deep Neural Networks (DNNs) can process a massive data volume but require great 
 
 % Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
 
-The main problem \cite{xiang2020interpretable} addresses is the danger of adversary attackers being able to recover original inputs or hidden properties of the input. 
-\cite{xiang2020interpretable} claim their complex-valued model to be robust against these kinds of adversary attacks and show this by attacking their model with various inversion and inference attacks. Here, they claim that attacking their complex-valued DNNs acquires greater reconstruction loss than when they attack the original DNNs, meaning they are more resistant to adversary attacks. Furthermore, even though the input is encoded, they claim that their complex-valued DNNs have almost the same utility performance (classification error rates) as the original DNNs. 
+The main problem \citet{xiang2020interpretable} addresses is the danger of adversary attackers being able to recover original inputs or hidden properties of the input. 
+\citet{xiang2020interpretable} claim their complex-valued model to be robust against these kinds of adversary attacks and show this by attacking their model with various inversion and inference attacks. Here, they claim that attacking their complex-valued DNNs acquires greater reconstruction loss than when they attack the original DNNs, meaning they are more resistant to adversary attacks. Furthermore, even though the input is encoded, they claim that their complex-valued DNNs have almost the same utility performance (classification error rates) as the original DNNs. 
 
 In this paper, we test the following concrete claims:
-\begin{enumerate}
-    \item \cite{xiang2020interpretable} proposed complex-valued DNNs effectively boost the difficulty of inferring inputs for the adversary compared to the baseline. \label{claim1}
-    \item \cite{xiang2020interpretable} proposed their privacy-preserving complex-valued DNN largely preserves the accuracy when compared to the baseline. \label{claim2}
+\begin{enumerate}[ wide = 0pt, leftmargin = *]
+    \item \citet{xiang2020interpretable} proposed complex-valued DNNs effectively boost the difficulty of inferring inputs for the adversary compared to the baseline. \label{claim1}
+    \item \citet{xiang2020interpretable} proposed their privacy-preserving complex-valued DNN largely \\ preserves the accuracy when compared to the baseline. \label{claim2}
 \end{enumerate}
 
 %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have "Claim 1, which is supported by Experiment 1 in Figure 1." The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly, it seemed hard for the students to understand what I was asking for.}
@@ -82,7 +82,7 @@ In this paper, we test the following concrete claims:
 \section{Methodology}
 % Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
 
-The paper from \cite{xiang2020interpretable} was replicated \footnote{Our implementation can be found at our GitHub (\url{https://github.com/GANA-FACT-AI/gana-fact-ai})} by solely using the methods described in their paper, since there was no implementation available online. Our approach involved implementing the models used by \cite{xiang2020interpretable}, which included the ResNet-$\alpha,\beta$-20/32/44/56/110 (\cite{DBLP:journals/corr/HeZRS15}), the LeNet (\cite{lecun1998gradient}), the VGG-16 (\cite{simonyan2015deep}) and the AlexNet (\cite{NIPS2012_c399862d}). Most of these papers had implementations available online, which were adjusted slightly to be able to process complex-valued intermediate layer features. Furthermore, these DNNs had to be disassembled to create the complex-valued DNN structure proposed by \cite{xiang2020interpretable} that consists of an encoder, processing module and decoder.
+The paper from \citet{xiang2020interpretable} was replicated \footnote{Our implementation can be found at our GitHub (\url{https://github.com/GANA-FACT-AI/gana-fact-ai})} by solely using the methods described in their paper, since there was no implementation available online. Our approach involved implementing the models used by \citet{xiang2020interpretable}, which included the ResNet-$\alpha,\beta$-20/32/44/56/110 (\citet{DBLP:journals/corr/HeZRS15}), the LeNet (\citet{lecun1998gradient}), the VGG-16 (\citet{simonyan2015deep}) and the AlexNet (\citet{NIPS2012_c399862d}). Most of these papers had implementations available online, which were adjusted slightly to be able to process complex-valued intermediate layer features. Furthermore, these DNNs had to be disassembled to create the complex-valued DNN structure proposed by \citet{xiang2020interpretable} that consists of an encoder, processing module and decoder.
 
 The encoder is in principle the same as the first few layers of the used DNN, but at the end of the encoder a complex rotation is applied (Eq. \ref{eq_rotate_forward}).
 
@@ -93,7 +93,7 @@ The encoder is in principle the same as the first few layers of the used DNN, bu
 
 The value a represents the regular input that is put through the encoder. The value b is the fooling counterpart that can be seen as a different input that is also put through the encoder. Theta is picked to be random angle, which will act as the secret key we mentioned earlier.
 
-The resulting features are then fed to the processing unit. The processing unit consists of the middle layers of the used DNN. The processing unit has to deal with complex features, which means adjustments had to be made to the regular functions that the DNN uses. We used the proposed functions in \cite{DBLP:journals/corr/TrabelsiBSSSMRB17} to achieve this. Furthermore it is important that the processing unit does not change the rotation of the features, because otherwise if we try to rotate it back with our randomly picked angle we will get random results. Therefore we also had to make the used functions rotation invariant. Methods for achieving this were described in \cite{xiang2020interpretable}.
+The resulting features are then fed to the processing unit. The processing unit consists of the middle layers of the used DNN. The processing unit has to deal with complex features, which means adjustments had to be made to the regular functions that the DNN uses. We used the proposed functions in \citet{DBLP:journals/corr/TrabelsiBSSSMRB17} to achieve this. Furthermore it is important that the processing unit does not change the rotation of the features, because otherwise if we try to rotate it back with our randomly picked angle we will get random results. Therefore we also had to make the used functions rotation invariant. Methods for achieving this were described in \citet{xiang2020interpretable}.
 
 Finally the features are put through the decoder, which consists of the final layers of the used DNN. The decoder first rotates the features back with the randomly picked angle (Eq. \ref{eq_decoder}) and then feeds the result to the final layers.
 
@@ -104,13 +104,13 @@ Finally the features are put through the decoder, which consists of the final la
 
 The value h represents the output of the processing unit and the value $\hat{y}$ is the prediction that the decoder d made.
 
-\cite{xiang2020interpretable} also uses a Wasserstein Generative Adversarial Network which was proposed by \cite{pmlr-v70-arjovsky17a} and is part of the encoder. This WGAN consists of a generator and a critic that use complex rotations to teach the network to generate synthesized features to hide the original ones. Since no implementation with a WGAN that works with complex-valued features was available online, this WGAN encoder had to be completely remade.
+\citet{xiang2020interpretable} also uses a Wasserstein Generative Adversarial Network which was proposed by \citet{pmlr-v70-arjovsky17a} and is part of the encoder. This WGAN consists of a generator and a critic that use complex rotations to teach the network to generate synthesized features to hide the original ones. Since no implementation with a WGAN that works with complex-valued features was available online, this WGAN encoder had to be completely remade.
 
-Lastly, for the adversary attacks, \cite{xiang2020interpretable} attacked the model with inversion and inference attacks. For the inversion attacks, we adopted the U-net model proposed by \cite{U-net}, which had similar variants online that had to be hardly modified to fit their implementation. For the inference attack, a model had to be implemented that functions as a classifier to predict hidden properties of the input.
+Lastly, for the adversary attacks, \citet{xiang2020interpretable} attacked the model with inversion and inference attacks. For the inversion attacks, we adopted the U-net model proposed by \citet{U-net}, which had similar variants online that had to be hardly modified to fit their implementation. For the inference attack, a model had to be implemented that functions as a classifier to predict hidden properties of the input.
 
 \subsection{Model descriptions}
 \subsubsection{Complex-valued DNNs}
-In \cite{xiang2020interpretable} approach, the DNN is split into two local parts that are used to encode and decode the data (encoder and decoder, respectively) and a middle part that performs all of the heavy data processing (processing module). 
+In \citet{xiang2020interpretable} approach, the DNN is split into two local parts that are used to encode and decode the data (encoder and decoder, respectively) and a middle part that performs all of the heavy data processing (processing module). 
 
 In the original work, two ResNet implementations were described: ResNet-$\alpha$ and ResNet-$\beta$. In ResNet-$\alpha$ the input is transformed until the first 16x16 feature map, from where the output is sent to the encoder. After the encoding, the processing module transforms the data until the first 8x8 feature map. From that point on, all following layers constitute to the decoder. The difference in ResNet-$\beta$ is that the decoder was composed by the last residual block and the layers following it. 
 
@@ -126,17 +126,17 @@ To introduce obfuscation and make it hard for the adversary to reconstruct the o
 \end{equation}
 The critic creates k-1 fake samples and rotates them by k-1 randomly sampled angles $\theta'$ (Eq. \ref{eq_rotate_back}), where $\theta'\neq\theta$. The critic then discriminates whether these rotated features are close to the original complex-valued features.
 
-From  \cite{xiang2020interpretable}, it was unclear whether the generator is only a part of the encoder or whether the WGAN trains all encoder layers. Because no architecture was given for the generator, we decided to train all the encoder layers with the WGAN loss and not introduce a stand-alone generator after the encoder.
+From  \citet{xiang2020interpretable}, it was unclear whether the generator is only a part of the encoder or whether the WGAN trains all encoder layers. Because no architecture was given for the generator, we decided to train all the encoder layers with the WGAN loss and not introduce a stand-alone generator after the encoder.
 
-% The original WGAN uses weight clipping for the Discriminator in order to enforce the Lipshitz-constraint. However, we found that this constraint was too harsh and that all the weights of the critic converged to the clipping value after a few iterations. Because of this behavior, it was impossible to train the WGAN appropriately. We found that this is a common problem with WGANs. \cite{DBLP:journals/corr/GulrajaniAADC17} suggested a solution to this problem using a gradient penalty. Instead of using weight clipping to enforce the Lipshitz-constraint, they added a penalty to the loss function if the gradient norm was not close to 1. Using this approach solved our problem and yielded reasonable gradients.
+% The original WGAN uses weight clipping for the Discriminator in order to enforce the Lipshitz-constraint. However, we found that this constraint was too harsh and that all the weights of the critic converged to the clipping value after a few iterations. Because of this behavior, it was impossible to train the WGAN appropriately. We found that this is a common problem with WGANs. \citet{DBLP:journals/corr/GulrajaniAADC17} suggested a solution to this problem using a gradient penalty. Instead of using weight clipping to enforce the Lipshitz-constraint, they added a penalty to the loss function if the gradient norm was not close to 1. Using this approach solved our problem and yielded reasonable gradients.
 
-The original WGAN uses weight clipping for the critic network. However we found that all the weights converged to the clipping values rather quickly. Because of this we cannot train the WGAN appropriately. To fix this issue we used a gradient penalty which was introduced in \cite{DBLP:journals/corr/GulrajaniAADC17}.
+The original WGAN uses weight clipping for the critic network. However we found that all the weights converged to the clipping values rather quickly. Because of this we cannot train the WGAN appropriately. To fix this issue we used a gradient penalty which was introduced in \citet{DBLP:journals/corr/GulrajaniAADC17}.
 
 \subsubsection{Adversary models}
 % Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
 
 \textbf{Inversion attacks}\\
-The objective of the inversion attack was to reconstruct the input images from the encoded intermediate features. \cite{xiang2020interpretable} implemented two inversion attacks: in inversion attack 1 a new discriminator ($D'$) is first trained to predict the most probable features ($a^*$) by learning the most likely angle at which the intermediate layer features are rotated (Eq. \ref{theta}). The most probable features (Eq. \ref{astar}) are then used to help train a decoder model that tries to reconstruct the original images (Eq. \ref{ihat}). In inversion attack 2 the angle prediction discriminator is not included and the attacker only trains a decoder that tries to reconstruct the original images from the given intermediate layer features. 
+The objective of the inversion attack was to reconstruct the input images from the encoded intermediate features. \citet{xiang2020interpretable} implemented two inversion attacks: in inversion attack 1 a new discriminator ($D'$) is first trained to predict the most probable features ($a^*$) by learning the most likely angle at which the intermediate layer features are rotated (Eq. \ref{theta}). The most probable features (Eq. \ref{astar}) are then used to help train a decoder model that tries to reconstruct the original images (Eq. \ref{ihat}). In inversion attack 2 the angle prediction discriminator is not included and the attacker only trains a decoder that tries to reconstruct the original images from the given intermediate layer features. 
 
 \begin{align}
     \hat{\theta} &= \max_{\theta}D'(\Re[x\exp(-i\hat{\theta}) \label{theta} \\
@@ -144,7 +144,7 @@ The objective of the inversion attack was to reconstruct the input images from t
     \hat{I} &= \text{dec}(a^*) \label{ihat}
 \end{align}
 
-The structure of the reconstruction model for both inversion attacks was based on a modified U-Net (\cite{U-net}) described in the original work. U-Net is a neural network architecture widely used for image segmentation. It is based on an Autoencoder architecture decorated by skip connections. The skip connections help to reconstruct the exact low-level attributes such as the location of edges. Intermediate layer features from the encoder are scaled up to the original input size and then fed into the U-Net, aiming to reconstruct the original image. 
+The structure of the reconstruction model for both inversion attacks was based on a modified U-Net (\citet{U-net}) described in the original work. U-Net is a neural network architecture widely used for image segmentation. It is based on an Autoencoder architecture decorated by skip connections. The skip connections help to reconstruct the exact low-level attributes such as the location of edges. Intermediate layer features from the encoder are scaled up to the original input size and then fed into the U-Net, aiming to reconstruct the original image. 
 
 % In case when the input of an adversary, i.e, feature tensor $x$, had dimensions smaller than that of the original image, it was up-sampled to the size of the 
 
@@ -157,7 +157,7 @@ During inference attacks a classifier is trained on either similar raw images (i
 \subsection{Datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
 
-\cite{xiang2020interpretable} used CIFAR-10/100 (\cite{cifar10}, \cite{cifar100}) to train the ResNets and LeNet, CUB-200 (\cite{WelinderEtal2010}) to train VGG-16 and CelebA (\cite{CelebA}) for AlexNet. Since we did not implement VGG-16 and AlexNet, we only used the CIFAR-10/100 datasets using the train/test split described in Table \ref{dataset}. Each split was halved to create two smaller datasets used for training/testing either the privacymodel or the adversary attacker. Before training, all datasets were normalized. 
+\citet{xiang2020interpretable} used CIFAR-10/100 (\citet{cifar10}, \citet{cifar100}) to train the ResNets and LeNet, CUB-200 (\citet{WelinderEtal2010}) to train VGG-16 and CelebA (\citet{CelebA}) for AlexNet. Since we did not implement VGG-16 and AlexNet, we only used the CIFAR-10/100 datasets using the train/test split described in Table \ref{dataset}. Each split was halved to create two smaller datasets used for training/testing either the privacymodel or the adversary attacker. Before training, all datasets were normalized. 
 
 \begin{table*}[t]
     \centering
@@ -178,7 +178,7 @@ During inference attacks a classifier is trained on either similar raw images (i
 \subsection{Hyperparameters}
 % Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g., manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
 
-Unfortunately, none of the standard hyperparameters such as learning rate, optimizer, weight decay, etc. were mentioned in the paper. Therefore we had to adapt and choose them ourselves. For the WGAN, we used the hyperparameters given in the original implementation by \cite{pmlr-v70-arjovsky17a}.  We implemented weight clipping and gradient penalty. For the first one, we used RMSprop with a learning rate of $5e^{-5}$ for both the generator and the critic. Weights were clipped between $-0.01$ and $0.01$ for the Critic's weights. 
+Unfortunately, none of the standard hyperparameters such as learning rate, optimizer, weight decay, etc. were mentioned in the paper. Therefore we had to adapt and choose them ourselves. For the WGAN, we used the hyperparameters given in the original implementation by \citet{pmlr-v70-arjovsky17a}.  We implemented weight clipping and gradient penalty. For the first one, we used RMSprop with a learning rate of $5e^{-5}$ for both the generator and the critic. Weights were clipped between $-0.01$ and $0.01$ for the Critic's weights. 
 
 As this learning rate was too low for the classification task, we used a different optimizer. Adam was used with a learning rate of $5e^{-4}$. For the gradient penalty approach, we set lambda to $10$ and used Adam with a learning rate of $5e^{-4}$. We did not do an intensive hyperparameter search to optimise these parameters.
 
@@ -228,7 +228,7 @@ The U-Net architecture used in the inversion attacks is constructed using 6 conv
 
 We found that the inversion attacks were reconstructing the images very well when we used them on our trained networks. Adding a convolution layer without a ReLU activation function to our generator increased the overall reconstruction loss, effectively making our network preserve the privacy better. This was further improved by randomly swapping a and b in our generator, which lead to a significant increase in the reconstruction loss.
 
-From all the networks that were used in \cite{xiang2020interpretable} we implemented LeNet and the ResNet-32/44/56/110-$\alpha, \beta$ architectures. We did not implement the other architectures, because the ResNet and LeNet architectures showed that the privacy protection was not working as described. We decided to continue our investigation into ResNet and LeNet, instead of implementing more networks which would face the same problems as ResNet and LeNet.
+From all the networks that were used in \citet{xiang2020interpretable} we implemented LeNet and the ResNet-32/44/56/110-$\alpha, \beta$ architectures. We did not implement the other architectures, because the ResNet and LeNet architectures showed that the privacy protection was not working as described. We decided to continue our investigation into ResNet and LeNet, instead of implementing more networks which would face the same problems as ResNet and LeNet.
 
 % Unfortunately we were not able to get AlexNet and VGG-16 to properly work as they both returned NaN after a certain duration of training. We could not find the cause of this issue and because of the time constraint we had to give up on these networks. The networks can still be found in the github on different branches than the main branch, but no good results can be produced with them.
 
@@ -240,8 +240,62 @@ From all the networks that were used in \cite{xiang2020interpretable} we impleme
 
 We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The runtime of each model was highly dependant on the architecture used. The runtimes for each model can be found in Table \ref{runtime-table}.
 
-\begin{table}[!htb]
-    \begin{minipage}{.45\linewidth}
+% \begin{table}[!htb]
+%     \begin{minipage}{.4\linewidth}
+%     \setlength{\abovecaptionskip}{5pt}
+%     \caption{Average runtime for each model}
+%     \centering
+  
+%     \begin{tabular}{l||l}
+%     \hline
+%     \textbf{Model} & \textbf{Average Runtime} \\
+%     \hline
+%     LeNet & 48 m \\
+%     % ResNet-20-$a$ & 2h 34m \\
+%     % ResNet-20-$b$ & 2h 28m \\
+%     ResNet-32-$a$ & 2h 29m \\
+%     ResNet-32-$b$ & 2h 41m \\
+%     ResNet-44-$a$ & 3h 15m \\
+%     ResNet-44-$b$ & 3h 08m \\
+%     ResNet-56-$a$ & 3h 34m \\
+%     ResNet-56-$b$ & 3h 23m \\
+%     ResNet-110-$a$ & 3h 20m \\
+%     ResNet-110-$b$ & 3h 12m \\
+%     \end{tabular}
+    
+%     \label{runtime-table}
+        
+%     \end{minipage}%
+%     \begin{minipage}{.4\linewidth}
+    
+%     \centering
+%     \setlength{\abovecaptionskip}{5pt}
+%     \caption{Inversion attack 1 and 2 results}
+%     \scalebox{0.6}{
+%     \begin{tabular}{l|c|c|c|c}
+%     \hline
+%     \multicolumn{1}{c|}{} & \multicolumn{2}{|c|}{Inversion Attack 1} &  \multicolumn{2}{|c}{Inversion Attack 2} \\
+%     \hline
+%     \textbf{Model} & \textbf{Paper} & \textbf{Reproduced} & \textbf{Paper} & \textbf{Reproduced}\\
+%     \hline
+%     LeNet & 0.2405 & 0.1499 & 0.1027 & 0.1244 \\
+%     ResNet-32-$\alpha$ & 0.2569 & 0.0277 & 0.2412 & 0.0464 \\
+%     ResNet-32-$\beta$ & 0.2515 & 0.0292 & 0.2425 & 0.0323 \\
+%     ResNet-44-$\alpha$ & 0.2746 & 0.0256 & 0.2419 & 0.0293 \\
+%     ResNet-44-$\beta$ & 0.2511 & 0.0190 & 0.2397 & 0.0383 \\
+%     ResNet-56-$\alpha$ & 0.2804 & 0.1031 & 0.2377 & 0.0399 \\
+%     ResNet-56-$\beta$ & 0.2585 & 0.0242 & 0.2358 & 0.0483 \\
+%     ResNet-110-$\alpha$ & 0.3081 & 0.0292 & 0.2495 & 0.0447 \\
+%     ResNet-110-$\beta$ & 0.2582 & 0.0207 & 0.2414 & 0.0321 \\
+    
+%     \end{tabular}
+%     }
+    
+%     \label{inversion-table}
+%     \end{minipage} 
+% \end{table}
+
+\begin{table*}[t]
     \setlength{\abovecaptionskip}{5pt}
     \caption{Average runtime for each model}
     \centering
@@ -264,10 +318,9 @@ We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The r
     \end{tabular}
     
     \label{runtime-table}
-        
-    \end{minipage}%
-    \begin{minipage}{.45\linewidth}
-    
+\end{table*}
+
+\begin{table*}[t]
     \centering
     \setlength{\abovecaptionskip}{5pt}
     \caption{Inversion attack 1 and 2 results}
@@ -292,8 +345,7 @@ We mostly used a RTX 2060 super for the GPU and a ryzen 3600x for the CPU. The r
     }
     
     \label{inversion-table}
-    \end{minipage} 
-\end{table}
+\end{table*}
 
 \section{Results}
 \label{sec:results}
@@ -392,8 +444,8 @@ The encoded features are rotated in the complex plane. Thus, their values can be
 There is no good way to test how the GAN is performing except training an adversary. If the adversary is trained poorly, there could be another adversary that is able to reconstruct the images much better.
 To test the adversary, we disabled the training of the WGAN and instead randomly swapped the encoded features $a$ with the randomly sampled feature $b$. The decoder had access to this information and thus was able to perform as good as the normal classifier. Surprisingly, the adversary performed really poor and was not able to reconstruct the images. Instead, the adversary reconstructed an image that was very blurred and an interpolation between the two images. Our results are shown in Figure \ref{fig:kanonymity}.
 
-Comparing the reconstructed images to the images of \cite{xiang2020interpretable}, we found that they look really similar.
-This skepticism is further supported by the fact that the images shown in appendix B of \cite{xiang2020interpretable} seem to be an interpolation of two images. Finally the average angle errors shown in table 4 of \cite{xiang2020interpretable} are all $\pi/4$ except for one (VGG-16). This seems questionable since this is equal to the initial angle that lies exactly in between a and b. These reasons combined make us doubt the k-anonimity that is claimed and makes us contemplate that it is 2-anonimity instead. This 2-anonimity means that the results are just interpolations of a and b, and the attacker just has to deceiver on from the other.
+Comparing the reconstructed images to the images of \citet{xiang2020interpretable}, we found that they look really similar.
+This skepticism is further supported by the fact that the images shown in appendix B of \citet{xiang2020interpretable} seem to be an interpolation of two images. Finally the average angle errors shown in table 4 of \citet{xiang2020interpretable} are all $\pi/4$ except for one (VGG-16). This seems questionable since this is equal to the initial angle that lies exactly in between a and b. These reasons combined make us doubt the k-anonimity that is claimed and makes us contemplate that it is 2-anonimity instead. This 2-anonimity means that the results are just interpolations of a and b, and the attacker just has to deceiver on from the other.
 
 All of this evidence suggests that an adversary could be able to reconstruct two images if it would be designed to do so. However, this questions the k-anonymity, which could be reduced to a 2-anonymity by selecting a better adversary.
 
@@ -404,11 +456,11 @@ All of this evidence suggests that an adversary could be able to reconstruct two
 
 % Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
 
-From the results of the initial implementation of the networks (without removing the ReLU and adding the swapping of a and b in the generator) we can see that we do not reproduce the results of \cite{xiang2020interpretable}. Our networks don't protect the privacy as the images can be perfectly reconstructed and the properties can be perfectly inferred. Therefore the first claim (\ref{claim1}) is not supported by our results. The classification errors are however quite low and even though they are higher than those from \cite{xiang2020interpretable}, we think that with the right parameters we could have achieved the same classification errors as them. Therefore we do think that the second claim (\ref{claim2}) is supported even though our results only show partial support.
+From the results of the initial implementation of the networks (without removing the ReLU and adding the swapping of a and b in the generator) we can see that we do not reproduce the results of \citet{xiang2020interpretable}. Our networks don't protect the privacy as the images can be perfectly reconstructed and the properties can be perfectly inferred. Therefore the first claim (\ref{claim1}) is not supported by our results. The classification errors are however quite low and even though they are higher than those from \citet{xiang2020interpretable}, we think that with the right parameters we could have achieved the same classification errors as them. Therefore we do think that the second claim (\ref{claim2}) is supported even though our results only show partial support.
 
-The splitting of the networks in \cite{xiang2020interpretable} is questionable. The whole idea of the paper is to have a processing unit running on the cloud so small IoT devices do not have to deal with the computational load themselves. This of course introduces privacy concerns, which the paper aims to address. However when we look at the way \cite{xiang2020interpretable} splits the networks into three parts, we see that a lot of computational effort is being put on the encoder and decoder networks. When we look at how they split the ResNet networks for example, approximately only one third of the computational effort is put on the processing unit. If this way of splitting is the only way the privacy can be protected, then it is questionable whether networks like this can actually be used on IoT devices. Also, the local device has to keep the dataset during inference in order to sample $b$. However, IoT devices lack storage capacity which could lead to major difficulties in practice.
+The splitting of the networks in \citet{xiang2020interpretable} is questionable. The whole idea of the paper is to have a processing unit running on the cloud so small IoT devices do not have to deal with the computational load themselves. This of course introduces privacy concerns, which the paper aims to address. However when we look at the way \citet{xiang2020interpretable} splits the networks into three parts, we see that a lot of computational effort is being put on the encoder and decoder networks. When we look at how they split the ResNet networks for example, approximately only one third of the computational effort is put on the processing unit. If this way of splitting is the only way the privacy can be protected, then it is questionable whether networks like this can actually be used on IoT devices. Also, the local device has to keep the dataset during inference in order to sample $b$. However, IoT devices lack storage capacity which could lead to major difficulties in practice.
 
-The way \cite{xiang2020interpretable} show their results of the inference attacks is questionable as well. They decided to evaluate the classification of the network performing the attack and the evaluation of the privacy of their network on different parts of the datasets. From an evaluation point of view, we do not understand why they did this. What is worse is that it seems they chose the dataset parts in such a way that their results seem better than they actually are. For example, they evaluate the classification on the 20 major super classes of CIFAR-100, but they evaluate the privacy on all 100 classes. By definition this means that the privacy error will be higher than the classification error, which is exactly what they want, hence why it seems a bit like cheating.
+The way \citet{xiang2020interpretable} show their results of the inference attacks is questionable as well. They decided to evaluate the classification of the network performing the attack and the evaluation of the privacy of their network on different parts of the datasets. From an evaluation point of view, we do not understand why they did this. What is worse is that it seems they chose the dataset parts in such a way that their results seem better than they actually are. For example, they evaluate the classification on the 20 major super classes of CIFAR-100, but they evaluate the privacy on all 100 classes. By definition this means that the privacy error will be higher than the classification error, which is exactly what they want, hence why it seems a bit like cheating.
 
 The choice of the U-Net as the adversary is unclear to us. We don't see any value in first upsampling the features followed by downsampling them in the first part of the U-Net. In addition, the input of the U-Net has no important low-level features as they are upscaled, so the value of the skip connections is questionable to us. We think it'd be sufficient if the adversary consists of a simple decoder that reconstructs images by upsampling and applying convolutions.
 
@@ -418,11 +470,11 @@ The choice of the U-Net as the adversary is unclear to us. We don't see any valu
 
 % Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
 
-Overall we found \cite{xiang2020interpretable} quite difficult to understand and reproduce, but what did make it a lot easier was the different implementations that were already online. For most networks that they used we found an implementation online that we could use and especially the complex neural network implementations were very useful. 
+Overall we found \citet{xiang2020interpretable} quite difficult to understand and reproduce, but what did make it a lot easier was the different implementations that were already online. For most networks that they used we found an implementation online that we could use and especially the complex neural network implementations were very useful. 
 
 \begin{itemize}
-    \item Datasets, such as CIFAR-10 (\cite{cifar10}), CIFAR-100 (\cite{cifar100}, CelebA (\cite{CelebA}) are publicly available and are easy to get access to.
-    \item Main architecture for the privacy model is based on the existing and well-documented architectures such as ResNet (\cite{DBLP:journals/corr/HeZRS15}), LeNet(\cite{lecun1998gradient}), AlexNet(\cite{AlexNet}) etc.
+    \item Datasets, such as CIFAR-10 (\citet{cifar10}), CIFAR-100 \\ (\citet{cifar100}, CelebA (\citet{CelebA}) are publicly available and are easy to get access to.
+    \item Main architecture for the privacy model is based on the existing and well documented architectures such as ResNet (\citet{DBLP:journals/corr/HeZRS15}), LeNet (\citet{lecun1998gradient}), AlexNet (\citet{AlexNet}), etc.
 \end{itemize}
 
 \subsection{What was difficult}
