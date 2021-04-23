@@ -1,4 +1,3 @@
-% \cite{Li_2020_CVPR}
 \section*{\centering Reproducibility Summary}
 
 % \descr{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
@@ -62,9 +61,11 @@ First of all, the main difficulty in reproducing the paper was caused by the cod
 \section{Introduction}
 % \descr{A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.}
 
-With the increased application of Machine Learning in automated systems, particularly in decision making systems, it has become desirable that individuals are treated equally in such automated environments. However, there exists a trade-off between the fairness and the performance of machine learning algorithms in a given task \citep{Li_2020_CVPR}. In current fair clustering algorithms, fair and effective representations are learned by mainly using small-scale and low-dimensional data. 
+With the increased application of Machine Learning in automated systems, particularly in decision making systems, it has become desirable that individuals are treated equally in such automated environments. However, there exists a trade-off between the fairness and the performance of machine learning algorithms in a given task \citep{Li_2020_CVPR}. In current fair clustering algorithms, fair and effective representations are learned by mainly using small-scale and low-dimensional data. In this paper, we consider representations to be 'effective' if they yield good performance in clustering tasks. In addition, representations are considered to be 'fair' when the algorithm is able to achieve great performance without using attributes like race and gender.
 
-Deep Fair Clustering (DFC) is an algorithm that aims to learn fair and clustering-favorable representations for large-scale and high-dimensional data. In this context, feature representations are considered to be fair if they are statistically independent of sensitive attributes. DFC consists of an encoder that produces the representations, and a discriminator that tries to predict the value of the sensitive attribute of a representation. A minimax game is used to learn fair representations in an adversarial manner. In order to preserve the utility of the representations, clustering is performed on all datapoints with the same sensitive attribute. This component is called 'structural preservation' because it preserves the clustering structure in each sensitive attribute. Finally, The KL-divergence is used as a clustering regularizer to prevent the formation of large clusters.
+Deep Fair Clustering (DFC) is an algorithm that aims to learn fair and clustering-favorable representations for large-scale and high-dimensional data. In this context, feature representations are considered to be fair if they are statistically independent of sensitive attributes. Whether a particular attribute is sensitive or not; that is a cultural question that lies outside the scope of the paper. The aim of the paper is to show that we can pick an arbitrary attribute of an image, e.g. whether it comes from dataset $X$ or dataset $Y$, and make sure that the feature representation is independent of the specific attribute. 
+
+DFC consists of an encoder that produces the representations, and a discriminator that tries to predict the value of the sensitive attribute of a representation. A minimax game is used to learn fair representations in an adversarial manner. In order to preserve the utility of the representations, clustering is performed on all datapoints with the same sensitive attribute. This component is called 'structural preservation' because it preserves the clustering structure in each sensitive attribute. Finally, The KL-divergence is used as a clustering regularizer to prevent the formation of large clusters.
 
 All code is available on Github \citep{onze_git}. 
 
@@ -84,12 +85,17 @@ The goal of this work is to validate the reproducibility of the DFC algorithm pr
 
 \begin{displayquote}
     Claim 1:
-    \textbf{DFC produces a fair clustering partition on high dimensional and large-scale visual data.}
+    \textit{DFC produces a fair clustering partition on high dimensional and large-scale visual data.}
 \end{displayquote}
 \begin{displayquote}
     Claim 2:
-    \textbf{DFC produces clustering-favorable representations under a fairness constraint.}
+    \textit{DFC produces clustering-favorable representations under a fairness constraint.}
     \end{displayquote}
+    
+% \begin{description}
+%     \item[Claim 1:] \textit{DFC produces a fair clustering partition on high dimensional and large-scale visual data.}
+%     \item[Claim 2:] \textit{DFC produces clustering-favorable representations under a fairness constraint.}
+% \end{description}
     % \item Claim 1
     % \textbf{DFC produces a fair clustering partition on high dimensional and large-scale visual data.} Test: DFC’s balance and entropy scores on the Color Reverse MNIST and MNIST-USPS datasets are at least comparable to the scores of other fair clustering algorithms ---- specifically ScFC, SpFC, FCC and FAlg
     
@@ -104,7 +110,7 @@ The goal of this work is to validate the reproducibility of the DFC algorithm pr
 To test the validity of claim 1, the balance and entropy scores will be examined and compared with the original paper. The validity of claim 2 will be tested similarly, where we instead examine the accuracy and normalized mutual information (NMI) score.
 Important to note is that the original paper mainly evaluated the DFC algorithm on binary sensitive attributes. As an example, in \citet{Li_2020_CVPR} a sensitive attribute was defined as whether an image from the \mn dataset has been reversed or not. Generally speaking, in the original paper the sensitive attributes could only take one out of two possible values. However, sensitive attributes in the real world, like race or gender, can take on multiple variables. 
 
-Thus, to evaluate the robustness of claim 1, we will perform the DFC algorithm for non-binary sensitive attributes. These will be modelled by `corrupting' the images in the \revMNIST dataset. The corruption process is done by partially replacing the pixels in the background of the images. For the \mn dataset, some pixels will be whitened, while for the \revMNIST dataset the some pixels will be replaced by black pixels.
+To evaluate the robustness of claim 1, we will perform the DFC algorithm for non-binary sensitive attributes. To do this, we modify one of the sensitive attributes chosen by the authors, particularly whether an image belongs to the \textit{MNIST} dataset or whether it is a \textit{Color Reverse MNIST} image. In the former case, all the pixels of the digit are white and the background pixels are all black; in the latter case it is the other way around. To make this attribute non-binary, images from both datasets will be corrupted; some pixel values will be flipped, and it is not the case anymore that we can distinguish the images purely on the background color. It would inspire confidence if DFC is still able to function properly. 
 
 Furthermore, we will investigate the robustness of both claims by testing the DFC algorithm on different model configurations. Specifically, we will test out different clustering regularizers by replacing the KL-divergence with other divergence measures, namely the Jensen-Shannon divergence (JS-divergence) and the Cauchy-Schwarz divergence (CS-divergence).
 
@@ -272,10 +278,10 @@ Furthermore, the CS-divergence is a divergence function that is inspired by info
     \label{eq:CS}
 \end{equation}
 
-The CS-divergence is, like the JS-divergence, a symmetric measure. Furthermore, the CS-divergence has the range $0 \leq CS(P || Q) \leq \infty$, where the minimum value of $0$ is obtained if $p(\textbf{x} = q(\textbf{x}))$.
+The CS-divergence is, like the JS-divergence, a symmetric measure. Furthermore, the CS-divergence has the range $0 \leq CS(P || Q) \leq \infty$, where the minimum value of $0$ is obtained if $p(\textbf{x}) = q(\textbf{x})$.
 
 \subsubsection{Corrupted Sensitive Attribute}
-Another extension mentioned in Section \ref{sec:claims} is that we consider the influence of the corrupted sensitive attribute. In the \revMNIST dataset the presence of this attribute is clear in background color. Corrupting the sensitive attribute in this dataset implies random modifications in the background color. We compare two corruption rates (0.1 and 0.4) against the original images; for example, a rate of 0.1 implies that a random 10\% of the background pixels are changed from black to white or vice versa. 
+Another extension mentioned in Section \ref{sec:claims} is that we consider the influence of the corrupted sensitive attribute. In the \revMNIST dataset the presence of this attribute is clear in background color, The numbers are black in the case of \USPSMNIST and white in the case of \revMNIST, The background is defined by everything that is not the colour of the number. Corrupting the sensitive attribute in this dataset implies random modifications in the background color. We compare two corruption rates (0.1 and 0.4) against the original images; for example, a rate of 0.1 implies that a random 10\% of the background pixels are changed from black to white or vice versa. 
 
 % \CAG{hier kan misschien een plaatje van een corrupted image, om het te illustreren.}.
 
@@ -398,9 +404,7 @@ Table \ref{tab:diverg_res} shows the results for different divergence functions 
     \caption{Quantitative results for the \revMNIST and \USPSMNIST dataset, for all four metrics, with varying divergence measures.}
     \label{tab:diverg_res}
 \end{table}
-
-On the \revMNIST dataset it can be observed that the accuracy do not differ significantly. Furthermore, using the CS-divergence seems to yield the highest accuracy. However, the NMI decreases significantly with JS- and CS-divergence as clustering regularizer. On top of that, the balance and entropy decrease significantly with CS-divergence. Using the JS-divergence also results in a decrease in balance and entropy on the \revMNIST dataset, even though that decrease is minor compared to the CS-divergence. In general, the KL-divergence outperforms the other two divergences on three of the four metrics on the \revMNIST dataset.
-
+In Table \ref{tab:diverg_res} it can be observed that the accuracy does not differ significantly on the \revMNIST dataset. Furthermore, using the CS-divergence seems to yield the highest accuracy. However, the NMI decreases significantly with JS- and CS-divergence as clustering regularizer. On top of that, the balance and entropy decrease significantly with CS-divergence. Using the JS-divergence also results in a decrease in balance and entropy on the \revMNIST dataset, even though that decrease is minor compared to the CS-divergence. In general, the KL-divergence outperforms the other two divergences on three of the four metrics on the \revMNIST dataset.
 On the \USPSMNIST dataset, it can be seen that the difference in accuracy and NMI is even less significant compared to the \revMNIST dataset. However, on the \USPSMNIST dataset all four metrics decrease when using the JS- or CS-divergence instead of the KL-divergence. Moreover, the balance and entropy seem to decrease more significantly than the accuracy and NMI. In general, on the \USPSMNIST dataset the JS- and CS-divergence perform worse than the KL-divergence. 
 
 
@@ -447,8 +451,8 @@ The results of the corruption extension can be found in Table \ref{tab:corrupt_r
 \end{table}
 
 
-As can be seen, both the accuracy and the NMI decrease when data has been corrupted. %In fact, a higher corruption rate leads to a lower accuracy and NMI value. 
-However, the decrease in accuracy and NMI seems to be more significant when the \rmn dataset is corrupted. On top of that, the balance and entropy decrease as well when the data is corrupted. In general, a higher corruption leads to lower values on all metrics.
+As can be seen in Table \ref{tab:corrupt_res}, both the accuracy and the NMI decrease when data has been corrupted. %In fact, a higher corruption rate leads to a lower accuracy and NMI value. 
+However, the decrease in accuracy and NMI seem to be more significant when the \rmn dataset is corrupted. Moreover, the balance and entropy decrease when the data is corrupted. In general, a higher corruption leads to lower values on all metrics. Finally, Table \ref{tab:corrupt_res} shows that the balance drops significantly with a higher corruption rate.
 
 % \begin{itemize}
 %     \item No clustering-favorable clusters with higher corruption (Voor final concusion: is expected want nummers zijn slechter zichtbaar)
@@ -482,8 +486,7 @@ The final extension researches the influence of the pretrained cluster centers o
     \caption{Quantitative results for all metrics, on \revMNIST and \USPSMNIST datasets, with and without using pretrained cluster centers.}
     \label{tab:cluster_res}
 \end{table}
-
-As can be seen, for both datasets accuracy and NMI are higher when pretrained cluster centers are used. The difference in accuracy is larger on the \USPSMNIST dataset, whereas the difference in NMI is smaller on this dataset, compared to \revMNIST. Moreover, the difference in balance on \USPSMNIST is not significant (0.018) while this is approximately five times larger (0.089) on the \revMNIST dataset. Finally, the entropy does not change significantly on both datasets.
+Most significantly, in Table \ref{tab:cluster_res}, it is visible that the accuracy on the \USPSMNIST dataset is significantly higher than that on \revMNIST, both with and without pretrained cluster centers. Furthermore, for both datasets accuracy and NMI are higher when pretrained cluster centers are used. The difference in accuracy is larger on the \USPSMNIST dataset, whereas the difference in NMI is smaller on this dataset, compared to \revMNIST. Moreover, the difference in balance on \USPSMNIST is not significant (0.018) while this difference is approximately five times larger (0.089) on the \revMNIST dataset. Finally, the entropy does not change significantly on both datasets.
 
 % \begin{itemize}
 %     \item Performing better with pretrained clusters in terms of accuracy and NMI the difference is more significant on \revMNIST
@@ -498,9 +501,7 @@ As can be seen, for both datasets accuracy and NMI are higher when pretrained cl
 
 % \descr{Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.}
 
-Our experimental results support the main claims of the original paper; namely that DFC is able to produce fair and clustering-favorable representations of large-scale and high dimensional data, such as images. 
-
-Furthermore, our extensions seem to add to the robustness of the model and strengthen the choices made by the original paper. First of all, the results of the different divergence functions show that both, CS- and JS-divergence, work but the default, KL-divergence, outperforms the two researched alternatives. Moreover, even though the \revMNIST dataset required the training of a new VAE and k-means clustering the results were still comparable; this speaks to the robustness of the algorithm that the original authors designed.
+Our experimental results support the main claims of the original paper; namely that DFC is able to produce fair and clustering-favorable representations of large-scale and high dimensional data, such as images. Furthermore, our extensions seem to add to the robustness of the model and strengthen the choices made by the original paper. First of all, the results of the different divergence functions show that both, CS- and JS-divergence, work but the default, KL-divergence, outperforms the two researched alternatives. Moreover, even though the \revMNIST dataset required the training of a new VAE and k-means clustering the results were still comparable; this speaks to the robustness of the algorithm that the original authors designed.
 
 \subsection{What was easy}
 % \descr{Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. }
@@ -516,12 +517,4 @@ The open source code of the authors was conveniently arranged. For example, the 
 
 
 First of all, a difficulty while reproducing the research was caused by the coding style; due to the lack of comments it was difficult at the start to get a good understanding of the code. Secondly, we were required to download the data ourselves. However, these filenames and labels did not correspond to the included .txt-files by the authors. Therefore, the model did not learn and we were forced to produce our own \file{train\_mnist.txt} and \file{train\_usps.txt}. Thirdly, the algorithm uses pretrained models, a pretrained VAE, and a file with pretrained cluster centers. However, the authors solely provided these for one of the four datasets, namely \USPSMNIST. Thus, for \revMNIST we had to build our own VAE based on their structure and calculate our own cluster centers. The latter came with an extra difficulty since in the paper it is not stated how the clustering was performed. Therefore, we had to guess and chose k-means clustering. This made the reproduction of the \revMNIST dataset much harder than anticipated.
-
-% \subsection{Communication with original authors}
-% \descr{Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. }
-
-
-
-
-
 
