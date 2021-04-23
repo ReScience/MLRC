@@ -3,4 +3,4 @@ rm metadata.tex
 make
 biber article
 rm metadata.tex
-make
+latexmk -pdf -pdflatex="xelatex -interaction=nonstopmode" -use-make article.tex

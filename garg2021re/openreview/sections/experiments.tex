@@ -1,0 +1,45 @@
+\section{Experimental setup}
+
+\subsection{Model descriptions}
+We kept the model architectures the same as mentioned in the original paper to maintain uniformity and implemented them ourselves. For the MNIST classification task we used the BinaryConnect architecture and for the CIFAR classification task we used the VGGBinaryConnect architecture. The authors also compared their BayesBiNN method with the LR-Net method in \citet{r8}. We implemented the same model architecture as in the LR-Net paper. The detailed architectures are mentioned in the supplementary material provided with this report. For the segmentation task, we used the original U-Net architecture detailed in \citet{r11} with a minor difference that we introduced a BatchNorm layer after every convolution layer.
+
+\subsection{Datasets}
+The datasets used for image classification tasks are MNIST, CIFAR-10, and CIFAR-100. For generating visualizations for the BayesBiNN and STE methods, we used small toy datasets, the Snelson dataset \citet{r9} for regression problems, and Two Moon's dataset \citet{r10} for classification problems. For the segmentation part, we used the Brain Tissue segmentation dataset from \citet{r11}, and for the continual learning visualizations we used the permuted MNIST dataset \citet{r12}. The pre-processing of inputs has been kept the same as mentioned in the original paper and has been detailed below.
+
+\textbf{Pre-processing}: For the MNIST dataset we simply normalize the images and do not perform data augmentation. We keep our validation split as 0.1 uniformly across all sets of experiments except the comparison with the LR-Net method \citet{r8}. For the CIFAR datasets also, we perform the normalization of images along with data-augmentation where we generate images by randomly cropping a 32x32 image from a 40x40 padded image. Finally, for our semantic segmentation task, we had a very small dataset of 30 images out of which 24 were chosen for training and 6 for validation. No other pre-processing has been done.
+
+\subsection{Hyperparameters}
+We have used the hyper-parameters given in the original paper. Table \autoref{tab:table1} contains the list of all the parameters we used for our experiments:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c | c | c | }
+\hline
+  Optimizer & Parameter & MNIST & CIFAR10 & CIFAR100 & Snelson Dataset & 2 Moons Dataset \\ \hline
+  \multirow{6}{5em}{BayesBiNN} & MC steps & 1 & 1 & 1 & 1 & 5 \\
+   & Initial LR & $10^{-4}$ & $3.10^{-4}$ & $3.10^{-4}$ & $10^{-4}$ & $10^{-3}$ \\
+   & Final LR & $10^{-16}$ & $10^{-16}$ & $10^{-16}$ & $10^{-5}$ & $10^{-5}$ \\
+   & LR Scheduler & Cosine & Cosine & Cosine & MultiStepLR & MultiStepLR \\
+   & Temperature $\tau$ & $10^{-10}$ & $10^{-10}$ & $10^{-8}$ & 1 & 1 \\
+   & Initialization $\lambda$ & $\pm$10 & $\pm$10 & $\pm$10 & $\pm$10 & $\pm$15 \\ \hline
+      
+  \multirow{3}{5em}{STE} 
+   & Initial LR & $10^{-2}$ & $10^{-2}$ & $10^{-2}$ & $10^{-1}$ & $10^{-1}$ \\
+   & Final LR & $10^{-16}$ & $10^{-16}$ & $10^{-16}$ & $10^{-1}$ & $10^{-3}$ \\
+   & LR Scheduler & Cosine & Cosine & Cosine & MultiStepLR & MultiStepLR \\
+\hline
+   
+  \multirow{3}{5em}{Adam (Full Precision)} 
+   & Initial LR & $10^{-5}$ & $10^{-4}$ & $10^{-4}$ & - & - \\
+   & Final LR & Step & Step & Step & - & - \\
+   & LR Scheduler & 1 & 100 & 100 & - & - \\ \hline
+
+\end{tabular}
+\caption{Training setting for different optimizers on MNIST, CIFAR10, and CIFAR100 datasets.}
+\label{tab:table1}
+\end{center}
+\end{table}
+
+
+\subsection{Computational requirements}
+All our final experimental results were performed on a machine having 1 NVIDIA Tesla V100 GPU with 16 GB memory. Training the Binary Network with BayesBiNN optimizer for a single run, takes around 2.5 GPU hours for MNIST, 5.5 GPU hours for CIFAR-10, and around 8.5 GPU hours for the CIFAR-100 dataset, in the current experimental setup.
