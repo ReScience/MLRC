@@ -183,10 +183,10 @@ In figure \ref{fig:reproduced_tgt_metrics}, we can see a comparison between the 
 
 We see that the coverage and correctness are similar for the UCI Heart disease dataset. On the UCI Iris dataset, the coverage is comparable but the correctness is better for TGT. In both housing and RNA, the coverage and correctness are better at less features and similar for more features. Overall, these results support claim 1, especially for a small amount of features.
 \begin{figure}[H]
-    \includegraphics[width=0.24\textwidth]{images/tffigures/iris-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/tffigures/housing-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/tffigures/heart-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/tffigures/bipolar-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/tffigures/iris-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/tffigures/housing-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/tffigures/heart-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/tffigures/bipolar-tradeoff.png}
     \caption{Comparison of the metrics(Correctness, Coverage, and Similarity) across different datasets for reproduction experiments.}
     \label{fig:reproduced_tgt_metrics}
 \end{figure}
@@ -212,10 +212,10 @@ The gammas($\gamma_s$) are truncated just like the deltas and their $L1$ norm is
 \subsubsection{UCI Heart Disease and UCI Boston Housing Dataset}
 In figure \ref{fig:pt_heart_housing} we see the results of our replication on the UCI Boston Housing and UCI Heart Disease dataset. For the UCI Boston Housing data, the TGT method seems to slightly outperform DBM both with and without scaling. This supports claim 1. The deltas($\delta_s$) and gammas($\gamma_s$) show high similarity, supporting claim 2. For the UCI Heart Disease dataset, we do not see a difference in performance without scaling while TGT with scaling performs slightly worse.
 \begin{figure}[H]
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/housing-tradeoff.png}
-    \includegraphics[width=0.244\textwidth]{images/ptfigures/housing-scaling-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/heart-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/heartscaling-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/housing-tradeoff.png}
+    \includegraphics[width=0.244\textwidth]{../openreview/images/ptfigures/housing-scaling-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/heart-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/heartscaling-tradeoff.png}
     \caption{Results for the PyTorch replication for UCI Boston Housing and UCI Heart Disease dataset.}
     \label{fig:pt_heart_housing}
 \end{figure}
@@ -224,10 +224,10 @@ In figure \ref{fig:pt_heart_housing} we see the results of our replication on th
 In figure \ref{fig:pt_diabetes_breast} we see the results for the Pima Indians Diabetes and Breast Cancer Wisconsin (Diagnostic) dataset. For the diabetes dataset, TGT with and without scaling outperforms DBM when more than one feature is used. This supports claim 1. Since the delta ($\delta$) similarity is close to $1$, claim 2 is also supported. For the Breast Cancer dataset, we see similar performance for DBM and TGT and slightly worse performance with scaling. The deltas ($\delta_s$) still have high similarity, supporting claim 2. 
 
 \begin{figure}[H]
-    \includegraphics[width=0.25\textwidth]{images/ptfigures/diabetes-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/diabetes_scaling-tradeoff.png}=
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/breast-tradeoff.png}
-    \includegraphics[width=0.24\textwidth]{images/ptfigures/breastscaling-tradeoff.png}
+    \includegraphics[width=0.25\textwidth]{../openreview/images/ptfigures/diabetes-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/diabetes_scaling-tradeoff.png}=
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/breast-tradeoff.png}
+    \includegraphics[width=0.24\textwidth]{../openreview/images/ptfigures/breastscaling-tradeoff.png}
     \caption{Results of the PyTorch replication on PIMA Indians Diabetes and Breast Cancer Wisconsin (Diagnostic) Dataset.}
     \label{fig:pt_diabetes_breast}
 \end{figure}
@@ -264,9 +264,9 @@ In order to study the efficacy of the proposed scaling function, we perform expe
 To further investigate the efficacy of TGT explanations, we use a probing-classifier \cite{belinkov-etal-2020-interpretability} as a proxy to study the qualitative differences of the features selected by TGT and DBM. For each cluster, we train a binary classifier with features ranked highest by TGT and DBM at different sparsity levels K. We compute the overall accuracy at each sparsity level using the ensemble of these binary classifiers.
 \begin{figure}
 \centering
-    \includegraphics[width=0.3\textwidth, height=3.5cm]{images/tffigures/housing-classification-2.png}
+    \includegraphics[width=0.3\textwidth, height=3.5cm]{../openreview/images/tffigures/housing-classification-2.png}
     % \hfill
-    \includegraphics[width=0.3\textwidth, height=3.5cm]{images/tffigures/iris-classification-2.png}
+    \includegraphics[width=0.3\textwidth, height=3.5cm]{../openreview/images/tffigures/iris-classification-2.png}
     \caption{Classification accuracy of probing classifier at different sparsity levels for Housing (left) and Iris (right) dataset.}
     \label{fig:classification}
 \end{figure}
@@ -288,6 +288,6 @@ A major difficulty in reproduction is the cluster selection. When retraining the
 % \subsection{Communication with original authors}
 % We asked the original authors for clarification on how to choose the $\epsilon$ hyper-parameter. However, it became apparent that we had misread, and the procedure is indeed adequately reported in the paper.
 
-\bibliographystyle{plain}
-\bibliography{bibliography.bib}
+%\bibliographystyle{plain}
+%\bibliography{bibliography.bib}
 % \newpage
