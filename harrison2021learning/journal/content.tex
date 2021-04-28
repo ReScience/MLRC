@@ -18,8 +18,6 @@ Re-implementing the BERT-based classification model to perform replicability, wi
 \subsection*{Communication With Original Authors}
 There was a continuous email chain with the authors for several weeks during the reproducibility work. They made additional code and datasets available per our requests, along with providing detailed responses and clarifications to our emailed questions. They encouraged the work and we wish to thank them for their time and support.
 
-\newpage
-
 % The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
 % Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.
 
@@ -138,6 +136,7 @@ The seq2seq experimental results in Table 4 of the original paper provide the av
 
 Pertaining to the English to German translations, the BLEU score was used, however, this was not available in the repository. After contacting the authors, we were provided with a link to the BLEU library they had used which is called ``compare-mt'' \citep{neubig-etal-2019-compare}. We had meanwhile used the NLTK implementation \citep{BirdKleinLoper09}, presuming it to be the most likely used. Therefore, for translation, we have used two different BLEU implementations: compare-mt for reproduction and NLTK for replication.
 
+\newpage
 
 \subsection{Computational Requirements}
 \label{sec:infrastructure}
@@ -172,8 +171,6 @@ All experiments were run on the LISA computing cluster provided by SURFsara, whi
     \bottomrule
   \end{tabular}
 \end{table}
-
-\newpage
 
 \section{Reproduction and Replication Results}
 \label{sec:results}
@@ -336,6 +333,8 @@ For the classification results, see Tables \ref{tab:classification-results-1} an
 
 \subsection{Seq2seq}
 The results in Tables \ref{tab:authors-seq-to-seq-results-1}, \ref{tab:authors-seq-to-seq-results-2} and \ref{tab:seq-to-seq translation results} support claims 2-3, and we were able to reproduce the results from Table 4 in the original paper. Especially the reported mean accuracy by \citet{pruthi-etal-2020-learning} shows no significant difference to our reported values for all seq2seq tasks except for the baseline experiments with uniform and no attention for the tasks sequence copy and sequence reverse. Both have a mean difference of 3-14 \% accuracy regarding the authors' accuracies. \citet{pruthi-etal-2020-learning} did not report accuracies for the translation task in their original paper, but they provided us with additional raw data which also contained the accuracy scores from their experiments. Therefore we also compare accuracies for the En-De MT task.
+
+\newpage
 
 \section{Results Beyond Original Paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
