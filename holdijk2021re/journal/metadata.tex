@@ -1,8 +1,8 @@
 % DO NOT EDIT - automatically generated from metadata.yaml
 
-\def \codeURL{https://github.com/rescience-c/template}
+\def \codeURL{https://github.com/LarsHoldijk/RE-ParameterizedExplainerForGraphNeuralNetworks}
 \def \codeDOI{}
-\def \codeSWH{}
+\def \codeSWH{swh:1:dir:541677177d4dbb9dc5b612dfc41373fad40b08f0}
 \def \dataURL{}
 \def \dataDOI{}
 \def \editorNAME{}
@@ -11,37 +11,40 @@
 \def \reviewerIORCID{}
 \def \reviewerIINAME{}
 \def \reviewerIIORCID{}
-\def \dateRECEIVED{01 November 2018}
+\def \dateRECEIVED{}
 \def \dateACCEPTED{}
 \def \datePUBLISHED{}
-\def \articleTITLE{ReScience (R)evolution}
-\def \articleTYPE{Editorial}
-\def \articleDOMAIN{}
+\def \articleTITLE{[Re] Parameterized Explainer for Graph Neural Network}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2020}
 \def \articleBIBLIOGRAPHY{bibliography.bib}
 \def \articleYEAR{2021}
-\def \reviewURL{}
-\def \articleABSTRACT{Three years have passed since ReScience published its first article and since September 2015, things have been going steadily. We're still alive, independent and without a budget. In the meantime, we have published around 20 articles (mostly in computational neuroscience \& computational ecology) and the initial has grown from around 10 to roughly 100 members (editors and reviewers), we have advertised ReScience at several conferences worldwide, gave some interviews and we published an article introducing ReScience in PeerJ. Based on our experience at managing the journal during these three years, we think the time is ripe for proposing some changes.}
-\def \replicationCITE{}
-\def \replicationBIB{}
-\def \replicationURL{}
+\def \reviewURL{https://openreview.net/forum?id=8JHrucviUf}
+\def \articleABSTRACT{ Scope of Reproducibility In this work we perform a replication study of the paper 	extit{Parameterized Explainer for Graph Neural Network}. The replication experiment focuses on three main claims: (1) Is it possible to reimplement the proposed method in a different framework? (2) Do the main claims with respect to the GNNExplainer hold? (3) Is the used evaluation method a valid method for explaining the classification decision by Graph Neural Networks?
+Methodology The authors TensorFlow code was largely used as starting point for our reimplementation in PyTorch. However, large parts of the evaluation setup were missing and differences were found between the listed configurations in the paper and the code. As a result, our codebase contains a large portion of novel code and introduces a different method for tracking experimental configurations. Using the new codebase all experiments are replicated. In addition to this, a short ablation study is performed.
+Results Due to numerous inconsistencies between code and paper, it is not possible to replicate the original results using the paper alone. With help of the original codebase, a number of the original results can be retrieved. The main comparison claim of the paper, to improve over the preceding GNNExplainer, does hold. However, after performing the replication experiments, some questions regarding the validity of the used evaluation setup in the original paper remain.
+What was easy The method proposed by the authors for explaining the Graph Neural Networks is easy to comprehend and intuitive. Re-implementation of the method is straightforward using a modern deep learning framework. The datasets used for the experimental setup were all provided together with their codebase.
+What was difficult The main difficulty arose from the difference between the experimental configurations discussed in the paper and implemented in the code. There were a number of small inconsistencies (eg. incorrect hyperparameter settings), but also some major ones (eg. using batch-normalization in training mode during evaluation). This issue was worsened by the fractured reporting of configurations in the code.
+Communication with original authors Contact was made with the authors on two occasions. During the first exchange the authors confirmed a number of clarifying questions and confirmed that the configurations as presented in the codebase were to be used instead of those provided in the paper. In the second exchange our reservations concerning the used experimental evaluation were conveyed to the authors. The authors did not share our concerns. }
+\def \replicationCITE{Luo, D., Cheng, W., Xu, D., Yu, W., Zong, B., Chen, H., & Zhang, X. (2020). Parameterized explainer for graph neural network. arXiv preprint arXiv:2011.04573.}
+\def \replicationBIB{luo2020parameterized}
+\def \replicationURL{https://arxiv.org/abs/2011.04573}
 \def \replicationDOI{}
-\def \contactNAME{Nicolas P. Rougier}
-\def \contactEMAIL{Nicolas.Rougier@inria.fr}
+\def \contactNAME{Lars Holdijk}
+\def \contactEMAIL{larsholdijk@gmail.com}
 \def \articleKEYWORDS{rescience c, rescience x}
 \def \journalNAME{ReScience C}
 \def \journalVOLUME{4}
 \def \journalISSUE{1}
 \def \articleNUMBER{}
 \def \articleDOI{}
-\def \authorsFULL{Konrad Hinsen and Nicolas P. Rougier}
-\def \authorsABBRV{K. Hinsen and N.P. Rougier}
-\def \authorsSHORT{Hinsen and Rougier}
+\def \authorsFULL{Lars Holdijk et al.}
+\def \authorsABBRV{L. Holdijk et al.}
+\def \authorsSHORT{Holdijk et al.}
 \title{\articleTITLE}
 \date{}
-\author[1,2,\orcid{0000-0003-0330-9428}]{Konrad Hinsen}
-\author[3,4,5,\orcid{0000-0002-6972-589X}]{Nicolas P. Rougier}
-\affil[1]{Centre de Biophysique Moléculaire, CNRS UPR4301, Orléans, France}
-\affil[2]{Synchrotron SOLEIL, Division Expériences, Gif sur Yvette, France}
-\affil[3]{INRIA Bordeaux Sud-Ouest, Bordeaux, France}
-\affil[4]{LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux, Centre National de la Recherche Scientifique, UMR 5800, Talence, France}
-\affil[5]{Institut des Maladies Neurodégénératives, Université  de Bordeaux, Centre National de la Recherche Scientifique, UMR 5293, Bordeaux, France}
+\author[1,\orcid{0000-0002-0634-8169}]{Lars Holdijk}
+\author[1,\orcid{0000-0002-9849-6838}]{Maarten Boon}
+\author[1,\orcid{0000-0001-7956-6282}]{Stijn Henckens}
+\author[1,\orcid{0000-0003-2454-3280}]{Lysander de Jong}
+\affil[1]{University of Amsterdam, Amsterdam, Netherlands}
