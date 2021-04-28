@@ -5,112 +5,95 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Reproducing Learning to Deceive With Attention-Based Explanations"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
-    
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Rahel Habacker
+    orcid: 0000-0001-9672-5951
+    email: rahel.habacker@student.uva.nl
+    affiliations: 1,*
+
+  - name: Andrew Harrison
+    orcid: 0000-0002-1407-3599
+    email: andrew.harrison@student.uva.nl
+    affiliations: 1,
+
+  - name: Mathias Parisot
+    orcid: 0000-0003-1521-918X
+    email: mathias.parisot@student.uva.nl
+    affiliations: 1,
+
+  - name: Ard Snijders
+    orcid: 0000-0001-6213-2218
+    email: ard.snijders@student.uva.nl
+    affiliations: 1,
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: rescience c, rescience x, Python
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
-  - doi: 
-  - swh: 
+  - url: https://github.com/MatPrst/deceptive-attention-reproduced #TODO: UPDATE THIS
+  - doi: 10.5281/zenodo.4692668
+  - swh: # N/A
 
 # Data URL and DOI (optional if no data)
 data:
-  - url:
-  - doi:
+  - url: https://github.com/MatPrst/deceptive-attention-reproduced/tree/main/deceptive-attention/src/classification/data #TODO: UPDATE THIS
+  - doi: 10.5281/zenodo.4686793
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: Danish Pruthi, Mansi Gupta, Bhuwan Dhingra, Graham Neubig, and Zachary C. Lipton. 2020. Learning to deceive with attention-based explanations. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 4782–4793, Online. Association for Computational Linguistics.
+ - bib:  pruthi-etal-2020-learning
+ - url:  https://arxiv.org/abs/1909.07913
+ - doi:  10.18653/v1/2020.acl-main.432
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "Pruthi et al. (2020) experimentally show that attention-based explanations can be manipulated, by adding a model-agnostic penalty term to the loss function that penalises the model for attending to certain tokens which have been shown to be crucial for high performance (termed impermissible tokens). Despite this penalty resulting in substantial reductions of attention masses of impermissible tokens, the authors find that models still use these tokens as evidenced by no observed drop in accuracy. Given the implications of their findings for the use of attention-based explanations, we seek to reproduce their core results, while replicating others including their BERT-based model. We manage to both successfully reproduce and replicate the majority of their findings, providing further evidence to the claims in the original paper."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
-  
+
 # Type of the article
 # Type can be:
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: Python 3
 
-  
+
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review: 
-  - url: 
+review:
+  - url: https://openreview.net/forum?id=-rn9m0Gt6AQ
 
 contributors:
   - name:
-    orcid: 
+    orcid:
     role: editor
   - name:
     orcid:
@@ -123,7 +106,7 @@ contributors:
 dates:
   - received:  November 1, 2018
   - accepted:
-  - published: 
+  - published:
 
 # This information will be provided by the editor
 article:

@@ -1,0 +1,68 @@
+\appendix
+\section{Appendix}
+
+\begin{table}[h!]
+\centering
+\caption{Reproductions seq2seq synthetic tasks Bigram Flip and Sequence Copy from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. All values are standard deviations over 5 different seeds.}
+\label{tab:seq-to-seq-stdv-1}
+\begin{tabular}{lcccccc} 
+\toprule
+Attention   & $\lambda$ & \multicolumn{2}{c}{Bigram Flip}                &  & \multicolumn{2}{c}{Sequence Copy}               \\ 
+\cline{3-4}\cline{6-7}
+            &           & Accuracy                   & Attention Mass                  &  & Accuracy                   & Attention Mass                   \\ 
+\midrule
+Dot-Product & 0.0       & $0.00\pmb{\,|\,}0.00$  & $1.36\pmb{\,|\,}0.21$ &  & $0.004\pmb{\,|\,}0.00$ & $1.06\pmb{\,|\,}0.11$  \\ 
+\midrule
+Uniform     & 0.0       & $0.27\pmb{\,|\,}1.90$  & $0.00\pmb{\,|\,}0.00$ &  & $2.52\pmb{\,|\,}4.20$  & $0.00\pmb{\,|\,}0.00$  \\
+None        & 0.0       & $0.94\pmb{\,|\,}0.95$  & -                     &  & $2.91\pmb{\,|\,}6.40$  & -                      \\ 
+\midrule
+Manipulated & 0.1       & $0.004\pmb{\,|\,}0.00$ & $22.6\pmb{\,|\,}7.50$ &  & $0.00\pmb{\,|\,}0.00$  & $9.85\pmb{\,|\,}9.70$  \\
+Manipulated & 1.0       & $0.12\pmb{\,|\,}0.67$  & $0.04\pmb{\,|\,}0.03$ &  & $10.5\pmb{\,|\,}0.005$ & $0.04\pmb{\,|\,}0.01$  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{Reproductions seq2seq synthetic task Sequence Reverse from Table 4 in \citet{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. All values are standard deviations over 5 different seeds.}
+\label{tab:seq-to-seq-stdv-2}
+\begin{tabular}{lccc} 
+\toprule
+Attention   & $\lambda$ & \multicolumn{2}{c}{Sequence Reverse}           \\ 
+\cline{3-4}
+            &           & Accuracy                 & Attention Mass                  \\ 
+\midrule
+Dot-Product & 0.0       & $0.00\pmb{\,|\,}0.00$ & $0.08\pmb{\,|\,}0.13$  \\ 
+\midrule
+Uniform     & 0.0       & $3.80\pmb{\,|\,}3.40$ & $0.00\pmb{\,|\,}0.00$  \\
+None        & 0.0       & $6.00\pmb{\,|\,}3.40$ & -                      \\ 
+\midrule
+Manipulated & 0.1       & $0.00\pmb{\,|\,}0.00$ & $17.7\pmb{\,|\,}10.0$  \\
+Manipulated & 1.0       & $0.24\pmb{\,|\,}0.04$ & $0.01\pmb{\,|\,}0.01$  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \caption{Reproductions En-De MT tasks on Multi30K from Table 4 in \citep{pruthi-etal-2020-learning} with cell scheme \textit{author | reproduced}. The BLEU(NLTK) values are replicated and were not provided by the authors. All values are standard deviations over 5 different seeds.}
+    \label{tab:seq-to-seq translation results stdv}
+    \centering
+    \begin{tabular}{lccccc}
+    \toprule
+      Attention & $\lambda$  & BLEU (C-MT)  & BLEU (NLTK) & Accuracy & Attention Mass\\
+      \midrule
+      Dot-Product   & 0.0 & $1.14\pmb{\,|\,}0.95$ & $0.95$ & $0.68\pmb{\,|\,}0.72$ & $1.15\pmb{\,|\,}1.53$
+      \\
+      \midrule
+      Uniform   & 0.0 & $0.87\pmb{\,|\,}0.76$ & $0.76$ & $1.05\pmb{\,|\,}0.53$ & $0.00\pmb{\,|\,}0.00$
+      \\
+      None   & 0.0 & $0.68\pmb{\,|\,}1.37$ & $1.37$ & $0.57\pmb{\,|\,}1.05$ & -
+      \\
+      \midrule
+      Manipulated   & 0.1 & $1.01\pmb{\,|\,}1.56$ & $1.56$ & $0.68\pmb{\,|\,}0.96$ & $1.04\pmb{\,|\,}4.20$
+      \\
+      Manipulated   & 1.0 & $2.25\pmb{\,|\,}0.89$ & $0.89$ & $1.80\pmb{\,|\,}0.80$ & $1.19\pmb{\,|\,}0.47$
+    \\
+    \bottomrule
+    \end{tabular}
+\end{table}
