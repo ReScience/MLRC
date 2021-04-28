@@ -1,0 +1,19 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+%\centering
+\caption{BPnP$_{faster}$ time statistics. Light \textcolor{SeaGreen}{green} with \textbf{bold} indicates quicker performance.}
+\label{tab:FasterBPnP_duration}
+\resizebox{\textwidth}{!}{\begin{tabular}{c|l|ccccc}
+\hline
+Drone &  & \textbf{\begin{tabular}[c]{@{}c@{}}Total \\ Training \\ Duration (hrs)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Model Fwd \\ Duration(s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Model Bwd \\ Duration(s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Mean \\ Optimizer \\ Step (s)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Total \\ Test \\ Duration (min)\end{tabular}} \\ \hline
+ & \textit{\begin{tabular}[c]{@{}l@{}}BPnP$_{faster}$\end{tabular}} & {\cellcolor{MyLightGreen} \textbf{6.80}} & 0.089 & {\cellcolor{MyLightGreen} \textbf{0.53}} & {\cellcolor{MyLightGreen} \textbf{0.66}} & 17.15 \\
+\multirow{-2}{*}{\textit{M2ED}} & BPnP & { 14.13} & 0.13 & { 2.73} & { 2.90} & 19.30 \\ \cline{1-1}
+\multicolumn{1}{l|}{} & \textit{\begin{tabular}[c]{@{}l@{}}BPnP$_{faster}$\end{tabular}} & {\cellcolor{MyLightGreen} \textbf{10.39}} & 0.09 & {\cellcolor{MyLightGreen} \textbf{0.54}} & {\cellcolor{MyLightGreen} \textbf{0.69}} & 18.85 \\
+\multicolumn{1}{l|}{\multirow{-2}{*}{\textit{Tello}}} & BPnP & { 20.38} & 0.13 & { 2.68} & { 2.85} & 19.95 \\ 
+%\cline{1-1}
+\hline
+\end{tabular}}
+\end{table}

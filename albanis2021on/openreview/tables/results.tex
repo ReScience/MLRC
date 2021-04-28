@@ -1,0 +1,24 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+\caption{Results for each experiment.}
+\label{tab:results}
+\resizebox{\textwidth}{!}{\begin{tabular}{c|l|llllllll}
+\hline
+drone &  & \textbf{NPE$\downarrow$} & \textbf{AD$\downarrow$} & \textbf{ACC2$\uparrow$} & \textbf{ACC5$\uparrow$} & \textbf{ADD2$\uparrow$} & \textbf{ADD5$\uparrow$} & \textbf{Proj2$\uparrow$} & \textbf{Proj5$\uparrow$} \\ \hline
+ & Mixture Loss & 0.014 & 0.027 & 92.13 & 98.07 & 81.31 & 93.34 & 99.45 & 99.58 \\
+ & Pose Loss & 0.012 & 0.026 & {\color[HTML]{F8A102} \textbf{95.20}} & {\color[HTML]{F8A102} \textbf{98.36}} & {\color[HTML]{F8A102} \textbf{90.29}} & {\color[HTML]{F8A102} \textbf{96.81}} & 98.05 & 99.14 \\
+ & EPnP & 0.014 & 0.027 & 92.89 & 98.19 & 80.50 & 93.64 & {\color[HTML]{F8A102} \textbf{99.52}} & {\color[HTML]{F8A102} \textbf{99.61}} \\
+ & HRNet & {\color[HTML]{F8A102} \textbf{0.011}} & {\color[HTML]{F8A102} \textbf{0.02}} & {\color[HTML]{FD6864} \textbf{90.75}} & {\color[HTML]{FD6864} \textbf{98.04}} & {\color[HTML]{FD6864} \textbf{80.52}} & {\color[HTML]{FD6864} \textbf{91.37}} & {\color[HTML]{FD6864} \textbf{97.56}} & {\color[HTML]{FD6864} \textbf{99.49}} \\
+ & SH & 0.015 & 0.028 & 89.43 & 96.94 & 78.20 & 90.42 & 96.56 & 99.02 \\
+\multirow{-6}{*}{\textit{M2ED}} & Higher & {\color[HTML]{FD6864} \textbf{0.011}} & {\color[HTML]{FD6864} \textbf{0.02}} & 89.92 & 97.75 & 79.58 & 90.99 & 97.50 & 99.44 \\ \hline
+\multicolumn{1}{l|}{} & Mixture Loss & 0.071 & {\color[HTML]{6434FC} \textbf{0.189}} & 43.38 & 82.11 & 14.88 & 41.47 & {\color[HTML]{6434FC} \textbf{93.97}} & 96.08 \\
+\multicolumn{1}{l|}{} & Pose Loss & {\color[HTML]{6434FC} \textbf{0.063}} & 0.223 & {\color[HTML]{6434FC} \textbf{55.31}} & {\color[HTML]{6434FC} \textbf{85.34}} & 20.04 & {\color[HTML]{6434FC} \textbf{50.53}} & 93.19 & 94.49 \\
+\multicolumn{1}{l|}{} & EPnP & 0.074 & 0.192 & 46.77 & 81.64 & {\color[HTML]{6434FC} \textbf{21.07}} & 49.59 & 93.77 & {\color[HTML]{6434FC} \textbf{96.13}} \\
+\multicolumn{1}{l|}{} & HRNet & {\color[HTML]{00D2CB} \textbf{0.091}} & 0.252 & 36.36 & 74.99 & 18.27 & 43.31 & 89.95 & 94.00 \\
+\multicolumn{1}{l|}{} & SH & 0.094 & {\color[HTML]{00D2CB} \textbf{0.214}} & 32.19 & 75.47 & 14.76 & 38.26 & {\color[HTML]{00D2CB} \textbf{92.23}} & {\color[HTML]{00D2CB} \textbf{96.25}} \\
+\multicolumn{1}{l|}{\multirow{-6}{*}{\textit{Tello}}} & Higher & 0.095 & 0.264 & {\color[HTML]{00D2CB} \textbf{42.98}} & {\color[HTML]{00D2CB} \textbf{75.69}} & {\color[HTML]{00D2CB} \textbf{20.19}} & {\color[HTML]{00D2CB} \textbf{46.63}} & 89.54 & 93.63 \\ \hline
+\end{tabular}}
+\end{table}
