@@ -1,0 +1,23 @@
+
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+Singh et al.~\cite{Singh_2020_CVPR} point out the dangers of \emph{contextual bias} in visual recognition datasets. They propose two methods, \emph{CAM-based} and \emph{feature-split}, that better recognize an object or attribute in the absence of its typical context while maintaining competitive within-context accuracy. 
+To verify their performance, we attempted to reproduce all 12 tables in the original paper, including those in the appendix. We also conducted additional experiments to better understand the proposed methods, including increasing the regularization in \textit{CAM-based} and removing the weighted loss in \textit{feature-split}.
+
+\subsection*{Methodology}
+As the original code was not made available, we implemented the entire pipeline from scratch in PyTorch 1.7.0. Our implementation is based on the paper and email exchanges with the authors.
+%\footnote{Our implementation can be found at \url{https://github.com/princetonvisualai/ContextualBias}.}
+We spent approximately four months reproducing the paper, with the first two months focused on implementing all 10 methods studied in the paper and the next two months focused on reproducing the experiments in the paper and refining our implementation. Total training times for each method ranged from 35--43 hours on COCO-Stuff~\cite{caesar2018cvpr}, 22--29 hours on DeepFashion~\cite{liuLQWTcvpr16DeepFashion}, and 7--8 hours on Animals with Attributes~\cite{AwA} on a single RTX 3090 GPU.
+
+\subsection*{Results}
+We found that both proposed methods in the original paper help mitigate contextual bias, although for some methods, we could not completely replicate the quantitative results in the paper even after completing an extensive hyperparameter search. For example, on COCO-Stuff, DeepFashion, and UnRel, our \emph{feature-split} model achieved an increase in accuracy on out-of-context images over the standard baseline, whereas on AwA, we saw a drop in performance. For the proposed \emph{CAM-based} method, we were able to reproduce the original paper’s results to within 0.5\% mAP.
+
+\subsection*{What was easy}
+Overall, it was easy to follow the explanation and reasoning of the experiments. The implementation of most (7 of 10) methods was straightforward, especially after we received additional details from the original authors.
+
+\subsection*{What was difficult}
+Since there was no existing code, we spent considerable time and effort re-implementing the entire pipeline from scratch and making sure that most, if not all, training/evaluation details are true to the experiments in the paper. For several methods, we went through many iterations of experiments until we were confident that our implementation was accurate.
+
+\subsection*{Communication with original authors}
+We reached out to the authors several times via email to ask for clarifications and additional implementation details. The authors were very responsive to our questions, and we are extremely grateful for their detailed and timely responses.
