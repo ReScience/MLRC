@@ -1,0 +1,19 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[hbt!]
+\centering
+\caption{BPnP results on the UAVA dataset. We trained all models for 44 epochs and select the best among them for inference. Light \textcolor{SeaGreen}{green} with \textbf{bold} and light \textcolor{Cerulean}{blue} indicate the best and second best performers.}
+\label{tab:results_bpnp}
+\resizebox{\textwidth}{!}{\begin{tabular}{l|l|llllllll}
+\hline
+Drone &  & \textbf{NPE$\downarrow$} & \textbf{AD$\downarrow$} & \textbf{ACC2$\uparrow$} & \textbf{ACC5$\uparrow$} & \textbf{ADD2$\uparrow$} & \textbf{ADD5$\uparrow$} & \textbf{Proj2$\uparrow$} & \textbf{Proj5$\uparrow$} \\ \hline
+ & $l_m$ & 0.014 & 0.027 & \cellcolor{MyLightBlue}92.13 & \cellcolor{MyLightBlue}98.07 & \cellcolor{MyLightBlue}81.31 & \cellcolor{MyLightBlue}93.34 & \cellcolor{MyLightGreen}\textbf{99.45} & \cellcolor{MyLightGreen}\textbf{99.58} \\
+ & $l_p$ & \cellcolor{MyLightBlue}0.012 & \cellcolor{MyLightBlue}0.026 & \cellcolor{MyLightGreen}\textbf{95.20} & \cellcolor{MyLightGreen}\textbf{98.36} & \cellcolor{MyLightGreen}\textbf{90.29} & \cellcolor{MyLightGreen}\textbf{96.81} & \cellcolor{MyLightBlue}98.05 & 99.14 \\
+\multirow{-3}{*}{\textit{M2ED}} & $l_h$ & \cellcolor{MyLightGreen}\textbf{0.011} & \cellcolor{MyLightGreen}\textbf{0.020} & 90.75 & 98.04 & 80.52 & 91.37 & 97.56 & \cellcolor{MyLightBlue}99.49 \\ \hline
+ & $l_m$ & \cellcolor{MyLightBlue}0.071 & \cellcolor{MyLightGreen}\textbf{0.189} & \cellcolor{MyLightBlue}43.38 & \cellcolor{MyLightBlue}82.11 & 14.88 & 41.47 & \cellcolor{MyLightGreen}93.97 & \cellcolor{MyLightGreen}\textbf{96.08} \\
+ & $l_p$ & \cellcolor{MyLightGreen}\textbf{0.063} & \cellcolor{MyLightBlue}0.223 & \cellcolor{MyLightGreen}\textbf{55.31} & \cellcolor{MyLightGreen}\textbf{85.34} & \cellcolor{MyLightGreen}\textbf{20.04} & \cellcolor{MyLightGreen}\textbf{50.53} & \cellcolor{MyLightBlue}\textbf{93.19} & \cellcolor{MyLightBlue}94.49 \\
+\multirow{-3}{*}{\textit{Tello}} & $l_h$ & 0.091 & 0.252 & 36.36 & 74.99 & \cellcolor{MyLightBlue}18.27 & \cellcolor{MyLightBlue}43.31 & 89.25 & 94.00 \\ \hline
+\end{tabular}}
+\end{table}

@@ -1,0 +1,281 @@
+
+
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+
+This report contains a set of experiments that seek to reproduce the claims of two recent works related to keypoint estimation, one specific to 6DoF object pose estimation, and the other presenting a generic architectural improvement for keypoint estimation but demonstrated in human pose estimation. 
+More specifically, in the backpropagatable PnP \cite{chen2020end}, the authors claim that incorporating geometric optimization in a deep-learning pipeline and predicting an object’s pose in an end-to-end manner yields improved performance.
+On the other hand, HigherHRNet \cite{cheng2020higherhrnet} introduces a novel heatmap aggregation method that allows for scale-aware pose estimations, offering higher keypoint localization accuracy for small scale objects.
+
+\subsection*{Methodology}
+
+We used the publicly provided code where available, adapting it to fit into a model development kit to facilitate our experiments.
+We used a dataset fit for validating both claims simultaneously, and designed a set of experiments based on the published methodologies, but also went beyond seeking to validate the higher level concepts.
+Our experiments were conducted on a Nvidia 2080 12 GB GPU with an average training time of 14 hours.
+
+\subsection*{Results}
+We reproduce the claims of both papers by conducting several experiments in the UAVA dataset \cite{albanis2020dronepose}. The integration of a differentiable geometric module within an keypoint-based object pose estimation model improved its performance in metrics. 
+We additionally verify that this is the case for other differentiable PnP implementations (\textit{i.e.}~EPnP). Further, our results indicate that indeed HigherHRNet improves keypoint localisation performance on small scale objects.
+
+\subsection*{What was easy}
+Both papers provided publicly available implementations. In addition, many different variations were also found online. 
+Finally, the papers themselves were very clearly written, offering insights on various important details.
+
+\subsection*{What was difficult}
+The main issue that required more effort was identifying the appropriate weights for BPnP \cite{chen2020end} in order to balance the different optimization objectives. 
+As expected, this varies for the context that it is applied (task, dataset) and the values presented in the paper did not work in our case. 
+Sub-optimal selection of weights leads to convergence issues.
+
+\subsection*{Communication with original authors}
+We communicated with the authors of \cite{chen2020end} through GitHub, and we would like to thank them as they provided a fast and detailed response. 
+Furthermore, their responsiveness to past issues had already provided a nice knowledge base regarding reproduction.
+
+\newpage
+%\textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+%Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+\section{Introduction}
+
+Object pose estimation seeks to determines the 3D position and orientation of an object in camera-centred coordinates. 
+During the last years, two main directions have been emerged for data-driven 6DoF object pose estimation; \textit{direct pose regression} which predict pose in an end-to-end manner, and \textit{indirect} that learns the surrogate task of keypoint localisation and then solves a Perspective-n-Point (PnP) problem to estimate the resulting pose.
+Even though it has been shown \cite{sattler2019understanding} that the latter methods better approach the problem, there are still open challenges that need to be solved. 
+One issue is the splitting between the actual task at hand, and the surrogate task that they learn.
+The other has to do with the spatial nature of keypoint localisation and smaller scale objects.
+Recently, two works have been presented that seek to address these issues, BPnP \cite{chen2020end} and HigherHRNet \cite{cheng2020higherhrnet}.
+In this work, we seek to reproduce and verify their claims in a task that is relevant for both of these works, drone pose estimation.
+While BPnP's relation has to do with the task at hand, HigherHRNet is also relevant because commodity drones are usually small form objects, and when flying around the further distance themselves from the operator, effectively reducing their scale in the camera's image domain.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+Consequently, we opt for reproducing the claims of both of these two relevant papers addressing the aforementioned challenges. 
+In more details, the authors of BPnP \cite{chen2020end} propose a novel differentiable module which calculates the derivatives of a PnP solver through implicit differentiation, enabling the backpropagation of its gradients to the network parameters, and as such allowing for end-to-end optimization and learning. 
+On the other hand, the authors of HigherHRNet \cite{cheng2020higherhrnet} focus on improving the 2d landmarks' localization performance for smaller-scale humans by proposing a novel multi-scale supervision scheme for training and a heatmap aggregation module for inference.
+
+The main claims of both papers can be summarised below:
+
+\begin{itemize}
+    \item \textbf{BPnP:} An end-to-end trainable pipeline for object pose estimation, can achieve greater accuracy by combing the reprojection losses (Table~\ref{tab:results_bpnp}).
+    \item \textbf{HigherHRNet:} A novel method for learning scale-aware representations using high-resolution feature pyramids, eventually achieving greater results for small scale objects\footnote{We apply the proposed module in the object pose estimation task, while authors originally demonstrated it for the human-pose estimation task, but its concept still applies in our case as well.} (Table~\ref{tab:results_higher}).
+\end{itemize}
+
+
+%Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+%A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+%This is concise, and is something that can be supported by experiments.
+%An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+%Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+We implemented our experiments by re-using the publicly available implementation for BPnP, and implementing HigherHRNet after styding the paper, the original publicly available implementation, as well as other implementations.
+In both cases we integrated the code base in a modular framework that facilitates reproducible experiments \cite{moai}, which generally required slight modifications of the original code provided by the authors to fit its requirements. 
+The overall methodology for our experiments is depicted in Figure~\ref{fig:methodology}.
+On the left, a traditional monocular heatmap-based keypoint localisation pipeline is presented, whereas on the right, the BPnP required components are illustrated.
+
+\textbf{BPnP:} BPnP focuses on the \textit{Pose Retrieval stage}, and following \cite{chen2020end} we trained our model under the 3 different schemes used in the original work as well:
+\begin{itemize}
+    \item heatmap loss ($l_h$),
+    \item mixture loss $l_m = l_h + \beta*l_{proj}$,
+    \item and pose loss $l_{p} = l_{reg} + l_{proj}$,
+\end{itemize}   
+where $l_{proj} =\|\pi(z | y, K) - x^* \|^2_2$ and $l_{reg} =\| x - \pi(z | y, K) \|^2_2$.
+Also, $\pi$ is the projection function employing the predicted pose($y$) from the PnP solver, the corresponding object's 3D points $z$ and $K$ the camera intrinsic matrix. 
+Apart from these experiments presented also in the original paper, we conducted an extra set of experiments that aimed at validation the concept of end-to-end 6DoF pose estimation via differentiable PnP.
+We used another openly available differentiable PnP implementation, and additionally, also tested the faster counterpart of BPnP. 
+We present results across many established object pose estimation metrics, as well as computational performance metrics for all the aforementioned experiments.
+
+\textbf{HigherHRNet:} On the other hand, for HigherHRNet we focused on the \textit{Heatmap regression part} by using different models for the decoder part of the architecture, with details following in Section~\ref{sec:models}.
+
+All the code and its documentation are submitted and published along with this report.
+
+\begin{figure*}[hbt!]
+  %\centering
+  \includegraphics[scale=0.25]{../openreview/figures/method_5.png}
+  \caption{Indirect object pose estimation approach consisting of the \textit{Heatmap Regression} part where HigherHRNet paper focuses on, and \textit{Pose Retrieval} part where BPnP focuses, alongside the supervision signals.}
+\label{fig:methodology}
+\end{figure*}
+
+
+\subsection{Model descriptions}
+\label{sec:models}
+The following models were used as our backbone for regressing the heatmaps and the corresponding coordinate spatial distributions (the decoder part in Figure~\ref{fig:methodology}):
+\begin{itemize}
+    \item \textit{HRNet \cite{sun2019deep}} with feature maps of width 48 and 3 stages. 
+    The 2nd, and 3rd, stages contain 1, 4 exchange blocks, respectively, and each exchange block contains 4 residual units.
+    \item\textit{HigherHRNet \cite{cheng2020higherhrnet}} with feature maps of width 48 and 3 stages. 
+    The 2nd, and 3rd, stages contain 1, 4 exchange blocks, respectively, and each exchange block contains 4 residual units.
+    \item \textit{Stacked Hourglass \cite{newell2016stacked}} with depth 2 and feature maps of width 128
+\end{itemize}
+
+Following the heatmap predictions, we apply a decoding operation (\textit{i.e.}~center of mass specifically) in order to extract the keypoints from the heatmaps, which are later driven to the PnP algorithm for retrieving the 6D pose. %The heatmaps size was set to one fourth of the the input image size,which is 80x60 in our case.
+
+In addition, we integrated the EPnP \cite{lepetit2009epnp} algorithm, using the available implementation in Pytorch3D \cite{ravi2020pytorch3d} instead of BPnP to assess whether other -- similar in concept -- implementations can verify the claim and quantify the differences between these approaches.
+As a side-note, it should be mentioned that our models' configuration slightly differs from the ones described in the original works in order to comply with the working resolution of the dataset we used.
+
+\subsection{Datasets}
+\subsubsection{UAVA}
+
+As aforementioned, our experiments were conducted on a dataset that allowed for the validation of both works simultaneously.
+This also better helps in deducing whether the claims are reproducible as the context (task or dataset) can vary. 
+We used the UAVA dataset\footnote{\url{https://vcl3d.github.io/UAVA/}} for object pose estimation. 
+UAVA targets human-robot cooperative Unmanned Aerial Vehicle(UAV) applications and offers two different drone models, namely DJI M2ED\footnote{\url{https://www.dji.com/gr/mavic-2-enterprise}} and Ryze Tello\footnote{\url{https://www.ryzerobotics.com/tello}}.
+%with the following statistics ... 
+The UAVA dataset provides the 3D models of both drones accompanied by ground-truth annotations such as 3D bounding boxes, 6D pose, and at the same time multi-modal data.
+More importantly, the difference in size between the two drone models allows for the validation of scale-invariant pose estimation.
+%Mode details about the dataset creation, the training. validation and testing scripts can be found in the provided link.
+
+%For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+\subsubsection{Preprocessing}
+We processed the original dataset in order to keep only the samples where all the 2D keypoints are within the image, given that BPnP relies on softly approximating the coordinate, and that would fail in the case of out of field-of-view keypoints.
+However, we should mention that we did not apply any other filtering (i.e. visibility of all the keypoints, boundary cases, etc.).
+
+\subsection{Hyperparameters}
+We train all the models for \textbf{44} epochs and select the best performing model for testing. 
+We used the \textbf{Adam} optimizer with a learning rate of $1e-4$, betas of values $0.9$ and $0.999$ and no weight decay, and a seed value of 1989 for ensuring reproducibility.
+Albeit, we experimented with different losses (\textit{i.e.}~KL, MSE) for $l_h$, we found that L1 loss works the best, offering the best results and faster convergence. 
+This could be attributed to the different resolution of the heatmaps grid (in our case is lower) as well as the different configuration of the heatmap decoder model (we used 3 stages instead of 4). 
+It is worth mentioning that we also tried a bigger heatmap resolution (\textit{e.g.}~$160 \times 120$) although we decided to conduct our final experiments in the lower resolution for two main reasons. 
+First, most heatmaps regression decoders used in the literature make their prediction in the $\nicefrac{1}{4}$ of the original image, and second, this higher heatmap resolution would enforce us to further reduce the depth of the decoder model.
+Specifically, for BPnP we set $\beta$ value to $1e-5$ after conducting a greedy heuristic search, with values ranging from $0.001$ to $1e-9$, as the proposed value for $\beta$ coefficient, did not work for our case. The selection of a non-appropriate $\beta$ coefficient value can lead to stability issues as noted in Section 5.2. 
+
+%\subsection{Training procedure} 
+%Following the approach proposed in the original paper \cite{chen2020end} we trained all models with $l_h$ loss only, for 30 epochs.After that, we trained the models for another 14 epochs by employing $l_m$ and $l_p$ losses. As the proposed value for $\beta$ coefficient did not work for our case, we set this value to $1e-5$ after conducting several manual experiments,with values ranging from 0.001 to 1e-9. We did not initialise the initial weights of our models and we use an Adam otpimizer with a learning rate of 1e-4 and betas [0.0,0.99], eps 1e-8 with no weight decay.
+%More details for the exact configuration of each experiment is provided with the associated config file (TODO--add link?).
+%Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+%ADD a table
+
+\subsection{Experimental setup and code}
+As mentioned above, we integrated the authors' code (BPnP) or our own reimplementations (HigherHRNet) in \cite{moai} which is a PyTorch framework for modular and reproducible workflows\footnote{\href{https://github.com/ai-in-motion/moai}{www.github.com/ai-in-motion/moai}}.
+Each model is implemented in a configuration file that defines the different components (optimizer, datasets, model architecture, pre-/post-processing graphs, etc.) and logs all hyperparameters.
+For each experiment we report the standard metrics below:
+%Therefore, in order to fit moai's requirements, we adapted the code provided from both authors, and provide results in various well-established pose metrics described below.% such as the normalised positional error (NPE), angular distance in rads (AD), position and rotation accuracy (ACC),6d pose (ADD) and projection (Proj).
+
+\textbf{NPE}: is the magnitude (L2-norm) of difference between the ground-truth and estimated position vectors from the origin of the camera reference frame to that of the drone body frame, normalised with  ground-truth vector.
+
+\textbf{AD}: is the angular distance between the predicted, rotation matrix, and ground-truth,or in other words, the magnitude of the rotation that aligns the drone body frame with the camera reference frame.
+
+\textbf{ACC}: considers an estimated pose to be correct if its rotation error is within \textbf{k$^{\circ}$} and the translation error is below \textbf{k cm}.
+
+\textbf{ADD}: is the average distance metric to compute the averaged distance between points transformed using the estimated pose and the ground truth pose. 
+Eventually, a pose estimation is considered to be correct if the computed average distance is within \textbf{k\%} of the model diagonal.
+
+\textbf{Proj}: is the mean distance between 2D keypoints projected with the estimated pose and those projected with ground truth pose. 
+An estimated pose is considered correct if this distance is within a threshold \textbf{k}.
+
+%Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+%Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+%Provide a link to your code.
+
+\subsection{Computational requirements}
+Table~\ref{tab:durations} showcases the total duration of each experiment (with a 24 batch size) as well as some other useful statistics such as the mean duration time for a forward pass, a backward pass, an optimizer step, as well as the total test duration with batch size 1. 
+It is clear, that the introduction of the differentiable PnP modules in the training procedure increases the total training time significantly, as the backward and step operation require more time.
+We ran our experiments on a machine with the specifications presented in Table~\ref{Hardware components}.
+\input{../openreview/tables/durations}
+\input{../openreview/tables/hardware}
+%Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+%For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+%For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+%(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\section{Results}
+\label{sec:results}
+Our results support the claims presented by both authors in \cite{chen2020end} and \cite{cheng2020higherhrnet} respectively. 
+As is demonstrated in Table~\ref{tab:results_bpnp}, the model trained with $l_p$ achieved better results in most of the metrics for both drone models. 
+Similarly, Table~\ref{tab:results_higher} indicates that HigherHRNet yields better results for the small-scale drone in most of the metrics, although its performance for the bigger M2ED drone is worse compared to the standard HRNet model.
+%Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+%\input{tables/results}
+\subsection{Results reproducing original papers}
+%For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+%For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+%Logically group related results into sections. 
+\subsubsection{BPnP}
+With these experiments we show that the addition of a differentiable PnP module improves the performance in object pose estimation task.
+We provide qualitative results in Figure~\ref{fig:qualitativeboth}. 
+It is worth highlighting that training with $l_p$ does not restrict the shape of the distribution the way that it is constrained when relying on heatmap supervision (\textit{i.e.}~Gaussian distribution approximation).
+Instead, the model freely localizes the keypoints, which results in more focused predictions. 
+This is illustrated in Figure~\ref{fig:qualitativehtmps} where qualitative results display the heatmaps on top of the color images. 
+\input{../openreview/tables/bpnp1}
+\begin{figure*}[hbt!]
+  \centering
+  \includegraphics[scale=0.70]{../openreview/figures/qualitativeheatmaps.png}
+  \caption{Qualitative heatmap results on random samples from the test-set. 
+  The first \textbf{two} columns depicts the M2ED drone while the last \textbf{two} the Tello drone; with heatmaps predicted by models trained with $l_p$ and $l_h$ respectively.
+  Evidently, heatmaps by the $l_h$ model (\textbf{second and fourth columns} tend to keep the 2D Gaussian shape distribution, while the $l_p$ ones (\textbf{first and third columns}) freely approximate the $(x,y)$ position enforced by the regularizer term($l_{reg}$) of the $l_p$ loss, eventually allowing for more distinguishable 2D keypoints estimations.}
+\label{fig:qualitativehtmps}
+\end{figure*}
+\subsubsection{HigherHRNet}
+These experiments showcase that the addition of the aggregation module improves the keypoint localization performance when targeting smaller-scale objects. 
+Specifically, the HigherHRNet architecture gives better results in most of the metrics for the small form drone (Tello). 
+On the other hand though, this is not the case for the larger drone, where the HigherHRNet performance is slightly worse than the standard HRNet's one. 
+\input{../openreview/tables/resultshigher}
+\subsection{Results beyond the BPnP paper}
+Apart from the experiments conducted by the authors in \cite{chen2020end} we provide additional to further support the main claims. 
+Particularly, we compared BPnP versus an alternative differentiable PnP algorithm (\textit{i.e.}~EPnP) and the results are demonstrated in Table~\ref{tab:bpnpvsepnp}. 
+We also provide extra experiments of a BPnP implementation in which the calculation of the higher-order derivatives is ignored from the coefficient's graph as presented in Table~\ref{tab:results_FasterBPnP}.
+%Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+\subsubsection{BPnP vs EPnP}
+For this experiment we utilised the same backbone (\textit{i.e.}~HRNet) but we changed the BPnP module with the EPnP. 
+We followed the exact same training procedure, hyperparameters, as well as the same loss $l_m$. 
+Results are summarized in Table~\ref{tab:bpnpvsepnp}.
+It is evident that EPnP and BPnP offers comparable results in most of the metrics. 
+\input{../openreview/tables/bpnpvsepnp}
+\subsubsection{BPnP$_{faster}$}
+Authors in \cite{chen2020end} provided an alternative method for calculating the gradients through the PnP layer, which essentially is the same method as the original, although ignoring the higher-order derivatives from the coefficients graph.
+Therefore, we provide results using this faster BPnP method in Table~\ref{tab:results_FasterBPnP}, comparing the two different versions, as well as their training times in Table~\ref{tab:FasterBPnP_duration}. 
+It seems that the original version outmatches the faster one, albeit there is no significant performance drop. 
+On the other hand, Table~\ref{tab:FasterBPnP_duration} indicates how the second implementation justifies its name. So, it is in users' fluency whether they need to sacrifice gradient accuracy and some performance drop in exchange for efficient training times.
+\input{../openreview/tables/Fasterbpnpresults}
+\input{../openreview/tables/fasterbpnp}
+\section{Discussion}
+\begin{figure*}[hbt!]
+  \centering
+  \includegraphics[scale=0.45]{../openreview/figures/qualitativeboth_2.png}
+  \caption{Qualitative results on random samples from the UAVA dataset from three different models. The \emph{\color{red}\textbf{red}} mask indicates predictions by $l_p$ trained model, \emph{\color{purple}\textbf{purple}} by $l_m$ and finally \emph{\color{cyan}\textbf{cyan}} by HRNet. 
+  The drone masks are rendered by employing the predicted pose(i.e. output of the BPnP) and then blended with the original color image. 
+  The first \textbf{three} columns depicts M2ED drone model while the rest \textbf{three} the Tello drone. 
+  The Tello samples are cropped and zoomed-in due to its small form factor.}
+\label{fig:qualitativeboth}
+\end{figure*}
+%Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+After conducting several experiments on the UAVA dataset, the central claims of \cite{chen2020end} and \cite{cheng2020higherhrnet} stand true; as they both outperform other methods. 
+Particularly, for validating BPnP we conducted the same experiments as the original paper, and further, we compare it with another differentiable PnP method (\textit{i.e.}~EPnP). 
+The inclusion of 2D-3D geometry constraints through differentiable geometric optimization, improves the performance.
+Extending the experiments of the original paper, we compare another implementation of the BPnP module which ignores the high order derivatives from the coefficient graph. 
+This module achieves comparable results as its counterpart apart it is much faster. It is worth noting, that both BPnP, and EPnP are quite time-consuming as demonstrated in Table~\ref{tab:durations}. 
+Finally, we study the performance of the HigherHRNet \cite{chen2020end} in a very challenging small scale object. Indeed, the performance of the proposed heatmap aggregation module achieves better results when compared with other well-established methods.
+\subsection{What was easy}
+Implementing most of the code was straightforward as authors of both papers provide source code. 
+GitHub issues were another source of retrieving information, clarifying parts of the papers when needed. 
+Additionally, both of the original papers are quite complete, well-written making it easy to follow.
+%Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+%Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\subsection{What was difficult}
+
+%List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+%Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+Our major difficulty was related to finding the appropriate value for balancing the terms of mixture loss $l_m$, aka the $\beta$ value.
+Even though, authors in \cite{chen2020end} provided the value that they used for their experiments this did not work for us, as this is a case specific parameter.
+It is worth noting that a non-appropriate selection of the balancing term can lead to convergence issues and negative results. 
+Even though, not related with the code of both of the papers, we feel that it would be constitutive to mention that we faced the same difficulties when trying to incorporate EPnP in our workflow.
+
+\subsection{Communication with original authors}
+%Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+Authors of \cite{chen2020end} did not specify the configuration of the used network in the pose estimation task, nor the hyperparameters. 
+Thus, we contacted them through GitHub where they provided a detailed answer, available now to the research community.
+We did not contact HigherHRNet authors \cite{cheng2020higherhrnet} as the online implementations and the text and figures in their paper were a good enough guide to understand and implement it.
+
+\section*{Acknowledgements}
+This research has been supported by the European Commission funded program \href{https://www.faster-project.eu/}{FASTER}, under H2020 Grant Agreement 833507.
+
+%\bibliographystyle{unsrt}  
+%\bibliography{refs}
+%\bibliography{bibliography}
