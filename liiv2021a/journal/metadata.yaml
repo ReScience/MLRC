@@ -1,104 +1,84 @@
+  
 # To be filled by the author(s) at the time of submission
 # -------------------------------------------------------
 
 # Title of the article:
-#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] A Reproduction of Ensemble Distribution Distillation"
 
 # List of authors with name, orcid number, email and affiliation
-# Affiliation "*" means contact author (required even for single-authored papers)
+# Affiliation "*" means contact author
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Toomas Liiv
+    orcid: 0000-0002-0682-636X
+    email: toomasl@kth.se
+    affiliations: 1,2,*
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Einar Lennelöv
+    orcid: 0000-0002-3787-5973
+    email: lennelov@kth.se
+    affiliations: 1,2      # * is for contact author
+
+  - name: Aron Norén
+    orcid: 0000-0001-7543-7790
+    email: aronno@kth.se
+    affiliations: 1,2      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
+    name:    Equal contribution
   - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
-
+    name:    KTH Royal Institute of Technology
+    address: Stockholm, Sweden
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: rescience c, rescience x, uncertainty estimation, ensemble distribution distillation,
+          tensorflow
 
-# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
-# You can get a DOI for your code from Zenodo, or an SWH identifier from
-# Software Heritage.
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/lennelov/endd-reproduce
   - doi: 
-  - swh: 
+  - swh: swh:1:dir:2c366708175b2ed7c83ce6b33a80dd43c8aad915
 
-# Data URL and DOI (optional if no data)
+# Date URL and DOI (optional if no data)
 data:
   - url:
   - doi:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite: "Andrey Malinin, Bruno Mlodozeniec, and Mark Gales. “Ensemble Distribution Distillation”. In:International Conference on Learning Representations (ICLR). 2020" # Full textual citation
+ - bib: malinin2019ensemble # Bibtex key (if any) in your bibliography file
+ - url: https://openreview.net/pdf?id=BygSP6Vtvr # URL to the PDF, try to link to a non-paywall version
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "We investigate the claims made in Ensemble Distribution Distillation by reproducing the original experiments performed by the authors. Our findings generally support the claims, although we do not observe the same poor performance of the EnD baseline model. We also provide a novel visualization of the uncertainty estimation behavior of the ensemble and corresponding distilled model."
 
 # Bibliography file (yours)
-bibliography: bibliography.bib
+bibliography: citations.bib
   
 # Type of the article
 # Type can be:
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,34 +86,34 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=p1BXNUcTFsN
 
 contributors:
-  - name:
-    orcid: 
+  - name: Koustuv Sinha
+    orcid: 0000-0002-2803-9236
     role: editor
-  - name:
+  - name: Anonymous Reviewers
     orcid:
     role: reviewer
-  - name:
+  - name: A Reproduction of Ensemble Distribution Distillation
     orcid:
     role: reviewer
 
 # This information will be provided by the editor
 dates:
-  - received:  November 1, 2018
-  - accepted:
-  - published: 
+  - received:  February 15, 2020
+  - accepted: February 15, 2020
+  - published: May 21, 2020
 
 # This information will be provided by the editor
 article:
-  - number: # Article number will be automatically assigned during publication
-  - doi:    # DOI from Zenodo
-  - url:    # Final PDF URL (Zenodo or rescience website?)
+  - number: 2 # Article number will be automatically assigned during publication
+  - doi: 10.5281/zenodo.3818623    # DOI from Zenodo
+  - url: https://zenodo.org/record/3818623/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
 
 # This information will be provided by the editor
 journal:
   - name:   "ReScience C"
   - issn:   2430-3658
-  - volume: 4
-  - issue:  1
+  - volume: 6
+  - issue:  2
