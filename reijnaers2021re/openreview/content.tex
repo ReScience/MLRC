@@ -1,0 +1,190 @@
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+In this paper we present an analysis and elaboration of \cite{plumb2020explaining}, in which an algorithm is posed by Plumb \textit{et al}. for the purpose of finding human-understandable explanations in terms of given explainable features of input data for differences between groups of points occurring in a lower-dimensional representation of that input data.
+
+\subsection*{Methodology}
+We have upgraded the original code provided by the authors such that it is compatible with recent versions of popular deep learning frameworks, namely the \texttt{TensorFlow 2.x}- and \texttt{PyTorch 1.7.x}-libraries. Furthermore, we have created our own implementation of the algorithm in which we have incorporated additional experiments in order to evaluate the algorithm's relevance in the scope of different dimensionality reduction techniques and differently structured data. We have performed the same experiments as described in the original paper using both the upgraded version of the code and our own implementation taking the authors' code and paper as references.
+
+\subsection*{Results}
+The results presented in \cite{plumb2020explaining} were reproducible, both by using the provided code and our own implementation. Our additional experiments have highlighted several limitations of the explanatory algorithm in question: the algorithm severely relies on the shape and variance of the clusters present in the data (and, if applicable, the method used to label these clusters), and highly non-linear dimensionality reduction algorithms perform worse in terms of explainability.
+
+\subsection*{What was easy}
+The authors have provided an implementation\footnotemark~that cleanly separates different experiments on different datasets and the core functional methodology. Given a working environment, it is easy to reproduce the experiments performed in \cite{plumb2020explaining}.
+
+\subsection*{What was difficult}
+Minor difficulties were experienced in setting up the required environment for running the code provided by Plumb \textit{et al}. locally (i.e. trivial changes in the code such as the usage of absolute paths and obtaining external dependencies). Evidently, it was time-consuming to rewrite all corresponding code, including the architecture for the variational auto-encoder provided by an external package, \texttt{scvis 0.1.0}\footnotemark.
+
+
+% This moves the first footnote to the next page. This improves readability as the first page already has a copyright in the footer.
+\setcounter{footnote}{1}
+\footnotetext{GitHub, \textit{Explaining Low Dimensional Representations}, \url{https://github.com/GDPlumb/ELDR}, accessed on January 29th, 2021}
+\setcounter{footnote}{2}
+\footnotetext{GitHub, \textit{shahcompbio/scvis: Python package for dimension reduction of high-dimensional biological data}, \url{https://github.com/shahcompbio/scvis}, accessed on January 22nd, 2021}
+
+\subsection*{Communication with original authors}
+No communication with the original authors was required to reproduce their work.
+
+\section{Introduction}
+As AI models are getting more integrated into applications with economic or social implications, the need for \textit{explaining} decisions made by (potentially complex) models is increasing. In many AI applications, big datasets form the basis of a decision-making algorithm \citep{6547979}. As these datasets often involve data of high dimensionality, the dimensionality of data is, in many different applications, often reduced using \textit{dimensionality reduction} (DR) techniques \citep{van2009dimensionality}.\\
+
+Data, and consequently the decisions made by an algorithm that are (in)directly based on that data, often involve some sort of `grouping,' either by utilizing a \textit{clustering method} or by (manually) pre-defined `clusters of data.' The `grouping process' may happen before the dimensionality reduction, for which, assuming well-organized data in which the dimensions correspond to explainable `real-life' \textit{features} of the phenomena measured in the data, the distinguishing characteristics of a certain group becomes relatively explainable as these groups are marked by boundaries in terms of explainable dimensions. However, this process can also happen after the dimensionality of the data has been reduced, which results in the groups being defined in terms of dimensions in a \textit{latent space}. Especially when grouping occurs after dimensionality reduction, different clusters in data often play a key role in the decision-making process of an algorithm -- one could, for example, when regarding \textit{credit risk modelling}, point out a group in latent space which `poses a high risk' when provided a loan \cite{MANCISIDOR2021114020}. Moreover, such groupings arise naturally under the context of (variational) auto-encoders, which are the architecture of preference for many deep learning applications \cite[p.~8]{plumb2020explaining}.\\
+
+Thus, considering the above-mentioned need for explainable machine decisions, in combination with the increasing use of DR algorithms and the reliance on observed data clusters in abstract latent spaces which are not understandable to the human mind, it is of great relevance and importance to develop methods to explain differences between groups in the light of the application of a certain dimensionality reduction technique.\\
+
+Elaborating upon the earlier introduced example of credit risk, one could argue that a reasonable explanation for a machine decision is of the kind: \textit{``Your loan was rejected, but if you would have earned \euro422,86 more per month, your loan would have been accepted.''} This type of explanation is a \textit{counterfactual explanation} -- a decision on the basis of a `fake,' counterfactual, `world,' in which features \textit{would have} been shaped differently. The proposed explanatory technique in \cite{plumb2020explaining} does exactly this: it reverse-engineers obtained cluster labels in latent space to label corresponding data in original space; then `tweaks' an initial cluster by translating that cluster in original space, so that it is mapped to (approximately) the area of the target cluster in latent space. Since the dimensions in original space correspond to explainable features---the groups' characteristics---which are comprehensible for a human mind; a translation that corresponds to merely adding or subtracting values to each of these features can be perfectly explained in `human language.' Since it is desirable for the explanations to be concise, the translation should be as \textit{sparse} as possible: the translation should `tweak' as few dimensions as possible. The intuition behind this idea is visualized in figure 1.
+
+\begin{figure}[h]
+  \scalebox{0.737}{\input{../openreview/figures/miscellaneous/visualisation_dimensionality_reduction_groups.tikz}}
+  \caption{Visualisation of the method described by Plumb \textit{et al}. Each point represents an individual cluster. The difference between clusters $1$ and $3$ are explained. Note that although point $1$ maps to $1'$, which is far from point $3$ in original space, point $1'$ is almost identical to $3$ in latent space -- this is the goal, as we want to find a point $1'$ which maps $1$ close to $3$ in latent space while keeping the translation from $1$ to $1'$ as sparse as possible. Note that the shown clusters (1--4) are determined in latent space and back-engineered to original space. $r(\boldsymbol{X}_i)$ is also referred to in \cite{plumb2020explaining} by $\boldsymbol{R}_i$.}
+\end{figure}
+
+\section{Scope of reproducibility}
+As follows from the introduction, the authors of \cite{plumb2020explaining} opted for a counterfactual, sparse explanation for key differences between (naturally arising) groups. Plumb \textit{et al}. propose an algorithm that generalizes this idea and attempts to find \textit{global} differences between all groups, constructed through a composition of simpler explanations and introduced as \textit{Transitive Global Translations} (TGT). The main tested contributions are that ``TGTs provide a \textit{global} and \textit{counterfactual} explanation between all groups which is mathematically consistent (i.e. symmetrical and transitive)'' and that ``TGTs overcome the shortcomings of statistical and manual interpretation which do not use the model that learned the low dimensional representation that was used to define the groups in the first place.''\\
+
+In addition to replicating these claims using the provided code, we further evaluated these statements by testing compatibility with other DR methods than the originally used variational auto-encoder and tested the applicability of the algorithm on different datasets with different internal structures. All the latter mentioned experiments were performed by rewriting and implementing the algorithm in \texttt{PyTorch} (taking the authors' code and paper as references), whereas the original code is written in \texttt{TensorFlow}, motivated by the development of \texttt{PyTorch} in becoming the preferred framework by researchers \cite{he2019mlframeworks} and the assertion that it offers clearer coding structure\footnote{Kirill Dubovikov, \textit{PyTorch vs TensorFlow -- spotting the difference}, \url{https://towardsdatascience.com/pytorch-vs-tensorflow-spotting-the-difference-25c75777377b}, accessed on January 25th, 2021}. For the sake of ensuring future reproducibility of the experiments originally presented in \cite{plumb2020explaining}, as an addition, we have also provided an upgraded version of the original code, without further modifications, to make it compatible with recent versions of \texttt{TensorFlow}.
+
+\section{Methodology}
+In accordance with section 2, for the purpose of reproducing \citep{plumb2020explaining}, several steps were taken in order to best cover the scope of the original paper with limited resources. Firstly, the provided artifacts were `modernized.' Concretely -- the code provided by Plumb \textit{et al}. and the external library \texttt{scvis} were upgraded to be compatible with \texttt{TensorFlow 2.4.1}\footnote{TensorFlow, \textit{Automatically upgrade code to TensorFlow 2}, \url{https://www.tensorflow.org/guide/upgrade}, accessed on January 22nd, 2021} and \texttt{matplotlib 3.3.3}\footnote{Matplotlib, \textit{API Changes}, \url{https://matplotlib.org/3.3.3/api/api_changes.html}, accessed on January 22nd, 2021}. Secondly, the provided code was rewritten from scratch -- both the code complementing the original paper; and the \texttt{scvis} library, to make the computation of the explanations independent from the DR algorithms. Thirdly, we have run our implementation on different DR algorithms---both linear and non-linear (see section 3.1)---and on different datasets (see section 3.3). Both the reproduced version (using the original code) and the rewritten version are further explained in section 3.2. All relevant code complementing \cite{plumb2020explaining}---the chunks which we have chosen to rewrite---are explicitly stated in the paper, making the method by Plumb \textit{et al}. reproducible, even if the code would not have been provided by the authors. 
+
+\subsection{Dimensionality reduction algorithms}
+Throughout \cite{plumb2020explaining}, DR algorithms are only mentioned in the general sense. Only in section 4 the algorithm which Plumb \textit{et al}. use for their experiments is introduced: a variational auto-encoder (VAE), which is a non-linear family of dimensionality reduction algorithms based on (deep) symmetrical neural networks with a \textit{bottleneck} in the middle layers which form the latent representation of the input data. The implemented VAE is based on the architecture proposed by \cite{ding2018interpretable}.\\
+
+The presented explanatory method \textit{should} work for any DR algorithm while effectively treating the algorithm as a `black box.' Apart from testing this hypothesis, it is relevant to compare `explanatory performance' on different DR algorithms as different algorithms suit different types of data. Furthermore, an explanation based solely on translations could possibly perform worse in situations wherein data is transformed in a non-linear manner, especially when methods inherently non-linearly transform (and warp) the input space. Therefore, as an addition to simply reproducing the implementation, experiments were done with several commonly known DR algorithms listed below.
+
+\subsubsection{Linear methods}
+We have opted for two different linear DR algorithms: truncated SVD (TSVD) and sparse PCA (SPCA) \cite{doi:10.1198/106186006X113430}. Both TSVD and SPCA reduce the dimensionality in a linear fashion. However, a key difference between both algorithms is that SPCA centers the data before computing the decomposition, where TSVD does not. As a result, TSVD handles sparse data more efficiently. The objective of SPCA is to find the sparse components that best reconstruct the data. While standard PCA, in most cases, extracts components using dense expressions, these are often hard to interpret. However, the sparse vectors extracted by sparse PCA naturally match the latent components, which increases explainability.
+
+\subsubsection{Non-linear methods}
+The implemented VAE is based on a Gaussian distribution, which results in a probabilistic generative model that preserves both local and global neighbor structures in the data \cite{ding2018interpretable}. As the VAE is solely used for encoding a constant latent space, the model is trained on the entire dataset. We further incorporate the use of three additional non-linear methods: kernel PCA (KPCA), locally linear embedding (LLE) \cite{Roweis2323} and isomaps. The latter two mentioned techniques are examples of \textit{manifold learning} \cite{cayton2005algorithms}.\\
+
+To achieve a non-linear tranformation, KPCA \cite{10.1007/BFb0020217} extends standard PCA through the use of kernels. These kernels effectively mimic a complex function that projects the input data on a \textit{higher} dimensional space in which, consequently, a lower-dimensional subspace is found in which the data is represented, resulting in a more efficient low-dimensional latent representation. The advantage is that KPCA is able to identify clusters which are not linear separable. For our experiments, we found that a sigmoid kernel provided the best performance (measured by the metrics proposed in section 3.2) when the latent space resulting from the KPCA was used to find TGTs.\\
+    
+Finally, manifold learning techniques are implemented to analyse whether TGTs can still perform on a higher-dimensional embedding of a low-dimensional manifold, especially for datasets of which its data might not lay on an underlying low-dimensional manifold. Isomaps can be seen as an extension of KPCA. Isomaps present a lower-dimensional space while maintaining distances between all points, while LLE aims to map to a lower-dimensional space while maintaining the distance in local neighborhoods. While Isomap could be seen as an extension of KPCA, LLE can be understood as a combination of PCAs run on local neighborhoods.\\
+
+As shown in section 4.1, different latent spaces (resulting from applying different processes for the purpose of reducing dimensions) seem to perform better in terms of explainability, which is further discussed in section 5.
+
+
+\subsection{Model descriptions}
+The original paper aimed to find an explanation for the key differences between a pair of groups in latent space where the explanation is expressed in terms of the original dimensions. This explanation is represented by a counterfactual translation of one of the groups (in the pair) in original space: ``\textit{what if} all points in group A, thus $\forall x \in A, x \in \mathbb{R}^d$, would have been translated, so that $\forall x \in A, \delta \in \mathbb{R}^d, x' = x + \delta$? Would group A have been roughly the same as group B \textit{after} the groups have been mapped to latent space, so that $\forall x \in A, \forall y \in B, x \in \mathbb{R}^d, y \in \mathbb{R}^m, r: \mathbb{R}^d \to \mathbb{R}^m, r(x') \approx r(y)$?''.\\
+
+As both the original space ($\mathbb{R}^d$) and latent space ($\mathbb{R}^m$) are Euclidean spaces, translations between any pair of groups within a larger number of groups ($\textgreater 2$) can be constructed by composing two translations (a vector addition in this context) or negating a translation (in this context equivalent to vector-scalar multiplication with $\lambda = -1$). Using these operations and a \textit{reference group}, explanations ($\delta$) can be obtained for every possible pair of groups. The intuition behind this idea is illustrated in figure 2. Points in figure 2 do not directly correspond to the groups for which we want to find differences, since these locations will be approximated using sparse translations (see figure 1). Moreover, this linearity enables the possibility to measure the difference between the points in the two groups in latent space using the $l_2$-norm of the squared differences. At the same time, it is also possible to measure the \textit{sparsity} of $\delta$ using $l_1$-regularization, which directly relates to the comprehensibility of the explanation posed by $\delta$.\\
+
+In order to obtain adequate components for the $\delta$-vector between a group and the reference group, all $\delta$-vectors can be initialized to zero and optimized by adjusting the components of $\delta$ corresponding to two randomly chosen groups in the negative direction of the gradient of a loss function which accounts for the above-mentioned constraints. This loss function is formulated in equation 9 of the original paper. While Plumb \textit{et al}. decide to incorporate the calculation of the gradient as an `extension' of the \texttt{scvis} package, which we have reproduced using the provided code, we have decided to analytically compute the gradient using \texttt{SciPy 1.6.0} (using the \texttt{optimize.approx\_fprime}-method). This implementation choice is in line with our aim to rewrite all code from scratch to obtain a `stand-alone' division between the explanatory algorithm (which is the main idea of the original paper) and various `black-box' dimensionality reduction algorithms, including the variational auto-encoder (the only algorithm Plumb \textit{et al}. experiment with), as introduced in the beginning of this section.\\
+
+\begin{wrapfigure}[18]{r}{0.4\textwidth}
+  \centering
+  \scalebox{0.784}{\input{../openreview/figures/miscellaneous/visualisation_composition_of_translations.tikz}}
+  \caption{Visualisation of the intuition behind the composition of two translations with regard to a reference group $0$, of which one is negated. Note that in this example every data point represents a whole group.}
+\end{wrapfigure}
+
+The model's performance is measured by two separate, but related (see section 4.1), metrics defined by \cite[p.~3]{plumb2020explaining}: \textit{correctness}, which measures the degree to which projected points are actually \textit{in the vicinity} of points they should map to (which they, in a sense, should `imitate') and \textit{coverage}, which measures the degree to which projected points \textit{cover} the target group. Both are defined in equation 3--4.
+
+\subsection{Datasets}
+In the upgraded-code model, we decided to reproduce the explanations on all provided datasets, including the synthetic and corrupted versions. The datasets used in the experiments in the original paper are the Heart Disease, Boston Housing, and Iris datasets; and the single-cell RNA dataset \cite{shekhar2016comprehensive}. Our from-scratch model has incorporated all provided datasets, except for the latter, due to lack of computation power. However, experiments were run on three additional UCI datasets: Seeds, Wine and Glass.\footnote{UCI Machine Learning Repository, \url{https://archive.ics.uci.edu/ml/datasets/{heart+disease, iris, seeds, Wine, glass+identification}} and \url{https://archive.ics.uci.edu/ml/machine-learning-databases/housing/}, accessed on January 29th, 2021; note the set notation in the latter section of the URL.} The additional data allow us to understand how varying underlying structures in data influence explainability using different DR algorithms. Not all datasets can be reduced by all techniques: all three added datasets do not yield eigencomponents for a sigmoidal Kernel-PCA procedure.
+
+\subsection{Hyperparameters}
+A constraint on the resulting explanations is that they must be sparse. The sparsity level is formally defined by $k$, representing the number of dimensions in the original space (with `real-life' features) used as the main components of the translation that forms the explanation. The hyperparameter $k$ is enforced \textit{after} the learning process by truncating the $\delta$-vector. To enforce sparsity \textit{during} the learning process, the $\delta$-vector is being $l_1$-regularized by a term $\lambda$, as follows from \cite[p.~5]{plumb2020explaining} and was inspired by the field of \textit{compressed sensing}. The resulting equation, which is minimized, is stated in equation 1. As further explained in section 3.5, different values for $\lambda$ are tested for optimization.
+
+\begin{equation}
+loss(\delta) = ||r(\bar{x}_{initial} + \delta) - \bar{r}_{target}||^2_2 + \lambda||\delta||_1
+\end{equation}
+
+Following \cite[p.~6]{plumb2020explaining}, in equation 2 a \textit{similarity measure} is defined to capture the degree of which the features of a $k_1$-sparse explanation correspond to $k_1$ dimensions of a $k_2$-sparse explanation where $k_2 > k_1$.
+
+\begin{equation}
+similarity(e_1, e_2) = \frac{\sum|e_1[i]|\mathbb{1}[e_2[i] \neq 0]}{||e_1||_1}
+\end{equation}
+
+Lastly, hyperparameter $\epsilon$ defines a threshold for the \textit{correctness} and \textit{coverage} metrics, as defined in equation 3--4. Although Plumb \textit{et al}. do hint on the type of search they have performed to find values for $\epsilon$, it is not clearly expanded upon \cite[p.~4]{plumb2020explaining}. For the purpose of analysing reproducibility, we have adopted the same values for $\epsilon$ (which were not present in the paper) for the same datasets. For all new data, we have introduced similar static values for $\epsilon$. Plumb \textit{et al}. do, however, propose an evaluation method for $\epsilon$, although it is again not mentioned in the paper. The authors take the mean, minimum and maximum of the diagonal values of the matrix of the correctness measures for all clusters (similar to the matrices shown in figure 4). These values can be misleading, as larger values for $\epsilon$ would inherently score high on correctness. Therefore, we have constrained $\epsilon \in [0, 2]$ and dynamically scale the latent spaces to force the data to be spread out (see section 3.5). We evaluated all values for $\epsilon$ and outline the means in table 1.
+
+\begin{align}
+correctness(t) &= \frac{1}{|\boldsymbol{X}_{initial}|} \sum\limits_{x \in \boldsymbol{X}_{target}} \mathbb{1} [\exists x' \in \boldsymbol{X}_{target} | || r(t(x)) - r(x')||^2_2 \leq \epsilon]\\
+coverage(t) &= \frac{1}{|\boldsymbol{X}_{target}|} \sum\limits_{x \in \boldsymbol{X}_{initial}} \mathbb{1} [\exists x' \in \boldsymbol{X}_{initial} | || r(x) - r(t(x'))||^2_2 \leq \epsilon]
+\end{align}
+
+\begin{table}[h]
+  \centering
+  \input{../openreview/tables/evaluation_of_epsilon.tex}
+  \caption{Evaluation of fixed epsilon values present in equations 3--4: mean of the diagonal of the correctness matrix.}
+\end{table}
+
+\subsection{Experimental setup and computational requirements}
+We have reproduced the experiments in \cite{plumb2020explaining} by using the upgraded \texttt{TensorFlow}-code. Additionally, we have run our from-scratch code on three additional datasets and six other dimensionality reduction algorithms. All experiments were run for five trials for eleven different values of $\lambda$ (evenly spaced between $0$ and $5$), for which the best set of $\delta$-vectors is chosen for all values of $k$ ($k$ is evenly spaced between $1$ and the number of dimensions $d$ in the original space, with a step size of $1$ for $d \leq 5$, and $2$ otherwise).\\
+    
+As pointed out in the previous section, an inadequately high value for $\epsilon$ poses a problem if the data in latent space is of low variance (especially if variance $\textless \epsilon$), as the performance measures, introduced in section 3.2 and shown in equations 3--4, would unjustly report very high scores. We have solved this problem by rescaling the data in latent space so that a variance of 10 is preserved (which amounts to a standard deviation of $\approx 3.16$). We have deliberately chosen not to utilize a method for removing \textit{outliers} prior to defining the factor with which to rescale the data in latent space, as to preserve `the spirit of the data,' especially since the internal structure of some datasets contain outliers which potentially correspond to groups with a significantly different character, as opposed to outliers resulting from noisy measurements. We further discuss our choice in section~5. However, as we failed to preserve an adequate amount of variance when performing \textit{TSVD} on the \textit{Glass}-dataset using this method, we manually scaled the data in this latent space, for this particular dataset, with an additional factor of $20$.\\
+
+In the from-scratch implementation, K-means is used for clustering, while for the replicated experiments in the original notebooks, following the code provided by the authors, clusters were manually selected.\\
+
+Experimental meta-results are shown in table 2. The original code, the 'modernized' version of the original code and the code for the from-scratch implementation can be found on our GitHub repository \cite{damiaan_j_w_reijnaers_2021_4686025}.
+
+\begin{table}[h]
+  \centering
+  \input{../openreview/tables/training_duration.tex}
+  \caption{Rounded TGT training time in hours per dataset and DR algorithm for all values of $k$, measured on an i7-4720HQ CPU @$\approx2.6$GHz. Measured for $5$ trials per $\lambda \in \{0, 0.5,  \ldots , 5\}$. VAE models train on a minimum of 3000 iterations.}
+\end{table}
+
+\section{Results}
+\begin{wrapfigure}[11]{r}{0.5\textwidth}
+  \vspace*{-0.75cm}
+  \subfloat[Plumb \textit{et al}.]{{\includegraphics[width=0.22\textwidth, trim=0 -0.45cm 0 0]{../openreview/figures/miscellaneous/results_housing_comparison_original_paper.png}}}
+  \subfloat[Implemented~from~scratch]{{\scalebox{0.23}{\input{../openreview/figures/miscellaneous/results_housing_comparison_from_scratch.pgf}}}}
+  \caption{Comparison of VAE on Housing data}
+\end{wrapfigure}
+
+Using our upgraded \texttt{TensorFlow}-code and the provided pre-trained VAE models, the obtained results are identical to those provided by the paper's codebase for all datasets and methods.\footnote{To compare, open the \textit{.ipynb} in all folders (except `code,' `scvis,' `MiscFigures,' and `Integrated-Gradients-master') on both repositories, and look at the resulting plots: \url{https://github.com/GDPlumb/ELDR} and \url{https://github.com/damiaanr/fact-ai/tree/main/ELDR-TF2.x_(pre_trained_models)}} After re-training all VAE models and re-learning all explanations, using the same upgraded \texttt{TensorFlow}-code, we obtain very similar results.\footnote{Now, compare the plots with \url{https://github.com/damiaanr/fact-ai/tree/main/ELDR-TF2.x_(newly_trained_models)}} The results are not identical, as the models learn slightly different representations, in which the manually selected clusters also differ. This indicates that the used cluster generation techniques influence the model's ability to explain based on a translation. An example arises with the Iris dataset: Plumb \textit{et al}. yield $0.833$ coverage, while we get only $0.66$. This difference caused by a different organization of clusters propagates further into the results for the corrupted data. Except for minor differences arising from this same issue, we successfully reproduced the results for all other datasets.\\
+
+When running the Housing, Iris and Heart datasets on the from-scratch implementation of the explanation algorithm using our implementation of \texttt{scvis}, we obtain either similar (see figure 3) or even better results than Plumb \textit{et al}. do. This again indicates that the method for dimensionality reduction does impact the results.\\
+
+For different datasets and different dimensionality reduction algorithms that map the datasets to different latent spaces, we have encountered the same problem related to the inability of explaining pairs of groups of which the clusters have a different standard deviation, as shown in the original paper in figures 4-7 \citep[p.~4]{plumb2020explaining}. This problem occurs, among others, in figure 5f in appendix A (and the corresponding measures in figure 6f).
+
+\subsection{Additional results not present in the original paper}
+
+As \citep[p.~6]{plumb2020explaining} pointed out, the \textit{correctness} and \textit{coverage} metrics are closely related. If the translations between arbitrary groups are symmetrical, the former translation---which is the technical representation of the explanation---is the negative of the latter (and vice-versa). Thus, when applying different \textbf{linear} dimensionality reduction algorithms, both metrics will exactly equal each other, as follows from the results shown below in table 3, and in figure 4 (note that the color map plot for correctness is the `transpose' of the plot for coverage, and vice-versa) and figure 6 (along all different values for $k$, the graphs conveying correctness and coverage are on top of each other for all linear algorithms).\\
+\begin{wrapfigure}[12]{l}{0.445\textwidth}
+  \scalebox{0.12}{\input{../openreview/figures/miscellaneous/metrics_housing_pca_k5.pgf}}
+  \caption{Metrics for Housing on PCA, $k = 5$}
+\end{wrapfigure}
+
+An additional observation is that topology-based dimensionality reduction techniques are less suitable for data compression when the compressed data consequently needs to be explained using translation-based counterfactual explanations. Locally linear embedding and isomapping are methods based on manifold mapping: a one- or two-manifold is embedded in two-dimensional space, and points of a higher-dimensional space are mapped onto this manifold. This often yields problematic data structures. For instance, when data is represented using a line (a one-manifold) and embedded in two-dimensional space in which the one-dimensional line is twirled. Since we are only considering translations (and, \textit{e.g.}, no rotations), the method is unable to adequately explain differences between clusters present on manifolds in latent space.\\
+
+Furthermore, we observed that certain datasets yield constant results when varying the sparsity-constraint. In this case, the compression from high-dimensional to two-dimensional space was (nearly) \textit{lossless} -- a single component suffices to explain the difference between any group. This phenomenon is shown in figure 6e in appendix A, indicating that the chemical composition of wine actually depends on only one latent variable: when using PCA, $99.98\%$ of the variance is explained by only two components (of which $99.81\%$ by the first component) out of 13 input dimensions. Note that the VAE seems to learn an approximation of LLE space (see figure 5e).\\
+
+All results for all introduced performance measures, datasets and dimensionality reduction algorithms, are shown in table 3 below and illustrated in figures 5--7 in appendix~A.
+
+
+\begin{table}[h]
+  \begin{adjustwidth}{-3cm}{-3cm}
+    \scriptsize
+    \centering
+    \input{../openreview/tables/results_correctness_coverage_similarity_transpose.tex}
+  \end{adjustwidth}
+  \caption{Correctness, coverage and similarity scores respectively for each model and dataset. Mean value is shown for the similarity scores while the score for the largest $k$ is taken for the correctness and coverage measures.}
+\end{table}
+
+
+\section{Discussion}
+We have been able to successfully reproduce and upgrade the code provided by Plumb \textit{et al.}, which is the implementation of the technique presented in \citep{plumb2020explaining}. We were able to reproduce results by running the pre-trained models; after re-training these models; and by rewriting the algorithm from scratch.\\
+
+The performance depends on the mapping to latent space. A limitation of the algorithm is the lack of variable freedom: only translations can be used to explain differences between groups. By utilizing different DR methods, we have shown that not all algorithms produce latent spaces in which translations suffice for an explanation between clusters. Especially manifold-based algorithms require a more sophisticated type of explanation using, for instance, rotation and scaling.\\
+
+A possible solution would be to generate an explanation in terms of a matrix (so that $\boldsymbol{x'} = \boldsymbol{Mx} + \boldsymbol{\delta}$ instead of $\boldsymbol{x'} = \boldsymbol{x} + \boldsymbol{\delta}$). However, explanations using translations are directly interpretable for humans as the dimensions of the tested datasets correspond to explainable features. Considering, for example, rotations, would come at the cost of explainability. However, forcing $\boldsymbol{M}$ to be diagonal (which leads to multiplying all data features by the corresponding diagonal factors) might yield proper explanations (of the type \textit{``If your monthly income would have been twice as big...''}).\\
+
+Furthermore, by using different datasets, we have shown that some DR techniques do a better job in terms of explainability between clusters. Data might be structured in different ways and produce different types of clusters. It directly follows from our results that the explanation method heavily relies on the generated clusters, and more importantly, its shapes and variance in latent space, which is another limitation.\\
+
+In section 3.5, we opted for an approach in which the latent spaces are dynamically scaled for the purpose of achieving a certain amount of variance in the data, as to obey the fixed hyperparameter $\epsilon$ which was introduced in section 3.4. A more robust method would be to dynamically define $\epsilon$ based on the variance in the latent space depending on the dataset and, potentially, proper handling of its outliers. We view the lack of expansion on this hyperparameter in the original paper as a (minor) limitation.\\
+
+As VAEs are sampling points in latent space from a distribution, an identical point $\boldsymbol{x}$ in the input space which is repeatedly mapped to latent space will yield different mappings. It would be interesting to further investigate to what extent explanatory algorithms can `handle' this variance -- to what extent such algorithms could find a stable and unchanging explanation in an ever-changing counterfactual world.
+
+
+\subsection{What was easy}
+After having asserted the dependencies needed to run the code provided by the authors on their GitHub repository, replicating the experiments performed in the paper was easy; the code was cleanly written, and it was easy to understand the architectural choices which the authors' made in their model.
+
+
+\subsection{What was difficult}
+Although the code required for computing the explanations was separated from the implementations in other folders in which it is applied on the different datasets, Plumb \textit{et al}. decided to perform experiments using a VAE and intertwined all code for generating the explanations with the \texttt{scvis}-library. This caused the explanatory model to rely on \texttt{TensorFlow}, while the explanation method itself does not require any deep learning. It is preferred to dissect the model into independent components, considering that the explanatory model should work with other DR algorithms, including those which do not require neural pipelines. Because of the authors' choice to use a VAE, the entire repository relied on \texttt{TensorFlow}. Mainly for this reason, we rewrote everything from scratch, as to provide the code for the dimensionality reduction methods on a `stand-alone' basis. As we were aiming to reproduce the results provided by the original paper, we also had to rewrite the external \texttt{scvis}-library, which provided the VAE architecture, in \texttt{PyTorch} (for the sake of keeping clean, separated and object-oriented code). This was very time-consuming as both frameworks are fundamentally different (dynamic vs static graph definition). The process of rewriting took approximately two weeks.\\
+
+Lastly, the results for the Bipolar dataset could only be replicated with the provided model configuration file. Although we have re-trained the model using the upgraded originally provided code, we have chosen to exclude this dataset for the additional experiments due to lack of computation power and time.
+
+\subsection{Communication with original authors}
+A short interaction occurred to gain more insight into the required external libraries as these were not listed in any documentation. Although the authors responded quickly, the issue had already been solved in the meantime.
