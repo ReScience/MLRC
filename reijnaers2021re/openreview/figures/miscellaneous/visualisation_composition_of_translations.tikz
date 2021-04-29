@@ -1,0 +1,34 @@
+\begin{tikzpicture}
+  \pgfplotsset{ticks=none}
+  \definecolor{oblue}{rgb}{0.4, 0.6, 0.8}
+
+  \begin{axis}[
+    enlargelimits=0.2,
+  ]
+
+    \addplot+[scatter/classes={a={blue}, b={red}, c={oblue}},
+      scatter,
+      mark=*,
+      only marks,
+      scatter src=explicit symbolic,
+      nodes near coords*={\Label},
+      visualization depends on={value \thisrow{label} \as \Label}
+    ]
+    table[meta=class]
+    {
+      x y class label
+      0.5 0.2 a 1
+      0.26 0.22 a 2
+      0.35 0.2 b 0
+      0.25 0.35 a 4
+      0.2 0.25 a 3
+      0.43 0.31 a 5
+    };
+    
+    \definecolor{oblue}{rgb}{0.4, 0.6, 0.8}
+    \draw[red,->,>=stealth,black] (axis cs:0.25,0.35) -- (axis cs:0.34,0.22) node[midway,right,sloped,rotate=90] {$\delta_{4}$};
+    \draw[red,->,>=stealth,black] (axis cs:0.35,0.2) -- (axis cs:0.42,0.3) node[midway,right,sloped,rotate=280] {$-\delta_{5}$};
+    \draw[red,->,>=stealth,oblue] (axis cs:0.25,0.35) -- (axis cs:0.42,0.31) node[midway,above,sloped,rotate=0] {$\delta_4 \circ -\delta_{5}$};
+   
+  \end{axis}
+\end{tikzpicture}
