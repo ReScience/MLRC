@@ -1,0 +1,318 @@
+
+\section{Introduction}
+
+Knowledge is the key to question answering task. Knowledge Graph (KG) is a multi-relational
+graph consisting of entities as nodes and relations among them as typed edges. KGs can accommodate a wide variety of facts, making them one of the potential candidates for intelligent decision-making. Question Answering over KG (KGQA) task aims to answer natural language queries posed over the KG. Multi-hop KGQA is a trending topic and has gained traction from both academia and industry recently. Multi-hop KGQA task involves reasoning over multiple edges of the KG to arrive at the correct answer. 
+
+Earlier works on KGs(e.g. \cite{yago}, \cite{freebase:datadumps}, \cite{dbpedia2015}, \cite{NELL}) have some element of sparsity, i.e. they do not capture all the facts available in the real world. Recent research on multi-hop KGQA has attempted to reduce this sparsity with the help of relevant external textual resources that are not readily available. On the other side, KG embeddings have emerged as an effective tool to overcome the KG sparsity by predicting missing links in the KG. Although effective, KG embeddings have not been explored for the multi-hop KGQA task. \cite{saxena-etal-2020-improving} fills this gap with the proposed EmbedKGQA method.This work intends to reproduce and perform an ablation (removing relation matching module) as well as extended study on EmbedKGQA(Saxena et al.[2020]). EmbedKGQA claims to be the first of its kind to use KG embeddings for multi-hop KGQA and improves over other state-of-the-art (SOTA) baselines.
+
+%This report describes the reproduction and ablation study on the work presented in \citep{saxena-etal-2020-improving} titled "Improving Multi-hop Question Answering over Knowledge Graphs using Knowledge Base Embeddings" (EmbedKGQA) published in ACL2020, as part of the ML Reproducibility Challenge 2020. 
+
+%A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item According to \citep{saxena-etal-2020-improving}, using ComplEx(\citep{ComplEx2016})KG embeddings significantly improves Hits@1 for multi-hop question answering for MetaQA(\citep{metaqa-dataset}) and WebQSP(\citep{webqsp-dataset}) datasets.
+    
+% \end{itemize}
+
+According to \citep{saxena-etal-2020-improving}, using ComplEx (\citep{ComplEx2016}) KG embeddings significantly improves Hits@1 for multi-hop KGQA task and it has been proved with the help of the results on MetaQA (\citep{metaqa-dataset}) and WebQSP (\citep{webqsp-dataset}) datasets. This reproducibility work tries to test this claim and conducts experiments as mentioned in table:\{2,3\} of the original paper. Section \ref{sec: reproduction_results} contains the corresponding results which support the claim with some anomalies.
+
+\section{Methodology}
+The authors of the original paper have open-sourced the code along with the data and pre-trained ComplEx KG embedding models. We have used the same codebase (commit:\href{https://github.com/malllabiisc/EmbedKGQA/tree/5d8fdbd4be77fdcb2e67a0dc8a7115844606175a}{5d8fdbd4}) and customized it for our purposes. In addition to this, we have added a comprehensive documentation to make it more interpretable. Moreover, a command-line functionality is also added to easily configure various transformers models in the training workflow.
+
+\subsection{Model descriptions}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{../openreview/model.png}
+  \caption{Overview of EmbedKGQA, the  proposed method for Multi-hop KGQA. \newline \centering Image source:  \citep{saxena-etal-2020-improving}.
+}
+  \label{model-figure}
+\end{figure}
+
+
+As shown in Figure:\ref{model-figure}, 
+EmbedKGQA has three modules: 
+\begin{enumerate}
+    \item KG Embedding Module\label{kg-emb-module} - This module contains a KG embedding model called ComplEx (\citep{ComplEx2016}) to learn embeddings for all entities in the input KG. 4 pretrained models have been shared by the author which contains 2 models for MetaQA-KG-\{Full, 50\} as well as 2 models WebQSP-KG-\{Full,50\} dataset. Details about the dataset are mentioned in section:\ref{sec:datasets}.
+\item Question Embedding Module\label{que-emb-module}: Given a question q, head entity h and set
+of answer entities A, this module learns the question
+embeddings based on the score function defined by the KG embedding method used in \ref{kg-emb-module}. 
+\item Answer Selection Module: This module uses the outputs of module:\ref{kg-emb-module} and \ref{que-emb-module} to select the final answer by scoring the (head entity and question)
+pair against all possible answers. The strategy is mentioned in section:\{4.4, 4.4.1\} of the original paper respectively.
+\end{enumerate}
+
+\subsection{Datasets}\label{sec:datasets}
+
+There are two datasets used in the original paper. MetaQA (\citep{metaqa-dataset}) and WebQSP (\citep{webqsp-dataset}). Both datasets have two portions. (1) KG data (2) QA data. KG data for both are further divided into two categories. (1) Using the full KG (indicated by suffix KG-Full) and (2) Using only 50\% of the facts in the respective KGs (indicated by suffix KG-50). The details of generating custom KG datasets are discussed here\footnote{\label{embedKGQAgit}\embedKGQAgit}. Both datasets are taken from here\footnote{\shareddatasetlink \hspace{.1cm} (As of 01/2021)}. Statistics for table:\{\ref{dataset-qa-stats}, \ref{dataset-kg-stats}\} have been taken from \citep{saxena-etal-2020-improving}. For generating question embeddings the question is placed between <s> and </s> tags for all transformers except SentenceTransformer as it takes the input sentence in its pure form. The preprocessing used in the original code has been used here. No additional preprocessing has been performed from our end. 
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|cc}
+\cline{1-4}
+\textbf{Dataset} & \textbf{Train} & \textbf{Dev} & \textbf{Test} & \textbf{} \\ \cline{1-4}
+MetaQA 1-hop     & 96,106         & 9,992        & 9.947         &           \\ \cline{1-4}
+MetaQA 2-hop     & 118,948        & 14,872       & 14,872        &           \\ \cline{1-4}
+MetaQA 3-hop     & 114,196        & 14,274       & 14,274        &           \\ \cline{1-4}
+WebQSP           & 2,998          & 100          & 1,639         &           \\ \cline{1-4}
+\end{tabular}
+\caption{QA data statistics for each dataset according to \citep{saxena-etal-2020-improving}}
+\label{dataset-qa-stats}
+
+\begin{tabular}{c|c|c|c|c}
+\hline
+\textbf{Dataset} & \textbf{Triples} & \textbf{Entities} & \textbf{Relations} & \textbf{Experiment-Alias} \\ \hline
+MetaQA-KG-Full   & 135k             & 43k               & 9                  & MetaQA\_full              \\ \hline
+WebQSP-KG-Full   & 5.7 million      & 1.8 million       & $\gamma$           & fbwq\_full                \\ \hline
+MetaQA-KG-50     & $\phi$           & -                 & -                  & MetaQA\_half              \\ \hline
+WebQSP-KG-50     & $\psi$           & -                 & -                  & fbwq\_half                \\ \hline
+\end{tabular}
+\caption{KG data statistics for each dataset. Refer\textsuperscript{\ref{embedKGQAgit}} for more details.}Experiment-Alias is the name used for the respective datasets in experiments.\newline$\gamma$ = Contains all facts that are within 2-hops of any entity mentioned in the questions of WebQSP. \newline $\phi$ = Contains only 50\% of the triples (randomly selected without replacement). \newline $\psi$ = Contains 50\% of the edges sampled randomly from fbwq\_full.
+\label{dataset-kg-stats}
+\end{table}
+\subsection{Hyper-Parameters}\label{sec:hyperparams}
+
+Hyper-parameters used to train the models aren't explicitly shared in the codebase or the paper, hence we decided to use the default values provided in the codebase\textsuperscript{\ref{embedKGQAgit}} to compensate the lack of time. For reproduction, a pretrained model shared along with the data was used; ComplEx(\citep{ComplEx2016}) was used as the knowledge graph embedding method for all the KG types, i.e., full and half of both datasets types. 
+
+For the purpose of reproducibility,  hyper-parameters for training MetaQA and WebQSP QA models have been taken from section:\{MetaQA\footnote{\url{https://github.com/malllabiisc/EmbedKGQA\#metaqa}}, WebQuestionsSP\footnote{\url{https://github.com/malllabiisc/EmbedKGQA\#webquestionssp}}\} of the original codebase respectively. For RoBERTa (\citep{roberta}), a pretrained model 'roberta-base' has been taken from HuggingFace transformers package (\citep{huggingface-transformers-package-2020}). Other hyper-parameters are populated by default values in the codebase\textsuperscript{\ref{embedKGQAgit}}.
+
+% relation\_dim=200 , hidden\_dim=256 , freeze=0 , model=ComplEx, batch\_size=128 , validate\_every=10, lr=0.0005, entdrop=0.1, reldrop=0.2, scoredrop=0.2, decay=1.0,  patience=5, ls=0.0, kg\_type=<half/full>;
+
+
+% relation\_dim=<200/128>, do\_batch\_norm 0, freeze=1, batch\_size=16, validate\_every=10, hops=<webqsp\_half/webqsp\_half>, lr=0.00002, entdrop=0.0, reldrop=0.0, scoredrop=0.0, decay=1.0, model=ComplEx, patience=20, ls=0.0, l3\_reg=0.001, nb\_epochs=200, que\_embedding\_model=RoBERTa
+
+
+\subsection{Experimental setup and code}
+Experiments have been performed on the NVIDIA DGX-1 server with 8xV100 GPUs, out of which 6 were used in this work. The metric used for validating the claims is Hits@1. According to \citep{kg-embedding-evaluation}, Hits@$k$ is the proportion of test triples ranking in the top-k results. The code for this work is open-sourced on GitHub\textsuperscript{\ref{mlrcgit}}. In addition to this, we have shared couple of Docker images\footnote{\label{mlrcdocker}\mlrcdocker} for easy kick-starting of experiments without the hassle of setting up the environment.
+
+Following trained models are made available in our Docker image\textsuperscript{\ref{mlrcdocker}}, chosen on the basis of better performance in our extended study.
+
+\begin{itemize}
+    \item TuckER KG embedding model for Meta-QA-\{Full, 50\}
+    \item QA models trained using ComplEx as KG embedding model and SBERT mentioned in table:\ref{que-emd-pretrained-models} as question embedding model for WebQSP-KG-\{Full, 50\}
+\end{itemize}
+
+
+
+
+\subsection{Computational requirements}
+
+This work has been performed on 6 V100-16GB GPUs connected via NVLink. NVLink reduced multi-GPU training time by 1/4. The time required for various reproductions are mentioned in table:\{\ref{MetaQA-reproduction},\ref{WebQSP-reproduction}\}.
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c}
+\hline
+\textbf{Type}  & \multicolumn{3}{c|}{\textbf{MetaQA-KG-Full}} & \multicolumn{3}{c}{\textbf{MetaQA-KG-50}} \\ \hline
+               & 1-hop         & 2-hop         & 3-hop        & 1-hop        & 2-hop        & 3-hop        \\ \hline
+Train (t)      & 350 seconds   & 380 seconds   & 380 seconds  & 280 seconds  & 330 seconds  & 320 seconds  \\ \hline
+Validation (v) & 42 seconds    & 95 seconds    & 147 seconds  & 47 seconds   & 108 seconds  & 182 seconds  \\ \hline
+T              & 10.89 hours   & 13.19 hours   & 14.64 hours  & 9.08 hours   & 12.16 hours  & 13.94 hours  \\ \hline
+\end{tabular}
+\vspace{.1in}
+\label{metaqa-data-train-time}
+
+\begin{tabular}{c|c|l|l|c|l|l}
+\hline
+\textbf{Type} & \multicolumn{3}{c|}{\textbf{WebQSP-KG-Full}} & \multicolumn{3}{c}{\textbf{WebQSP-KG-50}} \\ \hline
+Train  (t)     & \multicolumn{3}{c|}{280 seconds}              & \multicolumn{3}{c}{300 seconds}            \\ \hline
+Validation  (v)  & \multicolumn{3}{c|}{95 seconds}              & \multicolumn{3}{c}{105 seconds}           \\ \hline
+T             & \multicolumn{3}{c|}{10.42 hours}             & \multicolumn{3}{c}{10.92 hours}           \\ \hline
+\end{tabular}
+\caption{Time for training/validation. Refer section:\ref{sec:hyperparams} for hyper-parameters. (r=1, total\_epochs=100)}
+\label{webqsp-data-train-time}
+
+For table:\ref{webqsp-data-train-time},  validate\_every = The number of train routines before validation for a single epoch \newline
+Total runs (r) = Number of times the training has been performed for a particular task \newline Total train time (GPU hours) excluding early stopping, T = $(total\_epochs \times (t + v)) \times r$\newline
+
+\end{table}
+\subsection{Extended Experiments}
+Apart from reproducing the results mentioned in the original paper, a couple of extended experiments have been performed to find answers to the following two questions:
+\begin{enumerate}
+        \item \label{ext-tucker} Can recent KG embedding methods like TuckER ( \citep{tucker2019}) give higher accuracy on higher levels of hops, i.e., 3-hop scenario to be specific compared to \citep{ComplEx2016} used in the original paper? 
+    \item \label{ext-transformer} Can other transformer architectures like ALBERT (\citep{albert}), XLNet (\citep{xlnet}), Longformer (\citep{beltagy2020longformer}) and SBERT (\citep{reimers-2019-sentence-bert}) improve the results on WebQSP (\citep{webqsp-dataset})?
+\end{enumerate}
+
+Details of hyper-parameters used for these experiments are available in our GitHub repository\textsuperscript{\ref{mlrcgit}}. Various transformer models used for experiment-\ref{ext-transformer} are mentioned in table:\ref{que-emd-pretrained-models}.
+
+% \begin{table}[]
+% \centering
+% \begin{tabular}{|c|c|c|c|}
+% \hline
+% Experiment               & \multicolumn{1}{l|}{Dataset} & Epoch time (e)                        & Total runs (r) \\ \hline
+% RelationalTuckER3/SimplE & WebQSP-KG-Full               & 0.48 sec  * 9091 batches = 1.21 hours & 2              \\ \hline
+% RelationalTuckER3/SimplE & WebQSP-KG-50                 & 0.48 sec  6442 batches = .86 hours    & 2              \\ \hline
+% TuckER                   & MetaQA-KG-Full               & 12 secs                               & 1              \\ \hline
+% TuckER                   & MetaQA-KG-50                 & 11 secs                               & 1              \\ \hline
+% \end{tabular}
+% \caption{Stats for KG data training. Batch\_size = 128} 
+% \label{train-kg-run-time}
+% \end{table}
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c}
+\hline
+\textbf{Transformer}        & \textbf{Pretrained-Model}                       \\ \hline
+RoBERTa                     & roberta-base                                    \\ \hline
+XLNet                       & xlnet-base-cased                                \\ \hline
+ALBERT                      & albert-base-v2                                  \\ \hline
+SentenceTransformer (SBERT) & sentence-transformers/bert-base-nli-mean-tokens \\ \hline
+Longformer                  & allenai/longformer-base-4096                    \\ \hline
+\end{tabular}
+\caption{Pretrained models from HuggingFace transformers package (\citep{huggingface-transformers-package-2020})}
+\label{que-emd-pretrained-models}
+\end{table}
+
+\section{Results}
+\label{sec:results}
+We report results for reproducibility as well as our extended experiments. The results of reproduction have a mixed nature while the ones for our extended experiments show positive signs to support claim-\ref{ext-tucker}, \ref{ext-transformer}. Detailed discussion about the results can be found in section:\ref{sec: discussion}. For all tables in this report, bold values indicate better performance.
+
+\subsection{Results reproducing original paper}\label{sec: reproduction_results}
+We perform two experiments based on the two datasets introduced in section:\ref{sec:datasets}. These experiments provide vital information about the results mentioned in table:\{2,5\} of the original paper. The results of the two are reported in table:\{\ref{MetaQA-reproduction}, \ref{WebQSP-reproduction}\} respectively. From the results of table:5 in \citep{saxena-etal-2020-improving} and table:\ref{WebQSP-reproduction} in this report, it is evident that relation matching(RM) is an important component in multi-hop KGQA when the given KG is considerably large, i.e. \{MetaQA, WebQSP\} KG-Full; Definitely, WebQSP-KG-50 also shows improvement in presence of RM but the performance significantly improves when applied to KG-Full setting. The author of \citep{saxena-etal-2020-improving} had also expressed the same opinion in one of the virtual meetings.
+
+\begin{table}[]
+\centering
+\begin{tabular}{cccccccc}
+\hline
+\multicolumn{1}{c|}{\textbf{Model}} & \multicolumn{1}{c|}{\textbf{RM}} & \multicolumn{3}{c|}{\textbf{MetaQA-KG-Full}}                                                                                                                                       & \multicolumn{3}{c}{\textbf{MetaQA-KG-50}}                                                                                                           \\ \cline{3-8} 
+\multicolumn{1}{c|}{}                                & \multicolumn{1}{c|}{}                             & \multicolumn{1}{c|}{1-hop}                          & \multicolumn{1}{c|}{2-hop}                          & \multicolumn{1}{c|}{3-hop}                                    & \multicolumn{1}{c|}{1-hop}                          & \multicolumn{1}{c|}{2-hop}                          & 3-hop                           \\ \hline
+\multicolumn{1}{c|}{EmbedKGQA}                       & \multicolumn{1}{c|}{\tick}         & \multicolumn{1}{c|}{\textbf{97.5}} & \multicolumn{1}{c|}{\textbf{98.8}} & \multicolumn{1}{c|}{\textbf{94.8}}           & \multicolumn{1}{c|}{\textbf{83.9}} & \multicolumn{1}{c|}{\textbf{91.8}} & 70.3                            \\ \hline
+\multicolumn{1}{c|}{EmbedKGQA (Reproduced)}          & \multicolumn{1}{c|}{\cross}        & \multicolumn{1}{c|}{95.4}                           & \multicolumn{1}{c|}{96.4}                           & \multicolumn{1}{c|}{\underline{$72.3$}}    & \multicolumn{1}{c|}{83.2}                           & \multicolumn{1}{c|}{91.6}                           & \textbf{71.2}  \\ \hline
+\multicolumn{1}{l}{}                                 & \multicolumn{1}{l}{}                              & \multicolumn{1}{l}{}                                & \multicolumn{1}{l}{}                                & \multicolumn{1}{l}{}                                          & \multicolumn{1}{l}{}                                & \multicolumn{1}{l}{}                                & \multicolumn{1}{l}{}            \\ \hline
+\multicolumn{1}{c|}{$\Delta$}                        & \multicolumn{1}{c|}{-}                            & \multicolumn{1}{c|}{$-2.1$}                         & \multicolumn{1}{c|}{$-2.4$}                         & \multicolumn{1}{c|}{\underline{$-22.5$}} & \multicolumn{1}{c|}{$-0.7$}                         & \multicolumn{1}{c|}{$-0.2$}                         & \textbf{0.9} \\ \hline
+\end{tabular}
+\caption{Hits@1 results for original and reproduced experiments using MetaQA-KG-\{Full, 50\} datasets. $\Delta$ = (Reproduced Hits@1 without RM) - (Original Hits@1 with RM)}.
+\label{MetaQA-reproduction}
+
+\begin{tabular}{cccllc}
+\hline
+\multicolumn{1}{c|}{\textbf{Model}}                                                   &
+\multicolumn{1}{c|}{\textbf{RM}}  & 
+\multicolumn{3}{c|}{\textbf{WebQSP-KG-Full}} & \textbf{WebQSP-KG-50} \\ \hline
+\multicolumn{1}{c|}{EmbedKGQA}                                                        &
+\multicolumn{1}{c|}{\tick} & \multicolumn{3}{c|}{\textbf{66.6}}           & \textbf{53.2}         \\ \hline
+                    
+\multicolumn{1}{c|}{EmbedKGQA}                                                        &
+\multicolumn{1}{c|}{\cross} & \multicolumn{3}{c|}{\underline{48.1}}           & 47.4         \\ \hline
+
+\multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}EmbedKGQA (Reproduced)\end{tabular}} & 
+\multicolumn{1}{c|}{\cross}
+& \multicolumn{3}{c|}{54.9}                    & 41.3                  \\ \hline
+                                                                                      & \multicolumn{3}{c}{}                         &                       \\ \hline
+\multicolumn{1}{c|}{$\Delta_{original}$}                                                            &
+\multicolumn{1}{c|}{-}
+& \multicolumn{3}{c|}{\underline{$18.5$}}                    & 5.8                  \\ \hline
+\multicolumn{1}{c|}{$\Delta$}                                                            &
+\multicolumn{1}{c|}{-}
+& \multicolumn{3}{c|}{6.8}                    & -6.1                  \\ \hline
+\end{tabular}
+\caption{Hits@1 results for original and reproduced experiments using WebQSP-KG-\{Full, 50\} datasets. $\Delta$=(Reproduced Hits@1 without RM) - (Original Hits@1 without RM), $\Delta_{original}$ = (Original Hits@1 with RM) - (Original Hits@1 without RM).} 
+For table:\{\ref{MetaQA-reproduction}, \ref{WebQSP-reproduction}\}, KG-Embedding-Model=ComplEx. RM=Relation Matching, \tick = inclusion, \cross = exclusion. The original values for EmbedKGQA are taken from \citep{saxena-etal-2020-improving}. Underline indicates anomaly due to the absence of RM module.
+\label{WebQSP-reproduction}
+\end{table}
+
+\subsection{Results beyond the original paper}\label{ext-exp-results}
+
+We have conducted two additional experiments from our end to find an answer to claim:\{\ref{ext-tucker},\ref{ext-transformer}\}. The results in table:\{\ref{metqa-kg-full-ablation},\ref{metqa-kg-half-ablation}\} support claim-\ref{ext-tucker} but with a caveat. On the other hand,  values in table:\ref{webqsp-ablation} improve upon the results reported by the original paper creating a new SOTA baseline. Additional experiments ingest custom hyper-parameters mentioned in our codebase in absence of the original hyper-parameters. None of these experiments include the RM module.
+
+% \begin{enumerate}
+%     \item Replacing ComplEx (\citep{ComplEx2016}) with TuckER (\citep{tucker2019})as the knowledge graph embedding method for MetaQA dataset (\citep{metaqa-dataset})
+%     \item Using various transformers (\citep{xlnet}, \citep{albert}, \citep{beltagy2020longformer}, \citep{reimers-2019-sentence-bert}) instead of RoBERTa (\citep{roberta}) as used in the original paper.
+% \end{enumerate}
+
+\begin{table}[]
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+\multicolumn{1}{c|}{\textbf{KG-Model}} & \multicolumn{9}{c}{\textbf{MetaQA-KG-Full}}                                                                                                                                                                                                                                                                           \\ \hline
+\multicolumn{1}{c|}{}                  & \multicolumn{3}{c|}{1-hop}                                                                               & \multicolumn{3}{c|}{2-hop}                                                                                      & \multicolumn{3}{c}{3-hop}                                                                \\ \hline
+\multicolumn{1}{c|}{}                  & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c|}{Hits@10} & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c|}{Hits@10}        & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}        & Hits@10        \\ \hline
+\multicolumn{1}{c|}{ComplEx}           & \multicolumn{1}{c|}{95.39}          & \multicolumn{1}{c|}{\textbf{99.83}} & \multicolumn{1}{c|}{99.97}   & \multicolumn{1}{c|}{\textbf{96.46}} & \multicolumn{1}{c|}{\textbf{99.02}} & \multicolumn{1}{c|}{99.27}          & \multicolumn{1}{c|}{72.33}          & \multicolumn{1}{c|}{93.27}         & 95.66          \\ \hline
+\multicolumn{1}{c|}{TuckER}            & \multicolumn{1}{c|}{\textbf{95.51}} & \multicolumn{1}{c|}{99.81}          & \multicolumn{1}{c|}{99.97}   & \multicolumn{1}{c|}{93.13}          & \multicolumn{1}{c|}{98.7}           & \multicolumn{1}{c|}{\textbf{99.28}} & \multicolumn{1}{c|}{\textbf{73.81}} & \multicolumn{1}{c|}{\textbf{93.6}} & \textbf{96.09} \\ \hline
+                                       &                                     &                                     &                              &                                     &                                     &                                     &                                     &                                    &                \\ \hline
+\multicolumn{1}{c|}{$\Delta$}             & \multicolumn{1}{c|}{\textbf{0.12}}  & \multicolumn{1}{c|}{ \m0.02 }          & \multicolumn{1}{c|}{0}       & \multicolumn{1}{c|}{ \m3.33 }          & \multicolumn{1}{c|}{ \m0.32 }          & \multicolumn{1}{c|}{\textbf{0.01}}  & \multicolumn{1}{c|}{\textbf{1.48}}  & \multicolumn{1}{c|}{\textbf{0.33}} & \textbf{0.43}  \\ \hline
+\end{tabular}\caption{Comparison of ComplEx with TuckER based on Hits@$k$ results for MetaQA-KG-Full dataset. $k \in \{1,5,10\}$.}
+\label{metqa-kg-full-ablation}
+
+\begin{tabular}{cccccccccc}
+\hline
+\multicolumn{1}{c|}{\textbf{KG-Model}} & \multicolumn{9}{c}{\textbf{MetaQA-KG-50}}                                                                                                                                                                                                                                                                                                         \\ \hline
+\multicolumn{1}{c|}{}                  & \multicolumn{3}{c|}{1-hop}                                                                                      & \multicolumn{3}{c|}{2-hop}                                                                                      & \multicolumn{3}{c}{3-hop}                                                                                     \\ \hline
+\multicolumn{1}{c|}{}                  & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c|}{Hits@10}        & \multicolumn{1}{c|}{Hits@1}        & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c|}{Hits@10}         & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}        & Hits@10                             \\ \hline
+\multicolumn{1}{c|}{ComplEx}           & \multicolumn{1}{r|}{\textbf{83.24}} & \multicolumn{1}{r|}{\textbf{89.83}} & \multicolumn{1}{r|}{\textbf{91.22}} & \multicolumn{1}{r|}{\textbf{91.63}} & \multicolumn{1}{r|}{\textbf{97.08}} & \multicolumn{1}{r|}{\textbf{98.04}} & \multicolumn{1}{r|}{71.2}           & \multicolumn{1}{r|}{90.77}          & \multicolumn{1}{r}{93.72}          \\ \hline
+\multicolumn{1}{c|}{TuckER}            & \multicolumn{1}{r|}{83}             & \multicolumn{1}{r|}{89.36}          & \multicolumn{1}{r|}{90.41}          & \multicolumn{1}{r|}{86.07}          & \multicolumn{1}{r|}{94.66}          & \multicolumn{1}{r|}{96.4}           & \multicolumn{1}{r|}{\textbf{71.96}} & \multicolumn{1}{r|}{\textbf{91.16}} & \multicolumn{1}{r}{\textbf{93.94}} \\ \hline
+                                       &                                     &                                     &                                     &                                     &                                     &                                     &                                     &                                     &                                    \\ \hline
+\multicolumn{1}{c|}{$\Delta$}             & \multicolumn{1}{c|}{\m0.24}          & \multicolumn{1}{c|}{\m0.47}          & \multicolumn{1}{c|}{\m0.81}          & \multicolumn{1}{c|}{\m5.56}          & \multicolumn{1}{c|}{\m2.42}          & \multicolumn{1}{c|}{\m1.64}          & \multicolumn{1}{c|}{\textbf{0.76}}  & \multicolumn{1}{c|}{\textbf{0.39}}  & \textbf{0.22}                      \\ \hline
+\end{tabular}
+\caption{Comparison of ComplEx with TuckER based on Hits@$k$ results for MetaQA-KG-50 dataset. $k\in\{1,5,10\}$.}
+\label{metqa-kg-half-ablation}
+
+For table:\{\ref{metqa-kg-full-ablation}, \ref{metqa-kg-half-ablation}\}, $\Delta$= (TuckER Hits@$k$) - (ComplEx Hits@$k$).
+\end{table}
+
+\begin{table}[]
+\centering
+\begin{tabular}{lrrrrrr}
+\hline
+\multicolumn{1}{c|}{\textbf{Question-Embedding-Method}} & \multicolumn{3}{c|}{\textbf{WebQSP-KG-Full}}                                                                    & \multicolumn{3}{c}{\textbf{WebQSP-KG-50}}                                                                    \\ \hline
+\multicolumn{1}{c|}{}                                   & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c|}{Hits@10}        & \multicolumn{1}{c|}{Hits@1}         & \multicolumn{1}{c|}{Hits@5}         & \multicolumn{1}{c}{Hits@10}       \\ \hline
+\multicolumn{1}{l|}{RoBERTa (\citep{roberta})}                            & \multicolumn{1}{r|}{54.96}          & \multicolumn{1}{r|}{67.62}          & \multicolumn{1}{r|}{71.97}          & \multicolumn{1}{r|}{41.27}          & \multicolumn{1}{r|}{51.14}          & 54.19                             \\ \hline
+\multicolumn{1}{l|}{XLNet (\citep{xlnet}}                              & \multicolumn{1}{r|}{51.98}          & \multicolumn{1}{r|}{64.44}          & \multicolumn{1}{r|}{69.11}          & \multicolumn{1}{r|}{39.33}          & \multicolumn{1}{r|}{49.25}          & 52.04                             \\ \hline
+\multicolumn{1}{l|}{ALBERT (\citep{albert})}                             & \multicolumn{1}{r|}{47.31}          & \multicolumn{1}{r|}{59.83}          & \multicolumn{1}{r|}{63.98}          & \multicolumn{1}{r|}{31.15}          & \multicolumn{1}{r|}{42.31}          & 45.68                             \\ \hline
+\multicolumn{1}{l|}{Longformer (\citep{beltagy2020longformer})}                         & \multicolumn{1}{r|}{54.9}           & \multicolumn{1}{r|}{66.77}          & \multicolumn{1}{r|}{70.47}          & \multicolumn{1}{r|}{41.92}          & \multicolumn{1}{r|}{51.98}          & 54.83                             \\ \hline
+\multicolumn{1}{l|}{SBERT (\citep{reimers-2019-sentence-bert}}                & \multicolumn{1}{r|}{\textbf{55.55}} & \multicolumn{1}{r|}{\textbf{68.98}} & \multicolumn{1}{r|}{\textbf{72.74}} & \multicolumn{1}{r|}{\textbf{44.65}} & \multicolumn{1}{r|}{\textbf{53.86}} & \textbf{56.13}                    \\ \hline
+                                                        & \multicolumn{1}{l}{}                & \multicolumn{1}{l}{}                & \multicolumn{1}{l}{}                & \multicolumn{1}{l}{}                & \multicolumn{1}{l}{}                & \multicolumn{1}{l}{}              \\ \hline
+\multicolumn{1}{c|}{$\Delta$}                              & \multicolumn{1}{c|}{\textbf{0.59}}  & \multicolumn{1}{c|}{\textbf{1.36}}  & \multicolumn{1}{c|}{\textbf{0.77}}  & \multicolumn{1}{c|}{\textbf{3.38}}  & \multicolumn{1}{c|}{\textbf{2.72}}  & \multicolumn{1}{c}{\textbf{1.94}} \\ \hline
+\end{tabular}
+\caption{Hits@$k$ results for recent transformer models by \citep{huggingface-transformers-package-2020} used for generating question embeddings.
+KG-Embedding-Method=ComplEx, $\Delta$= (SBERT\_Hits@$k$ - RoBERTa\_Hits@$k$), $k\in\{1,5,10\}$}
+\label{webqsp-ablation}
+\end{table}
+
+\section{Discussion}\label{sec: discussion}
+
+The reproducibility results from table:\{\ref{MetaQA-reproduction},\ref{WebQSP-reproduction}\} corroborate the claims mentioned in section:\ref{sec:claims} to some extent. The reproduced version is within $\pm 2.4$ range (positive value indicates better performance and vice-versa) except for MetaQA-KG-Full dataset's 3-hop and WebQSP-KG-Full scenario which has a significant drop of 22.5\% and 18.5\% respectively. The absence of RM module has been reported and discussed here\footnote{\url{https://github.com/malllabiisc/EmbedKGQA/issues/1}}\textsuperscript{,}\footnote{\url{https://github.com/malllabiisc/EmbedKGQA/issues/51}}\textsuperscript{,}\footnote{\url{https://github.com/malllabiisc/EmbedKGQA/issues/56}}. For a given question, the RM module uses it's context to extract useful information from the available edges present in the KG. This information is further plugged into the answer selection module to select more relevant answers. Thus, relation matching is a vital component in multi-hop question answering, especially in KG-Full setting where more number of the edges are present w.r.t. KG-50 setting or any smaller KG w.r.t. the KG-Full setting. Results from table:\{\ref{MetaQA-reproduction},\ref{WebQSP-reproduction}\} corroborates the previous statement. Moreover, MetaQA-KG-50 3-hop outperforms the original model by a margin of +0.9\% without using RM which is an interesting observation. Apart from one reported anomaly, the reproduced results are pretty close to the original results in case of MetaQA dataset. Default set of hyper-parameters mentioned in the original codebase(Refer section: \ref{sec:hyperparams}) were used in the reproducibility study. The anomaly in WebQSP-KG-Full,i.e. 18.5\% drop bolsters the importance of RM in KG-Full setting. The reproduced results for WebQSP-KG-50 are within $\pm7$\% range. The use of different hyper-parameters can be one of the possible answers to this variation. This value is significant but not w.r.t. WebQSP-KG-Full's drop of 18.5\% which again strengthens the importance of RM in KG-Full setting. As mentioned in \ref{sec: reproduction_results}, RM is highly useful when the KG is considerably large.
+
+From table:\{\ref{metqa-kg-full-ablation}, \ref{metqa-kg-half-ablation}\}, it is clear that 
+TuckER (\citep{tucker2019}) performs better than ComplEx (\citep{ComplEx2016} for the 3-hop scenario for both MetaQA-KG datasets, i.e., Full and 50. Though these results strengthen claim-\ref{ext-tucker}, a more comprehensive set of tests may lead to a concrete conclusion. (e.g., experiments employing a broader set of hyper-parameters). 
+
+According to table:\ref{webqsp-ablation}, in all the cases, SBERT (\citep{reimers-2019-sentence-bert}) outperforms RoBERTa (\citep{roberta}) used in the original paper creating a new SOTA benchmark which supports claim-\ref{ext-transformer}.
+
+There were some experiments which didn't work out due to the lack of time. E.g. Using RelationalTucker3 (\citep{wang2019relational}) and SimplE (\citep{simple-embedding}) to test claim-\ref{ext-tucker}. Furthermore, hyper-parameter search couldn't be done due to the same reason hence we had to pick the default ones mentioned in the codebase. All these create a room for further experiments and improvements.
+
+\subsection{What was easy}
+
+The paper was straightforward to understand. The open-sourced codebase helped us get kick-started. 
+
+\subsection{What was difficult}\label{sec:diffcult-reasons}
+
+The structure of the codebase made it difficult to navigate it. Since the code relied upon different techniques for the two datasets, the development of one function that trains different kinds of KG embeddings and another function that trains different kinds of QA models for both datasets was difficult. MetaQA uses LSTM/GRU (\citep{lstm} / \citep{GRU} while WebQSP uses RoBERTa (\citep{roberta}) to perform the same task of generating question embeddings. Also, training KG embeddings for MetaQA yields files in the form of NumPy (\citep{NumPy}) files while WebQSP uses LibKGE (\citep{libkge}) for the same purpose which produces LibKGE specific KG embedding(KGE) models. Reproduction and the extensive study was a bit hard in the beginning as KGE and question embedding methodology varied for both datasets.  After having a couple of virtual meetings with the author and code review, it became easier to conduct the planned experiments. The unavailability of hyper-parameters used to train each module increased the experiment cycle by multi-fold. 
+
+\subsection{Communication with original authors}
+
+
+We had a couple of virtual meetings with the primary author of \citep{saxena-etal-2020-improving}. Though it was daunting to understand the codebase due to the reasons mentioned in section:\ref{sec:diffcult-reasons} with the help and support of the author, it became easier to navigate the codebase. 
+
+\subsection{Future Scope}
+
+We think that there is a wide range of empirical analysis and experimentation that can be performed for multi-hop QA task, out of which we are sharing a few here:
+
+\begin{enumerate}
+    \item KG embedding compression (\citep{kge_compression}) 
+    \item Using recent transformer models like Performer (\citep{performer}), Reformer (\citep{reformer}) etc. for generating question embeddings.
+    \item Using low-dimensional hyperbolic KG embeddings (\citep{chami-etal-2020-low}) in KG embedding module along with hyperbolic word embeddings (\citep{dhingra-etal-2018-embedding}) for question embedding module.
+    \item A new approach for sentence embedding, SBERT-WK (\citep{SBERT-WK}) instead of SBERT (\citep{reimers-2019-sentence-bert}) can be tried out.
+\end{enumerate}
