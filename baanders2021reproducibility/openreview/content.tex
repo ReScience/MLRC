@@ -1,0 +1,520 @@
+\section*{\centering Reproducibility Summary}
+
+% \descr{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsection*{Scope of Reproducibility}
+
+
+% \descr{State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.}
+
+Deep Fair Clustering (DFC) aims to provide a clustering algorithm that is fair, clustering-favourable, and which can be used on high-dimensional and large-scale data. In existing frameworks there is a trade-off between clustering quality and fairness. 
+In this report we aim to reproduce a selection of the results of DFC; using two of four datasets and all four metrics that were used in the original paper, namely accuracy, Normalized Mutual Information (NMI), balance and entropy.
+We use the authors' implementation and check whether it is consistent with the description in the paper. As extensions to the original paper we look into the effects of 1) using no pretrained cluster centers, 2) using different divergence functions as clustering regularizers and 3) using non-binary/corrupted sensitive attributes.
+
+
+% Deep Fair Clustering (DFC) aims to produce a fair clustering algorithm that is suited for high-dimensional large-scale visual data. It provides a unified framework of two existing strategies: these suffer from a trade-off between fairness and effectiveness. DFC’s objective is to learn a fair and clustering-favorable representation simultaneously. 
+% We primarily focus on reproducing the accuracy, normalized mutual information (NMI), balance, and entropy on the \revMNIST and \USPSMNIST datasets. In the paper these metrics are chosen to measure the validity and fairness of clusters. Furthermore, we study whether the authors' implementation is coherent with the description and conclusion in the paper. Moreover, we research the influence of the used pretrained clusters on the performance of the model. Furthermore, we consider different divergence functions as cluster regularizers. Finally, we create a more real-world like problem by corrupting the sensitive attribute.
+
+% \VrAanA{Moeten we het in dit gedeelte puur hebben over het reproduceren of ook over onze uitbreidingen?}
+
+\subsection*{Methodology}
+
+% \descr{Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. }
+
+
+The open source code of the authors has been used. The datasets and data-preprocessing has been done with our code, since the authors did not provide the datasets in their code. Also the pretrained Variational Autoencoder (VAE) dataset had to be re-implemented for the \revMNIST. For the extensions we wrote extra functions. For measuring the influence of discarding the pretrained cluster centers, the code was already provided by the authors.
+
+
+% has been published and has been used to reproduce a selection of the results from the paper. The datasets were not included, thus we created files to download the data using pytorch-vision. Thereafter, we corrected the authors' implementation of data pre-processing to ensure the images are compatible with the implementation. Here, we re-implemented the pretrained VAE for the \revMNIST dataset because it was not part of the default database. For extensions we added other divergence functions in the utils file and a corruptness argument in the dataloader file. Finally, we examined whether DFC runs without pretrained cluster centers.
+
+
+\subsection*{Results}
+
+% \descr{Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.}
+
+
+For the \USPSMNIST dataset, we report similar accuracy and NMI values that are within 1.2\% and 0.5\% of the values reported in the original paper. However, the balance and entropy differed significantly, where our results were within 73.1\% and 30.3\% of the original values respectively. For the \revMNIST dataset, we report similar values on accuracy, balance and entropy, which are within 5.3\%, 2.6\% and 0.2\% respectively. Only the value of the NMI differed significantly, name within 12.9\% of the original value In general, our results still support the main claim of the original paper, even though on some metrics the results differ significantly.
+
+\subsection*{What was easy}
+
+% \descr{Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to reimplement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.}
+The open source code of the authors was beneficial; it was well structured and ordered into multiple files. Furthermore, the code to use randomly initialized instead of pretrained cluster centers was already provided.
+% The open source code of the authors was beneficial, because it provided a framework in which we could reproduce the results from the paper. The code was well structured into multiple python script files, which made it easy to add the implementation of our extensions. Also, the code had an implementation that randomly initialises cluster centers. Thus, we only needed to modify the main file.
+
+\subsection*{What was difficult}
+
+% \descr{Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.}
+
+
+First of all, the main difficulty in reproducing the paper was caused by the coding style; due to the lack of comments it was difficult to get a good understanding of the code. Secondly, we were required to download the data ourselves. However, these filenames and labels did not correspond to the included txt-files by the authors. Therefore, the model did not learn and we regenerated \file{train\_mnist.txt} and \file{train\_usps.txt}. Finally, the authors only included pretrained models for the \USPSMNIST dataset. As a consequence, we had to pre-train some parts of the DFC algorithm for the \revMNIST dataset.
+
+% \subsection*{Communication with original authors}
+% \NR{Probs kunnen we dit stukje ook weglaten}
+% % \descr{Briefly describe how much contact you had with the original authors (if any).}
+
+
+% No communication with the original authors were necessary.
+
+\newpage
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.\\Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+
+\section{Introduction}
+% \descr{A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.}
+
+With the increased application of Machine Learning in automated systems, particularly in decision making systems, it has become desirable that individuals are treated equally in such automated environments. However, there exists a trade-off between the fairness and the performance of machine learning algorithms in a given task \citep{Li_2020_CVPR}. In current fair clustering algorithms, fair and effective representations are learned by mainly using small-scale and low-dimensional data. In this paper, we consider representations to be 'effective' if they yield good performance in clustering tasks. In addition, representations are considered to be 'fair' when the algorithm is able to achieve great performance without using attributes like race and gender.
+
+Deep Fair Clustering (DFC) is an algorithm that aims to learn fair and clustering-favorable representations for large-scale and high-dimensional data. In this context, feature representations are considered to be fair if they are statistically independent of sensitive attributes. Whether a particular attribute is sensitive or not; that is a cultural question that lies outside the scope of the paper. The aim of the paper is to show that we can pick an arbitrary attribute of an image, e.g. whether it comes from dataset $X$ or dataset $Y$, and make sure that the feature representation is independent of the specific attribute. 
+
+DFC consists of an encoder that produces the representations, and a discriminator that tries to predict the value of the sensitive attribute of a representation. A minimax game is used to learn fair representations in an adversarial manner. In order to preserve the utility of the representations, clustering is performed on all datapoints with the same sensitive attribute. This component is called 'structural preservation' because it preserves the clustering structure in each sensitive attribute. Finally, The KL-divergence is used as a clustering regularizer to prevent the formation of large clusters.
+
+All code is available on Github \citep{onze_git}. 
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% \descr{Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)}
+
+% \descr{A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."}
+
+% \descr{This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:}
+
+The goal of this work is to validate the reproducibility of the DFC algorithm proposed by  \citet{Li_2020_CVPR} beyond the scope of the original paper. The main claims of the original paper are as follows:
+
+\begin{displayquote}
+    Claim 1:
+    \textit{DFC produces a fair clustering partition on high dimensional and large-scale visual data.}
+\end{displayquote}
+\begin{displayquote}
+    Claim 2:
+    \textit{DFC produces clustering-favorable representations under a fairness constraint.}
+    \end{displayquote}
+    
+% \begin{description}
+%     \item[Claim 1:] \textit{DFC produces a fair clustering partition on high dimensional and large-scale visual data.}
+%     \item[Claim 2:] \textit{DFC produces clustering-favorable representations under a fairness constraint.}
+% \end{description}
+    % \item Claim 1
+    % \textbf{DFC produces a fair clustering partition on high dimensional and large-scale visual data.} Test: DFC’s balance and entropy scores on the Color Reverse MNIST and MNIST-USPS datasets are at least comparable to the scores of other fair clustering algorithms ---- specifically ScFC, SpFC, FCC and FAlg
+    
+    % \item Claim 2
+    % \textbf{When using non-binary sensitive attributes, DFC can produce a fair clustering partition on high dimensional large-scale visual data.} Test: The sensitive attributes of the \revMNIST dataset are 'corrupted'; the pixels in the background of the images from the \textit{MNIST} dataset are partially whitened while the background pixels of the \revMNIST dataset are partially replaced by black ones. To test the validity of the claim it is investigated whether DFC's balance and entropy scores, on this dataset, are at least comparable to the scores of the above-mentioned other fair clustering algorithms. 
+    
+    % \item Claim 3
+    % \textbf{DFC can produce clustering-favorable representations.} Test: DFC's accuracy and NMI scores on the \revMNIST and \USPSMNIST datasets are at least comparable to the results of other deep clustering algorithms, to wit ResNet50, DEC, DAC and CIGAN.
+    
+    % \item \textit{Point for feedback: In the paper we find the claim "Empirically, we provide extensive experimental demonstrations on four visual datasets to corroborate the superior performance of the proposed approach over existing fair clustering and deep clustering methods on both cluster validity and fairness criterion [pdf p. 9070 (Abstract)]. We recognize that the original experiments only use 'binary sensitive attributes' (sensitive attributes that are either present or not, it has no degree). Hence we split the fairness claim in two: claim 1 in which the results of the authors are reproduced, and claim 2 in which we use our 'corrupted' sensitive attributes. We wonder whether this representations of the claims is good like this since it does not represent precisely the claim of the authors.}
+
+To test the validity of claim 1, the balance and entropy scores will be examined and compared with the original paper. The validity of claim 2 will be tested similarly, where we instead examine the accuracy and normalized mutual information (NMI) score.
+Important to note is that the original paper mainly evaluated the DFC algorithm on binary sensitive attributes. As an example, in \citet{Li_2020_CVPR} a sensitive attribute was defined as whether an image from the \mn dataset has been reversed or not. Generally speaking, in the original paper the sensitive attributes could only take one out of two possible values. However, sensitive attributes in the real world, like race or gender, can take on multiple variables. 
+
+To evaluate the robustness of claim 1, we will perform the DFC algorithm for non-binary sensitive attributes. To do this, we modify one of the sensitive attributes chosen by the authors, particularly whether an image belongs to the \textit{MNIST} dataset or whether it is a \textit{Color Reverse MNIST} image. In the former case, all the pixels of the digit are white and the background pixels are all black; in the latter case it is the other way around. To make this attribute non-binary, images from both datasets will be corrupted; some pixel values will be flipped, and it is not the case anymore that we can distinguish the images purely on the background color. It would inspire confidence if DFC is still able to function properly. 
+
+Furthermore, we will investigate the robustness of both claims by testing the DFC algorithm on different model configurations. Specifically, we will test out different clustering regularizers by replacing the KL-divergence with other divergence measures, namely the Jensen-Shannon divergence (JS-divergence) and the Cauchy-Schwarz divergence (CS-divergence).
+
+Finally, in the original paper it is mentioned that pretrained cluster centers were used in the DFC algorithm. However, the motivation of using pretrained cluster centers in DFC is omitted, which might suggest that pre-training cluster centers are not a necessary part of the DFC pipeline. Therefore, we will examine the influence of pretrained cluster centers in DFC.
+
+% \descr{Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.}
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+% \descr{Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.}
+% We have used the authors' code to test the validity of the claims mentioned in the previous section. But we did have to implement a variational autoencoder and k-means clustering for adding new datasets. This is because the authors only provided pretrained models for the \usps dataset and no code to train the model on other datasets. The experiments were run on a GPU \CAG{Denk dat ze hier ook het type GPU willen. Ik weet niet wat ze bedoelen met documentation.} \NR{Is dit stukje een beetje dubbelop?}
+
+\subsection{Model descriptions}
+% \descr{Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). }
+\citet{Li_2020_CVPR} use a pretrained convolutional variational autoencoder (VAE). The available code only contained the pretrained encoder and decoder for the \USPSMNIST dataset \citep{git}. We implemented and pretrained a convolutional VAE for the \revMNIST dataset. The encoder is build of four convolutional layers, followed by batch normalization and a ReLU activation function. Moreover, the decoder is implemented by reversing the layers of the encoder. Both the encoder and decoder contained 610K and 58.9K parameters respectively. The VAE is trained using the Adam-optimizer and a learning rate of $1e-3$. 
+
+\citet{Li_2020_CVPR} also used pretrained cluster centers to start their DFC algorithm off with high accuracy clusters. They only provided pretrained cluster centers for the \USPSMNIST dataset: Therefore, in order to reproduce the results, we were required to obtain pretrained cluster centers for the \revMNIST dataset. For this task we used k-means clustering\footnote{\url{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html}} with $k=10$. Because the original code of the authors used 64-dimensional cluster centers, we first scaled our $32\times 32$ images down with a max pooling layer with 4 sized filters, so that the images would go from $32\times 32$ to $8\times 8$. After dimension reduction every image becomes a $1\times 64$ vector. We then fit every image in the dataset using MiniBatchKMeans from the sklearn package\footnote{\url{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}}. With $\texttt{max\_iter}=1000$ and $\texttt{batch\_size} = 512$. This results in our pretrained cluster centers which can be trained for every dataset.
+
+To examine during clustering whether fair representations are reached, a discriminator is used; when it cannot distinguish based on the sensitive attribute the representations are fair. This discriminator is a multilayer perceptron (MLP) using three linear layers, of which the first two are followed by a ReLU activation function and a dropout of 0.5: the final layer is followed by a sigmoid activation function. The discriminator is trained jointly with the encoder for 20000 epochs. Finally, the Adam optimizer is used with an initial learning rate of $lr_{\text{init}}=1e-4$. The learning rate is adjusted with $lr =lr_{\text{init}}(1+10t)^{-0.75}$, with $t=0$ at the start of the training process; with every iteration $t$ is linearly increased to $t=1$ at the end of the training process.
+
+
+
+
+% \begin{itemize}
+    % \item Parameters: Encoder = 610 K, Decoder = 58.9 K
+    % \item The description above is also used for the VAE for the second dataset (\citet{Li_2020_CVPR} only pretrained a convolutional VAE for one of the two datasets). For the VAE we implemented we used the same encoder and recreated the decoder based on the description (reversed architecture) in the paper.
+    % \item Voor \file{main.py}:: optimizer: Adam  $lr_{\text{init}}=1e-4$, adjusted with $lr =lr_{\text{init}}(1+10t)^{-0.75}$, with $t$ the training process, linearly increasing from 0 to 1. optimizer discriminative classifier: lr =10 lr(encoder and centroids. $\alpha$ set to 1.
+    % \item Discriminator is a Multilayer Perceptron (MLP). This model is not pretrained.
+    % \item datapoints are assigned by using the student-t distribution. This model is pretrained.
+    % \item The Encoder, Discriminator and cluster assignments are trained jointly.
+% \end{itemize}
+
+% \TODOtext{stuk over loss functions en cluster assignments met t-distribution}\\
+% stuk over loss
+The objective function consists of three parts; the fairness-adversarial loss ($\mathcal{L}_f$), the structural preservation loss ($\mathcal{L}_{s}$) and the clustering regularizer term ($\mathcal{L}_c$). 
+% FAIRNESS ADVERSARIAL
+ The task of the fairness-adversarial loss is to minimize the divergence between the cluster assignments of the different subgroups. In this way the term promotes a similar cluster distribution for all subgroups, hence, statistical independence between cluster assignments and the particular protected subgroup that the sample belongs to. The fairness-adversarial loss can be written as:
+ \begin{equation}
+    \mathcal{L}_f := \mathcal{L}(\mathcal{D}\circ\mathcal{A}\circ\mathcal{F}(X), G),
+    \label{eq:loss_f}
+\end{equation}
+where $\mathcal{L}$ denotes the cross-entropy loss and $\circ$ denotes the function composition: moreover, $\mathcal{D}$, $\mathcal{A}$, $\mathcal{F}$ denotes the discriminator, cluster assignment and encoder respectively.
+
+% STRUCTURAL PRESERVATION
+The fairness-adversarial loss encourages statistical independence of the cluster assignments and the sensitive attribute G, however, only optimizing $\mathcal{L}_f$ is not enough as it can lead to a degenerate solution, where the representations that are produced by the encoder are all constant. Of course, such a constant representation cannot lead to good clustering quality; it would hide, rather than illuminate, the fundamental structure in the data. The structural preservation loss prevents such a solution by penalizing it when the inner structure of a particular subgroup is altered in the DFC setting, as opposed to clustering the subgroup individually. The preservation loss, which was proposed by the authors \citep{Li_2020_CVPR} is given as follows:
+\begin{equation}
+    \mathcal{L}_s := \sum_{g\in[M]}\left|\left|\hat{P}_g\hat{P}_g^T-P_g P_g^T\right|\right|^2,
+\end{equation}
+where $[M]$ denotes the  set of sensitive attributes, $\hat{P}_g$ and $P_g$ denote the (soft) assignments of the $g-$th protected subgroup when individually clustered and clustered with DFC, respectively. 
+
+%Clustering regularizer
+Following other work in deep clustering, DFC employs a clustering regularizer to strengthen prediction confidence and to prevent large cluster sizes \citep{Li_2020_CVPR}. Contrary to earlier work, the clustering regularizer is chosen in such away that it encourages the members of a particular protected subgroup to be distributed equally over the clusters. To increase the confidence of the prediction an auxiliary target distribution $Q$ is defined. This target distribution is defined in such a way that it favors current high confidence assignments and is calculated as:
+\begin{equation}
+    q_k = \frac{(p_k)^2/\sum_{x\in X_g} p_k}{\sum_{k'\in [K]} ((p_{k'})^2/\sum_{x\in X_g} p_{k'}},
+    \label{eq:qk}
+\end{equation}
+with $p_k$ the probability that sample $x$ belongs to cluster $k$, and $X_g$ the samples that belong to protected subgroup $G$. Then, the clustering regularizer loss is defined as the KL-divergence between soft assignment $P$ and auxiliary target distribution $Q$:
+\begin{equation}
+    \mathcal{L}_c:= KL(P||Q)=\sum_{g\in [M]}\sum_{x\in X_g}\sum_{k\in[K]}p_k \log \frac{p_k}{q_k}.
+    \label{eq:KL}
+\end{equation}
+
+Again following the literature, the authors have chosen to use the Student t-distribution for soft cluster assignment \citep{Li_2020_CVPR}. The probability that the representation $z$ (corresponding to a particular sample $x$) belongs to cluster $c_k$ is then given by:
+\begin{equation}
+    p_k = \frac{(1+\frac{1}{\alpha}||z-c_k||^2)^{-\frac{\alpha+1}{2}}}{\sum_{k'\in [K]}(1+\frac{1}{\alpha}||z-c_{k'}||^2)^{-\frac{\alpha+1}{2}}},
+    \label{eq:student-t}
+\end{equation}
+with $\alpha$ the degree of freedom of the Student's t-distribution. In conclusion, the overall objective is defined as the following minimax strategy:
+\begin{align}
+    \max_{\mathcal{F}, \mathcal{A}}\quad& \alpha_f \mathcal{L}_f -\alpha_s \mathcal{L}_s-\mathcal{L}_c,\\
+    \min_{\mathcal{D}}\quad& \alpha_f\mathcal{L}_f
+    \label{eq:objective}
+\end{align}
+with $\alpha_f$ and $\alpha_s$ as trade-off hyperparameters.
+
+
+
+
+% \citet{Li_2020_CVPR} use a Student t-distribution to 
+
+% The objective function proposed by \citet{Li_2020_CVPR} for DFC entails three parts; fairness-adversarial loss, structural preservation loss, and clustering regularizer. Firstly, the aim of the fairness-adversarial loss is to ensure... Secondly, the structural preservation loss can be calculated by Formula ....: this loss encourages to preserve the structure in each protected subgroup........ Finally, clustering regularizer is used to avoid dominance of one sensitive attribute in a cluster..... \citet{Li_2020_CVPR} use KL-divergence Formulasss.
+
+
+
+\subsection{Datasets}
+% \descr{For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).}
+
+In this study, we have used two publicly available datasets:  \revMNIST and \USPSMNIST datasets. Both datasets contain a collection of grey-scale images of hand-written digits (0-9). 
+
+The first dataset, \USPSMNIST, is a combination of the \textit{MNIST}\footnote{\url{http://yann.lecun.com/exdb/mnist/}} and \textit{USPS}\footnote{\url{http://www.kaggle.com/bistaumanga/usps-dataset}} dataset. Both, \mn and \usps are downloaded using the \texttt{torch.vision.dataset} package. The label distributions and total number of examples in the training and test set can be found in Table \ref{tab:labeldistr}. The \mn dataset contains approximately eight times more images than \usps. In the \USPSMNIST dataset, the source, either \mn or \usps, is chosen to be the sensitive attribute. 
+
+The second dataset, \revMNIST, was constructed by reversing the images in the \mn dataset and concatenating them to the original. The color reversed images were constructed with \textit{pixel} = 255 - \textit{pixel}. The label distributions and total number of examples in the training and test set can also be found in Table \ref{tab:labeldistr}. Equivalent to the \USPSMNIST dataset, the sensitive attribute is the source of the image; in this case either \mn or \rmn.
+
+% \NR{Vraag aan Tobi: Heb je alle images gepadded of alleen bij \USPSMNIST}
+The images in all datasets are padded to create images of the same size ($32\times 32$); this implies a padding of 2 and 8 for the images of \mn and \usps respectively.
+
+
+% USPS info:
+% \begin{itemize}
+%     \item 7291 train 
+%     \item 2007 test
+%     \item 16x16
+% \end{itemize}
+
+% MNIST info:
+% \begin{itemize}
+%     \item training set of 60,000 examples
+%     \item test set of 10,000 examples
+%     \item 28x28
+% \end{itemize}
+
+% \NR{Doubt want ze koppelen USPS aan MNIST dus niet alle MNIST examples worden gebruikt? Aantal train examples komt wel overeen met de \file{.txt}-files }
+\begin{table}[H]
+    \resizebox{\columnwidth}{!}{%
+    \centering
+    \begin{tabular}{llllllllllll}  
+    \toprule
+    Dataset & 0 & 1 & 2 & 3 & 4 & 5& 6 & 7 & 8 & 9 & Total\\
+    % \multicolumn{1}{c}{Item} \\
+    % \cmidrule(r){1-3}
+    %  - Child-Sum TreeLSTM & ... & ...\\
+    \midrule
+    \textit{MNIST} train & 5923 & 6742 & 5958 & 6131 & 5842 & 5421 & 5918 & 6265 &    5851 & 5949 & 60000\\
+    % \textit{MNIST} test\NR{\footnote{Source: https://www.researchgate.net/publication/220464658\_Invariance\_analysis\_of\_modified\_C2\_features\_Case\_study-handwritten\_digit\_recognition}} & 980 & 1135 & 1032 & 1010 & 982 & 892 & 958 & 1028 &    974 & 1009 & 10000\\
+    \textit{USPS} train & 1194 & 1005 & 731 & 658 & 652 & 556 & 664 & 645 & 542 & 644 & 7291 \\
+    % \textit{USPS} test \\
+    \midrule
+    % \multicolumn{12}{c}{}\\
+    \revMNIST train & 11846 & 13484 & 11916 & 12262 & 11684 & 10842 & 11836 & 12530 &    11702 & 11898 & 120000\\
+    % \revMNIST test & 1960 & 2270 & 2064 & 2020 & 1964 & 1784 & 1916 & 2056 &    1948 & 2018 & 20000\\
+    %                   0      1      2    3      4      5    6       7    8    9
+    \USPSMNIST train & 7117 & 7747& 6689& 6789 & 6494& 5977&6582 & 6910 & 6393 & 6593& 67291\\
+    % \USPSMNIST test& & \\
+    \bottomrule
+    \end{tabular}
+    }
+    \caption{Label distribution per dataset}
+    \label{tab:labeldistr}
+\end{table}
+% \NR{Twee keer zo als MNIST veel voor\revMNIST?} \TT{waar heb je dit vandaan???? volgens mij is er alleen train set namelijk in deze paper }
+
+% \subsection{Hyperparameters}
+% % \descr{Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).}
+
+\subsection{Extensions}
+% This section discusses the three extensions more in depth.
+
+\subsubsection{Divergence Functions}
+As mentioned earlier in Section \ref{sec:claims}, we examined the effect of using different divergence functions as clustering regularizers by replacing the KL-divergence with either the Jensen-Shannon divergence (JS-divergence) or the Cauchy-Schwarz divergence (CS-divergence).
+
+The JS-divergence is the smoothed and symmetric version of the KL-divergence and is calculated as follows:
+
+\begin{equation}
+    JS(P||Q) = \frac{1}{2}KL(P||M) + \frac{1}{2}KL(Q||M)
+    \label{eq:JS}
+\end{equation}
+
+where $M = \frac{1}{2}(P + Q)$ and $KL(.||.)$ is the KL-divergence as defined in \ref{eq:KL}.
+
+Furthermore, the CS-divergence is a divergence function that is inspired by information theory. It is given by the following (\cite{Cauchy_Schwarz_divergence}):
+
+\begin{equation}
+    CS(P||Q) = -\log \frac{\int p(\textbf{x}) q(\textbf{x}) \text{d}\textbf{x}}{\sqrt{\int p^2(\textbf{x}) \text{d}\textbf{x} \int q^2(\textbf{x}) \text{d}\textbf{x}}}
+    \label{eq:CS}
+\end{equation}
+
+The CS-divergence is, like the JS-divergence, a symmetric measure. Furthermore, the CS-divergence has the range $0 \leq CS(P || Q) \leq \infty$, where the minimum value of $0$ is obtained if $p(\textbf{x}) = q(\textbf{x})$.
+
+\subsubsection{Corrupted Sensitive Attribute}
+Another extension mentioned in Section \ref{sec:claims} is that we consider the influence of the corrupted sensitive attribute. In the \revMNIST dataset the presence of this attribute is clear in background color, The numbers are black in the case of \USPSMNIST and white in the case of \revMNIST, The background is defined by everything that is not the colour of the number. Corrupting the sensitive attribute in this dataset implies random modifications in the background color. We compare two corruption rates (0.1 and 0.4) against the original images; for example, a rate of 0.1 implies that a random 10\% of the background pixels are changed from black to white or vice versa. 
+
+% \CAG{hier kan misschien een plaatje van een corrupted image, om het te illustreren.}.
+
+\subsubsection{Pretrained Cluster Centers}
+The final extension mentioned in Section \ref{sec:claims} is that we would examine the influence of pretrained cluster centers on the performance of DFC. If no pretrained cluster centers were used, they would be randomly initialized with Xavier initialisation using a uniform distribution.
+
+
+\subsection{Evaluation}
+% \descr{Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.}
+
+% - metrics
+% - pretrained
+
+To evaluate the models, we used the four metrics that were also used by \citet{Li_2020_CVPR}: accuracy and Normalized Mutual Information (NMI) were used to evaluate the cluster validity, while balance and entropy were calculated to evaluate the fairness of DFC. Equations \ref{eq:accuracy}-\ref{eq:entropy} are used to calculate the metrics: the NMI is calculated using sklearn.
+
+\begin{align}
+    Accuracy &= \frac{\sum_{i=1}^n \mathbb{I}_{y_i=map(\hat{y}_i)}}{n}    
+    \label{eq:accuracy}\\
+% \end{equation}
+% \begin{equation}
+    NMI &= \frac{\sum_{i,j} n_{ij}\log\frac{n\cdot n_{ij}}{n_{i+}\cdot n_{+j}}}{\sqrt{(\sum_i n_{i+}\log\frac{n_{i+}}{n}) (\sum_j n_{+j}\log\frac{n_{+j}}{n})}}
+    \label{eq:NMI}\\
+% \end{equation}
+% \begin{equation}
+    Balance &= \min_i\frac{\min_g |\mathcal{C}_i\cap X_g|}{n_{i+}}    
+    \label{eq:balance}\\
+% \end{equation}
+% \begin{equation}
+    Entropy &= -\sum_i \frac{|\mathcal{C}_i\cap X_g|}{n_{i+}}\log \frac{|\mathcal{C}_i\cap X_g|}{n_{i+}}+\epsilon
+    \label{eq:entropy}
+\end{align}
+
+
+In Eq. \ref{eq:accuracy}, $y_i$ and $\hat{y}_i$ represent the correct and predicted cluster label respectively: $map$ is a function that maps the cluster label $\hat{y}_i$ to the correct label $y_i$. In 
+Eq. \ref{eq:NMI}, $n_{ij}$ denotes the co-occurrence number; $n_{i+}$ and $n_{+j}$ denote the cluster size of the $i$-th and $j$-th clusters, in the obtained partition and ground truth, respectively. $n$ is the total data instance number. Furthermore, $\mathcal{C}_i$ represents the i-th cluster and $X_g$ the $g$-th protected subgroup. Finally, in Eq. \ref{eq:entropy}, $\epsilon=1e-5$, to ensure the $\log$ will always be defined.
+
+As mentioned before, accuracy and NMI are measures for the clustering quality. More specific, accuracy measures the correctness of clusters relative to a ground truth and NMI measures the similarity between the clustering obtained by DFC and the ground truth. For both metrics, a higher value indicates better clustering quality. Furthermore, balance and entropy evaluate the fairness of the obtained clustering. In particular, balance measures the homogeneity of the clustering across multiple sensitive attributes. A large value indicates that each cluster contains samples from multiple protected subgroups. If one cluster contains only instances of a particular protected subgroup, the balance has a score of $0$.
+Entropy is a softer fairness metric than balance that measures the diversity of the clustering. Just like balance, a large entropy value indicates that samples from a protected subgroup are present in almost every cluster, which indicates a more fair clustering and thus more fair representations.
+
+% FROM PAPER: Accuracy and NMI are two positive metrics to evaluate the cluster quality in terms of classification and information theory, where a larger value indicates better performance. Balance measures the minimum ratio of numbers of samples from different protected subgroups across all the clusters, and the upper bound for Balance is determined by the given data distribution. During clustering, one protected subgroup might get empty in one cluster and Balance goes to zero, which makes this metric too harsh for fair clustering evaluation. Here we add Entropy as a compliment that reflects the distribution of predictions as well as how unfairness the clusters are suffering from. Low entropy reveals that one subgroup of samples only assigns to a few clusters, while other clusters are with great unfairness
+
+%paper p.9074
+
+
+
+\subsection{Computational requirements}
+% \descr{Include a description of the hardware used, such as the GPU or CPU the experiments were run on. For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size). For each experiment, include the total computational requirements (e.g. the total GPU hours spent). (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.}
+
+The code was run locally on a GPU. The GPU in question is a GeForce GTX 970 with driver version 456.71. The CPU in this machine is an Intel Core i7-4770K. The memory used was 16.0 GB DDR3. For the main training of the adversarial network with 20000 iterations at 5000 iterations per evaluation the model ran in approximately 3.5 hours. This was the same computational cost to run DFC with a different divergence function. For the corruption extension we used 5000 iterations at 500 iterations per evaluation which took about 1.5 hours. The training of the VAE for the \revMNIST dataset took roughly 1 hour. The k-means clustering to obtain the pretrained clusters took approximately 15 minutes. Taking all this into account, the reproduction of the \revMNIST results from scratch took a total of circa 6.25 hours to compute. Finally, evaluating all the results with the saved models takes about 20 minutes. In conclusion, the code is not fast but it can be run on a local machine. A GPU is heavily recommended, because without one the code is about eight times slower.
+
+\section{Results}
+
+% \NR{Resultaten kloppen met de doorgestuurde tabellen}
+
+\label{sec:results}
+% \descr{Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. }
+
+
+% \subsection{Results}
+% \descr{For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline. Logically group related results into sections. }
+
+\subsection{Reproduced Results}
+
+The original results from \og  as well as the reproduced results can be found in Table \ref{tab:normal_res}. 
+
+\begin{table}[H]
+    % \resizebox{0.47\textwidth}{0.08\textheight}{
+    \centering
+    \begin{tabular}{llllll}  
+    \toprule
+    Dataset &Method  & Accuracy & NMI & Balance & Entropy\\
+    \midrule
+    \multirow{2}{*}{\revMNIST}&\citet{Li_2020_CVPR}  & 0.577 & 0.679 & 0.763 & 2.294/2.301\\
+    \cmidrule(r){2-6}
+    &Reproduced  & 0.548  & 0.591 & 0.783 & 2.301/2.299\\
+    \midrule
+    \multirow{2}{*}{\USPSMNIST}&\citet{Li_2020_CVPR}  & 0.825 & 0.789 & 0.067 & 2.301/2.265      \\
+    \cmidrule(r){2-6}
+    &Reproduced  & 0.835 & 0.785 & 0.018 & 2.301/1.579 \\
+    \bottomrule
+    \end{tabular}
+    % }
+    \caption{Reproduced and original quantitative results, for all metrics, on \revMNIST and \USPSMNIST dataset.}
+    \label{tab:normal_res}
+\end{table}
+
+First of all, the reproduced accuracies on both datasets are very similar to the original values of \citet{Li_2020_CVPR}; differing 0.029 and 0.01 on \revMNIST and \USPSMNIST respectively. Secondly, similar to accuracy, the original and reproduced NMI values do not differ much; 0.88 on \revMNIST and 0.004 on \USPSMNIST. Thirdly, the reproduced balance on \revMNIST is close to the original; differing 0.02: however, the difference is larger on the \USPSMNIST dataset (0.049).
+Finally, the entropy values on \revMNIST are very similar in contrast to the original and reproduced entropy on \USPSMNIST.
+
+\subsection{Results beyond original paper}
+% \descr{Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.}
+ 
+\subsubsection{Divergence Functions}
+
+Table \ref{tab:diverg_res} shows the results for different divergence functions as clustering regularizers.
+
+\begin{table}[H]
+    % \resizebox{0.47\textwidth}{0.08\textheight}{
+    \centering
+    \begin{tabular}{llHllll}  
+    \toprule
+    Dataset &Divergence Function&Method  & Accuracy & NMI & Balance & Entropy\\
+    \midrule
+    \multirow{3}{*}{\revMNIST}&KL-divergence&\citet{Li_2020_CVPR}  & 0.548  & 0.591 & 0.783 & 2.301/2.299\\
+    \cmidrule(r){2-7}
+    &JS-divergence&Reproduced  & 0.517 & 0.397 & 0.701 & 2.301/2.289    \\
+    \cmidrule(r){2-7}
+    &CS-divergence&Reproduced  & 0.592 & 0.408 & 0.025 & 2.301/2.084      \\
+    \midrule
+    \multirow{3}{*}{\USPSMNIST}&KL-divergence&\citet{Li_2020_CVPR}   & 0.835 & 0.785 & 0.018 & 2.301/1.579 \\
+    \cmidrule(r){2-7}
+    &JS-divergence&Reproduced  & 0.816 &  0.753 & 0.000 & 2.301/1.056   \\
+    \cmidrule(r){2-7}
+    &CS-divergence&Reproduced  & 0.815 & 0.755 & 0.000 & 2.301/0.737 \\
+    \bottomrule
+    \end{tabular}
+    % }
+    \caption{Quantitative results for the \revMNIST and \USPSMNIST dataset, for all four metrics, with varying divergence measures.}
+    \label{tab:diverg_res}
+\end{table}
+In Table \ref{tab:diverg_res} it can be observed that the accuracy does not differ significantly on the \revMNIST dataset. Furthermore, using the CS-divergence seems to yield the highest accuracy. However, the NMI decreases significantly with JS- and CS-divergence as clustering regularizer. On top of that, the balance and entropy decrease significantly with CS-divergence. Using the JS-divergence also results in a decrease in balance and entropy on the \revMNIST dataset, even though that decrease is minor compared to the CS-divergence. In general, the KL-divergence outperforms the other two divergences on three of the four metrics on the \revMNIST dataset.
+On the \USPSMNIST dataset, it can be seen that the difference in accuracy and NMI is even less significant compared to the \revMNIST dataset. However, on the \USPSMNIST dataset all four metrics decrease when using the JS- or CS-divergence instead of the KL-divergence. Moreover, the balance and entropy seem to decrease more significantly than the accuracy and NMI. In general, on the \USPSMNIST dataset the JS- and CS-divergence perform worse than the KL-divergence. 
+
+
+\subsubsection{Corrupted Sensitive Attribute}
+
+The results of the corruption extension can be found in Table \ref{tab:corrupt_res}.
+
+\begin{table}[H]
+    % \resizebox{0.47\textwidth}{0.08\textheight}{
+    \centering
+    \begin{tabular}{llllll}  
+    \toprule
+    Dataset & Corruption (in $\%$)  & Accuracy & NMI & Balance & Entropy\\
+    \midrule
+    \multirow{2}{*}{\mn} &0.1 & 0.451 & 0.487 & 0.639 & 2.301/2.288      \\
+    \cmidrule(r){2-6}
+     & 0.4   & 0.342 & 0.314 & 0.001 & 0.837/2.258     \\
+    \midrule
+    \multirow{2}{*}{\revMNIST}&  0.1  & 0.635 & 0.606 & 0.645 & 2.301/2.289 \\
+    \cmidrule(r){2-6}
+     & 0.4   & 0.474 & 0.483 & 0.002 & 2.164/2.198     \\
+    \midrule 
+    
+     \multirow{2}{*}{Both} &0.1   & 0.446 & 0.531 & 0.659 & 2.299/2.285     \\
+    \cmidrule(r){2-6}
+     & 0.4  & 0.313 & 0.213 & 0.000 & 1.615/1.583     \\
+    % \midrule
+    % \multirow{7}{*}{\USPSMNIST}& 0.1 & \mn & 0.731 & 0.690 & 0.000 & 2.258/2.081\\
+    % \cmidrule(r){2-7}
+    % & 0.4 &\mn  & 0.332 & 0.241 & 0.059 & 1.720/2.054 \\
+    % \cmidrule(r){2-7}
+    % & 0.1&\usps  & 0.892 & 0.889 & 0.049 & 2.301/2.236     \\
+    % \cmidrule(r){2-7}
+    % & 0.4 &\usps  & 0.889 & 0.881 & 0.043 & 2.301/2.232     \\
+    % \cmidrule(r){2-7}
+    % &0.1 & Both  & 0.845 & 0.805 & 0.000 & 2.300/2.021    \\
+    % \cmidrule(r){2-7}
+    % & 0.4& Both  & 0.237 & 0.257 & 0.000 & 0.908/0.797     \\
+    \bottomrule
+    \end{tabular}
+    % }
+    \caption{Quantitative results, on all four metrics, with varying corruption rates.}
+    \label{tab:corrupt_res}
+\end{table}
+
+
+As can be seen in Table \ref{tab:corrupt_res}, both the accuracy and the NMI decrease when data has been corrupted. %In fact, a higher corruption rate leads to a lower accuracy and NMI value. 
+However, the decrease in accuracy and NMI seem to be more significant when the \rmn dataset is corrupted. Moreover, the balance and entropy decrease when the data is corrupted. In general, a higher corruption leads to lower values on all metrics. Finally, Table \ref{tab:corrupt_res} shows that the balance drops significantly with a higher corruption rate.
+
+% \begin{itemize}
+%     \item No clustering-favorable clusters with higher corruption (Voor final concusion: is expected want nummers zijn slechter zichtbaar)
+%     \item Balance dropt ook flink als er meer gecorrupt wordt 
+%     \item Entropy wordt ook lager in alle gevallen
+%     \item Voor conclusie; zowel less clustering-favorable clusters als minder fairness
+% \end{itemize}
+
+
+\subsubsection{Pretrained Cluster Centers}
+
+The final extension researches the influence of the pretrained cluster centers on the utility and fairness of the clusters. The results for both datasets can be found in Table \ref{tab:cluster_res}.
+
+\begin{table}[H]
+    % \resizebox{0.47\textwidth}{0.08\textheight}{
+    \centering
+    \begin{tabular}{llHllll}  
+    \toprule
+    Dataset & Pretrained &Method  & Accuracy & NMI & Balance & Entropy\\
+    \midrule
+    \multirow{2}{*}{\revMNIST}&Yes&\citet{Li_2020_CVPR}  & 0.548  & 0.591 & 0.783 & 2.301/2.299\\
+    \cmidrule(r){2-7}
+    &No&Reproduced  & 0.468 & 0.494 & 0.872 & 2.301/2.302    \\
+    \midrule
+    \multirow{2}{*}{\USPSMNIST}&Yes&\citet{Li_2020_CVPR}  & 0.835 & 0.785 & 0.018 & 2.301/1.579 \\
+    \cmidrule(r){2-7}
+    &No&Reproduced  & 0.822 &  0.770 & 0.000 & 2.301/1.568   \\
+    \bottomrule
+    \end{tabular}
+    % }
+    \caption{Quantitative results for all metrics, on \revMNIST and \USPSMNIST datasets, with and without using pretrained cluster centers.}
+    \label{tab:cluster_res}
+\end{table}
+Most significantly, in Table \ref{tab:cluster_res}, it is visible that the accuracy on the \USPSMNIST dataset is significantly higher than that on \revMNIST, both with and without pretrained cluster centers. Furthermore, for both datasets accuracy and NMI are higher when pretrained cluster centers are used. The difference in accuracy is larger on the \USPSMNIST dataset, whereas the difference in NMI is smaller on this dataset, compared to \revMNIST. Moreover, the difference in balance on \USPSMNIST is not significant (0.018) while this difference is approximately five times larger (0.089) on the \revMNIST dataset. Finally, the entropy does not change significantly on both datasets.
+
+% \begin{itemize}
+%     \item Performing better with pretrained clusters in terms of accuracy and NMI the difference is more significant on \revMNIST
+%     \item entropy stays approximately the same
+%     \item Balance verandert ook niet echt significant
+% \end{itemize}
+
+
+% As can be seen the performance without the pretrained cluster centers is slightly worse on the \revMNIST dataset with a difference of $0.030$ in accuracy. The accuracy and NMI are lower difference in accuracy on the \USPSMNIST dataset is $0.12$... Moreover, the balance is ... higher with a difference of $0.094$ 
+
+\section{Discussion}
+
+% \descr{Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.}
+
+Our experimental results support the main claims of the original paper; namely that DFC is able to produce fair and clustering-favorable representations of large-scale and high dimensional data, such as images. Furthermore, our extensions seem to add to the robustness of the model and strengthen the choices made by the original paper. First of all, the results of the different divergence functions show that both, CS- and JS-divergence, work but the default, KL-divergence, outperforms the two researched alternatives. Moreover, even though the \revMNIST dataset required the training of a new VAE and k-means clustering the results were still comparable; this speaks to the robustness of the algorithm that the original authors designed.
+
+\subsection{What was easy}
+% \descr{Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. }
+
+% \descr{Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). }
+
+The open source code of the authors was conveniently arranged. For example, the divergence function was put in the utils file, which made it easy to test other divergence functions as well. Also, the code had an implementation that randomly initialises cluster centers; to discard the pretrained cluster centers only modifications in the main file were needed. Once we understood the code base, the code structure became intuitive and easy to work with. 
+
+\subsection{What was difficult}
+% \descr{List part of the reproduction study that took more time than you anticipated or you felt were difficult. }
+
+% \descr{Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". }
+
+
+First of all, a difficulty while reproducing the research was caused by the coding style; due to the lack of comments it was difficult at the start to get a good understanding of the code. Secondly, we were required to download the data ourselves. However, these filenames and labels did not correspond to the included .txt-files by the authors. Therefore, the model did not learn and we were forced to produce our own \file{train\_mnist.txt} and \file{train\_usps.txt}. Thirdly, the algorithm uses pretrained models, a pretrained VAE, and a file with pretrained cluster centers. However, the authors solely provided these for one of the four datasets, namely \USPSMNIST. Thus, for \revMNIST we had to build our own VAE based on their structure and calculate our own cluster centers. The latter came with an extra difficulty since in the paper it is not stated how the clustering was performed. Therefore, we had to guess and chose k-means clustering. This made the reproduction of the \revMNIST dataset much harder than anticipated.
+
