@@ -1,0 +1,95 @@
+\documentclass{article}
+
+%
+%
+%
+
+%
+%
+
+%
+%
+%
+
+%
+\usepackage[square,numbers]{natbib}
+\usepackage[final]{neurips_2019}
+
+%
+%
+
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\input{packages.tex}
+
+\newcommand{\comment}[2]{\todo[inline,caption={}]{\textbf{#1: }#2}}%
+\newcommand{\inlinecomment}[3]{%
+%
+%
+  {\color{#1}#2: #3}}%
+\newcommand\commenter[2]%
+{%
+  \expandafter\newcommand\csname i#1\endcsname[1]{\inlinecomment{#2}{#1}{##1}}
+  \expandafter\newcommand\csname #1\endcsname[1]{\comment{#1}{##1}}
+}
+\commenter{keivan}{green}
+\commenter{ehsan}{red}
+\commenter{klim}{blue}
+\title{Reproducibility Report for "On Warm-Starting Neural Network Training"}
+
+\setcitestyle{numerical,open={[},close={]}}
+
+%
+%
+%
+%
+%
+%
+%
+
+\author{%
+  Klim Kireev\\
+  EPFL \\
+  \And
+  Amirkeivan Mohtashami\\
+  EPFL \\
+  \And
+  Ehsan Pajouheshgar \\
+  EPFL \\
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+}
+
+\begin{document}
+
+\maketitle
+
+
+\input{content.tex}
+
+\bibliographystyle{IEEEtran}
+%
+\bibliography{literature}
+
+\end{document}
+
+
