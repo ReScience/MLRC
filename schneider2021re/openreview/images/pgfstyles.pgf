@@ -1,0 +1,97 @@
+\usetikzlibrary{fit,positioning}%
+\tikzset{%
+  % that's a hack ... but I like it´
+  node distance/.append code={
+    \pgfkeyssetvalue{/tikz/node distance value}{#1}
+  },
+}%
+\tikzset{%
+  every node/.append style={
+    align=center,
+  },
+  block/.style={%
+    draw,
+    rounded corners,
+  },%
+  input/.style={
+  },
+  encoder/.style={
+    block,
+    fill=zombie,
+  },
+  fc/.style={
+    block,
+    fill=martini,
+  },
+  attention/.style={
+    block,
+    fill=calypso,
+    minimum width=3cm,
+  },
+  mlp/.style={
+    block,
+    fill=aquaisland,
+  },
+  operation/.style={
+    circle,
+    draw,
+    text width=3mm,
+  },
+  add/.style={
+    operation, inner sep=2pt,
+    node contents={$+$},
+%     label={[center]0:$+$},
+  },
+  mult/.style={
+    operation, inner sep=2pt,
+    node contents={$\cdot$},
+%     label={[center]0:$+$},
+  },
+  arrow/.style={
+    -latex,rounded corners,
+  }
+}%
+
+
+\pgfplotsset{select coords between index/.style 2 args={
+  x filter/.code={
+    \ifnum\coordindex<#1\def\pgfmathresult{}\fi
+    \ifnum\coordindex>#2\def\pgfmathresult{}\fi
+  }
+}}
+
+\pgfplotsset{
+  bar/.style={
+    draw=none,
+  },
+  freq bar/.style={
+    bar,
+    %    fill=tumblue,
+  },
+  crop bar/.style={
+    width=1.1\linewidth,
+    width=1.25\linewidth,
+    ybar=0.0mm,
+    bar width=1.25mm,
+    axis x line*=bottom,
+    axis y line*=left,
+    y axis line style={draw=none},
+    ymajorgrids=true,
+    enlarge x limits={abs=2mm},
+    enlarge y limits=true,
+    major grid style={draw=tumivory},
+    ytick style={draw=none},
+    x tick label style={font=\tiny, rotate=55, anchor=east, inner sep=0pt},
+    y tick label style={font=\tiny},
+    xlabel near ticks,
+    ylabel near ticks,
+    xlabel={crop type class},
+    ylabel={relative occurrence},
+    label style={font=\scriptsize},
+    legend style={
+      legend columns=-1,
+      font=\scriptsize,
+      draw=none,
+    },
+  },
+}

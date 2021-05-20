@@ -1,0 +1,86 @@
+﻿\usetikzlibrary{fit,positioning}%
+\tikzset{%
+  every node/.append style={
+    align=center,
+  },
+  block/.style={%
+    draw,
+  },%
+  input/.style={
+  },
+  encoder/.style={
+    block,
+    fill=tumbluelight,
+  },
+  fc/.style={
+    block,
+    fill=tumbluelight,
+  },
+  attention/.style={
+    block,
+    fill=tumbluelight,
+    minimum width=3cm,
+  },
+  mlp/.style={
+    block,
+    fill=tumbluelight,
+  },
+  operation/.style={
+    circle,
+    draw,
+    text width=3mm,
+  },
+  add/.style={
+    operation, inner sep=2pt,
+    node contents={$+$},
+%     label={[center]0:$+$},
+  },
+  mult/.style={
+    operation, inner sep=2pt,
+    node contents={$\cdot$},
+%     label={[center]0:$+$},
+  },
+  arrow/.style={
+    -latex,
+  }
+}%
+
+\begin{tikzpicture}[
+  node distance=5mm and 1cm,
+]
+
+  % creating all nodes
+  \node[encoder] (encoder) {encoding};
+  \node[fc, right=5cm of encoder] (fc1) {FC};
+  \node[fc, above=5mm of fc1] (fc2) {FC};
+
+  \node (add) [add, at=($(encoder.east)!0.35!(fc1.west)$)];
+  \node[below=2cm of add] (pos_enc) {positional encoding};
+  
+  \path let \p{1}=(fc1.south), \p{2}=(fc2.north), \n{x dist}={abs(\y{2}-\y{1})} in
+  node[attention,right=of fc1.south east,anchor=south west,minimum height=\n{x dist}]
+  (attention) {attention};
+  \node (mult) [mult, below=of attention];
+  \node[mlp, below=of mult] (mlp) {MLP};
+
+  \node[input, left=1cm of encoder] (input) {input};
+
+  % connecting nodes
+  \draw[arrow] (input) -- (encoder);
+  \draw[arrow] (encoder) -- node[above] {$e$} (add);
+  \draw[arrow] (add) -- node[above, pos=.25] {$(e+p)$} (fc1);
+  \draw[arrow] ($(add)!.5!(fc1)$) |- (fc2);
+
+  \draw[arrow] (fc1) --node[above] {$q$} (fc1 -| attention.west);
+  \draw[arrow] (fc2) --node[above] {$k$} (fc2 -| attention.west);
+
+  \draw[arrow] (attention) -- node[right] {$a$} (mult);
+  \draw[arrow] ($(add)!.5!(fc1)$) |- node[pos=.75, above] {$v=(e+q)$} (mult);
+
+  \draw[arrow] (mult) -- (mlp);
+  \draw[arrow] (mlp) -- ++(0,-5mm);
+
+  \draw[arrow] (pos_enc) -- node[right] {$p$} (add);
+  
+
+\end{tikzpicture}
