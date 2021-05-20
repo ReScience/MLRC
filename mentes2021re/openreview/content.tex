@@ -1,0 +1,342 @@
+\section*{\centering Reproducibility Summary}
+
+\textit{In this study, we present our results and experience during replicating the paper titled "Spatial-Adaptive Network for Single Image Denoising". This paper proposes novel spatial-adaptive denoising architecture for efficient noise removal by leveraging the deformable convolutions to adapt spatial information (i.e. edges and textures). We have implemented the model from scratch in PyTorch framework, and then have conducted real and synthetic noise experiments on the corresponding datasets. We have achieved to reproduce the results qualitatively and quantitatively.
+}
+
+\subsection*{Scope of Reproducibility}
+
+The original paper proposes an encoder-decoder structure exploiting a residual spatial-adaptive block and a context block to capture multi-scale information for achieving the state-of-the-art on real and synthetic noise removal.
+
+\subsection*{Methodology}
+
+We have implemented the model, namely \textit{SADNet}, from scratch in PyTorch as described in the paper, and also adopted the training loop and proposed blocks from the author's code. Since the weight initialization of proposed blocks was not implicitly defined in the paper, we have decided to use the default initialization method for convolutional layers in PyTorch (\textit{i.e.} Kaiming). Experiments have been completed on a single RTX 2080 Ti in 3 days for each, and it requires ${\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}3$GB GPU memory for training, and ${\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}8$GB CPU memory for loading the data, due to the file structure of datasets.
+
+
+\subsection*{Results}
+
+%Start with your overall conclusion - where was your study successful and where not successful. Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, that upholds the paper's conclusion that it performs much better than baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement call to decide if your results support the original claim of the paper. 
+We have achieved to reproduce the results qualitatively and quantitatively on synthetic and noise removal tasks. SADNet has the capacity to learn to remove the synthetic and real noise in images, and it produces visually-plausible outputs even after a few epochs. Moreover, we have employed SSIM and PSNR metrics to measure the quantitative performance for all settings. The quantitative results on both tasks are on-par when compared to the reported results in the paper.
+
+\subsection*{What was easy}
+
+%Describe which parts of your reproduction study were easy. E.g. was it easy to run the author's code, or easy to re-implement their method based on the description in the paper. The goal of this section is to summarize to the reader which parts of the original paper they could easily apply to their problem. 
+ The code was open-source, and implemented in PyTorch, hence adopting the training loop and proposed blocks to our implementation facilitated our reproduction study. The loss function is straightforward and the architecture has a \textit{U-Net-like} structure, so that we could achieve to implement the architecture in a fair time. 
+
+
+\subsection*{What was difficult}
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify. 
+Due to the lack of compatibility with the current versions of PyTorch and TorchVision and the dependency on an external CUDA implementation of deformable convolutions, we have encountered several issues during our implementation. Then, we have considered to re-implement residual spatial-adaptive block and context block from scratch for deferring these dependencies, however, we could not achieve it just by referring to the paper in limited time. Therefore, we have decided to directly use the provided blocks as in the author's code.
+
+
+\subsection*{Communication with original authors}
+We did not make any contact with the authors since we achieved to solve the issues encountered during the implementation of SADNet by examining the author's code. 
+
+% Briefly describe how much (if any contact) you had with the original authors.
+
+\section{Introduction}
+%A  few  sentences  placing  the  work  in  context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+Recent works \cite{NEURIPS2018_f0e52b27, Zhou_Jiao_Huang_Wang_Wang_Shi_Huang_2020, Guo2019Cbdnet, anwar2019ridnet} have shown that the previous assumption of an identically-distributed additive white Gaussian noise (AWGN) is not an accurate representation of the real noise occurring in images. Traditional denoiser architectures lack the ability to adapt textures and edges, and thus miss the details while denoising, due to the over-smoothing behaviour of CNNs. A workaround to this problem is implementing a deeper network, however, such a practice introduces a more complex model with its computational burden.
+
+In the original paper \cite{10.1007/978-3-030-58577-8_11}, an encoder-decoder architecture consisting a residual spatial-adaptive block, namely RSAB, is proposed for removing spatially-variant and channel-dependent noise while processing larger regions in each step by utilizing deformable convolutions. As the main claim of the paper, this method produces better performance than the compared methods in given benchmark, and also for the synthetic noise removal task.
+
+In this reproducibility report, we studied SADNet architecture for both real and synthetic noise removal in detail, which contains implementing the architecture described in the paper, running the experiments, reporting the important details about certain issues encountered during reproducing, and comparing the obtained results with the ones
+reported in the original paper.
+
+\section{Scope of reproducibility}
+
+%Explain the claims from the paper you picked for the reproduction study and briefly motivate your choice. We recommend picking the claim that is the central contribution of the paper. To find what this contribution is, try to summarize the most important result of the paper in 1-2 sentences, e.g. "This paper introduces a new activation function X that outperforms a similar activation function Y on tasks Z,V,W". 
+The main idea of the paper is to present a spatial-adaptive architecture with encoder-decoder structure which captures the relevant features from the complex image content while removing real noise appearing in images. Residual spatial-adaptive block (RSAB) makes it possible to achieve this in an efficient manner.  
+
+The proposed model, namely SADNet, claims to outperform the state-of-the-art performances in SSIM and PSNR metrics with a moderate run-time. To validate these claims, we try to investigate the following questions:
+\begin{itemize}
+			\item Is the implementation details described in the paper and provided code sufficient for replicating the quantitative results reported in the paper?
+			\item Are the qualitative results visually-plausible?
+			\item Are the replicated quantitative results competitive enough?  
+            %\item Is it achievable to reproduce the ablation study?
+            \item Could our replication obtain a proximate denoising duration compared to the reported results in the original paper? 
+\end{itemize}
+
+
+\section{Methodology}
+
+%Explain your approach - did you use the author's code, did you aim to re-implement the approach from the paper description. Summarize the resources (code, documentation, GPUs) that you used. 
+We have implemented the model, namely SADNet, from scratch in PyTorch \cite{NEURIPS2019_9015}, as described in the paper by adopting RSAB, Context block and Offset block from the author's code. The implementation of residual blocks (ResBlock) in the author's code differs from the common residual block implementation \cite{7780459} by not using the output activation. In contrast to the common practice of applying a nonlinear activation function to the output, their ResBlock implementation directly forwards its output to the next level layers. At this point, the authors handle those activations at the model scope. We also removed Batch Normalization \cite{pmlr-v37-ioffe15} from the residual blocks as proposed by the original paper. To enhance the readability of the model structure in our implementation, we imported those activation functions back in to ResBlock.
+
+The deformable convolutions in RSAB are implemented in CUDA, hence we used NVIDIA GPUs with the relevant CUDA driver.
+
+For validating the reported results on real noisy images, we have implemented the data loaders, which are missing in the author's code. Furthermore, we integrated WandB \cite{wandb} library to the training loop in order to track our experiments during training.
+
+
+\subsection{SADNet}
+%nclude a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it’s pretrained)
+\begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=0.96\textwidth]{images/model_from_paper.png}
+    \end{center}
+    \caption{Representation of the SADNet architecture. Obtained from the paper \cite{10.1007/978-3-030-58577-8_11}.}
+    \label{fig:model_from_paper}
+\end{figure}
+
+SADNet is an encoder-decoder architecture with skip connections which favors spatial adaptability and large receptive field over deeper networks for the well-studied denoising task. The proposed model aims to achieve the state-of-the-art denoising performance while maintaining the computational complexity by exploiting residual spatial-adaptive block (RSAB), Context Block and Offset Block. The visual representation of SADNet architecture is shown in \autoref{fig:model_from_paper}, and also the structural details about our implementation of SADNet can be seen in \autoref{tab:long}.
+
+Regions with the sharp texture changes in an image, typically edges and corners, raise difficulties for training the regular convolutions, due to its fixed-size weighting mechanism. Such regions, where different textures co-occur in a particular receptive field of the regular convolutions, are simply ignored during the weighting process, due to the fixed size kernels. To address this issue, self-similarity weighting is attained via modulated deformable convolutions \cite{deform} in RSAB. The kernels of the deformable convolutions have a learnable offset for each location in an image, and thus it has the capacity to adapt to the spatial texture changes. The formula of modulated deformable convolutions can be seen as follows 
+
+\begin{equation}
+    \label{eqn:deform}
+    y(p)=\sum_{p_i\in N(p)\ }^{}w_i\cdot x(p_i+\Delta p_i)\cdot \Delta m_i
+\end{equation}
+
+where $\Delta p_i$ denotes the learnable offset for location $p_i$, and $\Delta m_i$ is the extra degree of freedom for adjusting the modulation scalar between $[0,1]$. 
+
+The nature of the decoder architectures enforces to transform the feature maps from coarse to fine at each scale. For learning the offsets more accurately in RSABs, the offsets $\Delta p^{s-1}$ and the modulation scalars $\Delta m^{s-1}$ from the previous scale are further transferred into the current scale $s$ with the help of Offset Blocks. The offset transfer is formulated as  
+
+\begin{equation}
+    \label{eqn:offset}
+    \left ( \Delta p^s,\Delta m^s \right ) = F_{offset}\left ( x, F_{up}\left ( \left ( \Delta p^{s-1},\Delta m^{s-1} \right ) \right ) \right )
+\end{equation}
+
+where $F_{up}$ denotes the up-sampling operation. RSAB receive the extracted features and the  reconstructed features  from  the  previous  scale conveyed by the Offset Block. The inputs are then fused through a modulated deformable convolution layer with a subsequent regular convolution layer. Moreover, a skip connection similar to ResBlock is employed to enhance the information transferring. At this point, RSAB can be formulated as,
+
+\begin{equation}
+    \label{eqn:RSAB}
+    F_{RSAB}(x) = F_{cn}(F_{act}(F_{dcn}(x)))+x
+\end{equation}
+
+where $F_{cn}$ and $F_{dcn}$ denote regular convolution and modular deformable convolution, respectively. Lastly, $F_{act}$ stands for the leaky ReLU activation function \cite{Maas13rectifiernonlinearities} with a negative slope of $0.2$.
+
+Another introduced block is the Context Block, which resides at the bottleneck of the model. To increase the size of the receptive fields while preserving the spatial resolution, Context Block is employed for the model, just between the encoder and decoder structures. Furthermore, unlike the common implementation of Context Block, Batch Normalization layer is removed in the published code, and only four dilation rates are used, which are 1, 2, 3 and 4.
+
+Following the original paper, we used $L_{1}$ loss for training our model on real-noise image datasets, and $L_{2}$ loss for training on synthetic image datasets.
+
+\begin{table}[t!]
+\centering
+\caption{Details of our model implementation.}
+\label{tab:long}
+\begin{tabular}{c|c|c|c|c}
+\textbf{Module Name}    & \textbf{Kernel Size} & \textbf{\# of Channels} & \textbf{Stride} & \textbf{Non-linearity} \\ \hline
+Conv1                   & $1\times1$           & 3 $\rightarrow$ 32      & 1               & Leaky ReLU(0.2)        \\
+ResBlock1               & $3\times3$           & 32 $\rightarrow$32      & 1               & Leaky ReLU(0.2)        \\
+Conv2                   & $2\times2$           & 32 $\rightarrow$64      & 2               & Leaky ReLU(0.2)        \\
+ResBlock2               & $3\times3$           & 64 $\rightarrow$ 64     & 1               & Leaky ReLU(0.2)        \\
+Conv3                   & $2\times2$           & 64 $\rightarrow$128     & 2               & Leaky ReLU(0.2)        \\
+ResBlock3               & $3\times3$           & 128 $\rightarrow$ 128   & 1               & Leaky ReLU(0.2)        \\
+Conv4                   & $2\times2$           & 128 $\rightarrow$ 256   & 2               & Leaky ReLU(0.2)        \\
+ResBlock4               & $3\times3$           & 256 $\rightarrow$ 256   & 1               & Leaky ReLU(0.2)        \\ \hline
+Context Block           &                      & 256 $\rightarrow$ 256   &                 & Leaky ReLU(0.2)        \\
+Offset Block Bottleneck &                      & 256 $\rightarrow$ 256   &                 & Leaky ReLU(0.2)        \\
+RSAB Bottleneck         &                      & 256 $\rightarrow$ 256   &                 & Leaky ReLU(0.2)        \\ \hline
+TransposeConv1          & $2\times2$           & 256 $\rightarrow$ 128   & 2               & Leaky ReLU(0.2)        \\
+Concat1 (/w ResBlock3)  &                      & 128 $\rightarrow$ 256   &                 &                        \\
+Conv5                   & $1\times1$           & 256 $\rightarrow$ 128   & 1               & Leaky ReLU(0.2)        \\
+Offset Block 1          &                      & 128 $\rightarrow$ 128   &                 & Leaky ReLU(0.2)        \\
+RSAB 1                  &                      & 128 $\rightarrow$ 128   &                 & Leaky ReLU(0.2)        \\ \hline
+TransposeConv2          & $2\times2$           & 128 $\rightarrow$ 64    & 2               & Leaky ReLU(0.2)        \\
+Concat2 (/w ResBlock2)  &                      & 64 $\rightarrow$ 128    &                 &                        \\
+Conv6                   & $1\times1$           & 128 $\rightarrow$ 64    & 1               & Leaky ReLU(0.2)        \\
+Offset Block 2          &                      & 64 $\rightarrow$ 64     &                 & Leaky ReLU(0.2)        \\
+RSAB 2                  &                      & 64 $\rightarrow$ 64     &                 & Leaky ReLU(0.2)        \\ \hline
+TransposeConv3          & $2\times2$           & 64 $\rightarrow$ 32     & 2               & Leaky ReLU(0.2)        \\
+Concat3 (/w ResBlock1)  &                      & 32 $\rightarrow$ 64     &                 &                        \\
+Conv7                   & $1\times1$           & 64 $\rightarrow$ 32     & 1               & Leaky ReLU(0.2)        \\
+Offset Block 3          &                      & 32$\rightarrow$32       &                 & Leaky ReLU(0.2)        \\
+RSAB 3                  &                      & 32$\rightarrow$32       &                 & Leaky ReLU(0.2)        \\ \hline
+Concat4 (/w input)      &                      & 32$\rightarrow$35       &                 &                        \\
+ConvOut                 & $3\times3$           & 35 $\rightarrow$ 3      & 1               & Linear                
+\end{tabular}
+\end{table}
+
+
+
+ \subsection{Datasets}
+%For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+The original paper uses SIDD Medium \cite{SIDD_2018_CVPR} and RENOIR \cite{renoir} datasets during training for denoising real noisy images and reports the qualitative and quantitative results on DND \cite{8099777} and SIDD validation \cite{SIDD_2018_CVPR} datasets. Since the author's code only provides the data loader for synthetic image datasets, we have integrated our SIDD validation data loader implementation and the DND test script provided by TU Darmstadt \cite{8099777} to our pipeline. For synthetic noise removal, additive white Gaussian noise with standard deviation of 30, 50 and 70 have been added to DIV2K dataset \cite{Agustsson_2017_CVPR_Workshops}, which consists 800 high resolution images. To validate the performance of SADNet on synthetic noise removal task, the models are tested on BSD68 \cite{937655} and Kodak24 datasets processed with the same noise addition mechanism.
+ 
+Both test and validation data for all settings are composed of high resolution images. Therefore, they are fed to the model as 128x128 patches cropped by fixed coordinates, as described in the paper. We have applied $90\degree$ rotation, horizontal and vertical flipping to the images during training, following the practice in the paper.
+
+
+
+
+\subsection{Hyperparameters}
+%Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+In our replication study, we used the ADAM optimizer \cite{kingma:adam} with $ \beta_{1} = 0.9$, $ \beta_{2} = 0.999$, and $\epsilon = 1e-8$, with an initial learning rate of $1e-4$ during training, as described in the paper. The provided code initializes the weights of the convolutional layers in all blocks with Xavier Uniform method \cite{Glorot2010UnderstandingTD}. Since this choice has not been discussed in the paper, we left each convolution layer initialized by the default weight initialization method in PyTorch (\textit{i.e.} Kaiming \cite{He2015DelvingDI}) in our experiments.
+
+
+\begin{table}[b!]
+\centering
+  \caption{Quantitative results on SIDD sRGB validation dataset. Compared methods: CBM3D \cite{4378954}, CDnCNN-B \cite{zhang2017beyond}, CBDNet \cite{Guo2019Cbdnet}, PD \cite{Zhou_Jiao_Huang_Wang_Wang_Shi_Huang_2020}, RIDNet \cite{anwar2019ridnet}, SADNet \cite{10.1007/978-3-030-58577-8_11}.}
+\resizebox{\linewidth}{!}{
+        \begin{tabular}{cccccccc}
+            \hline
+            \textbf{Method}  & \textbf{CBM3D}  & \textbf{CDnCNN-B}  & \textbf{CBDNet}  & \textbf{PD}  & \textbf{RIDNet} & \textbf{SADNet} & \textbf{SADNet (ours)} \\
+            \hline \hline
+            Blind/NonBlind   &  Non-blind     & Blind             & Blind           & Blind       &    Blind        &     Blind       &         Blind \\%new row
+            
+             PSNR            &   30.88       & 26.21             & 30.78           & 32.94       &    38.71        &     \textbf{39.46}       &         39.41 \\%new row
+            \hline
+        \end{tabular}}
+\label{tab:sidd}
+\end{table}
+
+\begin{figure}[b!]
+    \centering
+        \includegraphics[width=0.96\textwidth]{images/bardak.png}
+        \begin{subfigure}{0.3\textwidth}
+            \includegraphics[width=\linewidth]{images/bardak_noisy.png}
+            \caption{Noisy: 18.15 dB}
+            \label{fig:bardak_noisy}
+        \end{subfigure}\hfil % <-- added
+        \begin{subfigure}{0.3\textwidth}
+            \includegraphics[width=\linewidth]{images/bardak_gt.png}
+            \caption{Clear: $\infty$ dB}
+            \label{fig:bardak_clear}
+        \end{subfigure}\hfil % <-- added
+        \begin{subfigure}{0.3\textwidth}
+            \includegraphics[width=\linewidth]{images/bardak_out.png}
+            \caption{SADNet (ours): 34.67 dB}
+            \label{fig:bardak_out}
+        \end{subfigure}\hfil % <-- added
+    \caption{Real image denoising results on SIDD validation dataset. The results on the first two rows are obtained from the paper \cite{10.1007/978-3-030-58577-8_11},  the third row represents our results on the same image.}
+    \label{fig:bardak}
+\end{figure}
+
+
+\subsection{Experimental setup}
+%Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). Provide a link to your code.
+
+In this study, we have followed the same training procedures for all setting, and employed SSIM and PSNR values as performance metrics, as described in the original paper. The parameters for all training settings can be found in the configuration file in our GitHub repository. Our implementation and the trained weights are open-sourced, and can be accessed at \url{https://github.com/sami-automatic/SADNet_Replication}.
+
+
+\subsection{Computational requirements}
+%Include a description of the hardware used, such as the GPU or CPU the experiments were run on. For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).For each experiment, include the total computational requirements (e.g. the total GPU hours spent).(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.Provide information on computational requirements for each of your experiments. For example, the number of CPU/GPU hours and memory requirements. You'll need to think about this ahead of time, and write your code in a way that captures this information so you can later add it to this section. 
+The experiments have been conducted on a single RTX 2080Ti for approximately 3 days, and only requires high GPU memory, mostly due to modulated deformable convolutions. It requires ${\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}3$GB GPU memory for training, and ${\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}8$GB CPU memory for loading the data, due to the file structure of datasets. 
+
+
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.96\textwidth]{images/tus.png}
+    \begin{subfigure}{0.28\textwidth}
+        \includegraphics[width=\linewidth]{images/tus_noisy.png}
+        \caption{Noisy: 17.59 dB}
+        \label{fig:tus_noisy}
+    \end{subfigure}\hfil % <-- added
+    \begin{subfigure}{0.28\textwidth}
+        \includegraphics[width=\linewidth]{images/tus_gt.png}
+        \caption{Clear: $\infty$ dB}
+        \label{fig:tus_clear}
+    \end{subfigure}\hfil % <-- added
+    \begin{subfigure}{0.28\textwidth}
+        \includegraphics[width=\linewidth]{images/tus_out.png}
+        \caption{SADNet (ours): 35.62 dB}
+        \label{fig:tus_out}
+    \end{subfigure}\hfil % <-- added
+    \caption{Real image denoising results on SIDD validation dataset. The results on the first two rows are obtained from the paper \cite{10.1007/978-3-030-58577-8_11},  the third row represents our results on the same image.}
+    \label{fig:tus}
+\end{figure}
+
+\section{Results}
+%Start with a high-level overview of your results. Does your work support the claims you listed in section 2.1? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+%Go into each individual result you have, say how it relates to one of the claims and explain what your result is. Logically group related results into sections. Clearly state if you have gone beyond the original paper to run additional experiments and how they relate to the original claims. 
+We have implemented the model from scratch by following the descriptions presented in the original paper, and then achieved to replicate the claimed results by referring to the published code. Overall, our implementation of SADNet achieved on-par performances in SSIM and PSNR metrics on test datasets, and we also validated the results on both denoising tasks by examining their qualitative results. 
+
+As shown in \autoref{tab:sidd}, our quantitative results on SIDD sRGB validation dataset has 39.41 PSNR value, which is only 0.12\% less than the one reported in the original paper. Moreover, the average duration of a single inference of SADNet is 26.7 ms. according to the paper, while our implementation of SADNet completes the single inference on 25.9 ms. The visual comparisons of real noise removal of the images are shown in \autoref{fig:bardak} and \autoref{fig:tus}. The samples are from SIDD validation dataset, according to the ones reported in the paper. The first two rows in these figures are directly taken from the original paper for further comparison with our replication results, which can be seen in the third row. On the results from the original paper, SADNet mainly differs from the compared methods by generating a distinct clear continuous stripe texture on the background while preserving the object surface appearance. Our replication clearly shares the similar behaviour. Therefore, we can state that the replicated quantitative results on real noise removal task are competitive enough, and also supports the main claim in the original paper.
+
+
+Similarly, \autoref{tab:synt} demonstrates that the results of our SADNet implementation achieves on-par PSNR values with the ones reported in the paper for different noise levels (\textit{i.e. $\sigma\in\{30, 50, 70\}$}) on BSD68 and Kodak24 datasets. Particularly, we have obtained better results than all other compared methods and the reported SADNet results on Kodak24 dataset for all noise levels. Moreover, the replicated SADNet model imitates the qualitative results of the original model on both datasets. Although the images from Kodak24 and BSD68 are heavily exposed to the synthetic noise, SADNet has the ability to remove noise, and to generate well-defined textures when compared to the recent works. As shown in \autoref{fig:kus}, all other compared methods have smoothed the texture and swept away the feather details, meanwhile the original implementation of SADNet and ours achieve to generate more plausible feather-like texture. Similar to the previous example, in \autoref{fig:kodak_table}, the clothing details are significantly preserved, especially pilling on the top-left part of the cloth and the vertical texture details on the cloth.   
+
+The ground truth of DND validation set is private, and thus it is not possible to locally validate the results on this dataset. Despite of several attempts to submit our results to DND online validation system, we could not obtain SSIM and PSNR results, due to the server error. We have tried to contact with DND Team, but we could not get any advice for solving this issue.
+
+
+ \begin{figure}[t!]
+    \centering
+        \includegraphics[width=0.96\textwidth]{images/deneme.png}
+        \begin{subfigure}{0.28\textwidth}
+            \includegraphics[width=\linewidth]{images/bsd_gt.png}
+            \caption{Clear}
+            \label{fig:bsd_clear}
+        \end{subfigure}\hfil % <-- added
+        \begin{subfigure}{0.28\textwidth}
+            \includegraphics[width=\linewidth]{images/bsd_noisy.png}
+            \caption{Noisy: 14.65 dB}
+            \label{fig:bsd_noisy}
+        \end{subfigure}\hfil % <-- added
+        \begin{subfigure}{0.28\textwidth}
+            \includegraphics[width=\linewidth]{images/bsd_out.png}
+            \caption{SADNet (ours): 28.96 dB}
+            \label{fig:bsd_out}
+        \end{subfigure}\hfil % <-- added
+    \caption{Synthetic image denoising results on BSD68 dataset with noise level $\sigma = 50$. The results on the first row are obtained from the paper \cite{10.1007/978-3-030-58577-8_11}, the second row represents our results on a similar patch.}
+    \label{fig:kus}
+\end{figure}
+
+% Please add the following required packages to your document preamble:
+
+\begin{table}[b!]
+\centering
+\caption{Average PSNR(dB) results on synthetic color noisy images.}
+\label{tab:synt}
+\begin{tabular}{c|lll|lll}
+\multirow{2}{*}{\textbf{Datasets}} & \multicolumn{3}{c|}{Kodak24 ($\sigma$)}                                   & \multicolumn{3}{c}{BSD68 ($\sigma$)}                                    \\ \cline{2-7} 
+                                   & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{50} & \multicolumn{1}{c|}{70} & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{50} & \multicolumn{1}{c}{70} \\ \hline
+\textbf{Models}                    &                        &                        &                         &                        &                        &                        \\ \hline
+\textbf{CBM3D} \cite{4378954}            & 30.89                  & 28.63                  & 27.27                   & 29.73                  & 27.38                  & 26.00                  \\
+\textbf{DnCNN} \cite{zhang2017beyond}            & 31.39                  & 29.16                  & 27.64                   & 30.40                  & 28.01                  & 26.56                  \\
+\textbf{MemNet} \cite{8237748}           & 29.67                  & 27.65                  & 26.40                   & 28.39                  & 26.33                  & 25.08                  \\
+\textbf{FFDNet} \cite{zhang2018ffdnet}           & 31.39                  & 29.10                  & 27.68                   & 30.31                  & 27.96                  & 26.53                  \\
+\textbf{RNAN} \cite{zhang2018residual}             & 31.86                  & 29.58                  & 28.16                   & 30.63                  & 28.27                  & 26.83                  \\
+\textbf{RIDNet} \cite{anwar2019ridnet}          & 31.64                  & 29.25                  & 27.94                   & 30.47                  & 28.12                  & 26.69                  \\
+\textbf{SADNet} \cite{10.1007/978-3-030-58577-8_11}            & 31.86                  & 29.64                  & 28.28                   & \textbf{30.64}                  & \textbf{28.32}                  & \textbf{26.93}                  \\
+\textbf{SADNet (ours)}             & \textbf{32.06}                  & \textbf{29.86}                  & \textbf{28.47}                   & 30.58                  & \textbf{28.30}                  & \textbf{26.91}                 
+\end{tabular}
+\end{table}
+  
+
+
+ \begin{figure}[t!]
+    \includegraphics[width=0.96\textwidth]{images/kız.png}
+    \centering % <-- added
+    \begin{subfigure}{0.28\textwidth}
+      \includegraphics[width=\linewidth]{images/kodak_gt.png}
+      \caption{Clear}
+      \label{fig:kodak_clear}
+    \end{subfigure}\hfil % <-- added
+    \begin{subfigure}{0.28\textwidth}
+      \includegraphics[width=\linewidth]{images/kodak_noisy.png}
+      \caption{Noisy: 15.48 dB}
+      \label{fig:kodak_noisy}
+    \end{subfigure}\hfil % <-- added
+    \begin{subfigure}{0.28\textwidth}
+      \includegraphics[width=\linewidth]{images/kodak_out.png}
+      \caption{SADNet (ours): 30.22 dB}
+      \label{fig:kodak_out}
+    \end{subfigure}
+    \caption{Synthetic image denoising results on Kodak24 dataset with noise level $\sigma = 50$. The results on the first row are obtained from the paper \cite{10.1007/978-3-030-58577-8_11}, the second row represents our results on a similar patch.}
+    \label{fig:kodak_table}
+\end{figure}
+
+
+\section{Discussion}
+
+% Give your judgement on if you feel the evidence you got from running the code supports the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+%runtime, its place in DND benchmark, 
+The qualitative results generated with our replication strongly resemble to the presented results, and differs from the other compared studies. According to these results, we can state that our implementation of SADNet consistently yields visually-plausible results on both real and synthetic noisy images, and supports the claims of the original paper. In addition, our experiments firmly correlates with the reported PSNR values.
+
+Overall, the paper and the provided code was sufficient for replicating the results on real and synthetic noise removal. For re-implementing the model from scratch, we have only referred to the paper, and ended up on-par performance with the ones in the paper on all settings. 
+
+Lastly, to provide an insight for run-time on different hardware, our replication has 25.9 ms. inference run-time on real noise removal task, whereas the reported run-time duration is 26.7 ms. Note that we used a single RTX 2080Ti GPU during our experiments, while a single GTX 1080Ti GPU is used in the original study, and we assume that this is the reason of this difference.
+
+\subsection{What was easy}
+
+The code was open-source, and implemented in PyTorch, hence adopting the training loop and proposed blocks to our implementation facilitated our reproduction study. The loss function is straightforward and the architecture has a \textit{U-Net-like} structure, so that we could achieve to implement the architecture in a fair time. 
+
+\subsection{What was difficult}
+
+Due to the lack of compatibility with the current versions of PyTorch and TorchVision and the dependency on an external CUDA implementation of deformable convolutions, we have encountered several issues during our implementation. Then, we have considered to re-implement residual spatial-adaptive block and context block from scratch for deferring these dependencies, however, we could not achieve this just by referring to the paper. Therefore, we have decided to directly use the provided blocks as in the author's code. 
+
+\subsection{Communication with original authors}
+
+We did not make any contact with the authors since we achieved to solve the issues encountered during the implementation of SADNet by examining the author's code. 
