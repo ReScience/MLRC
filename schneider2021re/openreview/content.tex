@@ -1,0 +1,319 @@
+\section*{\centering Reproducibility Summary}
+
+\textit{The presented study evaluates \citetitle{Garnot20:SIT} by \textcite{Garnot20:SIT} within the scope of the \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}.
+Our work focuses on both aspects constituting the paper:
+the method itself and the validity of the stated results.
+We show that, despite some unforeseen design choices, the investigated method is coherent in itself and performs the expected way.}
+
+
+\subsection*{Scope of Reproducibility}
+
+The evaluated paper presents a method to classify crop types from multispectral satellite image time series with a newly developed \emph{pixel-set encoder} and an adaption of the Transformer \parencite{Vaswani17:Attention}, called \emph{temporal attention encoder}. 
+
+
+\subsection*{Methodology}
+
+In order to assess both the architecture and the performance of the approach, we first attempted to implement the method from scratch, followed by a study of the authors' openly provided code.
+Additionally, we also compiled an alternative dataset similar to the one presented in the paper and evaluated the methodology on it.
+
+
+\subsection*{Results}
+
+During the study, we were not able to reproduce the method due to a conceptual misinterpretation of ours regarding the authors' adaption of the Transformer \parencite{Vaswani17:Attention}.
+However, the publicly available implementation helped us answering our questions and proved its validity during our experiments on different datasets.
+Additionally, we compared the papers' temporal attention encoder to our adaption of it, which we came across while we were trying to reimplement and grasp the authors' ideas.
+
+
+\subsection*{What was easy}
+
+Running the provided code and obtaining the presented dataset turned out to be easily possible.
+Even adapting the method to our own ideas did not cause issues, due to a well documented and clear implementation.
+
+
+\subsection*{What was difficult}
+
+Reimplementing the approach from scratch turned out to be harder than expected, especially because we had a certain type of architecture in mind that did not fit the dimensions of the layers mentioned in the paper.
+Furthermore, knowing how the dataset was exactly assembled would have been beneficial for us, as we tried to retrace these steps, and therefore would have made the results on our dataset easier to compare to the ones from the paper.
+
+
+\subsection*{Communication with original authors}
+
+While working on the challenge, we stood in E-mail contact with the first and second author, had two online meetings and got feedback to our implementation on \GitHub. 
+Additionally, one of the authors of the Transformer paper \parencite{Vaswani17:Attention} provided us with further answers regarding their models' architecture.
+
+%%%% Second part of the report
+
+
+\newpage
+
+
+\section{Introduction}
+
+The \emph{machine learning} community showcases impressively and with great success how to design systems for analysing large data inventories, with the goal of identifying relevant patterns within them.
+At the same time, the \emph{remote sensing} and \emph{Earth observation} sector found itself confronted with the availability of novel dedicated sensor platforms.
+These are now capable of continuously acquiring new data at high temporal, spatial, and spectral frequencies, requiring the development of innovative and efficient ways to process these data stocks.
+In light of that, several machine learning methods have found wide application in the field of remote sensing and Earth observation.
+As the availability of observation data increased massively during the last decades \parencite{Lary18:MLA}, various retrieval, detection, and prediction problems can be addressed this way.
+Nevertheless, Earth observation data is mostly of a very inhomogeneous nature, which is due to the different designs and layouts of the receiving sensor platforms.
+In addition, geophysical processes on the Earth's surface are complex and manifest themselves in observable changes with different dynamic patterns.
+Therefore, the goal of gaining deeper understanding of such processes requires the use of interpretable models \parencite{Maxwell18:IML}.
+
+In their recent CVPR publication \citetitle{Garnot20:SIT}, \textcite{Garnot20:SIT} propose a new method to address these issues.
+Motivated by the practical problem of \emph{crop type classification} from sequences of optical satellite imagery---that we consider a proxy for the entirety of vegetative processes on the Earth' surface---, the authors made use of \emph{attention mechanisms}.
+In particular, they claimed adapting the \emph{Transformer} architecture \parencite{Vaswani17:Attention} that has gained considerable popularity in the recent past, enabling it to digest such specific Earth observation data modalities.
+Additionally, they introduce a \emph{pixel-set encoder} as a new option to deal with medium-resolution satellite images instead of the known convolutional neural networks in image processing.
+
+Due to their aforementioned properties, the handling of Earth observation data in practical applications requires special care.
+Most prevalently, they exhibit a considerable amount of spatial autocorrelation \parencite{Spiker07:SSA}, reinforcing the already known issues of \emph{underspecification} inherent to data-driven machine learning models \parencite{DAmour20:UPC}.
+This generally leads to overfitting effects and poor generalisation performance.
+Hence, we carefully reproduced the proposed methods, first by starting from scratch just following the descriptions given in the paper under investigation, and subsequently by adapting the reference implementation openly provided by the original authors.
+To sanity-check both implementations and to further assess the transferability and generalisation properties of the studied model, we carried out further experiments relying on an alternative but comparable dataset.
+Following the idea of this reproducibility challenge, we will make our implementation and data public, allowing the community to likewise evaluate our findings.
+
+\subsection{Reproducibility questions}
+\label{sec:claims}
+
+%During the reproducibility evaluation, we addressed the following questions, each examining an aspect or claim of the original paper:
+As a foundation of our reproduction study, we identified the following key questions, each one examining one particular aspect or claim of the original paper:
+%\begin{itemize}
+\begin{enumerate}
+%[leftmargin=*, label=\textit{\roman*)}]
+[label=\textit{\roman*)}]
+  \item Is it possible to reproduce the presented methods and their performance with \emph{and} without referring to the authors' publicly available code?
+  \item To which extent do the author's implicit claim of adapting the transformer architecture affect the model and its performance?
+  \item Does the model perform comparably well when being only tested or both trained and tested on a different dataset?
+  \item How is the outcome influenced by the choice of the test set assembly, namely by splitting the data randomly or regionally?
+%\end{itemize}
+\end{enumerate}
+
+\subsection{Contributions beyond the original paper}
+In addition to the results in the original paper, we also report the performance of the method evaluated on an alternative dataset and on a test set that does not show regionally overlap with the training set.
+
+\section{Methodology and experimental setup of the reproduction study}
+
+In order to study the reproducibility of the original publication, we followed different approaches to answer the questions raised in \cref{sec:claims}.
+Each of the following subsections will address one of these questions by introducing the methodology behind the chosen experiments and present our obtained results as replies to the author's claims.
+Generally, we traversed the following three different experimental stages that we will also publish on \GitHub\footnote{\url{https://github.com/maja601/RC2020-psetae}} for better traceability:
+We first started by developing the entire approach ourselves in \python and \pytorch \parencite{Paszke19:Pytorch}, as described in  \cref{sec:reprod_code}, followed by a short study on the original implementation in \cref{sec:run_code} and a comparison of one particular technical aspect in \cref{sec:transformer}.
+Eventually, we conducted experiments on the influence of input data in the remaining sections.
+
+\subsection{Reproduction and accuracy of the satellite time series classification} \label{sec:reprod_general}
+
+The proposed architecture for \emph{satellite time series classification} consists of two components which the authors introduce as the \emph{pixel set encoder (PSE)} and the \emph{temporal attention encoder (TAE)}.
+While the former takes care of a randomly sampled pixel set from a crop parcel and produces an embedding of the input, the latter, an adapted variant of the Transformer architecture \parencite{Vaswani17:Attention}, produces an output by applying self-attention to these multi-temporal embeddings.
+Unlike practices familiar from \emph{natural language processing}, PSE and TAE get both optimised during the training phase.
+A detailed summary of the composition and number of parameters in the networks can be obtained from \extref{Table 1} in the studied paper.
+
+All experiments were conducted on an \brand{Ubuntu 20.10} workstation equipped with \SI{64}{\giga\byte} of RAM, an \brand{Intel i7-8700} CPU and an \brand{NVidia GeForce RTX 2060} GPU.
+
+
+
+\subsubsection{Full replication study of the approach} \label{sec:reprod_code}
+
+We reimplemented the proposed architecture described in \extref{Section 3: Methods} of the investigated paper almost literally in \python.
+As the section is subdivided into the three parts describing the \emph{spatial encoder}, also referred to as the \emph{pixel-set encoder}, the temporal attention encoder, and the \emph{spatio-temporal classifier}, these three modules likewise build the core of this reproduction study.
+More precisely, \extref{Table 1} of \textcite{Garnot20:SIT} allowed us to inherit all model hyper-parameters straightforwardly.
+For one of the four used \emph{multi-layer perceptrons (MLPs)}, it was stated that it consisted of \emph{fully-connected layers} $\FC$, \emph{batch normalisation}, and \emph{ReLU activations}.
+We, thus, inductively assumed these components to be part of the other three MLPs as well.
+While we managed to develop an inefficient yet working version of the {spatial encoder}, some aspects of the \emph{temporal attention encoder} appeared unintuitive at first sight.
+Unlike the original Transformer model \parencite{Vaswani17:Attention}, on which this module is based, the values $v$ are not calculated by a fully-connected layer.
+Instead, the sum of the \emph{spatial encoder} outputs and the positional encoding is multiplied with the attention mask $a$, which is visualised in \cref{fig:tae_transformer_garnot}.
+The authors motivated this change with the claim that it \emph{\enquote{removes needless computations, and avoids a potential information bottleneck}} \parencite[\cf][Section 3.2.]{Garnot20:SIT}.
+Having the original Transformer implementation in mind, we misinterpreted this design choice.
+Thus, in our implementation, we divided the multi-head attention input into four equal tracks, as we were not able to think of another way to end up having \num{512} nodes to be passed over to the $\MLP_3$ (\cf \extref{Table 1} of \cite{Garnot20:SIT}).
+This misconception was partially reinforced by the superscript $(h)$ in formula (5) in \cite{Garnot20:SIT}, \ie
+\begin{equation}
+    k_h^{(t)}, q_h^{(t)} = \FC_1^{(h)} \left(e^{(t)} + p^{(t)} \right) \quad ,
+\end{equation}
+suggesting that, for each head $h$, an entirely independent fully-connected layer $\FC^{(h)}$ was used.
+This way, our network reimplementation became incredibly blown up and we were not able to spot the correct approach.
+
+
+All hyper-parameters and training details were directly taken from the \extref{Section 3.4: Implementation details} from \textcite{Garnot20:SIT}.
+After completing the first presented stages of the implementation, we were able to achieve an accuracy of about \SI{60}{\percent}.
+Subsequently, we had a first online meeting with the first and second author of the investigated paper, 
+%where we found out that our assumption about the used labels was wrong:
+where we identified some misconception concerning the used labels:
+Instead of using all 20 classes from the \dictionary{label\_19class} dictionary in the provided \filename{lables.json} file, only the top-20 classes from the \dictionary{label\_44class} dictionary of the same file were utilised by the authors, \ie the classes with more than 100 occurrences in the dataset.
+It also got to our attention that, \textit{in lieu} of the proposed batch normalisation, the multi-layer perceptrons should perform \emph{layer normalisation}.
+Unfortunately, despite the first author providing helpful feedback on our implementation via \GitHub, we were still not able to achieve a relevant increase in accuracy compared to the previously stated \SI{60}{\percent}.
+After comparing our implementation to the reference implementation provided by the authors, it became apparent that we struggled to grasp the authors' ideas about the data organisation and the spatio-temporal classifier.
+Therefore, we will investigate what led us to misinterpret the Transformer's adaption in \cref{sec:transformer} and the data organisation in \cref{sec:crossdataset}.
+
+\subsubsection{Evaluation of the original implementation}  \label{sec:run_code}
+
+\figArchitecture
+
+Obtaining the authors' code and running it locally proved to be easy thanks to a well-documented \GitHub repository\footnote{\url{https://github.com/VSainteuf/pytorch-psetae}}.
+In general, their reference implementation is modular, clearly structured, and sufficiently commented which makes the entire architecture easy to adapt to one's own needs.
+The model can either be trained from scratch or, together with a provided checkpoint, used to solely run the inference.
+We present a comparison of the test results from the checkpoint and when training from scratch in \cref{tab:tae_vs_taeT_subtable}.
+Using the system specified in \cref{sec:reprod_general}, training the model for one single epoch took approximately \SI{27}{\second}, while running the inference on one sample batch containing 128 parcels completed within about \SI{0.04}{\second}.
+For the following experiments, we exclusively used the official reference implementation to ensure comparability.
+
+\subsection{Experiments on the transformer architecture} \label{sec:transformer}
+
+As stated in \cref{sec:reprod_code}, we previously relied on some faulty assumptions related to the architecture of the adapted Transformer multi-head attention.
+Fortunately, the original code provided by the authors helped us to reconstruct their initial idea.
+Nevertheless, having the vanilla off-the-shelf Transformer implementation in mind, we were inquisitive about the impact of the particular architectural change proposed by \citeauthor{Garnot20:SIT}.
+Hence, we took the reference implementation and changed two lines of it in a way that the {temporal attention encoder} then employed a third fully-connected layer $\FC_v$, just like the vanilla Transformer attention model does, as described by \textcite{Vaswani17:Attention}.
+\Cref{fig:tae_transformer_Adapted} illustrates this subtle change in comparison to the architecture realized by the authors of the paper under investigation, shown in \cref{fig:tae_transformer_garnot}.
+We provide the code for this version as a fork of the original repository.\footnote{\url{https://github.com/maja601/pytorch-psetae}}
+%A visual comparison of the the original and the adapted TAE is given in \cref{fig:tae_transformer}.
+
+
+%\tabCompareTAE
+\tabCompareTAECrossData
+While this adaption of the proposed architecture reduces the number of trainable model parameters to \SI{80}{\percent}, we were able to reproduce the reported performance or even experienced a slight increase in accuracy, as summarised in \cref{tab:tae_vs_taeT_subtable}.
+
+%While using only \SI{80}{\percent} of the parameters compared to the architecture proposed by \citeauthor{Garnot20:SIT}, \cref{tab:tae_vs_taeT} shows that the adapted approach performs \alternative{}{slightly} better using the provided pretrained model and equally well as a newly trained model.\noteMK{Vlt schon ein kurzes Wort zur Begründung? Damit das nicht so im Raum steht.}
+
+\subsection{Generalisation and transferability} \label{sec:generalisation}
+
+Until that stage, we mainly considered the theoretical aspects of this reproduction study.
+Conversely, this section focuses on the application-oriented side.
+%We wanted to know whether it is possible to really use this method, hence we designed an entirely new dataset they same way the authors claimed their dataset was constructed.
+In light of our observations described before, we wanted to investigate whether the increased number of parameters in the original model can become beneficial when scaling the underlying classification problem by confronting it with an alternative dataset.
+%The next section introduces these two datasets, followed by two experiments performed with the help of the newly developed one.
+
+\subsubsection{Datasets}
+
+Although a tremendous amount of satellite data, especially from the \sentinel platforms, is publicly available, the computer vision and machine learning community still lacks labels or annotations for addressing most relevant research questions.
+Therefore, \textcite{Garnot20:SIT} did not only publish a new method, but also complemented it with a dataset containing crop type labels of more than \num{190000} agricultural parcels within the area of a particular tile of the \sentinel tiling grid \tilename{T31TFM}, located in France.
+Additionally and to evaluate the reproducibility of the presented methods' results on a different input, an analogous dataset with parcels located in Slovenia was constructed in the course of this study.
+The following two sections gives insight into the background and properties of these two datasets.
+
+% \paragraph{\sentinel Tile \tilename{T31TFM}: Dataset from the paper}
+\paragraph{FR-\tilename{T31TFM}: Dataset from the paper}
+Unlike CNN-based methods, the approach by \citeauthor{Garnot20:SIT} does not require the observation data to be stored as images with defined neighborhood relations, but rather as an unordered set of pixels for each parcel.
+From their \GitHub page, a toy dataset containing 500 parcels, each saved as \numpy data files, can be obtained.
+To get access to the entire dataset, an inquiry needs to be sent to the authors, which they reply to within no time.
+This dataset includes \num{192056} \numpy data files of dimension $ \NObservations \times \NBands \times \NPixels$,
+%with $\NObservations$ being the number of observations dates, $\NBands$ the number of bands (10 in this case), and $\NPixels$ the number of pixels for each particular parcel.
+with $\NObservations$, $\NBands=10$, and $\NPixels$ being the number of observations dates, spectral bands, and pixels for each particular parcel, respectively.
+It additionally comes with several metafiles, \ie 
+the dates of the observations, 
+the labels of the parcels, 
+the geometric features of the parcels---which are stated to be necessary for the pixel set encoder---, and 
+pre-computed normalisation values.
+By design, the dataset is randomly partitioned into test, validation, and training parcels, following a split ratio of 3:1:1.
+
+This dataset also faces one of the biggest challenges in crop type classification from satellite data, namely the uneven distributed data foundation, as visualised in \cref{fig:fr_top_20_bar}.
+
+In their original paper, \citeauthor{Garnot20:SIT} refer to several data preprocessing steps, such as 
+reducing the number of spectral bands delivered by the \sentinel satellite from 13 to 10, 
+linearly interpolating ground pixels that are affected by cloud cover, 
+normalising the reflectance data, and 
+adding Gaussian noise. 
+%The way we performed these steps and created a new dataset will be presented in the next section.
+
+
+% \paragraph{\sentinel Tile \tilename{T33TWM}: Additional Dataset}
+\paragraph{SI-\tilename{T33TWM}: Additional dataset}
+
+\figMapSlo
+As part of another project at our lab, a pan-European reference dataset for crop type classification is currently under development and will be made publicly available early next year.
+This way, we had the chance to use some of the data obtained from Slovenia to construct a {pixel set} similar to the one presented by \textcite{Garnot20:SIT}.
+In order to keep it as close as possible to the original, we selected similar time steps and also performed a linear cloud pixel interpolation on L2A \sentinel data.
+As we did not have access to the precise cloud detection module used by the authors, we manually annotated cloudy pixels in this region of interest.
+The \filename{dataset\_preparation.py} script provided by \citeauthor{Garnot20:SIT} took care of pooling the Sentinel-2 data and the reference data in \geojson format.
+The necessary normalisation parameters had likewise to be calculated manually, as well as the operation to extract the geometric features used in the {spatial encoder}.
+Contrasting the description given in the paper under investigation, the sequential order of components within this geometry feature vector differed in a way that its second element appeared not to be the \emph{pixel count} $\NPixels$ but rather, as we assume from looking at the original dataset, the area of the bounding box.
+Considering the labels, we prepared two versions: 
+One file with the previously stated top-20 crop classes from the original dataset, called top-20-F, and another one containing the top-20 classes from our alternatively chosen region, analogously named top-20-S and illustrated in \cref{fig:sl_top_20_bar}.
+Since the crop cultivation in Slovenia differs from France, several classes of the original top-20-F were not represented in the new dataset, as shown in \cref{fig:top20F_for_S}.
+This appears to render the classification on top-20-F an easier problem than on top-20-S.
+\Cref{sec:testset} will provide more background regarding the split of the dataset and to one of the particular difficulties inherent to geospatial data, which is why we put one region aside in advance.
+This way, we were able to evaluate the performance of the method also on regionally unseen data.
+A visual explanation of the train and test split is shown in \cref{fig:map_slo}.
+
+
+\subsubsection{Cross-dataset evaluation} \label{sec:crossdataset}
+
+\figDatasetStatistics
+%\tabCrossData
+
+The first experiment on the generalisation abilities of the described method was performed with the model being trained on the FR-\tilename{T31TFM} dataset.
+After the descriptions of the chosen classes were obtained from the original authors, we picked the same classes from our SI-\tilename{T33TWM} dataset and ran the inference on our prepared test pixel set.
+\Cref{tab:cross_data_subtable} summarises the overall results, showing that the performance dropped significantly compared to the ones reported previously (\cf \cref{tab:tae_vs_taeT_subtable}).
+
+
+\subsubsection{Method application to a different region}
+
+\tabResultsTrainedRegional
+
+Taking advantage of the relatively short training time, it was easily possible to train the entire model on our own data.
+This way, we evaluated whether the outcomes reported by \citeauthor{Garnot20:SIT} could be reproduced, even without having access to data at exactly the same preprocessing level.
+For this purpose, we ran the experiment twice on the new SI-\tilename{T33TWM} dataset, \ie first with the top-20-F labels and then with the top-20-S labels.
+%In the columns \emph{random split} of \cref{tab:trained_on_ours_plus_regional} the results of the experiments are shown.
+In \cref{tab:trained_on_ours_plus_regional}, the columns \emph{random split} show the results of these experiments.
+These can directly be compared to the ones from the paper.
+
+\subsection{Experiments on the choice of the test set} \label{sec:testset}
+
+Beside the issue of limited geometric resolution in \sentinel data, the influence of spatial autocorrelation has always to be taken into account when dealing with Earth observation satellite imagery \parencite{Spiker07:SSA}.
+Due to the coarse sampling of the Earth's surface, adjacent pixels might share relevant amounts of information with each other.
+Therefore, using contiguous field parcels for training as well as for testing can lead to non-representative results over-estimating the true performance of the classification model.
+We tried to account for these effects by reserving an entirely separate region, shown in \cref{fig:map_slo}, as an additional test set.
+This region was selected to approximate one-fifth of the parcels and a class distribution representative for the entire SI-\tilename{T33TWM} dataset.
+Results of this experiment are included into \cref{tab:trained_on_ours_plus_regional}, where we compare the original random split to the new regional split.
+
+
+\section{Discussion}
+
+This section focuses on the analysis of reproducibility in general and will not justify the authors claim that their method is the current state-of-the-art approach to solve satellite time series classification.
+We therefore split the findings of the study into two aspects that we tried to evaluate:
+On the one hand, we will discuss the insights we have gained by reproducing the methodological process itself, and on the other hand, we will elaborate our approach to reproduce the desired results produced by the method.
+
+\subsection{Reproducibility of the method}
+
+When reimplementing the full architecture, we found that, despite having all parameters at hand, it would have been helpful to have access to more information concerning the data preprocessing and organisation, as well as to the adaption of the original Transformer model \parencite{Vaswani17:Attention}, to achieve performance similar to that reported by the authors.
+From our perspective, we cannot tell whether or not better \python programming skills would have been beneficial and if someone with more experience with the multi-head attention would have been able to understand and implement the method right away.
+In any case, the authors certainly developed a coherent methodology and, by providing the corresponding code alongside with the paper, have ensured that all interested parties can clearly follow their ideas.
+
+As a result of our misinterpretation of the Transformer adaptation proposed by \citeauthor{Garnot20:SIT}, we came across an alternative approach that performed comparably well as the one from the paper, but requiring only \SI{80}{\percent} of its parameters.
+When we asked the authors about this observation, we concluded that we all had different opinions on the most obvious derivative of the method developed by \textcite{Vaswani17:Attention} applied to the problem of satellite time series classification.
+Upon request, the authors of the Transformer paper confirmed that keeping the fully-connected layer $\FC_v$ has proven to be helpful and acknowledged the validity of our approach.
+Under these circumstances, it is not straightforwardly answerable whether the implicit claim of having the Transformer adapted in the papers' way can be supported.
+
+However, it can be said that the well-documented code and clean \GitHub repository contributed strongly to our understanding of the method and helped us answer most of our comprehension question.
+Since this all is publicly available, a reproduction of the presented method based on that implementation is possible.
+
+
+\subsection{Reproducibility of the outcomes}
+
+Besides the possibility to reproduce the methodological aspects of the original paper, we were also interested in whether we could achieve the results stated in the investigated paper.
+By training the entire model by ourselves with the original dataset, we faced no considerable difficulties using the data.
+We were, in fact, able to achieve a slightly higher overall accuracy on the original test set compared to using the model pre-trained by the authors.
+
+However, a slight drop in performance became observable when we used an alternative yet similarly preprocessed dataset.
+While we still reached an overall accuracy of over \SI{87}{\percent} for the random split on our new and potentially more challenging dataset, we were not able to reach \SI{84}{\percent} when running the inference on a regionally separated test set.
+This result highlights the importance of the right choice of a representative test set, especially when using Earth observation imagery, while still acknowledging that the presented method is potentially able to generalise to unseen and new data.
+%Whether it still outperforms previous state-of-the-art methods on the new dataset is left to the authors and their competitors, but the claimed validity of the approach is shown in the given experiments.
+Nevertheless, our reproduction experiments confirmed the claimed validity of the approach and it is to be left to the authors and the entire research community to investigate whether the presented model is able to compete with state-of-the-art methods given broader and more diverse datasets.
+
+The only issue with the presented method arose when we used one dataset for training and another one for testing.
+Although we tried to preprocess our new dataset exactly the way the authors did, we were not able to obtain convincing results.
+There might be several reasons causing this issue, like an incorrect harmonisation of the dataset, other parameters for the interpolation of the cloud-covered pixels, or assumptions about the data we unknowingly and implicitly made different than the authors.
+Hence, it remains interesting for us to know how exactly the data was processed.
+
+To summarise, we support the claim that the method can successfully classify crop parcels when it was trained on data that was acquired under the same conditions, as the data it eventually gets tested on.
+
+\section{Conclusion}
+
+During the proposed study of \citetitle{Garnot20:SIT} by \textcite{Garnot20:SIT}, we assessed several questions regarding different aspects of the reproducibility of the paper.
+Therefore, we first attempted to reimplement the methodology from scratch based on the descriptions given in that paper.
+As this proved to be more challenging than expected and prone to misunderstandings, we proceeded to evaluate the provided clean implementation in terms of an adaption of the Transformer architecture \parencite{Vaswani17:Attention}.
+There, we came across a discrepancy between our understanding of the vanilla multi-head attention concept and the one used in the paper.
+Our obtained results show that, by changing the proposed adaptation in a subtle way towards the more basic multi-head attention, the model uses considerably fewer parameters, while still performing equally well.
+
+When employing the authors' implementation and dataset, we were able to reproduce the presented results straightforwardly and even on a new dataset that we specifically developed for this survey, the approach delivered meaningful results.
+The only issues arose when the training and the test dataset did not share exactly the same properties lifting the accurate preprocessing of the data to a crucial component of the proposed method.
+
+In conclusion, we can state that the examined method is conclusive in itself and valid.
+Our experiments speak in favour of the approach and our findings might highlight a path in which further works should proceed.
+This direction of research could take advantage of the dataset which we will make publicly available within the next few months.
+
+%
+%\setlength\bibitemsep{1.5\itemsep}
+%\printbibliography
