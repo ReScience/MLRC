@@ -1,0 +1,69 @@
+\begin{table}[h]
+    \captionsetup{aboveskip=\tableaboveskip,belowskip=\tablebelowskip}
+    \caption{\textbf{Modifying \textit{RigL} for structured sparsity, compared on CIFAR-10 and CIFAR-100 datasets.} \textit{RigL}-struct fails to match the accuracy of \textit{RigL} and just matches Small-Dense in performance. }
+    \centering
+    
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{ c cc cc cc cc}
+     \toprule
+    \multirow{3}{*}{\textbf{Method}} & 
+    \multicolumn{4}{c}{\textbf{CIFAR-10}} & \multicolumn{4}{c}{\textbf{CIFAR-100}} \\
+    \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+    
+    {} &
+    \multicolumn{2}{c}{$1 - s=0.1$} & \multicolumn{2}{c}{$1 - s=0.2$} &
+    \multicolumn{2}{c}{$1 - s=0.1$} & \multicolumn{2}{c}{$1 - s=0.2$} \\
+    \cmidrule(lr){2-5} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+    
+    {} & 
+    \makecell{Accuracy $\uparrow$ \\ (Test)}  & \makecell{Wall Time $\downarrow$} &
+    \makecell{Accuracy $\uparrow$ \\ (Test)}  & \makecell{Wall Time $\downarrow$}  &
+    \makecell{Accuracy $\uparrow$ \\ (Test)}  & \makecell{Wall Time $\downarrow$} &
+    \makecell{Accuracy $\uparrow$ \\ (Test)}  & \makecell{Wall Time $\downarrow$} \\
+    \midrule
+    
+    {Small-Dense} &
+    {89.0 $\pm$ 0.35} & {0.11x} & 
+    {91.0 $\pm$ 0.07} & {0.20x} &
+    {70.8 $\pm$ 0.22} & {0.11x} & 
+    {72.6$\pm$ 0.93} & {0.20x} \\
+    
+    \midrule
+    
+    \multicolumn{9}{c}{Random Initialization} \\
+    \midrule
+    
+    {RigL} &
+    {91.7 $\pm$ 0.18} & {1.0x} &
+    {92.9 $\pm$ 0.10} & {1.0x} &
+    {71.8 $\pm$ 0.33} & {1.0x} &
+    {73.5 $\pm$ 0.04} & {1.0x} \\
+    
+    {RigL-Struct} &
+    {87.0 $\pm$ 0.09} & {0.10x} &
+    {90.4 $\pm$ 0.27} & {0.20x} &
+    {69.1 $\pm$ 0.11} & {0.10x} &
+    {71.9 $\pm$ 0.13} & {0.20x} \\
+    
+    \midrule
+    \multicolumn{9}{c}{ERK Initialization} \\
+    \midrule
+    
+    {RigL} &
+    {92.4 $\pm$ 0.06} & {1.0x} &
+    {93.1 $\pm$ 0.09} & {1.0x} &
+    {72.6 $\pm$ 0.37} & {1.0x} &
+    {73.4 $\pm$ 0.15} & {1.0x} \\
+    
+    {RigL-Struct} &
+    {89.6 $\pm$ 0.16} & {0.17x} &
+    {91.3 $\pm$ 0.18} & {0.35x} &
+    {71.1 $\pm$ 0.15} & {0.23x} &
+    {72.9 $\pm$ 0.08} & {0.38x} \\
+    \bottomrule
+    
+    \end{tabular}%
+    }
+    
+    \label{tab:structured-sparsity}
+\end{table}
