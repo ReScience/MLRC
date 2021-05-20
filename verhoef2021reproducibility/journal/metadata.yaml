@@ -5,59 +5,48 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Reproducibility study - Does enforcing diversity in hidden states of LSTM-Attention models improve transparency?"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
-    
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Pieter Bouwman
+    orcid: 0000-0002-1697-792X
+    email: pieterbouwman98@gmail.com
+    affiliations: 1,*      # * is for contact author
+  - name: Yun Li
+    orcid: 0000-0002-2715-3168
+    email: liyun.elf@gmail.com
+    affiliations: 1
+  - name: Rogier van der Weerd
+    orcid: 0000-0002-7791-2580
+    email: rogier_vdweerd@hotmail.com
+    affiliations: 1
+  - name: Frank Verhoef
+    orcid: 0000-0001-6235-7177
+    email: fsa.verhoef@chello.nl
+    affiliations: 1
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: Attention, NLP, Transparency, Explainability, Faithfulness, Plausibility, Reproducibility, LSTM, ReScience
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/MotherOfUnicorns/FACT_AI_project
   - doi: 
-  - swh: 
+  - swh: swh:1:dir:19a8073757cc142f8f50eb44014aca87cad0b8bf
 
 # Data URL and DOI (optional if no data)
 data:
@@ -66,22 +55,25 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: "A. K. Mohankumar, P. Nema, S. Narasimhan, M. M. Khapra, B. V. Srinivasan, and B. Ravindran. Towards Transparent and Explainable Attention Models. In: Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics. Online: Association for Computational Linguistics, July 2020, pp. 4206–4216. DOI: 10.18653/v1/2020.acl-main.387. URL: https://www.aclweb.org/anthology/2020.acl-main.387." # Full textual citation
+ - bib:  mohankumar_towards_2020 # Bibtex key (if any) in your bibliography file
+ - url:  https://www.aclweb.org/anthology/2020.acl-main.387 # URL to the PDF, try to link to a non-paywall version
+ - doi:  10.18653/v1/2020.acl-main.387 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "It has been shown that the weights in attention mechanisms do not necessarily offer a faithful explanation of the model's predictions. 
+           In the paper Towards Transparent and Explainable Attention Models the authors propose two methods 
+           to enhance faithfulness and plausibility of the explanations provided by an LSTM model combined with a basic attention mechanism. 
+           The authors claim that applying these methods, Orthogonalization and Diversity Driven Training, results in attention weights that offer more faithful and plausible explanations of the model's predictions, without sacrificing model performance.
+           For this reproducibility study, we focus on the main claims made in this paper, following four investigative routes: 
+           Replication, Code review, Evaluation methodology, Generalization to other architectures.
+           We confirm that Orthogonalization and Diversity Driven Training achieve similar accuracies as the Vanilla LSTM, while lowering conicity. 
+           However, we cannot reproduce the results of several of the experiments in the paper that underlie their claim of better transparency. 
+           In addition, a close inspection of the code base reveals some potentially problematic inconsistencies. 
+           Despite this, under certain conditions, we do confirm that Orthogonalization and Diversity Driven Training can be useful methods to increase transparency. 
+           How to formulate these conditions more generally remains unclear and deserves further research. 
+           One pattern that seems to emerge is that the benefits of Orthogonalization or Diversity Driven Training are most apparent for the relatively simpler tasks with a single input sequence, such as sentiment classification. 
+           The potential to improve faithfulness of the weights might be high in those cases as it not a given that attention weights carry any meaning for these tasks."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +83,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020, Natural Language Processing
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +98,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=lE0wqKGROKa
 
 contributors:
   - name:
@@ -121,7 +113,7 @@ contributors:
 
 # This information will be provided by the editor
 dates:
-  - received:  November 1, 2018
+  - received:  
   - accepted:
   - published: 
 
@@ -133,7 +125,7 @@ article:
 
 # This information will be provided by the editor
 journal:
-  - name:   "ReScience C"
-  - issn:   2430-3658
-  - volume: 4
-  - issue:  1
+  - name:  
+  - issn:  
+  - volume: 
+  - issue:  
