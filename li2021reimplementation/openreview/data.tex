@@ -1,0 +1,7 @@
+\section{Data Preprocessing and Augmentation} \label{sec:data}
+FixMatch requires a weak augmentation $\alpha(\cdot)$ and a strong augmentation $\mathcal{A}(\cdot)$.
+For the weak augmentation, we randomly flip an image with probability $0.5$ as \citep{sohn2020fixmatch} and translate an image up to $12.5\%$ with probability $0.5$ \footnote{Here, \citep{sohn2020fixmatch} didn't indicate what probability they use for the translation.}. For the strong augmentation, FixMatch uses either RandAugment (RA) \citep{cubuk2020randaugment} or CTAugment \citep{kurakin2020remixmatch} for their experiments. However, we use RA for our experiments with the maximum magnitude $10$ (same as the official experiment setup) and $2$ randomly selected operations per image.
+% (\RT{ need to justify how 10 is selected})
+
+Due to the limitation of computational resources, we examine the reproducibility of \citep{sohn2020fixmatch} on the dataset CIFAR-10 \citep{krizhevsky2009learning}.
+In CIFAR-10, there are $50000$ training data and $10000$ testing data. We take $5000$ training data as the validation dataset. Then we use the remaining training dataset to make labeled and unlabeled datasets and augment both datasets into the same target number as in \citep{sohn2020fixmatch}. After augmentation, we have $2^{13}$ labeled images and $2^{13} \times 7$ unlabeled images for the CIFAR-10 training dataset. 
