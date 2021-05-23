@@ -1,0 +1,37 @@
+\section*{\centering Reproducibility Summary}
+% \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+
+\paragraph{Scope of Reproducibility.}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+The main objective of this work is to confirm the effectiveness of FixMatch (\cite{sohn2020fixmatch}), which combines pseudo labelling and consistency regularization in semi-supervised learning (SSL) tasks, by achieving similar results on CIFAR-10 and demonstrating the key success of FixMatch via ablation studies. Furthermore, we also investigated the the existence of confirmation errors in FixMatch by reconstructing the batch structure during the training process.
+\paragraph{Methodology.}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+All the experiments in this work were conducted on CIFAR-10 using the same network architecture, Wide ResNet28-2. A single V100 is used for each experiment with an average training time of 70 hours. We re-implemented FixMatch mainly based on the paper using Pytorch and refer to the official implementation (in Tensorflow) for details and replicated similar results shown in the second-last row of Table 2 of column CIFAR-10 in \cite{sohn2020fixmatch}. Ablation studies were focused on two key factors of FixMatch, ratio of unlabeled data and confidence threshold, as shown in Figure 3 (a) \& (b) in \cite{sohn2020fixmatch}. 
+
+\paragraph{Results.}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+Compared with the average error rate reported in Table 2 in \cite{sohn2020fixmatch}, our implementation achieves similar error rates by $3.77$ lower on CIFAR-10 with 40 labels, $0.22$ higher on CIFAR-10 with 250 labels, and $0.1$ higher on CIFAR-10 with 4000 labels. Thus it is supported that FixMatch outperforms semi-superivesed learning benchmarks. And the results of ablation studies exhibit almost the same trends as Figure 3 (a) \& (b) show in the paper, which demonstrated that the author's choices with respect to those ablations were experimentally sound. We also confirmed the existence of confirmation errors in pseudo labels by checking the confusion matrix of the prediction of unlabeled data in different training stages.
+
+
+\paragraph{What was easy.}
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+It is generally easy to re-implement FixMatch given all the experimental settings in the paper, with key parameters clearly stated in each experimental section and detailed lists of hyperparameters in appendix.
+Compared with CTAugment, RandAugment is relatively easy to implement since it requires no parameters tuning during training and coefficients representing the severity of all distortions are given in appendix. Besides, it converges faster than CTAugment.
+
+\paragraph{What was difficult.}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+The official implementation is complicated thus not easy to follow. And there are some details missing in the paper compared to the code: 1. the official implementation actually use leaky ReLU instead of ReLU for ResNet; 2. Exponential moving average is only mentioned for experiments on ImageNet but actually also used on CIFAR-10; 3. the details on how to update the weights of the magnitude bins of CTAugment are not given in the paper, and our implementation achieves a slightly worse results than the average error rate reported (1.14 higher with 250 labels).
+
+
+
+\paragraph{Communication with original authors.}
+% Briefly describe how much contact you had with the original authors (if any).
+All the confused parts mentioned in the previous section are clarified by the original authors via email and in the issues of their Github repository.
+

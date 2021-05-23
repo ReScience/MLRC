@@ -1,0 +1,562 @@
+\section*{\centering Reproducibility Summary}
+
+It has been shown \citep{jain-wallace-2019-attention} that the weights in attention mechanisms do not necessarily offer a faithful explanation of the model's predictions. In the paper \textit{Towards Transparent and Explainable Attention Models} \citet{mohankumar_towards_2020} propose two methods to enhance faithfulness and plausibility of the explanations provided by an LSTM model combined with a basic attention mechanism. 
+
+\subsubsection{Scope of Reproducibility}For this reproducibility study, we focus on the main claims made in this paper:
+\begin{itemize}
+    \item The attention weights in standard LSTM attention models do not provide faithful and plausible explanations for its predictions.
+    This is potentially because the conicity of the LSTM hidden vectors is high. 
+    \item Two methods can be applied to reduce conicity: Orthogonalization and Diversity Driven Training. When applying these methods, the resulting attention weights offer more faithful and plausible explanations of the model's predictions, without sacrificing model performance.
+\end{itemize}
+
+\subsubsection{Methodology}The paper includes a link to a repository with the code used to generate its results. We follow four investigative routes:
+(i) \textit{Replication}: we rerun experiments on datasets from the paper in order to replicate the results, and add the results that are missing in the paper; 
+(ii) \textit{Code review}: we scrutinize the code to validate its correctness;
+(iii) \textit{Evaluation methodology}: we extend the set of evaluation metrics used in the paper with the LIME method, in an attempt to resolve inconclusive results;
+(iv) \textit{Generalization to other architectures}: we test whether the authors' claims apply to variations of the base model (more complex forms of attention and a BiLSTM encoder).
+
+\subsubsection{Results}We confirm that the Orthogonal and Diversity LSTM achieve similar accuracies as the Vanilla LSTM, while lowering conicity. However, we cannot reproduce the results of several of the experiments in the paper that underlie their claim of better transparency. In addition, a close inspection of the code base reveals some potentially problematic inconsistencies. Despite this, under certain conditions, we do confirm that the Orthogonal and Diversity LSTM can be useful methods to increase transparency. 
+How to formulate these conditions more generally remains unclear and deserves further research.
+The single input sequence tasks appear to benefit most from the methods. For these tasks, the attention mechanism does not play a critical role for achieving performance. 
+
+\subsubsection{What was easy/difficult}
+The codebase of the authors is accessible and can be run easily, with good facilities to prepare datasets and define configurations. The Orthogonalization and Diversity Training methods are well explained in the paper and mostly cleanly implemented. The larger datasets (Amazon and CNN) are difficult to run due to memory requirements and compute times. The codebase can be hard to navigate, a consequence of the choice to accommodate a large variation of models and datasets in one framework.
+
+\subsubsection{Communication with original authors} We reached out to the authors on a fundamental but unexplained choice in the model architecture but unfortunately did not hear back before the deadline of our assignment.
+
+\newpage
+
+\section{Introduction}
+
+The popularity of attention models has sparked many studies on the interpretability of the attention distributions, with often conflicting claims \citep{jain-wallace-2019-attention, wiegreffe-pinter-2019-attention, serrano-smith-2019-attention}.
+\citet{mohankumar_towards_2020} argue that the reason why attention weights do not always provide  a faithful explanation of the model's predictions is that the learned hidden states of the LSTM based encoder are very similar across time steps, which is expressed by high conicity of these vectors. As a result, random permutation of the attention weights leads to a similar final context vector, which implies the weights do not provide a faithful explanation. The authors propose two methods that force the hidden states of the LSTM to be more diverse. Orthogonal LSTM ensures low conicity by orthogonalizing the hidden state at time $t$ with respect to the mean of the previous hidden states. In Diversity LSTM the model is trained to jointly maximize the log-likelihood of the training data and to minimize the conicity of the hidden states. 
+\section{Scope of reproducibility}
+In this reproducibility study we focus on the authors' main claim that the Diversity LSTM and Orthogonal LSTM lead to more faithful and plausible explanations, while maintaining accuracy of the predictions.
+The authors support their claim by evaluating a series of metrics that are assumed to be indicative of levels of faithfulness and plausibility. We follow four investigative routes:
+
+\begin{itemize}
+    \item Replication: The main part of our study is focused on reproducing the results on the metrics in \citet{mohankumar_towards_2020}, and to validate whether we can confirm their observations and conclusions. Furthermore, as the original paper only presents the results of a selection of models and datasets, we complement the results where possible. Most notably, we add results on the Orthogonal LSTM that were not in the original paper. Models, code and datasets are described in Section 3.  Our replication results are presented in Section 4;
+    \item Code review: As the authors' code\footnote{\scriptsize  \url{https://github.com/akashkm99/Interpretable-Attention}} is publicly available, we use their code for the reproduction. In Section 5 we investigate whether the implementation is consistent with the description of the algorithms in the paper;
+    \item Evaluation methodology: In Section 6 we report on our attempt to resolve inconclusive results we found on the attribution methods by extending the set of evaluation metrics used in the paper with the LIME method;
+    %\footnote{\scriptsize The code with all extensions we made for this review can be accessed at \url{https://anonymous.4open.science/r/FACT_AI_project/}};
+    \item Generalization to other architectures: In Section 7 we test whether the authors' claims apply to variations of the base model (more complex forms of attention and a BiLSTM encoder).
+\end{itemize}
+We conclude this paper in Section 8 with a discussion on the conditions under which the proposed methods are most likely to be effective, and a reflection on our replication study.
+
+\section{Methodology}
+
+\subsubsection{Code}
+The code accompanying the paper is an extension based on the code\footnote{\scriptsize  \url{https://github.com/successar/AttentionExplanation}} first developed by \citet{jain-wallace-2019-attention}. The entry point of the code is clear and well documented and allows a user to define specific jobs using command line arguments for hyperparameters. Preprocessing routines for the most datasets are included. 
+
+\subsubsection{Datasets}
+We reran the experiments on 11 of the 14 datasets used in the paper. The nature and size of the datasets covers a wide range, from relatively simple binary sentiment classification tasks with single input sequence (abbreviated: SS) (e.g. SST with average input sentence length of 20 words), to complex question answering tasks with dual input sequences (abbreviated: DS)\footnote{\scriptsize{These distinctions are differently named in the code: SS is referred to as \texttt{BC} and DS as \texttt{QA}}} (e.g. CNN with average document size of 760 words and an average of 26 answer categories). Some illustrations of data points can be found in Appendix D. The code repository includes links to the datasets, as well as the pre-processing routines used by the authors. We excluded the Amenia and Diabetes datasets because they were not accessible in time. The Amazon dataset caused memory issues when running the experiments. Despite these issues we were able to get the accuracies and conicity values for this dataset.
+
+\subsubsection{Model descriptions}
+The baseline model (Vanilla LSTM) used in the paper is shown in Figure \ref{fig:model_arch}. For DS tasks, it consists of two uni-directional LSTM encoders that act on a P-path (for document input phrases) and a Q-path (for question input phrases). When applied on SS tasks in the paper, only the P-path is used. An attention decoder is applied to the hidden states of the P-path LSTM to form the context vector $\mathbf{c}_\alpha$ on which the model calculates its output. The last hidden state of the Q-path is used as the query term for DS tasks.
+
+The Diversity and Orthogonal LSTM that \citet{mohankumar_towards_2020} propose are variants of the baseline model.
+The {\bf Orthogonal LSTM} applies an orthogonalization procedure to the LSTM hidden state vectors during training: the hidden state in timestep $t$ is set to the component that is orthogonal to the mean of previous hidden states. This enforces low conicity of the hidden state vectors $\mathbf{h}^p_t$.
+The {\bf Diversity LSTM} uses a standard LSTM cell with no explicit orthogonalization, but minimizes conicity jointly with the standard loss.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1.0\linewidth]{./figures/model_arch_cropped_.pdf}
+\caption{The LSTM+attention model as defined in the paper}
+\label{fig:model_arch}
+\end{figure}
+
+\subsubsection{Hyperparameters}
+Given the wide variety of tasks and datasets, there is an elaborate set of model- and optimization hyperparameters. Not all parameter values are indicated in the original paper, some were retrieved by inspecting the code (an overview is presented in Appendix A). For all parameters, we used the defaults provided in the original code. We do not engage in further hyperparameter optimization to stay close to the original paper's approach. Note that we are interested in transparency and explainability of the models, not their optimal performance.  
+
+\subsubsection{Experimental setup and computational requirements}
+We strictly follow the code environment as dictated by the requirements file that accompanies the code. All our experiments with this code are conducted on GPU nodes of the Lisa Cluster at SURFsara\footnote{\url{https://userinfo.surfsara.nl/systems/lisa/description}}. We had access to two Nvdia GTX1080Ti GPUs (11Gb VRAM). 
+
+Train and evaluation times varied between datasets and model variations, from ca. 5 minutes (SST dataset) to more than 40 hours (CNN dataset). We ran multiple seeds only on a selection of critical datasets to verify that differences we observed w.r.t. the results in the original paper were significant. Due to resource constraints, all other comparisons are based on single seeding, as was done in the original paper. This means that our observations are indicative, not conclusive.
+
+\section{Replication of the paper's results}
+
+\subsection{Core replication results}
+Our reproduction study reveals numerous differences in results reported by \citet{mohankumar_towards_2020}, for all datasets where we ran the experiments.  Despite the differences, we support the observation that Diversity and Orthogonal LSTM reach similar accuracies as Vanilla LSTM, and lower conicity values, with the same exception reported in the paper (CNN).
+However, we find the claim that Diversity LSTM leads to more transparent attention distributions is not consistently supported. For Orthogonal LSTM, some results were omitted in the original paper, and we find conflicting results about the effect on faithfulness and plausibility. We present an overview of the comparisons by metric, and the impact our findings have on the main claims of the authors.
+
+\subsubsection{Accuracy and conicity} Of all accuracy and conicity values reported by \citet{mohankumar_towards_2020}, we are able to reproduce 86\% within a 3\%-point margin.
+Models and datasets that produced the most notable differences are highlighted in Table \ref{tab:comparison_accuracy}.
+Despite the different values, the observation that Diversity and Orthogonal LSTM reach similar accuracies as Vanilla LSTM still holds, except for the CNN dataset.
+Also, we can confirm that conicity values are much lower in Diversity and Orthogonal LSTM, except for CNN in the Diversity LSTM.
+The largest difference in accuracy we observe for bAbI3, but the output files reveal that the model was not done training after the default 200 epochs.
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|l|r r|r r|r r|}
+    \multicolumn{7}{c}{Accuracy\%}  \\
+    \hline
+    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} 
+    & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} 
+    & \multicolumn{2}{p{2cm}||}{\centering Orthogonal LSTM} \\
+    \hline
+    Dataset & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST  & 81.79 & 80.3 & 79.95 & 80.0 & 80.05 & 77.6  \\
+    IMDB & 89.49 & 89.3 & 88.54 & 87.8 & 88.71 & 88.3 \\
+    Yelp & 95.60 & 94.5 & 95.40 & 93.8 & 96.00 & 94.5  \\
+    20News & 93.55 & 90.8 & 91.03 & 90.8 & 92.15 & 91.9 \\
+    Tweets & \textbf{87.02} & \red{83.3} & 87.04 & 85.4 & 83.20 & 83.9 \\
+    \hline
+    SNLI & 78.23 & 77.3 & 76.96 & 74.0 & 76.46 & 76.6 \\
+    QQP & 78.74 & 78.4 & 78.40 & 78.2 & 78.61 & 78.6  \\
+    bAbI1 & 99.10 & 100.0 & 100.00 & 100.0 & 99.90 & 99.9  \\
+    bAbI2 & \textbf{40.10} & \red{54.4} & \textbf{40.20} & \red{54.6} & 56.10 & 59.0 \\
+    bAbI3 & \textbf{47.70} & \red{21.1}& \textbf{50.90} & \red{56.3} & \textbf{51.20} & \red{57.7}  \\
+    CNN & \textbf{63.07} & \red{59.5} & \textbf{58.19} & \red{46.3} & 54.30 & 53.6  \\
+    \hline
+    \multicolumn{7}{c}{Conicity} \\
+    \hline
+    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} 
+    & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} 
+    & \multicolumn{2}{p{2cm}|}{\centering Orthogonal LSTM} \\
+    \hline
+    Dataset & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST & 0.68 & 0.71 & 0.20 & 0.19 & 0.28 & 0.28 \\
+    IMDB &  \textbf{0.69} & \red{0.60} & 0.08 & 0.09 & 0.18 & 0.16 \\
+    Yelp &  0.53 & 0.54 & \textbf{0.06} & \red{0.35} & 0.18 & 0.19 \\
+    20News &  0.77 & 0.76 & 0.15 & 0.14 & 0.23 & 0.24\\
+    Tweets &  0.77 & 0.78 & 0.24 & 0.23 & 0.27 & 0.26\\
+    \hline
+    SNLI & 0.56 & 0.59 & \textbf{0.12} & \red{0.04} & \textbf{0.27} & \red{0.31}\\
+    QQP &  0.59 & 0.58 & 0.04 & 0.03 & 0.33 & 0.32 \\
+    bAbI1 & \textbf{0.56} & \red{0.77} & 0.07 & 0.07 & 0.22 & 0.23 \\
+    bAbI2 &  \textbf{0.48} & \red{0.43} & \textbf{0.05} & \red{0.13} & \textbf{0.21} & \red{0.17} \\
+    bAbI3 &  \textbf{0.43} & \red{0.93} & 0.10 & 0.11 & 0.12 & 0.13 \\
+    CNN &  \textbf{0.45} & \red{0.40} & \textbf{0.06} & \red{0.38} & 0.07 & 0.10 \\
+    \hline
+    \end{tabular}
+    \caption{Comparison of reported accuracy and conicity values (differences > 0.03 are highlighted).}
+    \label{tab:comparison_accuracy}
+\end{table}
+
+
+%\begin{table}[ht]
+%   \scriptsize
+% \centering
+%   \begin{tabular}{|l|r r|r r|r r||r r|r r|r r|}
+%    \hline
+%   Dataset & \multicolumn{6}{c||}{Accuracy\%} & \multicolumn{6}{c|}{Conicity} \\
+%   \hline
+%   & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} 
+%    & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} 
+%    & \multicolumn{2}{p{2cm}||}{\centering Orthogonal LSTM} 
+%    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} 
+%    & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} 
+%   & \multicolumn{2}{p{2cm}|}{\centering Orthogonal LSTM} \\
+%   \hline
+%   & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun \\
+%   \hline 
+%   SST  & 81.79 & 80.3 & 79.95 & 80.0 & 80.05 & 77.6 & 0.68 & 0.71 & 0.20 & 0.19 & 0.28 & 0.28 \\
+%   IMDB & 89.49 & 89.3 & 88.54 & 87.8 & 88.71 & 88.3 & \textbf{0.69} & \red{0.60} & 0.08 & 0.09 & 0.18 & 0.16 \\
+%  Yelp & 95.60 & 94.5 & 95.40 & 93.8 & 96.00 & 94.5 & 0.53 & 0.54 & \textbf{0.06} & \red{0.35} & 0.18 & 0.19 \\
+%  20News & 93.55 & 90.8 & 91.03 & 90.8 & 92.15 & 91.9 & 0.77 & 0.76 & 0.15 & 0.14 & 0.23 & 0.24\\
+%  Tweets & \textbf{87.02} & \red{83.3} & 87.04 & 85.4 & 83.20 & 83.9 & 0.77 & 0.78 & 0.24 & 0.23 & 0.27 & 0.26\\
+%  \hline
+%  SNLI & 78.23 & 77.3 & 76.96 & 74.0 & 76.46 & 76.6 & 0.56 & 0.59 & \textbf{0.12} & \red{0.04} & \textbf{0.27} & \red{0.31}\\
+%  QQP & 78.74 & 78.4 & 78.40 & 78.2 & 78.61 & 78.6 & 0.59 & 0.58 & 0.04 & 0.03 & 0.33 & 0.32 \\
+%  bAbI1 & 99.10 & 100.0 & 100.00 & 100.0 & 99.90 & 99.9 & \textbf{0.56} & \red{0.77} & 0.07 & 0.07 & 0.22 & 0.23 \\
+%  bAbI2 & \textbf{40.10} & \red{54.4} & \textbf{40.20} & \red{54.6} & 56.10 & 59.0 & \textbf{0.48} & \red{0.43} & \textbf{0.05} & \red{0.13} & \textbf{0.21} & \red{0.17} \\
+%  bAbI3 & \textbf{47.70} & \red{21.1}& \textbf{50.90} & \red{56.3} & \textbf{51.20} & \red{57.7} & \textbf{0.43} & \red{0.93} & 0.10 & 0.11 & 0.12 & 0.13 \\
+%  CNN & \textbf{63.07} & \red{59.5} & \textbf{58.19} & \red{46.3} & 54.30 & 53.6 & \textbf{0.45} & \red{0.40} & \textbf{0.06} & \red{0.38} & 0.07 & 0.10 \\
+%    \hline
+%   \end{tabular}
+%    \caption{Comparison of reported accuracy and conicity values (differences > 0.03 are highlighted).}
+%    \label{tab:comparison_accuracy}
+%\end{table}
+
+\subsubsection{Importance of hidden representation} \citet{mohankumar_towards_2020} analyse the importance of hidden representations using intermediate representation erasure \citep{serrano-smith-2019-attention} and also by examining the effect of permuting the attentions weights \citep{jain-wallace-2019-attention}. 
+
+A visual comparison of the box plots about representation erasure in the paper with box plots in our reruns shows similar results in 25 of the 30 boxes. Despite the fact that our rerun shows lower medians for the box plots for the LSTM in IMDB and 20News dataset, the observation still holds that Diversity LSTM and Orthogonal LSTM reach a quicker decision flip for SS tasks.
+We concur with the authors' observations on the paraphrase detection (QQP) and Q\&A task (bAbI1). In our rerun we see that the quick decision flip that is shown in bAbI1 also occurs in bAbI2 and bAbI3. 
+\citet{mohankumar_towards_2020} do not report on SNLI and CNN, where our rerun shows no improvement of the Diversity LSTM and Orthogonal LSTM models over Vanilla LSTM.
+
+The impact of permuting attention weights is difficult to compare with our results as \citet{mohankumar_towards_2020} only report a graphical representation (violin plots) of median output difference. After visual comparison we judge that the overall results are similar for IMDB, 20News and Yelp. We also evaluate the median output difference for datasets not reported by \citet{mohankumar_towards_2020}. We observe that the results for SST and Tweets show a similar `shift to the right' as reported for other binary classification tasks. For DS tasks we observe that Vanilla LSTM already has relatively high median output difference, and the Diversity LSTM and Orthogonal LSTM provide less improvement.
+
+We conclude that in our experiments, the Diversity and Orthogonal LSTM do result in quicker decision flips and higher output difference for SS tasks, but not consistently for the other tasks.
+
+
+\subsubsection{Comparison with rationales} 
+Our rerun of rationale length and rationale attention shows very different results as reported by \citet{mohankumar_towards_2020}, 
+see Table \ref{tab:rationales}. Although we can confirm that Diversity LSTM results in shorter rationales, we cannot support the claim that Diversity LSTM provides much higher attention to the rationale than Vanilla LSTM. In our rerun this only holds for 20News.
+
+The data for the Orthogonal LSTM, which were not reported by \citet{mohankumar_towards_2020}, show much shorter rationale length, consistent with the paper's claim. However, impact on the share of attention on the rationale is mixed: it is higher for Yelp and 20 News, similar for IMDB and Tweets, but lower for SST.
+
+For DS tasks, the rationale comparison is not implemented by the authors, we suspect because of the high computational costs involved for calculating rationales in tasks with multiple output categories.
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|l|r r|r r|r r|}
+    \multicolumn{7}{c}{Rationale attention} \\
+    \hline
+    & \multicolumn{2}{p{1.7cm}}{\centering Vanilla LSTM} & \multicolumn{2}{|p{1.7cm}}{\centering Diversity LSTM} & \multicolumn{2}{|p{1.7cm}|}{\centering Orthogonal LSTM} \\
+    \hline
+   Dataset & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST      & \textbf{0.348} & \red{0.74} & 0.624 & 0.55 & - & 0.35 \\
+    IMBD     & \textbf{0.472} & \red{0.97} & \textbf{0.761} & \red{0.91} & - & 0.92  \\
+    Yelp     & 0.438 & 0.43 & \textbf{0.574} & \red{0.27} & - & 0.55 \\
+    20News   & 0.627 & 0.62 & 0.884 & 0.94 & - & 0.86 \\
+    Tweets   & \textbf{0.284} & \red{0.82} & \textbf{0.764} & \red{0.59} & - & 0.79  \\
+    \hline
+    \multicolumn{7}{c}{Rationale length} \\
+    \hline
+    & \multicolumn{2}{p{1.7cm}}{\centering Vanilla LSTM} & \multicolumn{2}{|p{1.7cm}}{\centering Diversity LSTM} & \multicolumn{2}{|p{1.7cm}|}{\centering Orthogonal LSTM} \\
+    \hline
+    Dataset & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST       & \textbf{0.240} & \red{0.72} & 0.175 & 0.18 & - & 0.10 \\
+    IMBD      & \textbf{0.217} & \red{0.92} & \textbf{0.169} & \red{0.22} & - & 0.27 \\
+    Yelp     & \textbf{0.173} & \red{0.38} & 0.160 & 0.19 & - & 0.11 \\
+    20News   & \textbf{0.215} & \red{0.59} & \textbf{0.173} & \red{0.27} & - & 0.24 \\
+    Tweets   & \textbf{0.225} & \red{0.81} & 0.306 & 0.32 & - & 0.39 \\
+    \hline
+    \end{tabular}
+    \caption{Comparison of reported rationales (differences > 0.05 are highlighted)}
+    \label{tab:rationales}
+\end{table}
+
+%\begin{table}[ht]
+%    \scriptsize
+%    \centering
+%    \begin{tabular}{|l|r r|r r|r r||r r|r r|r r|}
+%    \hline
+%    Dataset & \multicolumn{6}{|c||}{Rationale attention} & \multicolumn{6}{c|}{Rationale length} \\
+%    \hline
+%    & \multicolumn{2}{|p{1.7cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{|p{1.7cm}|}{\centering Diversity LSTM} & \multicolumn{2}{|p{1.7cm}||}{\centering Orthogonal LSTM} & \multicolumn{2}{p{1.7cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{p{1.7cm}|}{\centering Diversity LSTM} & \multicolumn{2}{p{1.7cm}|}{\centering Orthogonal LSTM} \\
+%    \hline
+%    & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun \\
+%    \hline 
+%    SST      & \textbf{0.348} & \red{0.74} & 0.624 & 0.55 & - & 0.35 & \textbf{0.240} & \red{0.72} & 0.175 & 0.18 & - & 0.10 \\
+%    IMBD     & \textbf{0.472} & \red{0.97} & \textbf{0.761} & \red{0.91} & - & 0.92 & \textbf{0.217} & \red{0.92} & \textbf{0.169} & \red{0.22} & - & 0.27 \\
+%    Yelp     & 0.438 & 0.43 & \textbf{0.574} & \red{0.27} & - & 0.55 & \textbf{0.173} & \red{0.38} & 0.160 & 0.19 & - & 0.11 \\
+%%    Amazon   & 0.346 & - & 0.396 & - & - & - & 0.162 & -  & 0.240 & - & - & - \\
+%%    Anemia   & 0.611 & - & 0.739 & - & - & - & 0.192 & -  & 0.237 & - & - & -  \\
+%%    Diabetes & 0.742 & - & 0.825 & - & - & - & 0.458 & - & 0.354 & - & - & -\\
+%    20News   & 0.627 & 0.62 & 0.884 & 0.94 & - & 0.86 & \textbf{0.215} & \red{0.59} & \textbf{0.173} & \red{0.27} & - & 0.24 \\
+%    Tweets   & \textbf{0.284} & \red{0.82} & \textbf{0.764} & \red{0.59} & - & 0.79 & \textbf{0.225} & \red{0.81} & 0.306 & 0.32 & - & 0.39 \\
+%    \hline
+%    \end{tabular}
+%    \caption{Comparison of reported rationales (differences > 0.05 are highlighted)}
+%    \label{tab:rationales}
+%\end{table}
+
+
+\subsubsection{Comparison with attribution methods}
+\label{sec:comparison_attribution}
+The rerun of the correlation metrics shows numerous differences in both Pearson correlation and JS Divergence.
+After studying Pearson correlation, we support the authors' claim that compared with Vanilla LSTM, Diversity LSTM produces attention weights that better correlate with gradients and integrated gradients, although in our results the relative increase of correlation with gradients is smaller: 13\%\footnote{\scriptsize This percentage represents the average of the increases over all datasets.} instead of the 65\% reported by \citet{mohankumar_towards_2020}.
+However, we do not see the claimed reduction in JS Divergence. In fact, for all datasets the Diversity LSTM produces similar or even higher JS Divergence values than Vanilla LSTM, except JS Divergence with Integrated Gradients for 20News, see Table \ref{tab:comparison_JSD}. The Orthogonal LSTM, for which no correlation data is reported in the paper, is in line with the Diversity LSTM in this respect.
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|l|r r|r r|r r|}
+    \multicolumn{7}{c}{JS Divergence Gradients} \\
+    \hline
+    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} & \multicolumn{2}{p{2cm}|}{\centering Orthogonal LSTM} \\
+    \hline
+    & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST & 0.10 & 0.09 & 0.08 & 0.09 & - & 0.14 \\
+    IMDB & 0.09 & 0.08 & 0.09 & 0.11 & - & 0.13 \\
+    Yelp & 0.15 & 0.12 & \textbf{0.13} & \red{0.17} & - & 0.16 \\
+    20News & 0.15 & 0.18 & \textbf{0.06} & \red{0.17} & - & 0.17  \\
+    Tweets & 0.08 & 0.07 & 0.12 & 0.09 & - & 0.18 \\
+    \hline
+    SNLI & 0.11 & 0.11 & 0.10 & 0.11 & - & 0.12  \\
+    QQP & \textbf{0.15} & \red{0.10} & 0.10 & 0.11 & - & 0.12  \\
+    bAbI1 & \textbf{0.33} & \red{0.12} & 0.21 & 0.23 & - & 0.21 \\
+    bAbI2 & \textbf{0.53} & \red{0.39} & \textbf{0.23} & \red{0.40} & - & 0.38  \\
+    bAbI3 & \textbf{0.46} & \red{0.26} & 0.37 & 0.36 & - & 0.43 \\
+    CNN & \textbf{0.22} & \red{0.16} & \textbf{0.17} & \red{0.34} & - & 0.39 \\
+    \hline
+    \multicolumn{7}{c}{JS Divergence Integrated Gradients} \\
+    \hline
+    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} & \multicolumn{2}{p{2cm}|}{\centering Orthogonal LSTM}  \\
+    \hline
+    Dataset & original & rerun & original & rerun & original & rerun \\
+    \hline 
+    SST & 0.12 & 0.10 & 0.09 & 0.10 & - & 0.15 \\
+    IMDB & 0.13 & 0.11 & 0.13 & 0.15 & - & 0.18 \\
+    Yelp & 0.19 & 0.18 & 0.19 & 0.19 & - & 0.17 \\
+    20News & 0.21 & 0.22 & \textbf{0.07} & \red{0.13} & - & 0.15 \\
+    Tweets  & 0.08 & 0.08 & \textbf{0.15} & \red{0.10} & - & 0.19 \\
+    \hline
+    SNLI & 0.16 & 0.14 & 0.13 & 0.14 & - & 0.15 \\
+    QQP  & \textbf{0.19} & \red{0.15} & 0.15 & 0.14 & - & 0.14 \\
+    bAbI1  & \textbf{0.43} & \red{0.25} & 0.24 & 0.22 & - & 0.28 \\
+    bAbI2  & \textbf{0.58} & \red{0.51} & \textbf{0.19} & \red{0.58} & - & 0.54 \\
+    bAbI3 & \textbf{0.64} & \red{0.35} & \textbf{0.41} & \red{0.64} & - & 0.64\\
+    CNN & \textbf{0.30} & \red{0.23} & \textbf{0.21} & \red{0.51} & - & 0.44 \\
+    \hline
+    \end{tabular}
+    \caption{Comparison of correlation metrics. Differences > 0.03 are highlighted}
+    \label{tab:comparison_JSD}
+\end{table}
+
+%\begin{table}[ht]
+%    \scriptsize
+%    \centering
+%    \begin{tabular}{|l|r r|r r|r r||r r|r r|r r|}
+%    \hline
+%    Dataset & \multicolumn{6}{c||}{JS Divergence Gradients} & \multicolumn{6}{c|}{JS Divergence Integrated Gradients} \\
+%    \hline
+%    & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} & \multicolumn{2}{p{2cm}||}{\centering Orthogonal LSTM} & \multicolumn{2}{p{2cm}|}{\centering Vanilla LSTM} & \multicolumn{2}{p{2cm}|}{\centering Diversity LSTM} & \multicolumn{2}{p{2cm}|}{\centering Orthogonal LSTM} \\
+%    \hline
+%    & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun & original & rerun \\
+%    \hline 
+%    SST & 0.10 & 0.09 & 0.08 & 0.09 & - & 0.14 & 0.12 & 0.10 & 0.09 & 0.10 & - & 0.15 \\
+%    IMDB & 0.09 & 0.08 & 0.09 & 0.11 & - & 0.13 & 0.13 & 0.11 & 0.13 & 0.15 & - & 0.18 \\
+%    Yelp & 0.15 & 0.12 & \textbf{0.13} & \red{0.17} & - & 0.16 & 0.19 & 0.18 & 0.19 & 0.19 & - & 0.17 \\
+%%    Amazon & 0.17 & - & 0.12 & - & - & - & 0.21 & - & 0.12 & - & - & - \\
+%    20News & 0.15 & 0.18 & \textbf{0.06} & \red{0.17} & - & 0.17 & 0.21 & 0.22 & \textbf{0.07} & \red{0.13} & - & 0.15 \\
+%    Tweets & 0.08 & 0.07 & 0.12 & 0.09 & - & 0.18 & 0.08 & 0.08 & \textbf{0.15} & \red{0.10} & - & 0.19 \\
+%    \hline
+%    SNLI & 0.11 & 0.11 & 0.10 & 0.11 & - & 0.12 & 0.16 & 0.14 & 0.13 & 0.14 & - & 0.15 \\
+%    QQP & \textbf{0.15} & \red{0.10} & 0.10 & 0.11 & - & 0.12 & \textbf{0.19} & \red{0.15} & 0.15 & 0.14 & - & 0.14 \\
+%    bAbI1 & \textbf{0.33} & \red{0.12} & 0.21 & 0.23 & - & 0.21 & \textbf{0.43} & \red{0.25} & 0.24 & 0.22 & - & 0.28 \\
+%    bAbI2 & \textbf{0.53} & \red{0.39} & \textbf{0.23} & \red{0.40} & - & 0.38 & \textbf{0.58} & \red{0.51} & \textbf{0.19} & \red{0.58} & - & 0.54 \\
+%    bAbI3 & \textbf{0.46} & \red{0.26} & 0.37 & 0.36 & - & 0.43 & \textbf{0.64} & \red{0.35} & \textbf{0.41} & \red{0.64} & - & 0.64\\
+%    CNN & \textbf{0.22} & \red{0.16} & \textbf{0.17} & \red{0.34} & - & 0.39 & \textbf{0.30} & \red{0.23} & \textbf{0.21} & \red{0.51} & - & 0.44 \\
+%    \hline
+%    \end{tabular}
+%    \caption{Comparison of correlation metrics. Differences > 0.03 are highlighted}
+%    \label{tab:comparison_JSD}
+%\end{table}
+
+
+\subsubsection{Analysis by POS tags}
+
+A comparison of the importance that is attributed to various POS tags shows similar importance and ranking for the SST, 20News and Tweets datasets. For Yelp and QQP we get different outcomes. Most notably, with vanilla LSTM model for Yelp we see no attention given to punctuations (PUNC), for which \citet{mohankumar_towards_2020} reports highest attention. For QQP, \citet{mohankumar_towards_2020} reports 23\% on PUNC, while we find only 9\%. 
+Our results indicate the improvements shown in POS tags are less clear than reported by \citet{mohankumar_towards_2020}.
+
+\subsubsection{Human evaluation} We could not reproduce the human evaluation within the four-week time frame of our research.
+\citet{mohankumar_towards_2020} reports convincing results, and we also believe human interpretation should play a key role in judging whether their methods improve transparency. We include some examples in Appendix D for this purpose.
+
+\subsection{Conclusion regarding reproducibility} Our findings are summarized in Table \ref{tab:claims}. We conclude that it is not immediately clear that Diversity LSTM and Orthogonal LSTM provide better transparency for all the studied datasets. 
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|p{2.5cm}|p{5.5cm}|p{1.5cm}|p{2.5cm}|}
+    \hline
+    Metric & Claim (with reference to paragraph number in \citet{mohankumar_towards_2020})  & Supported after rerun & Notes \\
+    \hline
+    \hline
+    Accuracy and conicity &  Diversity LSTM and Orthogonal LSTM achieve similar accuracies as Vanilla LSTM, but much lower conicity (\S 5.2) & Yes & Except CNN in Diversity LSTM \\
+    \hline
+    Fraction of hidden representation required for decision flip (box plots) & Diversity LSTM and Orthogonal LSTM reach quicker decision flip (\S 5.3) & Yes (for models in paper) & Especially for BC tasks, somewhat for QQP; not for SNLI and QA tasks \\
+    \hline
+    Median Output difference on randomly permuting attention weights (violin charts) & Diversity LSTM and Orthogonal LSTM are more sensitive to random permutation of weights than Vanilla LSTM (\S 5.3) & Yes (for models in paper) & Clear difference for BC tasks, mixed picture for the dual-sequence tasks. \\
+    \hline
+    Rationale attention & Diversity LSTM provides much higher attention to rationales than Vanilla LSTM across the 8 Text classification datasets (\S 5.4) & No & Only true for 20News; No results reported on QA tasks \\ 
+    \hline
+    Rationale length &  Diversity LSTM often provides shorter rationales than Vanilla LSTM (\S 5.4) & Yes & No results reported on QA tasks\\
+    \hline
+    Pearson correlation and JS divergence between distribution of attention and (integrated) gradients & Attention weights in Diversity LSTM better agree with gradients and integrated gradients than Vanilla LSTM (\S 5.5) & Mixed & Diversity LSTM has higher Pearson correlation, but similar or higher JS Divergence \\
+    \hline
+    Attention given to POS tags & Attention given to punctuation marks is significantly reduced on the Yelp, Amazon and QQP datasets (\S 5.6) & No & Not for Yelp, less clear for QQP \\
+    \hline
+     & Diversity LSTM gives much more attention to adjectives than Vanilla LSTM in the four sentiment analysis tasks (SST, IMDB, Yelp, Amazon) (\S 5.6) & Yes & True for SST and IMDB, but not for Yelp \\
+    \hline
+    Human evaluation of plausibility & Human evaluators prefer attention distribution of Diversity LSTM over Vanilla LSTM for Yelp, SNLI, QQP and bAbI1 (\S 5.7) & Not reproduced & Evaluation by only 15 people \\
+    \hline
+    \end{tabular}
+    \caption{Evidence for authors' claims after rerun}
+    \label{tab:claims}
+\end{table}
+
+\begin{itemize}
+\item 
+The Orthogonal LSTM clearly leads to lower conicity than Vanilla LSTM, but \citet{mohankumar_towards_2020} show little evidence with other metrics that indicate higher faithfulness:  
+of the 14 datasets, only 6 boxplots and 4 violin charts are included.
+The results observed in our rerun are mixed. For example, Orthogonal LSTM works well for 20News, but for SNLI there is hardly any effect on the box plot, and also correlation/JSD with (integrated) gradients is worse.
+\item
+For Diversity LSTM, \citet{mohankumar_towards_2020} show convincing evidence with substantial data. We observe similar trends in conicity, and the impact of diversity training is clear in the box plots and violin charts for the binary classification tasks. However, for the tasks that require two input sequences like SNLI, bAbI2, CNN our rerun shows that Diversity LSTM does not contribute much to faithfulness and can lead to lower correlation with (integrated) gradients and higher JS Divergence.
+\end{itemize}
+
+\section{Code Review}
+
+As part of the reproduction study, we familiarized ourselves with the code to understand how the model and the experiments had been implemented. We also scrutinized the code to check whether we could find a cause for the differences we found in the reported metrics.
+The code's class architecture can accommodate a wide range of tasks, datasets and model configurations. While convenient, this also makes the codebase complex and susceptible to errors. 
+The code review revealed several debatable choices, of which the main ones are described below.
+
+\subsubsection{Orthogonalization of Q-path in dual input sequence tasks}
+
+For DS tasks, we expect the orthogonalization procedure to only be activated in the P-path (the path of the input document) of the model, as this is the path on which the attention mechanism applies its weights $\alpha_t$. However, in the code, orthogonalization is \textit{also} applied to the Q-path (the path of the question phrase in the Q\&A tasks, or the second input phrase in SNLI and QQP).
+
+In our view, this introduces a potentially problematic effect. The attention mechanism uses only the \underline{last} hidden state vector $\mathbf{h}_t^q$ as the query term.
+This representation for the last word in the sequence will only retain the vector component orthogonal to the mean of the previous word representations, as a result of orthogonalization.
+We argue that the direction of $\mathbf{h}_t^q$ in the hidden space will represent the exclusive `change of meaning' that the last word adds to the sequence. This is not a problem in the bAbI tasks, where the prompt word in the question phrase is always the last word (e.g., `Where is Jane'). But for longer questions where the prompt words appear earlier in the question, this may impede the attention mechanism from finding the right prompt words. 
+
+In order to test this sensitivity, we conduct an experiment for the simpler SS tasks.
+We apply orthogonalization during training and compare model performance when i) attention weights are left unconstrained vs. ii) all attention weights are set to zero, except for the last hidden state. The result is shown in Table \ref{tab:QPath_ortho_problem}. 
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|r|c|c||c|c|}
+    \hline
+    & \multicolumn{2}{c||}{Vanilla LSTM} & \multicolumn{2}{c|}{Orthogonal LSTM} \\
+    \hline
+     & Base  & last\_only  & Base  & last\_only \\
+     \multicolumn{1}{|c|}{Dataset} & attention  & attention  & attention  & attention \\
+    \hline 
+    SST:   accuracy&   0.803  &  \green{0.810} &  0.776  &  \red{0.583}\\
+         (conicity)&  (0.713) & (0.763)& (0.283) & (0.265)\\
+    \hline 
+    IMDB: accuracy& 0.893& \green{0.876} & 0.883 & \red{0.784}\\
+    (conicity)&  (0.602)& (0.885) & (0.163) & (.141) \\
+    \hline 
+    20News: accuracy& 0.908 & \orange{0.857}&0.919&\red{0.583}\\
+    (conicity)& (0.761)  & (0.831)&(0.235)&(0.395)\\
+    \hline 
+    Tweets: accuracy& 0.833&\orange{0.782} &0.839 & \red{0.712}\\
+    (conicity)& (0.776)&(0.798)&(0.260)&(0.330)\\
+    \hline
+    \end{tabular}
+    \caption{Demonstration of adverse effect of orthogonalization on the information content of the last hidden state vector (results reflect our experiments, not the original paper)}
+    \label{tab:QPath_ortho_problem}
+\end{table}
+
+What is striking is the performance remains on par (marked in green) for Vanilla LSTM when only attending to the last hidden state, indicating the model performs well without the attention mechanism.
+However, we observe a performance drop of 10\%-34\% (absolute) when attention is constrained for the Orthogonal LSTM (marked in red). Indeed, it appears part of the information required for inference is lost.
+How this effect impacts the results requires further study. It may explain the accuracy drop from 63\% (Vanilla LSTM) to 58\%/54\%(Diversity/Orthogonal LSTM) for CNN as reported in Table 2 by \citet{mohankumar_towards_2020}.
+We have contacted the authors to verify their intentions, but did not receive a response prior to submission of this reproduction study.
+
+\subsubsection{Disparate calculation of final prediction}
+For DS tasks, in the code the final prediction layer is implemented as $\hat{y} = \text{softmax}(\mathbf{W}_r (\tanh(\mathbf{W}_p \mathbf{c}_{\alpha} + \mathbf{b}_p + \mathbf{W}_q \mathbf{h}^q_n + \mathbf{b}_q)) + \mathbf{b}_r)$. This deviates from the prediction function $\hat{y} = \text{softmax}(\mathbf{W}_0 \mathbf{c}_{\alpha})$ described in Section 2.1 by \citet{mohankumar_towards_2020}\footnote{\scriptsize  \url{https://github.com/akashkm99/Interpretable-Attention/blob/master/model/modules/Decoder.py\#L101-L107}}. However, this does not affect the core architecture, namely LSTM and attention, so we did not modify the code or conduct further experiments.
+    
+\subsubsection{Fine-tuning of embeddings}
+The models use pre-trained embeddings except for the bAbI datasets. Words outside of the pre-trained embeddings' vocabulary are initialized with zero-vectors. All embeddings are fine-tuned (i.e. trainable), independently for the P- and Q-paths for DS tasks. This is not mentioned in the original paper and this choice is questionable as it leads to an excessive number of trainable parameters (e.g., >40M for the CNN dataset, see Appendix A) and training time, while it is unlikely to be critical for the tasks.
+
+\subsubsection{Definition of dev set for bAbI datasets}
+While pre-processing bAbI datasets, 15\% of the train set is randomly selected to be used as dev set, resulting in much higher similarity between these two splits compared to the test set. As a result, the trained model is overfit on the train set, and we observe a large gap between dev and test accuracy.
+    
+\section{Extension of the evaluation methods}
+As discussed in Section \ref{sec:comparison_attribution}, our rerun of Pearson's correlation and JS Divergence between attention weights and gradients/integrated gradients points towards a less convincing conclusion.
+We therefore also used the LIME framework \citep{ribeiro2016should} as a third metric for comparing how transparent the attention weights are as explanations, as well as how much improvements are brought about by the Diversity and Orthogonal LSTM.
+
+\begin{table}[ht]
+\scriptsize
+    \centering
+    \begin{tabular}{|l|c|c|c||c|c|c|}
+    \hline
+    & \multicolumn{3}{c||}{Pearson's Correlation}& \multicolumn{3}{c|}{JS Divergence} \\
+    \hline
+    Dataset & Vanilla & Ortho. & Div. & Vanilla & Ortho. & Div. \\
+    \hline
+    IMDB
+    & 0.42 & \red{0.33} & 0.42
+    & 0.26 & \red{0.44} & \red{0.42}\\
+    20News
+    & 0.30 & \green{0.70} & \green{0.71}
+    & 0.22 & \red{0.42} & \red{0.45}\\
+    Tweets
+    & 0.13 & \green{0.38} & \green{0.43}
+    & 0.07 & \red{0.33} & \red{0.18}\\
+    \hline
+    SNLI
+    & 0.24 & 0.22 & 0.23
+    & 0.15 & 0.15 & 0.12\\
+    bAbI1
+    & 0.69 & 0.67 & \red{0.58}
+    & 0.42 & 0.38 & 0.46\\
+    \hline
+    \multicolumn{7}{l}{\scriptsize{Numbers that agree with expectations (higher correlation, lower JS}} \\
+    \multicolumn{7}{l}{Divergence) are highlighted in \green{green},  numbers opposite to expectations} \\
+    \multicolumn{7}{l}{are highlighted in \red{red}.}
+    \end{tabular}
+    \caption{Correlation and JS Divergence between attention weights and LIME scores}
+    \label{tab:lime}
+\end{table}
+
+We use LIME to generate a score for the predicted class on each word-position in the sentence, which can then be compared with the attention weights. For calculating JS divergence we also rescaled the lime score so that the scores range from 0 to 1, and sums to 1 per sentence (i.e. similar to attention scores). The results are shown in Table \ref{tab:lime}, where we experimented with only a representative selection of datasets due to time and resource constraints.
+
+Similar to our comparison of attention weights with gradient-based methods, Table \ref{tab:lime} indicates Diversity and Orthogonal LSTM fail to produce explanations consistent with LIME.
+It is also not clear which statistical measure is best for comparing whether two explanation methods agree with each other. In several instances (e.g. 20News and Tweets), we observe an increase in Pearson's correlation and an increase in JS Divergence at the same time when going from Vanilla LSTM to Orthogonal/Diversity LSTM models.
+
+\section{Generalization to other model architectures}
+
+Despite the differences we found between our observations and the observations reported by \citep{mohankumar_towards_2020}, we still see the potential value of the methods they propose.
+This is because we did observe sparser attention weights when using Diversity and Orthogonal LSTM, and because of the strong preference expressed for the Diversity LSTM in the human evaluations conducted by \citet{mohankumar_towards_2020}.
+
+We therefore investigate how well these methods work in alternative settings. So far the Orthogonalization and Diversity Training methods are only tested on one-layer uni-directional LSTM models with attention. However, in many recent studies, BiLSTM-based attention models or Transformer models are used  \citep{zhou2018nlp,lee2019ncuee,8554396}. Similarly, more complex attention mechanisms such as self-attention and multi-head attention \citep{vaswani_attention_2017} gained popularity due to their superior performance. For this reason, we investigate whether the proposed methods can be extended to more complex models and whether the authors' two main claims still apply.
+
+\subsubsection{Extending to other attention mechanisms}
+The application of more advanced attention mechanisms (such as multi-head attention) poses a challenge because they produce more than one attention weight per word. It is not straightforward to generate explanations and word importance based on these weights. As a consequence, several of the evaluation metrics used by the authors cannot be applied in their current form. This would require making non-trivial design choices on how to  combine multiple distributions of the attention weights.
+Further research is required to investigate this and whether existing methods such as Attention Flow and Attention Rollout \citep{abnar_quantifying_2020} can provide a resolution. 
+
+\subsubsection{Extending to other architectures: BiLSTM Experiments}
+We replace the uni-directional LSTM in the model (Figure \ref{fig:model_arch}) with a bi-directional LSTM. 
+We choose the BiLSTM architecture, and not a Transformer based architecture, as the latter requires dealing with the more advanced attention mechanisms discussed above.
+ 
+In order to maintain the decoder's complexity (the attention mechanism), we preserve the output dimension of the LSTM. This requires halving the dimension of the hidden states, which also ensures that the number of trainable weights of the BiLSTM is comparable to that of the unidirectional LSTM.
+For the Diversity BiLSTM, the same diversity weights are used as in \citet{mohankumar_towards_2020}. 
+The conicity term present in the loss function of the Diversity BiLSTM is calculated based on the concatenated forward and backward hidden representations. Orthogonalization for the Ortho BiLSTM is applied before concatenation of the forward and backward hidden states.\\
+Results show that the application of the two methods proposed by \citet{mohankumar_towards_2020} do not result in performance loss and do lower conicity. 
+However, on other metrics and across datasets, the picture is mixed like we saw in our reproducibility results for the unidirectional LSTM, indicating the methods do not unconditionally improve explanations. We will not discuss these results in detail, but conclude that it is indeed possible to extend the proposed methods to BiLSTM attention models. Full results are included in Appendix C for completeness.
+
+\section{Discussion}
+Our reproduction shows that enforcing low conicity between the hidden states of an LSTM encoder does not guarantee improved transparency in the studied datasets, at least not on the metrics used by \citet{mohankumar_towards_2020}. We find the authors' claim about improved transparency not generally applicable and under certain conditions their methods even hurt accuracy.
+Still, the Diversity LSTM and Orthogonal LSTM do lead to improved metrics on some datasets, and the human evaluation \citet{mohankumar_towards_2020} conducted shows strong preference for the Diversity LSTM over Vanilla LSTM. This raises the question under what conditions these methods should be applied. 
+
+\subsubsection{Conditions underlying effectiveness} One pattern that seems to emerge is that the benefits of orthogonalizing or diversity training are most apparent for the relatively simpler SS tasks. The potential to improve faithfulness of the weights might be high in those cases as it not a given that attention weights carry any meaning for these tasks. 
+
+\begin{table}[ht]
+    \scriptsize
+    \centering
+    \begin{tabular}{|r|cc|cc|}
+    \hline
+     & \multicolumn{2}{c|}{Base attention}
+     & \multicolumn{2}{c|}{Constrained attention}\\
+     \multicolumn{1}{|c|}{Dataset} 
+     & \multicolumn{1}{c}{Reported}
+     & \multicolumn{1}{c|}{Repr.}
+     & uniform & last\_only \\%& first\_only \\ 
+    \hline 
+    SST &   .818 & .803 & \green{.800} & \green{.810} \\%& \red{.586}\\
+    IMDB &  .895 & .893 & \green{.883} & \green{.876} \\%& \red{.527} \\
+    Yelp &  .956 & .949 & \green{.950} & \green{.949} \\%& \red{.620} \\
+    20News& .936 & .908 & \green{.898} & \orange{.857} \\%& \red{.543} \\
+    Tweets& .870 & .833 & \green{.833} & \orange{.782} \\%& \red{.533} \\
+    \hline
+    SNLI&   .782 & .773 & \green{.755} & \green{.759} \\%& \red{.676} \\
+    QQP&    .787 & .784 & \green{.789} & \green{.792} \\%& \green{.866} \\
+    bAbI1& .991 & 1.00 & \red{.485} & \red{.729} \\%& \red{.161} \\
+    bAbI2& .401 & .544 & \red{.315} & \red{.441} \\%& \red{.172} \\
+    bAbI3& .477 & .211$^*$ & -&-\\%\multicolumn{2}{c|}{*Failed reproduction, n/a} \\
+    CNN &.631 &.595 & \red{.424}& \red{.367} \\
+    \hline
+    \multicolumn{5}{l}\scriptsize{$^*$ Reproduction failed, comparisons not applicable}\\
+    \end{tabular}
+    \caption{Impact on performance of the Vanilla LSTM when forcing uniform, first- and last only attention}
+    \label{tab:constrained_attn}
+\end{table}
+
+
+For some tasks, the LSTM does not strictly need the attention mechanism to perform well, as is shown in Table \ref{tab:constrained_attn} when the attention mechanism is constrained to be either uniform or attending to the last word only. In contrast, the more difficult DS tasks do require the attention mechanism in order to reach higher accuracies. This pattern is similar to that described by \citet{wiegreffe-pinter-2019-attention}. 
+
+We suspect that there is a relation between a) how crucial the attention mechanism is for performance in a given task, b) how much improvement Orthogonal/Diversity LSTM can offer w.r.t. plausibility of the attention weights for explaining the model's outputs. This relationship, and the conditions under which orthogonalization and diversity training offer the best results, deserves additional investigation.
+
+\subsubsection{Reflection on our replication study} A key insight we have gained is that even with access to the original code, exact reproduction of the results is not guaranteed. We have not been able to find the cause of several differences in results. The available time and hardware limited our possibilities to repeat these experiments with multiple seeds to find an estimate of the variance of outcomes. 
+
+Another insight we gained is that the metrics concerning faithfulness and plausibility can be hard to interpret, as it is deeply entangled with the nature of the dataset as well as the model implementation. 
+To enable scalable development of transparent AI models, reliable quantitative metrics are needed that can accurately approximate real humans' judgement. 
+We believe further development of transparency metrics is an important area for further research to help build more transparent models.
+
+\section*{Acknowledgement}
+We'd like to thank Stefan Schouten for his guidance and insightful discussions.
+
+
+
+
+

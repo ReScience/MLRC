@@ -1,0 +1,25 @@
+\section{FLOP Counting Procedure}
+
+Following \citet{rigl}, we base our counting procedure on the Micronet Challenge\footnote{https://micronet-challenge.github.io/}, which was conducted as a part of NeurIPS 2019. Support for unstructured sparsity is assumed while computing the number of additions and multiplication operations. The sum of these two gives us the theoretical FLOPs for a single forward pass through the model. \\
+
+Concretely, let the FLOPs required for a forward pass through a dense model be $f_d$ and the corresponding for a sparse model (or small-dense model) be $f_s$. Then, the FLOPs for training a dense model are $3f_d$---since the backward pass involves computing gradients with respect to each weight and activation. $f_s$ can be computed for a model given its sparsity distribution via the counting procedure. The FLOPs required to train a sparse model depend on the technique used, as detailed below.
+
+\subsection{Inference FLOPs}
+
+\subsubsection{Small-Dense, RigL, SET, Static} These methods involve constant layer-wise sparsity throughout training, hence the FLOP count can be determined during any step. The FLOP count for Random initialized models are $(1-s)$ times the Dense FLOPs.
+
+\subsubsection{SNFS, Pruning} Both methods involve varying layer-wise sparsity during training, and hence non-constant FLOP consumption. The final weights are used to determine inference FLOPs in this case.
+
+\subsection{Train FLOPs}
+
+\subsubsection{Small-Dense, Static} Dense gradients are not required by these models, and hence have a train FLOP count of $3f_s$.
+
+\subsubsection{SET} Dense gradients are not required, and random growth can be implemented quite efficiently. Thus, the train FLOP count is $3f_s$.
+
+\subsubsection{RigL} Dense gradients are required only every $\Delta T$ steps, hence the corresponding train FLOP count is: $\frac{3\Delta Tf_s + 2f_s + f_d }{\Delta T + 1}$. We note that since $\Delta T$ is typically set between 100--1000, the preceding expression is quite close to $3f_s$.
+
+\subsubsection{SNFS} Dense gradients are required at each training step, resulting in $2f_s + f_d$ FLOPs consumed at each step. Since the sparse FLOP count varies as we train, the average FLOP count is: $2\mathbb{E}[f_{s,t}] + f_d$, where $f_{s,t}$ is the sparse inference FLOPs at train step $t$.
+
+\subsubsection{Pruning} Does not require dense gradients, but the sparsity increases smoothly from $0\%$ to the target value as we train. The FLOP consumption here is $3\mathbb{E}[f_{s,t}]$, , where $f_{s,t}$ is the sparse inference FLOPs at train step $t$.\\
+
+To determine $\mathbb{E}[f_{s,t}]$, we compute a running average of the FLOP consumption after every epoch. Notably, we find that the inference cost of Pruning is often close to a Random initialized sparse network, while SNFS, regardless of initiazation, is compute-intensive.

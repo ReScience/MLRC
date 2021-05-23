@@ -1,0 +1,128 @@
+@inproceedings{mohankumar_towards_2020,
+    title = "Towards Transparent and Explainable Attention Models",
+    author = "Mohankumar, Akash Kumar  and
+      Nema, Preksha  and
+      Narasimhan, Sharan  and
+      Khapra, Mitesh M.  and
+      Srinivasan, Balaji Vasan  and
+      Ravindran, Balaraman",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.387",
+    doi = "10.18653/v1/2020.acl-main.387",
+    pages = "4206--4216",
+    abstract = "Recent studies on interpretability of attention distributions have led to notions of faithful and plausible explanations for a model{'}s predictions. Attention distributions can be considered a faithful explanation if a higher attention weight implies a greater impact on the model{'}s prediction. They can be considered a plausible explanation if they provide a human-understandable justification for the model{'}s predictions. In this work, we first explain why current attention mechanisms in LSTM based encoders can neither provide a faithful nor a plausible explanation of the model{'}s predictions. We observe that in LSTM based encoders the hidden representations at different time-steps are very similar to each other (high conicity) and attention weights in these situations do not carry much meaning because even a random permutation of the attention weights does not affect the model{'}s predictions. Based on experiments on a wide variety of tasks and datasets, we observe attention distributions often attribute the model{'}s predictions to unimportant words such as punctuation and fail to offer a plausible explanation for the predictions. To make attention mechanisms more faithful and plausible, we propose a modified LSTM cell with a diversity-driven training objective that ensures that the hidden representations learned at different time steps are diverse. We show that the resulting attention distributions offer more transparency as they (i) provide a more precise importance ranking of the hidden states (ii) are better indicative of words important for the model{'}s predictions (iii) correlate better with gradient-based attribution methods. Human evaluations indicate that the attention distributions learned by our model offer a plausible explanation of the model{'}s predictions. Our code has been made publicly available at https://github.com/akashkm99/Interpretable-Attention",
+}
+
+@inproceedings{jain-wallace-2019-attention,
+    title = "{A}ttention is not {E}xplanation",
+    author = "Jain, Sarthak  and
+      Wallace, Byron C.",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N19-1357",
+    doi = "10.18653/v1/N19-1357",
+    pages = "3543--3556",
+    abstract = "Attention mechanisms have seen wide adoption in neural NLP models. In addition to improving predictive performance, these are often touted as affording transparency: models equipped with attention provide a distribution over attended-to input units, and this is often presented (at least implicitly) as communicating the relative importance of inputs. However, it is unclear what relationship exists between attention weights and model outputs. In this work we perform extensive experiments across a variety of NLP tasks that aim to assess the degree to which attention weights provide meaningful {``}explanations{''} for predictions. We find that they largely do not. For example, learned attention weights are frequently uncorrelated with gradient-based measures of feature importance, and one can identify very different attention distributions that nonetheless yield equivalent predictions. Our findings show that standard attention modules do not provide meaningful explanations and should not be treated as though they do.",
+}
+
+@inproceedings{ribeiro2016should,
+  title={" Why should I trust you?" Explaining the predictions of any classifier},
+  author={Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+  booktitle={Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining},
+  pages={1135--1144},
+  year={2016}
+}
+
+@inproceedings{serrano-smith-2019-attention,
+    title = "Is Attention Interpretable?",
+    author = "Serrano, Sofia  and
+      Smith, Noah A.",
+    booktitle = "Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2019",
+    address = "Florence, Italy",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P19-1282",
+    doi = "10.18653/v1/P19-1282",
+    pages = "2931--2951",
+    abstract = "Attention mechanisms have recently boosted performance on a range of NLP tasks. Because attention layers explicitly weight input components{'} representations, it is also often assumed that attention can be used to identify information that models found important (e.g., specific contextualized word tokens). We test whether that assumption holds by manipulating attention weights in already-trained text classification models and analyzing the resulting differences in their predictions. While we observe some ways in which higher attention weights correlate with greater impact on model predictions, we also find many ways in which this does not hold, i.e., where gradient-based rankings of attention weights better predict their effects than their magnitudes. We conclude that while attention noisily predicts input components{'} overall importance to a model, it is by no means a fail-safe indicator.",
+}
+
+@inproceedings{wiegreffe-pinter-2019-attention,
+    title = "Attention is not not Explanation",
+    author = "Wiegreffe, Sarah  and
+      Pinter, Yuval",
+    booktitle = "Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)",
+    month = nov,
+    year = "2019",
+    address = "Hong Kong, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D19-1002",
+    doi = "10.18653/v1/D19-1002",
+    pages = "11--20",
+    abstract = "Attention mechanisms play a central role in NLP systems, especially within recurrent neural network (RNN) models. Recently, there has been increasing interest in whether or not the intermediate representations offered by these modules may be used to explain the reasoning for a model{'}s prediction, and consequently reach insights regarding the model{'}s decision-making process. A recent paper claims that {`}Attention is not Explanation{'} (Jain and Wallace, 2019). We challenge many of the assumptions underlying this work, arguing that such a claim depends on one{'}s definition of explanation, and that testing it needs to take into account all elements of the model. We propose four alternative tests to determine when/whether attention can be used as explanation: a simple uniform-weights baseline; a variance calibration based on multiple random seed runs; a diagnostic framework using frozen weights from pretrained models; and an end-to-end adversarial attention training protocol. Each allows for meaningful interpretation of attention mechanisms in RNN models. We show that even when reliable adversarial distributions can be found, they don{'}t perform well on the simple diagnostic, indicating that prior work does not disprove the usefulness of attention mechanisms for explainability.",
+}
+
+@inproceedings{vaswani_attention_2017,
+	address = {Red Hook, NY, USA},
+	series = {{NIPS}'17},
+	title = {Attention is all you need},
+	isbn = {978-1-5108-6096-4},
+	abstract = {The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.0 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature.},
+	booktitle = {Proceedings of the 31st {International} {Conference} on {Neural} {Information} {Processing} {Systems}},
+	publisher = {Curran Associates Inc.},
+	author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Łukasz and Polosukhin, Illia},
+	month = dec,
+	year = {2017},
+	pages = "6000--6010",
+}
+
+
+@inproceedings{zhou2018nlp,
+  title={NLP at IEST 2018: BiLSTM-attention and LSTM-attention via soft voting in emotion classification},
+  author={Zhou, Qimin and Wu, Hao},
+  booktitle={Proceedings of the 9th Workshop on Computational Approaches to Subjectivity, Sentiment and Social Media Analysis},
+  pages={189--194},
+  year={2018}
+}
+
+@inproceedings{lee2019ncuee,
+  title={NCUEE at MEDIQA 2019: medical text inference using ensemble BERT-BiLSTM-Attention model},
+  author={Lee, Lung-Hao and Lu, Yi and Chen, Po-Han and Lee, Po-Lei and Shyu, Kuo-Kai},
+  booktitle={Proceedings of the 18th BioNLP Workshop and Shared Task},
+  pages={528--532},
+  year={2019}
+}
+
+@INPROCEEDINGS{8554396,
+  author={A. {Aziz Sharfuddin} and M. {Nafis Tihami} and M. {Saiful Islam}},
+  booktitle={2018 International Conference on Bangla Speech and Language Processing (ICBSLP)}, 
+  title={A Deep Recurrent Neural Network with BiLSTM model for Sentiment Classification}, 
+  year={2018},
+  volume={},
+  number={},
+  pages={1-4},
+  doi={10.1109/ICBSLP.2018.8554396}}
+  
+@inproceedings{abnar_quantifying_2020,
+	address = {Online},
+	title = {Quantifying {Attention} {Flow} in {Transformers}},
+	url = {https://www.aclweb.org/anthology/2020.acl-main.385},
+	doi = {10.18653/v1/2020.acl-main.385},
+	abstract = {In the Transformer model, “self-attention” combines information from attended embeddings into the representation of the focal embedding in the next layer. Thus, across layers of the Transformer, information originating from different tokens gets increasingly mixed. This makes attention weights unreliable as explanations probes. In this paper, we consider the problem of quantifying this flow of information through self-attention. We propose two methods for approximating the attention to input tokens given attention weights, attention rollout and attention flow, as post hoc methods when we use attention weights as the relative relevance of the input tokens. We show that these methods give complementary views on the flow of information, and compared to raw attention, both yield higher correlations with importance scores of input tokens obtained using an ablation method and input gradients.},
+	booktitle = {Proceedings of the 58th {Annual} {Meeting} of the {Association} for {Computational} {Linguistics}},
+	publisher = {Association for Computational Linguistics},
+	author = {Abnar, Samira and Zuidema, Willem},
+	month = jul,
+	year = {2020},
+	pages = {4190--4197},
+	file = {Full Text PDF:/Users/FrankVerhoef/Zotero/storage/WI8TBE5Y/Abnar en Zuidema - 2020 - Quantifying Attention Flow in Transformers.pdf:application/pdf},
+}
+

@@ -1,0 +1,46 @@
+\begin{table}[th]
+    \captionsetup{aboveskip=\tableaboveskip,belowskip=\tablebelowskip}
+    \caption{\textbf{Reference vs Optimal $(\alpha, \Delta T)$ on CIFAR-10.} Optimal hyperparameters are obtained by tuning with a TPE sampler in Optuna. The difference between the reference and optimal performance is small, indicating that there is not a significant benefit in tuning $(\alpha, \Delta T)$ individually for each initialization and sparsity configuration.}
+    \label{tab:effect-alpha-deltaT}
+    \centering
+    
+    \begin{tabular}{ c c  cc  cc}
+    \toprule
+    \multirow{3}{*}{\textbf{Initialization}} & \textbf{Density} & 
+    \multicolumn{2}{c}{\textbf{Reference}} & \multicolumn{2}{c}{\textbf{Optimal}} \\
+    \cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+    {} & {$(1-s)$} & 
+    {$(\alpha, \Delta T)$} & \makecell{Accuracy $\uparrow$ \\ (Test)} & 
+    {$(\alpha, \Delta T)$} & \makecell{Accuracy $\uparrow$ \\ (Test)} \\
+    \midrule
+    
+    Random & 0.1 & 
+    {0.3, 100} & {91.7 $\pm$ 0.18} &  
+    {0.197, 50} & \textbf{91.8 $\pm$ 0.17} \\
+    
+    Random & 0.2 & 
+    {0.3, 100} & {92.6 $\pm$ 0.10} &  
+    {0.448, 150} & \textbf{92.8 $\pm$ 0.16} \\
+    
+    Random & 0.5 & 
+    {0.3, 100} & \textbf{93.3 $\pm$ 0.07} &  
+    {0.459, 550} & \textbf{93.3 $\pm$ 0.18} \\
+    \midrule
+    
+    ERK & 0.1 & 
+    {0.3, 100} & \textbf{92.4 $\pm$ 0.06} &  
+    {0.416, 200} & \textbf{92.4 $\pm$ 0.23} \\
+    
+    ERK & 0.2 & 
+    {0.3, 100} & \textbf{93.1 $\pm$ 0.09} &  
+    {0.381, 950} & \textbf{93.1 $\pm$ 0.21} \\
+    
+    ERK & 0.5 & 
+    {0.3, 100} & {93.4 $\pm$ 0.14} &  
+    {0.287, 500} & \textbf{93.8 $\pm$ 0.06} \\
+    \hline
+
+    \end{tabular}
+    
+    \label{tab:replication_verify}
+\end{table}

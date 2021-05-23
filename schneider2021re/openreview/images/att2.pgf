@@ -1,0 +1,47 @@
+﻿% \input{/home/koerner/doc/papers/2020_RC/Reproducibility_Challenge_2020/images/pgfstyles.pgf}%
+\begin{tikzpicture}[
+  node distance=5mm and 10mm,
+]
+  % creating all nodes
+
+  % the encoder node
+  \node[encoder] (encoder) {encoding};
+
+  % the fc nodes
+  \node[fc, right=50mm of encoder] (fc1) {$\FC_q$};
+  \node[fc, above=of fc1] (fc2) {$\FC_k$};
+  \node[fc, below=of fc1,fill=sunglo] (fc3) {$\FC_v$};
+
+  \node (add) [add, at=($(encoder.east)!0.35!(fc1.west)$)];
+  \node[below=2*\pgfkeysvalueof{/tikz/node distance value} of add] (pos_enc) {positional encoding};
+  
+  % the attention module was as large as both FC modules ... here's how you can do that
+  \path 
+    let \p{1}=(fc1.south), 
+        \p{2}=(fc2.north), 
+        \n{y dist}={abs(\y{2}-\y{1})} 
+   in node[attention, right=of fc1.south east, anchor=south west, minimum height=\n{y dist}] (attention) {attention};
+
+  \node (mult) [mult, at=(fc3 -| attention)];
+  \node[mlp, below=of mult] (mlp) {$\MLP$};
+
+  \node[input, left=of encoder] (input) {input};
+
+  % connecting nodes
+  \draw[arrow] (input) -- (encoder);
+  \draw[arrow] (encoder) -- node[above] {$e$} (add);
+  \draw[arrow] (add) -- node[above, pos=.25] {$(e+p)$} (fc1);
+  \draw[arrow] ($(add)!.5!(fc1)$) |- (fc2);
+
+  \draw[arrow] (fc1) --node[above] {$q$} (fc1 -| attention.west);
+  \draw[arrow] (fc2) --node[above] {$k$} (fc2 -| attention.west);
+
+  \draw[arrow] (attention) -- node[right] {$a$} (mult);
+  \draw[arrow] ($(add)!.5!(fc1)$) |- (fc3);
+  \draw[arrow] (fc3) -- node[above] {$v$} (mult);
+
+  \draw[arrow] (mult) -- (mlp);
+  \draw[arrow] (mlp) -- ++(0,-5mm);
+
+  \draw[arrow] (pos_enc) -- node[right] {$p$} (add);
+\end{tikzpicture}

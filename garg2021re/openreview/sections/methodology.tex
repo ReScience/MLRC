@@ -1,0 +1,42 @@
+\section{Methodology}
+
+We have re-implemented the algorithm proposed in the paper from scratch using PyTorch and created an end-to-end model trainer with a Keras-like interface. We referred to the code given by the authors for the baseline model hyperparameters and the source of synthetic datasets. The algorithm presented by the original authors in their paper can be represented as follows:
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\DontPrintSemicolon
+
+\KwInput{\textbf{Input:} Initialize $\lambda$} \;
+
+\For{number of training epochs}{
+    \For{ i = 1,...,number of mini-batch examples}{
+        Sample $ \epsilon \sim \mathcal{U}(0,1) $ and set $\delta = \frac{1}{2}\log\frac{\epsilon}{1-\epsilon}$ \;
+        Initialize $w_{b}$ = $\tanh((\lambda + \delta)/\tau)$ \;
+        Compute following using \textit{gumbel-softmax} trick \[ g_i :=  \frac{1}{M} \nabla_{w_{b}}l(y_{i}, f_{w_{r}}(x_{i})) \] \[s_i := \frac{N(1-w^2_{b})}{\tau(1-\tanh(\lambda)^2)}\]
+    }
+    Update $\mu$ and $\lambda$ using following equation \[\mu \leftarrow \tanh(\lambda) \] \[\lambda \leftarrow (1-\alpha)\lambda - \alpha[\sum\limits_{i=1}^{M} (s_i\odot g_i) - \lambda_{0}]\]
+}
+\caption{Bayesian Learning rule for BayesBiNN}
+\label{alg:alg1}
+\end{algorithm}
+
+This would make the paper easier to interpret and this implementation on code.
+Some of the mathematical expressions mentioned in the original paper were presented from various sources and missed out several intermediate steps which we found to be very important while reproducing the paper from scratch. Here we present a step-wise derivation of some important expressions written in the original paper: 
+
+Bayesian formulation of the discrete optimization problem, in which loss has to be minimized w.r.t posterior $q(w)$, given prior $p(w)$ can be written as: 
+\[\mathbb{E}_{q(\,w)\,} [\,\sum\limits_{i=1}^{N}l(\,y_{i}, f_{w}(\,x_{i})\,)\,]\, + \mathcal{D}_{KL}[\,q(w)\|p(w)]\,\]
+To solve the above optimization problem, Bayesian learning rule given in \citet{r6} is applied, assuming solution to be a part of minimal exponential family of distribution, given by: \[q(w) = h(w)\text{exp}[\lambda^{T}\phi(w) - A(\lambda)]\]  
+where base measure $h(w)$ is assumed to be 1. Following is the update rule used to learn $\lambda$: \[\lambda \leftarrow (1-\rho)\lambda - \rho[\nabla_{\mu}\mathbf{E}_{q(w)}[l(y_{i} f_{w}(x_{i}))]-\lambda_{0}]\] where $\rho$ is the learning rate, $\mu = \mathbf{E}_{q(w)}[\phi(w)]$. Bernoulli distribution being a special case of minimal exponential family distribution, we assume prior $p(w) \sim \mathrm{Bern}(p)$ with $p = 0.5$, and posterior $q(w)$ to be mean-field Bernoulli distribution: \[q(w) = \prod_{j=1}^W p_{j}^{\frac{1+w_{j}}{2}}(1-p_{j})^{\frac{1-w_{j}}{2}} \]   
+
+For weight $j$, \[q(w_j) = \mathrm{exp}(\frac{1}{2}(1+w_j)\log p_j + \frac{1}{2}(1-w_j)\log(1-p_j))\] \[ = \mathrm{exp}(\underbrace{w_j}_{\phi(w)}\underbrace{\frac{1}{2}\log\frac{p}{1-p})}_{\lambda} + \frac{1}{2}\log(p(1-p))\]
+Comparing above expression with minimal exponential family distribution, we can say:
+\[\lambda = \frac{1}{2}\log\frac{p}{1-p} \, \mathrm{and} \, \phi(w) = w.\]
+
+We defined $\mu = \mathbb{E}_{q(w)}[\phi(w)]$,
+\[\mu = \int wq(w)dw = \mathbb{E}[q(w)] = \sum\limits_{w^{i}\in\{-1,1\}}w^{i} q(w^{i}) \] \[= \sum\limits_{w^{i}\in\{-1,1\}}w^{i} p^{\frac{1+w^{i}}{2}}(1-p)^{\frac{1-w^{i}}{2}} = -(1-p) + p\]
+\[= 2p-1\]
+From above derivations we can say that, $p = 1/(1 + \mathrm{exp}(-2\lambda)) = \mathrm{Sigmoid}(2\lambda)$ and $q(w) \sim \mathrm{Bern}(p)$.
+
+To implement the update rule, we need to compute the gradient with respect to $\mu$. Original paper uses a reparamaterization trick called  gumbel-softmax trick \citet{r7}, which is used to relax the discrete random variables of a concrete distribution (for eg, bernoulli distribution).  Binary concrete relaxation \citet{r7} of binary concrete random variable $X \in (0,1)$ with distribution $X \sim \mathrm{BinConcrete}(\alpha, \lambda)$ with temperature $\lambda$ and location $\alpha $, \[X = \frac{1}{1 + \mathrm{exp}(-(\log\alpha + L)/\lambda)}\] where $L \sim $ Logistic. And its density is given by \[p_{\alpha,\lambda}(x) = \frac{\lambda\alpha x^{-\lambda-1}(1-x)^{-\lambda-1}}{(\alpha x^{-\lambda} + (1-x)^{-\lambda})^{2}}\]
+
+Using above expressions, for binary weights $w_j \in \{0,1\}$, relaxed variable $w_{r}^{\epsilon_{j}, \tau}(p_j) \in (0,1)$ can be used with temperature $\tau$ and $\alpha = e^{2\lambda}$ given by \[ w_{r}^{\epsilon_{j}, \tau}(p_j) = \frac{1}{1 + \mathrm{exp}(-\frac{2\lambda_j + 2\delta_j}{\tau})},\] where $\delta_j \sim$ Logistic and its density is given by \[p(w_{r}^{\epsilon_{j}, \tau}(p_j)) = \frac{\tau e^{2\lambda} w_{r}^{\epsilon_{j}, \tau}(p_j)^{-\tau-1}(1-w_{r}^{\epsilon_{j}, \tau}(p_j))^{-\tau-1}}{(e^{2\lambda} w_{r}^{\epsilon_{j}, \tau}(p_j)^{-\tau} + (1-w_{r}^{\epsilon_{j}, \tau}(p_j))^{-\tau})^{2}}\]
