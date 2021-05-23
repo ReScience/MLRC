@@ -1,3 +1,44 @@
+\section{Reproducibility Summary}
+
+%\textit{This report describes the reproduction and ablation study on the work presented in \cite{saxena-etal-2020-improving} titled "Improving Multi-hop Question Answering over Knowledge Graphs using Knowledge Base Embeddings" (EmbedKGQA) published in ACL2020, as part of the ML Reproducibility Challenge 2020. 
+% Our work consists of three parts: (1) Reproducing results from the original paper (2) Ablation study on the knowledge graph embedding module (3) Ablation study on the question embedding module using various transformer models. The code for this work is hosted at \textbf{\mlrcgit} with complete documentation for easy and smooth reproduction.}
+
+\subsection{Scope of Reproducibility}
+Our work consists of four parts: 
+\begin{enumerate}
+\item Reproducing the results from \cite{saxena-etal-2020-improving}.
+\item Exploring the effect of various knowledge graph embedding models in the Knowledge Graph Embedding module.
+\item Exploring the effect of various transformer models in the Question Embedding module.
+\item Verifying the importance of the Relation Matching (RM) module.
+\end{enumerate}
+
+Based on the code shared by the authors, we have reproduced the results for EmbedKGQA\cite{saxena-etal-2020-improving}. We have not performed relation matching deliberately to validate point-4.
+
+\subsection{Methodology}
+
+We have used the code provided by \cite{saxena-etal-2020-improving} with some customization for reproducibility. In addition to making the codebase more modular and easy to navigate, we have made changes to incorporate different transformers in the question embedding module. Question-Answering models were trained from scratch as no pre-trained models were available for our particular dataset. The code for this work is available on GitHub (See page footer for the link).
+
+\subsection{Results}
+We were able to reproduce the Hits@$1$ to be within \textbf{$\pm$2.4\%} of the reported value (in most cases). Anomalies were observed in 2 cases. 
+\begin{enumerate}
+\item In MetaQA-KG-Full (3-hop) dataset.
+\item WebQSP-KG-Full dataset.
+\end{enumerate}
+From our experiments on the QA model, we have found that a recent transformer architecture, SBERT\cite{reimers-2019-sentence-bert} produced better accuracy than the original paper. Replacing RoBERTa\cite{roberta} with SBERT\cite{reimers-2019-sentence-bert} increased the absolute accuracy by $\approx$3.4\% and $\approx$0.6\% in the half KG and the full KG case respectively. (KG: Knowledge Graph, "$\approx$": Approximately)
+
+
+% results for - meta q&A (full/half, 1-3 hops), webqsp.metaq&a (full, 3hop) - results differ due to relational matching.rest all are within +/- 2%
+
+\subsection{What was easy}
+As the code was open-sourced, we didn't have to implement the paper giving us the liberty to customize the codebase to focus on the author's claim validation, perform extended experiments and explore shared as well as new models. In addition to this, pretrained KG embedding models were shared which helped in the reproduction experiment. 
+
+\subsection{What was difficult}
+
+The lack of comprehensive documentation along with missing comments defining functions/classes/attributes etc. made it laborious to review the code and modify it. In addition to large training times for question answering models, the knowledge graph embeddings also required a significant amount of computing resources.
+
+\subsection{Communication with original authors}
+We had a couple of virtual meetings with Apoorv Saxena\footnote{\url{https://apoorvumang.github.io}}, the primary author of EmbedKGQA\cite{saxena-etal-2020-improving}. 
+
 
 \section{Introduction}
 
