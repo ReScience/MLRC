@@ -5,59 +5,40 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Improving Multi-hop Question Answering over
+Knowledge Graphs using Knowledge Base Embeddings"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Jishnu Jaykumar P
+    orcid: 0000-0003-1635-368X
+    email: jishnu.jayakumar182@gmail.com
+    affiliations: 1,*
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Ashish Sardana
+    orcid: 0000-0001-8716-171X
+    email: asardana@nvidia.com
+    affiliations: 1      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
-
-
+    name:    NVIDIA
+    address: Bengaluru, India
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords: knowledge graph, embeddings, multi-hop, question-answering, deep learning
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/jishnujayakumar/MLRC2020-EmbedKGQA
   - doi: 
-  - swh: 
+  - swh: swh:1:dir:c95bc4fec7023c258c7190975279b5baf6ef6725
 
 # Data URL and DOI (optional if no data)
 data:
@@ -66,22 +47,17 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: "Saxena, A., Tripathi, A., & Talukdar, P. (2020, July). Improving multi-hop question answering over knowledge graphs using knowledge base embeddings. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics (pp. 4498-4507)."
+ - bib:  saxena-etal-2020-improving
+ - url:  https://www.aclweb.org/anthology/2020.acl-main.412
+ - doi:  10.18653/v1/2020.acl-main.412
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "This work describes the reproduction and extended study on the work titled \"Improving Multi-hop Question Answering over Knowledge Graphs using Knowledge Base Embeddings\" (EmbedKGQA) published in ACL2020, as part of the ML Reproducibility Challenge 2020. Our work consists of four parts: (1) Reproducing results EmbedKGQA (2) Adding more experiments by
+replacing the knowledge graph embedding method (3) and exploring the question embedding method using various
+transformer models (4) Verifying the importance of Relation Matching (RM) module. Based on the code shared by
+the authors, we have reproduced the results for the EmbedKGQA method. We have not purposely performed relation
+matching to validate point-4."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +67,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,7 +82,7 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=VFAwCMdWY7
 
 contributors:
   - name:
