@@ -5,46 +5,56 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+title: "[Re] Explaining Groups of Points in Low-Dimensional Representations"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
+  - name: Rajeev Verma
+    orcid: 0000-0002-2340-0942
+    email: rajeev.verma@student.uva.nl
+    affiliations: 1,*
     
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Jim J. O. Wagemans
+    orcid: 
+    email: jim.wagemans@student.uva.nl
+    affiliations: 1      # * is for contact author
+
+  - name: Paras Dahal
+    orcid: 0000-0003-2344-2787
+    email: paras.dahal@student.uva.nl
+    affiliations: 1      # * is for contact author
+
+  - name: Auke Elfrink
+    orcid: 
+    email: auke.elfrink@student.uva.nl
+    affiliations: 1      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
+    name:    University of Amsterdam
+    address: The Netherlands
     
-  - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
+  # - code:    2
+  #   name:    Synchrotron SOLEIL, Division Expériences
+  #   address: Gif sur Yvette, France
     
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
+  # - code:    3
+  #   name:    INRIA Bordeaux Sud-Ouest
+  #   address: Bordeaux, France
     
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
+  # - code:    4
+  #   name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
+  #            Centre National de la Recherche Scientifique, UMR 5800
+  #   address: Talence, France
     
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+  # - code:    5
+  #   name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
+  #            Centre National de la Recherche Scientifique, UMR 5293
+  #   address: Bordeaux, France
 
 
 # List of keywords (adding the programming language might be a good idea)
@@ -55,9 +65,9 @@ keywords: rescience c, rescience x
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
+  - url: https://github.com/elfrink1/FACT
   - doi: 
-  - swh: 
+  - swh: swh:1:dir:445130f59283e6dce7df5eb72dd346a5c57c9230
 
 # Data URL and DOI (optional if no data)
 data:
@@ -66,22 +76,13 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite: "Gregory Plumb, Jonathan Terhorst, Sriram Sankararaman, Ameet Talwalkar; Proceedings of the 37th International Conference on Machine Learning, PMLR 119:7762-7771"
+ - bib:  plumb2020explaining
+ - url:  http://proceedings.mlr.press/v119/plumb20a.html
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "This report covers our reproduction of the paper Explaining Low dimensional Representation by Plumb et al. In this paper, a method (Transitive Global Translations, TGT) is proposed for explaining different clusters in low dimensional representations of high dimensional data. They show their method outperforms the Difference Between the Means (DBM) method, is consistent in explaining differences with few features and matches real patterns in data. We verify these claims by reproducing their experiments and testing their method on new data. We also investigate the use of more complex transformations to explain differences between clusters."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -91,14 +92,14 @@ bibliography: bibliography.bib
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2020
 
 # Coding language (main one only if several)
-language:
+language: Python
 
   
 # To be filled by the author(s) after acceptance
@@ -106,16 +107,16 @@ language:
 
 # For example, the URL of the GitHub issue where review actually occured
 review: 
-  - url: 
+  - url: https://openreview.net/forum?id=cqAHExg2f
 
 contributors:
-  - name:
+  - name: 
     orcid: 
     role: editor
-  - name:
+  - name: 
     orcid:
     role: reviewer
-  - name:
+  - name: 
     orcid:
     role: reviewer
 
