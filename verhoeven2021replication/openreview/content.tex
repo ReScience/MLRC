@@ -1,3 +1,42 @@
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+We verify the outcome of the methodology proposed in the article, which attempts to provide post-hoc causal explanations for black-box classifiers through causal reference. This is achieved by replicating the code step by step, according to the descriptions in the paper. All the claims in the paper have been examined, and we provide additional metric to evaluate the portability, expressive power, algorithmic complexity and the data fidelity of their framework. We have further extended their analyses to consider all benchmark datasets used, confirming results.
+
+% % \noindent\rule{\textwidth}{1pt}
+
+\subsection*{Methodology}
+We use the same architecture and (hyper)parameters for replication. However, the code has a different structure and we provide a more efficient implementation for the measure of information flow. In addition, Algorithm 1 in the original paper is not implemented in their repository, so we have also implemented Algorithm 1 ourselves and further extend their framework to another domain (text data), although unsuccessfully. Furthermore, we make a detailed table in the paper to show the time used to produce the results for different experiments reproduced. All models were trained on Nvidia GeForce GTX 1080 GPUs provided by Surfsara's LISA cluster computing service at university of Amsterdam\footnote{This is our course project for the master course Fairness, Accountability, Confidentiality and Transparency in AI at the University of Amsterdam. Lisa cluster: \url{https://userinfo.surfsara.nl/systems/lisa}.}. 
+
+% % \noindent\rule{\textwidth}{1pt}
+
+\subsection*{Results}
+
+% % Start with your overall conclusion - where was your study successful and where not successful. Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, that upholds the paper's conclusion that it performs much better than baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement call to decide if your results support the original claim of the paper. 
+% % We have reproduced the performance of the GCE model on MNIST and fMNIST datasets. Through visualizing latent variables, we observed that the model is able to find causal factors $\alpha$ and non-causal factors $\beta$. As $\alpha$ change, the image features related to classifier outputs are modified, leading to different classification results. By contrast, the changes of $\beta$ modified the digit images but do not affect classifier outputs. Quantitative results also support the claim: 1. information flow from $\alpha$ to classifier predictions is large but from $\beta$ to classifier outputs is small; 2.replacing $\alpha$ with random noise greatly decreases classifier accuracy while replacing $\beta$ does not. 
+
+We reproduced the framework in the original paper and verified the main claims made by the authors in the original paper. However, the GCE model in extension study did not manage to separate causal factors and non-causal factors for a text classifier due to the complexity of fine-tuning the model.
+
+% % \noindent\rule{\textwidth}{1pt}
+
+\subsection*{What was easy}
+% %Describe which parts of your reproduction study were easy. E.g. was it easy to run the author's code, or easy to re-implement their method based on the description in the paper. %The goal of this section is to summarize to the reader which parts of the original paper they could easily apply to their problem. 
+The original paper comes with extensive appendices, many of which contain crucial details for implementation and understanding of the intended function. The authors provide code for most of the experiments presented in the paper. Although at the beginning their code repository was not functional, we use it as a reference to re-implement our code. The author also updated their code two weeks after we start our own implementation, which made it easy for us to verify the correctness of our re-implementation.
+
+% % \noindent\rule{\textwidth}{1pt}
+
+\subsection*{What was difficult}
+
+% %Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify. 
+The codebase the authors provided was initially unusable, with missing or renamed imports, hardcoded filepaths and an all-around convoluted structure. Additionally, the description of Algorithm 1 is quite vague and no implementation of it was given. Beyond this, computational expense was a serious issue, given the need for inefficient training steps, and re-iterating training several times for hyperparameter search.
+
+% % \noindent\rule{\textwidth}{1pt}
+
+\subsection*{Communication with original authors}
+% %Briefly describe how much (if any contact) you had with the original authors.
+This reproducibility study is part of a course on fairness, accountability, confidentiality and transparency in AI. Since it is a course project where we interacted with other group in the forum, and another group also working with this paper has reached out to the authors about problems with the initial repository, we did not find necessary to do it again.
+%\newpage
+
 \section{Introduction}
 Machine learning is increasingly used in different applications. The wide-scale spread of these methods places more emphasis on transparent algorithmic decision making, which has the potential  to mitigate the potential for disruptive social effects. Yet, despite reliable results of complex black boxes, their internal reasoning and inner workings are not necessarily apparent to end-users or even designers. As a result, not even trained experts can grasp the reasoning behind forecasts. Moreover, modern legislation have necessitated the opportunity challenging these systems, especially in heavily regulated domains, increasing the need for machine learning systems that are (post-hoc) interpretable \cite{carvalho2019machine}.\\
 
@@ -17,18 +56,18 @@ All code has been made publicly available via a Github repository\footnote{\url{
 The original paper establishes a causal inference framework. While intuitive, this introduces the additional challenge of balancing causal intervention with expressive latent variables. To overcome this hurdle, \cite{oshaughnessy2020generative} integrate causal inference into the VAE learning objective. This system consists of two basic components: a way to describe the data distribution, and a method of generating a consistent classification model. In order to get a clear objective of the reproduction, we consider the the main claim(s) of the original paper as:
 
 \begin{itemize}
-     \item Claim 1: creating a generative framework that describes a black-box classifier, and a process that achieves this while maintaining latent descriptions that result in high data fidelity and scalability of the overall system
-     \item Claim 2: their objective function helps the generative model disentangle the latent variables into causal and non-causal factors for the classifier. Their approach is sufficient for any black-box classifier that can provide class gradients and probabilities with respect to the classifier input
-     \item Claim 3: the resulting explanations show what is important to the accompanying classifier %They perform extensive experiments in order to validate their framework by picking a generative model architecture and then training it on data related to the classification task.
-     \item Claim 4: the learned representation may also be used to explain counterfactual explanations as it incorporates both generative and causal modelling %Their approach incorporates generative and causal modelling. Even though we concentrated on how learned features were used to explain phenomena, 
+	\item Claim 1: creating a generative framework that describes a black-box classifier, and a process that achieves this while maintaining latent descriptions that result in high data fidelity and scalability of the overall system
+	\item Claim 2: their objective function helps the generative model disentangle the latent variables into causal and non-causal factors for the classifier. Their approach is sufficient for any black-box classifier that can provide class gradients and probabilities with respect to the classifier input
+	\item Claim 3: the resulting explanations show what is important to the accompanying classifier %They perform extensive experiments in order to validate their framework by picking a generative model architecture and then training it on data related to the classification task.
+	\item Claim 4: the learned representation may also be used to explain counterfactual explanations as it incorporates both generative and causal modelling %Their approach incorporates generative and causal modelling. Even though we concentrated on how learned features were used to explain phenomena, 
 \end{itemize}
 
 The standard of reproducibility demands that machine learning methods be routinely evaluated on the verifiability of their results. The following additional metrics (properties) will be used as measurement of reproducibility:
 \begin{itemize}
-    \item Portability: the modelling domains and types of machine learning models that can benefit from their framework %(In their paper, they clearly state that a generative model architecture is required to train it on data related to the classification task.)
-    \item Expressive Power: the explanation structure that can be produced by their framework
-    \item Algorithmic Complexity: the computational complexity of their algorithm
-    \item Data Fidelity: the degree of precision of the data will range from low to high fidelity. In cases where high-faithfulness data to train the model are not necessary, low-faithfulness data often may be used. The small amount of usable data will greatly influence the model's ability to yield accurate estimates.
+	\item Portability: the modelling domains and types of machine learning models that can benefit from their framework %(In their paper, they clearly state that a generative model architecture is required to train it on data related to the classification task.)
+	\item Expressive Power: the explanation structure that can be produced by their framework
+	\item Algorithmic Complexity: the computational complexity of their algorithm
+	\item Data Fidelity: the degree of precision of the data will range from low to high fidelity. In cases where high-faithfulness data to train the model are not necessary, low-faithfulness data often may be used. The small amount of usable data will greatly influence the model's ability to yield accurate estimates.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,8 +88,8 @@ The Generative Causal Explainer (GCE), is at its core a generative model with aw
 
 The goal of this modelling framework is to learn a generative mapping $g:(\alpha, \beta)\rightarrow X$ that further satisfies the following criteria: $p(g(\alpha, \beta)) \approx p(X)$, the factors $(\alpha, \beta)$ are statistically independent and $\alpha$ has strong clausal influence on the classifier's output $Y$. The proposed objective function of this framework is thus,
 \begin{equation}
-\mathop{\text{argmax}}  \limits_{g \in G}  \quad \mathcal{C}(\alpha, Y) + \lambda \cdot \mathcal{D}(p(g(\alpha, \beta)), p(X))
-\label{object} 
+	\mathop{\text{argmax}}  \limits_{g \in G}  \quad \mathcal{C}(\alpha, Y) + \lambda \cdot \mathcal{D}(p(g(\alpha, \beta)), p(X))
+	\label{object} 
 \end{equation}
 where $g$ is the GCE model that satisfies the constraints from the set of possible generative models $G$, $\mathcal{C}(\alpha, Y)$ is a metric that quantifies the causal influence of $\alpha$  on $Y$ and $\mathcal{D}$ is a variational lower bound that measures the proximity of $p(g(\alpha, \beta))$ to $p(X)$. The inclusion of the $\mathcal{D}(p(g(\alpha, \beta)), p(X))$ is necessary to ensure the generated explanations remain in, and ideally closely approximate, the data distribution. 
 
@@ -81,29 +120,29 @@ Upon start of this project, the original authors' official code repository was n
 \section{Experimental Setup and Code}
 \label{sec:experiments}
 \begin{figure}[t]
-\centering
-    \begin{subfigure}[t]{.23\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/pictures/Figure3/alpha_1.png}
-        \caption{Sweep $\alpha_1$}
-        % \label{fig:alpha_1}
-    \end{subfigure}
-    \begin{subfigure}[t]{.23\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/pictures/Figure3/beta_1.png}
-        \caption{Sweep $\beta_1$}
-        % \label{fig:beta_1}
-    \end{subfigure}
-    \begin{subfigure}[t]{.23\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/pictures/Figure3/beta_2.png}
-        \caption{Sweep $\beta_2$}
-        % \label{fig:beta_1}
-    \end{subfigure}
-    \begin{subfigure}[t]{.23\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/pictures/Figure3/beta_3.png}
-        \caption{Sweep $\beta_3$}
-        % \label{fig:beta_2}
-    \end{subfigure}
-    \caption{Visualizations of learned latent factors for MNIST classifier trained on classes `3' and `8'. The colour denotes the classifier's decision, with each adhering to a specific class. The axis  gives the additive value to each latent dimension. Complete results are in Figure \ref{fig:complte_:mnist_results 38} for MNIST 3-8, Figure \ref{fig:mnist_results 149 complete} for MNIST 1-4-9, and Figure \ref{fig:fmnist_results complete} for FMNIST 0-3-4.}
-    \label{fig:mnist_results 38}
+	\centering
+	\begin{subfigure}[t]{.23\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/pictures/Figure3/alpha_1.png}
+		\caption{Sweep $\alpha_1$}
+		% \label{fig:alpha_1}
+	\end{subfigure}
+	\begin{subfigure}[t]{.23\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/pictures/Figure3/beta_1.png}
+		\caption{Sweep $\beta_1$}
+		% \label{fig:beta_1}
+	\end{subfigure}
+	\begin{subfigure}[t]{.23\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/pictures/Figure3/beta_2.png}
+		\caption{Sweep $\beta_2$}
+		% \label{fig:beta_1}
+	\end{subfigure}
+	\begin{subfigure}[t]{.23\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/pictures/Figure3/beta_3.png}
+		\caption{Sweep $\beta_3$}
+		% \label{fig:beta_2}
+	\end{subfigure}
+	\caption{Visualizations of learned latent factors for MNIST classifier trained on classes `3' and `8'. The colour denotes the classifier's decision, with each adhering to a specific class. The axis  gives the additive value to each latent dimension. Complete results are in Figure \ref{fig:complte_:mnist_results 38} for MNIST 3-8, Figure \ref{fig:mnist_results 149 complete} for MNIST 1-4-9, and Figure \ref{fig:fmnist_results complete} for FMNIST 0-3-4.}
+	\label{fig:mnist_results 38}
 \end{figure}
 
 \subsection{Datasets}
@@ -116,12 +155,12 @@ Experiments conducted using text classification used the Stanford sentiment tree
 \subsection{Hyperparameters}
 In the reproduction experiments,  hyperparameters are set to be the same as the original paper.  The lists of hyperparameters of CNN classifier and GCE model can be found in Table \ref{tab:hyperparameter_gce} and Table \ref{tab:hyperparameter_cnn}, see Appendix \ref{appendix:architectures}. 
 % Hyperparameter search conducted through an implementation of Algorithm 1 from the original paper.
-  
+
 Beyond just the values provided, however, Algorithm 1 from the original paper was also implemented to conduct a hyperparameter search for $K$, $L$ and $\lambda$. This procedure was not rigorously defined in the original paper, using terms that are left open for interpretation, such as "plateaus" or "approaches". Due to this, some assumptions were made in the process:
 \begin{itemize}
-    \item ``Plateauing" was defined as the value in question achieving a local optimum, with the next iteration reversing its trend.
-    \item ``Approaching the value from step 1" was defined as either coming within a certain percentage threshold of the target value, or being closer to the target value than the next iteration.
-    \item $\mathcal{D}$ and $\mathcal{C}$ were defined as loss values subject to minimization.
+	\item ``Plateauing" was defined as the value in question achieving a local optimum, with the next iteration reversing its trend.
+	\item ``Approaching the value from step 1" was defined as either coming within a certain percentage threshold of the target value, or being closer to the target value than the next iteration.
+	\item $\mathcal{D}$ and $\mathcal{C}$ were defined as loss values subject to minimization.
 \end{itemize}
 
 % Left out for brevity and because I don't know how to write good pseudocode
@@ -131,32 +170,32 @@ In pseudocode, this formulation equates to:
 \SetKwRepeat{Do}{do}{while}
 \begin{algorithm}[H]
 \DontPrintSemicolon
-    Initialize $K$, $L$ = 0\\
-    \Do{$\mathcal{D} < \mathcal{D}_{previous}$} {
-        Increment $L$\\
-        Train model, optimizing only $\mathcal{D}$\\
-    }
-    Set $\mathcal{D}_{target}$ to previous (best) $\mathcal{D}$
-    Set $L$ to previous (best) $L$\\
-    \Do{$\mathcal{C} > \mathcal{C}_{previous}$} {
-        Decrement $L$, increment $K$\\
-        Initialize $\lambda$ = $\lambda_0$\\
-        \Do{diff < $\xi \mathcal{D}$ or diff > previous diff} {
-            Train model\\
-            Set diff to the difference between new $\mathcal{D}$ and $\mathcal{D}$ from step 1\\
-            Increase $\lambda$ by a factor of $\kappa$\\
-        }
-    }
-    Set $K, L, \lambda$ to previous (best) $K, L, \lambda$\\
+Initialize $K$, $L$ = 0\\
+\Do{$\mathcal{D} < \mathcal{D}_{previous}$} {
+Increment $L$\\
+Train model, optimizing only $\mathcal{D}$\\
+}
+Set $\mathcal{D}_{target}$ to previous (best) $\mathcal{D}$
+Set $L$ to previous (best) $L$\\
+\Do{$\mathcal{C} > \mathcal{C}_{previous}$} {
+Decrement $L$, increment $K$\\
+Initialize $\lambda$ = $\lambda_0$\\
+\Do{diff < $\xi \mathcal{D}$ or diff > previous diff} {
+Train model\\
+Set diff to the difference between new $\mathcal{D}$ and $\mathcal{D}$ from step 1\\
+Increase $\lambda$ by a factor of $\kappa$\\
+}
+}
+Set $K, L, \lambda$ to previous (best) $K, L, \lambda$\\
 \caption{Principled procedure for selecting ($K$, $L$, $\lambda$).}
 \label{alg:hparams}
 \end{algorithm}
 
 This technique requires three parameters to be chosen:
 \begin{itemize}
-    \item $\xi$: a factor that dictates how close to the $\mathcal{D}$ obtained in step 1 a value must be to be considered as having approached $\mathcal{D}$.
-    \item $\lambda_0$: the value of $\lambda$ to start with.
-    \item $\kappa$: the factor by which to increase $\lambda$.
+\item $\xi$: a factor that dictates how close to the $\mathcal{D}$ obtained in step 1 a value must be to be considered as having approached $\mathcal{D}$.
+\item $\lambda_0$: the value of $\lambda$ to start with.
+\item $\kappa$: the factor by which to increase $\lambda$.
 \end{itemize}
 In our hyperparameter search experiments, we use $\xi = 0.05$, $\lambda_0 = 10^{-3}$ and $\kappa = 10^{0.5}$. Notably, we found small discrepancies between the authors' suggested hyperparameters and those found by our implementation of Algorithm 1. Ultimately, however, no significant visual alterations were found in the explanations for the image classification tasks. As such, for the sake of reproducibility, presented results are given using training with the hyperparameters from the original paper.
 \end{comment}
@@ -168,23 +207,23 @@ In pseudocode, this formulation equates to:
 \SetKwRepeat{Do}{do}{while}
 \begin{algorithm}[H]
 \DontPrintSemicolon
-    Initialize $K$, $L$ = 0\\
-    \Do{$\mathcal{D} < \mathcal{D}_{previous}$} {
-        Increment $L$\\
-        Train model, optimizing only $\mathcal{D}$\\
-    }
-    Set $\mathcal{D}_{target}$ to previous (best) $\mathcal{D}$
-    Set $L$ to previous (best) $L$\\
-    \Do{$\mathcal{C} > \mathcal{C}_{previous}$} {
-        Decrement $L$, increment $K$\\
-        Initialize $\lambda$ = $\lambda_0$\\
-        \Do{diff < $\xi \mathcal{D}$ or diff > previous diff} {
-            Train model\\
-            Set diff to the difference between new $\mathcal{D}$ and $\mathcal{D}$ from step 1\\
-            Increase $\lambda$ by a factor of $\kappa$\\
-        }
-    }
-    Set $K, L, \lambda$ to previous (best) $K, L, \lambda$\\
+Initialize $K$, $L$ = 0\\
+\Do{$\mathcal{D} < \mathcal{D}_{previous}$} {
+Increment $L$\\
+Train model, optimizing only $\mathcal{D}$\\
+}
+Set $\mathcal{D}_{target}$ to previous (best) $\mathcal{D}$
+Set $L$ to previous (best) $L$\\
+\Do{$\mathcal{C} > \mathcal{C}_{previous}$} {
+Decrement $L$, increment $K$\\
+Initialize $\lambda$ = $\lambda_0$\\
+\Do{diff < $\xi \mathcal{D}$ or diff > previous diff} {
+Train model\\
+Set diff to the difference between new $\mathcal{D}$ and $\mathcal{D}$ from step 1\\
+Increase $\lambda$ by a factor of $\kappa$\\
+}
+}
+Set $K, L, \lambda$ to previous (best) $K, L, \lambda$\\
 \caption{Principled procedure for selecting ($K$, $L$, $\lambda$).}
 \label{alg:hparams}
 \end{algorithm}
@@ -192,12 +231,12 @@ In pseudocode, this formulation equates to:
 
 This technique requires three parameters to be chosen:
 \begin{enumerate}
-    \item $\xi$: a factor that dictates how close to the $\mathcal{D}$ obtained in step 1 a value must be to be considered as having approached $\mathcal{D}$.
-    \item $\lambda_0$: the value of $\lambda$ to start with.
-    \item $\kappa$: the factor by which to increase $\lambda$.
+	\item $\xi$: a factor that dictates how close to the $\mathcal{D}$ obtained in step 1 a value must be to be considered as having approached $\mathcal{D}$.
+	\item $\lambda_0$: the value of $\lambda$ to start with.
+	\item $\kappa$: the factor by which to increase $\lambda$.
 \end{enumerate}
 In our hyperparameter search experiments, we use $\xi = 0.05$, $\lambda_0 = 10^{-3}$ and $\kappa = 10^{0.5}$.
-  
+
 \subsection{Model Training}
 In reproduction experiments, we trained a GCE model to generate explanation factors for image classifier outputs. The CNN classifier was trained for image recognition task using SGD as optimizer. The network architecture is shown in Table \ref{tab:cnn_architecture} and the hyperparamters settings are listed in Table \ref{tab:hyperparameter_cnn}. The GCE model is trained to maximize the objective \ref{object} with Adam optimizer. We use the values of K, L and $\lambda$  suggested in the original paper. Hyperparameter details can be found in Table~\ref{tab:hyperparameter_gce}. 
 
@@ -207,11 +246,10 @@ In reproduction experiments, we trained a GCE model to generate explanation fact
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure}[!htbp]
-    \centering
-    %\makebox[\textwidth][c]{\includegraphics[width=1.25\textwidth]{../openreview/pictures/mnist_149/alpha_1_149_high_reso.png}}
-    \includegraphics[width=\textwidth]{../openreview/pictures/mnist_149/alpha_1_149_high_reso.png}
-    \caption{High-resolution transition regions of the first causal factor in explaining the MNIST 1/4/9 classifier.}
-    \label{fig:high_resolution_149}
+	\centering
+	\makebox[\textwidth][c]{\includegraphics[width=1.25\textwidth]{openreview/pictures/mnist_149/z_0_zoomed.pdf}}
+	\caption{High-resolution transition regions of the first causal factor in explaining the MNIST 1/4/9 classifier.}
+	\label{fig:high_resolution_149}
 \end{figure}
 
 \section{Results} \label{sec:results}
@@ -226,31 +264,31 @@ To verify the causal influence of the GCE on the classifier, the information flo
 Our implementation reproduces the results in the original paper and supports the authors' claim that their method is able to separate causal and non-causal factors of a classifier. The learned latent factors can then be applied to explain classification decisions of a classifier.
 
 \begin{figure}[t]
-\centering
-    \begin{subfigure}[t]{.45\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/ablation_study_034/InformationFlow.png}
-         \caption{Information flow.}
-        % \label{fig:5a}
-    \end{subfigure}
-     \begin{subfigure}[t]{.45\linewidth}
-        \includegraphics[width=.9\textwidth]{../openreview/ablation_study_034/AblationAccuracy.png}
-         \caption{Removal of latent factors.}
-        % \label{fig:5b}
-    \end{subfigure}
-    \begin{subfigure}[t]{.45\linewidth}
-        \centering
-        \includegraphics[width=.66\textwidth]{../openreview/pictures/fmnist/alpha_1.png}
-         \caption{Sweep of $\alpha_1$.}
-        % \label{fig:5c}
-    \end{subfigure}
-    \begin{subfigure}[t]{.45\linewidth}
-        \centering
-        \includegraphics[width=.66\textwidth]{../openreview/pictures/fmnist/beta_1.png}
-         \caption{Sweep of $\beta_1$.}
-        % \label{fig:5d}
-    \end{subfigure}
-    \caption{Ablation study for training FMNIST dataset: (a) each latent factor affecting the classifier performance measured by information flow. (b) comparison of classifier accuracies when data aspects regulated by the individual latent factors are eliminated. Figure 5(c-d) visualizes the aspects learned by $\alpha_1$ and $\beta_1$. The figures here are generated using the FMNIST data-set.}
-    \label{fig:ablation information flow}
+	\centering
+	\begin{subfigure}[t]{.45\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/ablation study 034/InformationFlow.png}
+		\caption{Information flow.}
+		% \label{fig:5a}
+	\end{subfigure}
+	\begin{subfigure}[t]{.45\linewidth}
+		\includegraphics[width=.9\textwidth]{openreview/ablation study 034/AblationAccuracy.png}
+		\caption{Removal of latent factors.}
+		% \label{fig:5b}
+	\end{subfigure}
+	\begin{subfigure}[t]{.45\linewidth}
+		\centering
+		\includegraphics[width=.66\textwidth]{openreview/pictures/fmnist/alpha_1.png}
+		\caption{Sweep of $\alpha_1$.}
+		% \label{fig:5c}
+	\end{subfigure}
+	\begin{subfigure}[t]{.45\linewidth}
+		\centering
+		\includegraphics[width=.66\textwidth]{openreview/pictures/fmnist/beta_1.png}
+		\caption{Sweep of $\beta_1$.}
+		% \label{fig:5d}
+	\end{subfigure}
+	\caption{Ablation study for training FMNIST dataset: (a) each latent factor affecting the classifier performance measured by information flow. (b) comparison of classifier accuracies when data aspects regulated by the individual latent factors are eliminated. Figure 5(c-d) visualizes the aspects learned by $\alpha_1$ and $\beta_1$. The figures here are generated using the FMNIST data-set.}
+	\label{fig:ablation information flow}
 \end{figure}
 
 \subsection{Results beyond original paper}
@@ -264,21 +302,21 @@ As a final extension, an attempt was made at using an altered GCE set-up on a te
 Table~\ref{tab:training_time} shows the amount of time required to train each model. It is clear that training a vanilla VAE takes more computational power than training a classifier on the same data. However, an even larger cost is induced by the causal loss calculation required for the GCE; GCE models consistently took more than five times longer to train than their VAE counterparts with the same architecture.
 
 \begin{table}[t]
-   \caption{Training time of classifiers, GCE models and vanilla VAE models (GCE models trained without the causal loss term).} 
-   \label{tab:training_time}
-   \small
-   \centering
-   \begin{tabular}{ccccccccc}
-    \toprule
-    \multicolumn{2}{c}{\multirow{2}[2]{*}{\textbf{Dataset}}} & \multirow{2}[2]{*}{\textbf{K+L}} & \multicolumn{3}{c}{\textbf{Duration (hrs)}} & \multicolumn{3}{c}{\textbf{Duration (relative to classifier)}} \\
-    \multicolumn{2}{c}{} &       & Classifier & VAE   & GCE   & Classifier & VAE   & GCE \\
-    \midrule
-    MNIST & 3, 8  & 8     & 00:01:11 & 00:05:24 & 00:34:25 & 1.00  & 4.56  & 29.08 \\
-    MNIST  & 1, 4, 9 & 4  & 00:02:47 & 00:05:17 & 00:25:04 & 1.00  & 1.90  & 9.01 \\
-    FMNIST & 0, 3, 4 & 6  & 00:02:59 & 00:03:58 & 00:23:40 & 1.00  & 1.33  & 7.93 \\
-    SST   & Pos, Neg & 32 & 00:02:49 & 05:15:09 & -  & 1.00  & 111.89 & - \\
-    \bottomrule
-    \end{tabular}
+	\caption{Training time of classifiers, GCE models and vanilla VAE models (GCE models trained without the causal loss term).} 
+	\label{tab:training_time}
+	\small
+	\centering
+	\begin{tabular}{ccccccccc}
+		\toprule
+		\multicolumn{2}{c}{\multirow{2}[2]{*}{\textbf{Dataset}}} & \multirow{2}[2]{*}{\textbf{K+L}} & \multicolumn{3}{c}{\textbf{Duration (hrs)}} & \multicolumn{3}{c}{\textbf{Duration (relative to classifier)}} \\
+		\multicolumn{2}{c}{} &       & Classifier & VAE   & GCE   & Classifier & VAE   & GCE \\
+		\midrule
+		MNIST & 3, 8  & 8     & 00:01:11 & 00:05:24 & 00:34:25 & 1.00  & 4.56  & 29.08 \\
+		MNIST  & 1, 4, 9 & 4  & 00:02:47 & 00:05:17 & 00:25:04 & 1.00  & 1.90  & 9.01 \\
+		FMNIST & 0, 3, 4 & 6  & 00:02:59 & 00:03:58 & 00:23:40 & 1.00  & 1.33  & 7.93 \\
+		SST   & Pos, Neg & 32 & 00:02:49 & 05:15:09 & -  & 1.00  & 111.89 & - \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
