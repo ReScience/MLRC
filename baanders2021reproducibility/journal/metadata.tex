@@ -1,0 +1,49 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/topteulen/UVA-FACT}
+\def \codeDOI{}
+\def \codeSWH{swh:1:dir:7058002f161d29f18e52a18ebe326b7911b1b616;}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha}
+\def \editorORCID{}
+\def \reviewerINAME{Anonymous Reviewers}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{29 January 2021}
+\def \dateACCEPTED{01 April 2021}
+\def \datePUBLISHED{26 May 2021}
+\def \articleTITLE{[Re] Deep Fair Clustering for Visual Learning}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{AI}
+\def \articleBIBLIOGRAPHY{bibliography.bib}
+\def \articleYEAR{2021}
+\def \reviewURL{https://openreview.net/forum?id=DXVAJGohUKs}
+\def \articleABSTRACT{Deep Fair Clustering (DFC) aims to provide a clustering algorithm that is fair, clustering-favourable, and which can be used on high-dimensional and large-scale data. In existing frameworks there is a trade-off between clustering quality and fairness. In this report we aim to reproduce a selection of the results of DFC; using two of four datasets and all four metrics that were used in the original paper, namely accuracy, Normalized Mutual Information (NMI), balance and entropy. We use the authors’ implementation and check whether it is consistent with the description in the paper. As extensions to the original paper we look into the effects of 1) using no pretrained cluster centers, 2) using different divergence functions as clustering regularizers and 3) using non-binary/corrupted sensitive attributes.
+The open source code of the authors has been used. The datasets and data-preprocessing has been done with our code, since the authors did not provide the datasets in their code. Also the pretrained Variational Autoencoder (VAE) dataset had to be re-implemented for the Color Reverse MNIST . For the extensions we wrote extra functions. For measuring the influence of discarding the pretrained cluster centers, the code was already provided by the authors.
+For the MNIST-USPS dataset, we report similar accuracy and NMI values that are within 1.2% and 0.5% of the values reported in the original paper. However, the balance and entropy differed significantly, where our results were within 73.1% and 30.3% of the original values respectively. For the Color Reverse MNIST dataset, we report similar values on accuracy, balance and entropy, which are within 5.3%, 2.6% and 0.2% respectively. Only the value of the NMI differed significantly, name within 12.9% of the original value In general, our results still support the main claim of the original paper, even though on some metrics the results differ significantly.
+The open source code of the authors was beneficial; it was well structured and ordered into multiple files. Furthermore, the code to use randomly initialized instead of pretrained cluster centers was already provided.
+First of all, the main difficulty in reproducing the paper was caused by the coding style; due to the lack of comments it was difficult to get a good understanding of the code. Secondly, we were required to download the data ourselves. However, these filenames and labels did not correspond to the included txt-files by the authors. Therefore, the model did not learn and we regenerated train_mnist.txt and train_usps.txt. Finally, the authors only included pretrained models for the MNIST-USPS dataset. As a consequence, we had to pre-train some parts of the DFC algorithm for the Color Reverse MNIST dataset.}
+\def \replicationCITE{Li, Peizhao, Han Zhao, and Hongfu Liu. "Deep fair clustering for visual learning." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020.}
+\def \replicationBIB{Li_2020_CVPR}
+\def \replicationURL{https://openaccess.thecvf.com/content_CVPR_2020/papers/Li_Deep_Fair_Clustering_for_Visual_Learning_CVPR_2020_paper.pdf}
+\def \replicationDOI{}
+\def \contactNAME{Tobias Teule}
+\def \contactEMAIL{Tobiasteule@gmail.com}
+\def \articleKEYWORDS{rescience c, rescience x,python, Deep clustering}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{7}
+\def \journalISSUE{2}
+\def \articleNUMBER{}
+\def \articleDOI{}
+\def \authorsFULL{Tobias Teule et al.}
+\def \authorsABBRV{T. Teule et al.}
+\def \authorsSHORT{Teule et al.}
+\title{\articleTITLE}
+\date{}
+\author[1,\orcid{https://orcid.org/0000-0003-2986-0971}]{Tobias Teule}
+\author[1,\orcid{https://orcid.org/0000-0002-6178-318X}]{Nienke Reints}
+\author[1,\orcid{https://orcid.org/0000-0003-4046-1752}]{Chris Al Gerges}
+\author[1,\orcid{https://orcid.org/0000-0002-2890-7275}]{Pauline Baanders}
+\affil[1]{University of Amsterdam, Amsterdam, Netherlands}
