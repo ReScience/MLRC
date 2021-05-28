@@ -1,0 +1,160 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] On end-to-end 6{DoF} object pose estimation and robustness to object scale"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Georgios Albanis
+    orcid: 0000-0002-2032-6767
+    email: galbanis@iti.gr
+    affiliations: 1,* # * is for contact author
+    
+  - name: Nikolaos Zioulis
+    orcid: 0000-0002-7898-9344
+    email: nzioulis@iti.gr
+    affiliations: 1
+  
+  - name: Anargyros Chatzitofis
+    orcid: 0000-0002-3848-4210
+    email: tofis@iti.gr
+    affiliations: 1
+
+  - name: Anastasios Dimou
+    orcid: 0000-0003-2763-4217
+    email: dimou@iti.gr
+    affiliations: 1
+
+  - name: Dimitrios Zarpalas
+    orcid: 0000-0002-9649-9306
+    email: zarpalas@iti.gr
+    affiliations: 1
+
+  - name: Petros Daras
+    orcid: 0000-0003-3814-6710
+    email: daras@iti.gr
+    affiliations: 1          
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    Centre for Research and Technology Hellas
+    address: Thessaloniki, Greece
+    
+  # - code:    2
+  #   name:    Synchrotron SOLEIL, Division Expériences
+  #   address: Gif sur Yvette, France
+    
+  # - code:    3
+  #   name:    INRIA Bordeaux Sud-Ouest
+  #   address: Bordeaux, France
+    
+  # - code:    4
+  #   name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
+  #            Centre National de la Recherche Scientifique, UMR 5800
+  #   address: Talence, France
+    
+  # - code:    5
+  #   name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
+  #            Centre National de la Recherche Scientifique, UMR 5293
+  #   address: Bordeaux, France
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x , python, pytorch, object pose estimation
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/tzole1155/EndToEndObjectPose
+  - doi: 
+  - swh: swh:1:dir:5e754c06b0dac970857b31733766fb9a268edee6
+
+# Data URL and DOI (optional if no data)
+data:
+  - url: https://vcl3d.github.io/UAVA/
+  - doi: 10.5281/zenodo.3994337
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "chen2020end,
+          title={End-to-end learnable geometric vision by backpropagating PnP optimization},
+          author={Chen, Bo and Parra, Alvaro and Cao, Jiewei and Li, Nan and Chin, Tat-Jun},
+          booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+          pages={8100--8109},
+          year={2020}" # Full textual citation
+ - bib: chen2020end # Bibtex key (if any) in your bibliography file
+ - url: https://openaccess.thecvf.com/content_CVPR_2020/papers/Chen_End-to-End_Learnable_Geometric_Vision_by_Backpropagating_PnP_Optimization_CVPR_2020_paper.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi: 10.1109/CVPR42600.2020.00812 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+            This report contains a set of experiments that seek to reproduce the claims of two recent works related to keypoint estimation, one specific to 6DoF object pose estimation, and the other presenting a generic architectural improvement for keypoint estimation but demonstrated in human pose estimation. 
+            More specifically, in the backpropagatable PnP , the authors claim that incorporating geometric optimization in a deep-learning pipeline and predicting an object’s pose in an end-to-end manner yields improved performance.
+            On the other hand, HigherHRNet  introduces a novel heatmap aggregation method that allows for scale-aware pose estimations, offering higher keypoint localization accuracy for small scale objects.
+          "
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: "ML Reproducibility Challenge 2020"
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=PCpGvUrwfQB
+
+contributors:
+  - name: Koustuv Sinha,\\ Jessica Zosa Forde
+    orcid: 
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid: 
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  January 29, 2021
+  - accepted:  April 1, 2021  
+  - published: May 27, 2021
+
+# This information will be provided by the editor
+article:
+  - number: 2 # Article number will be automatically assigned during publication
+  - doi: 10.5281/zenodo.4833219   # DOI from Zenodo
+  - url: https://zenodo.org/record/4833219/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 7
+  - issue:  2
