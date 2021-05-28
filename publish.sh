@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODE=sandbox
+MODE=zenodo
 inp=$1
 echo $inp
 
