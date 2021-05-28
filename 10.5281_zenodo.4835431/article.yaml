@@ -1,0 +1,132 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reproducibility report of \"Interpretable Complex-Valued Neural Networks for Privacy Protection\""
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Arsen Sheverdin
+    orcid: 0000-0002-2033-6674
+    email: arsen.sheverdin@student.uva.nl
+    affiliations: 1,*
+    
+  - name: Alko Knijff
+    orcid: 0000-0002-3118-3677
+    email: alko.knijff@student.uva.nl
+    affiliations: 1
+    
+  - name: Noud Corten
+    orcid: 0000-0002-0167-3069
+    email: noud.corten@student.uva.nl
+    affiliations: 1
+
+  - name: Georg Lange
+    orcid: 0000-0001-5082-9018
+    email: georg.lange@student.uva.nl
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x, machine, learning, deep, complex, valued, neural, network, python, pytorch
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/GANA-FACT-AI/gana-fact-ai
+  - doi: 
+  - swh: swh:1:dir:16f75580c3619b9e0b00b6dceef8e5bf2f5a47c4
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: Liyao Xiang, Haotian Ma, Hao Zhang, Yifan Zhang, Jie Ren, and Quanshi Zhang. 2020. Interpretable complex-valued neural networks for privacy protection.
+ - bib:  xiang2020interpretable
+ - url:  http://arxiv.org/abs/1505.04597
+ - doi:  # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility
+The original work by  Xiang et al. claimed that complex-valued DNNs effectively increase the difficulty of inferring inputs for the adversary attacks compared to the baseline. 
+In addition, Xiang et al. stated that the proposed privacy-protecting complex-valued DNN effectively preserves the accuracy when compared to the baseline.
+Methodology
+Since the original paper's code was not published, all of the codebase was written independently from scratch, based solemnly on how it was described in the paper. We mostly used a Nvidia's \textit{RTX 2060 Super} as the GPU and a \textit{AMD Ryzen 3600x} as the CPU.  The runtime of each model was highly dependant on the architecture used. The runtimes for each model can be found in Table 2.
+Results
+In contrast to the first claim, we have discovered that for most of the architectures, reconstruction errors for the attacks are quite low, which means that in our models the first claim is not supported. We also found that for most of the models, the classification error is somewhat higher than those provided in the paper. However, these indeed relate to the original work and partially support the second claim of the authors.
+What was easy
+Authors of the original paper utilized famous architectures for some of architectures' parts, such as ResNet and LeNet, that were well explained and defined in the literature. In addition, authors, provided formulas on the modified rotation-invariant Complex DNN modules (ReLU, max pooling etc.), implementation of which was relatively straightforward. The paper was based on the openly available datasets. 
+What was difficult
+The paper did not provide  any information on the architecture of the critic for the WGAN, along with the architecture of the angle discriminator utilized in inversion attack 1. It also does not  provide any information about crucial hyperparameters, such as the k value used for k-anonimity."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2020
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=P30M7d9DyXw
+
+contributors:
+  - name: Koustuv Sinha,\\ Jesse Dodge
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid: 
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  January 29, 2021
+  - accepted:  April 1, 2021  
+  - published: May 27, 2021
+
+
+# This information will be provided by the editor
+article:
+  - number: 20 # Article number will be automatically assigned during publication
+  - doi: 10.5281/zenodo.4835431    # DOI from Zenodo
+  - url: https://zenodo.org/record/4835431/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 7
+  - issue:  2
