@@ -1,0 +1,135 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reimplementation of FixMatch and Investigation on Noisy (Pseudo) Labels and Confirmation Errors of FixMatch"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Ci Li
+    orcid: 0000-0002-7627-0125
+    email: cil@kth.se
+    affiliations: 1,2
+  
+  - name: Ruibo Tu
+    orcid: 0000-0003-1356-9653
+    email: ruibo@kth.se
+    affiliations: 1,2
+    
+  - name: Hui Zhang
+    orcid: 0000-0002-0992-5830
+    email: omegazhanghui@gmail.com
+    affiliations: 1,2,*    # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    KTH Royal Institute of Technology
+    address: Stockholm, Sweden
+    
+  - code:    2
+    name:    Equal contributions
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/Celiali/FixMatch.git
+  - doi: 
+  - swh: swh:1:dir:6c3389cac6218bdd28599fea638c6c5def256081
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "K. Sohn, D. Berthelot, C.-L. Li, Z. Zhang, N. Carlini, E. D. Cubuk, A. Kurakin, H. Zhang, and C. Raffel. Fixmatch: Simplifying semi-supervised learning with consistency and confidence.arXiv preprint arXiv:2001.07685, 2020" # Full textual citation
+ - bib:  \cite{sohn2020fixmatch} # Bibtex key (if any) in your bibliography file
+ - url:  https://arxiv.org/pdf/2001.07685.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi:  # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "FixMatch is a semi-supervised learning method, which achieves comparable results with 
+          fully supervised learning by leveraging a limited number of labeled data (pseudo labelling technique) 
+          and taking a good use of the unlabeled data (consistency regularization ). 
+          In this work, we reimplement FixMatch and achieve reasonably comparable performance with the official 
+          implementation, which supports that FixMatch outperforms semi-superivesed learning benchmarks and 
+          demonstrates that the author's choices with respect to those ablations were experimentally sound.
+          Next, we investigate the existence of a major problem of FixMatch, confirmation errors, by 
+          reconstructing the batch structure during the training process. It reveals existing confirmation errors, 
+          especially the ones caused by asymmetric noise in pseudo labels. 
+          To deal with the problem, we apply equal-frequency and confidence entropy regularization to the labeled 
+          data and add them in the loss function. Our experimental results on CIFAR-10 show that using either of 
+          the entropy regularization in the loss function can reduce the asymmetric noise in pseudo labels and 
+          improve the performance of FixMatch in the presence of (pseudo) labels containing (asymmetric) noise. 
+          Our code is available at the url: https://github.com/Celiali/FixMatch"
+
+# Bibliography file (yours)
+bibliography: ../openreview/bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2020
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=3VXeifKSaTE
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid: 
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  January 29, 2021
+  - accepted:  April 1, 2021  
+  - published: May 27, 2021
+
+
+# This information will be provided by the editor
+article:
+  - number: 9 # Article number will be automatically assigned during publication
+  - doi: 10.5281/zenodo.4834442    # DOI from Zenodo
+  - url: https://zenodo.org/record/4834442/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 7
+  - issue:  2
