@@ -1,6 +1,6 @@
-# RC-2020 Accepted Papers
+# Machine Learning Reproducibility Challenge (MLRC) 2021 Accepted Papers
 
-This repository serves as the editorial venue for [ML Reproducibility Challenge 2020](https://paperswithcode.com/rc2020) accepted papers.
+This repository serves as the editorial venue for [ML Reproducibility Challenge 2021](https://paperswithcode.com/rc2021) accepted papers.
 
 ## Instructions for Camera ready
 
@@ -106,6 +106,10 @@ Once your compilation is ready, open a Pull Request (PR) to the repository with 
 While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
 
 **New: CI with Github Actions**: We have now setup a continuous integration with Github Actions to run after every push and PR. Once you submit your PR, you can check the build logs from the PR right itself (currently we build all projects together, so search the log with the name of your folder). Thanks to [Xavier Bouthillier](https://github.com/bouthilx) for helping to set it up! 
+
+## MLRC2020
+
+Files and latex sources for MLRC 2020 edition is now moved to [2020](2020/) folder.
 
 ## For Editors
 
