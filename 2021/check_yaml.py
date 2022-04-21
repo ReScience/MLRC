@@ -102,6 +102,9 @@ if __name__ == "__main__":
     metadata_files = [x for x in metadata_files if "template" not in x]
     assert len(metadata_files) >= 1, "No metadata file found"
     for mfile in metadata_files:
+        if "editorial" in mfile:
+            print("Skipping check for editorial")
+            continue
         print(f"Validating {mfile} ...")
         meta = yaml.safe_load(open(mfile))
         check_title(meta)
