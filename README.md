@@ -28,6 +28,9 @@ apt-get install texlive
 
 For Windows: [Download Tex Live](https://www.tug.org/texlive/acquire-netinstall.html) from source.
 
+**Note**: We also use [Git LFS](https://git-lfs.github.com/) to upload and store the compiled pdfs. You need to run this once in your local terminal to setup LFS uploads: `git lfs install`.
+
+
 ### Step 1: Setup report folder
 
 - Fork this repository and clone it locally (**Note**: clone recursively using `--recurse-submodules` or `--recursive` flag)
@@ -117,7 +120,7 @@ python check_yaml.py
 
 ### Step 5: Submit a PR
 
-Once your compilation is ready, open a Pull Request (PR) to main branch. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
+To submit your report, open a Pull Request (PR) to main branch. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata. Even if you have completed the report partially due to compilation issues, we ****strongly recommend**** to open your Pull Requests early to 1. get quicker help from our Area Chairs, and 2. take advantage of Github Actions for auto compilation.
 
 ### :bulb: Continuous Integration
 
