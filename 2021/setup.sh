@@ -204,13 +204,19 @@ journal:
   - issue:  1
 EOF
 
-# KEYS="$1"
 KEYS=$(cat accepted.bib | sed -n "s/[^{]*@inproceedings{\([^,]*\).*/\1/p")
-for key in $KEYS; do
-    git checkout -b $key
+key="$1"
+
+if [[ ! "${KEYS[*]}" =~ "${key}" ]]; then
+    echo "$key is not a valid bibkey. Please check accepted.bib for the correct key."
+else
     echo "Setting up folder ${key}"
-    rm -rf $key
+    if [ -d "$key" ]; then
+        echo "Directory ${key} exists. If you want to create the boilerplate from scratch, delete the folder first."
+        exit
+    fi
     ## Create sample openreview folder
+    echo "Creating openreview folder ..."
     mkdir -p $key/openreview
     touch $key/.gitkeep
     touch $key/openreview/.gitkeep
@@ -222,6 +228,7 @@ for key in $KEYS; do
     echo "$APPENDIX" >> $key/openreview/appendix.tex
 
     ## Create sample journal folder
+    echo "Creating journal folder ..."
     mkdir -p $key/journal
     touch $key/journal/.gitkeep
     cd $key/journal
@@ -246,8 +253,6 @@ for key in $KEYS; do
     echo "$ARTICLE" > article.tex
     echo "$METADATA" > metadata.yaml
     echo "$BIBFILE" > bibliography.bib
-    echo "Done for folder ${key}"
+    echo "Done creating folder ${key}"
     cd ../..
-    git commit -m "Initial setup"
-    git checkout main
-done
+fi

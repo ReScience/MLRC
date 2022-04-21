@@ -4,11 +4,12 @@ This repository serves as the editorial venue for [ML Reproducibility Challenge 
 
 ## Instructions for Camera ready
 
-ReScience editorial process consists of porting the existing latex sources into ReScience template, and then adding necessary information relevant for final publication. Authors of RC2020 accepted papers are requested to submit their camera-ready papers as outlined in the steps below. The project structure of this repository is organized as:
-
-- `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/accepted.bib)
-  - `openreview`  <-- location for the source files submitted to openreview
-  - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
+ReScience editorial process consists of porting the existing latex sources into ReScience template, and then adding necessary information relevant for final publication. Authors of RC2021 accepted papers are requested to submit their camera-ready papers as outlined in the steps below. The project structure of this repository is organized as:
+ 
+ - 2021/
+  - `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/accepted.bib)
+    - `openreview`  <-- location for the source files submitted to openreview
+    - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
 
 
 ### Step 0: Setup your development environment for Latex
@@ -27,17 +28,36 @@ apt-get install texlive
 
 For Windows: [Download Tex Live](https://www.tug.org/texlive/acquire-netinstall.html) from source.
 
-
-### Step 1: Copy the camera-ready latex content in `openreview` folder
+### Step 1: Initialize files and test CI compilation 
 
 - Fork this repository and clone it locally (**Note**: clone recursively using `--recurse-submodules` or `--recursive` flag)
-- Add the latex content of your paper in the `openreview` folder of your paper citekey. (You can check your correct folder from [accepted.bib](accepted.bib))
+- Find your `<paper_citekey>` from [accepted.bib](/2021/accepted.bib). It is the key after `@inproceedings`.
+- In [2021](/2021) directory, setup your report folder using the `<paper_citekey>`. For example, if your citekey is `ahmed2022re`, then run the [setup.sh](/2021/setup.sh) with the argument:
+
+``` bash
+cd 2021/
+./setup.sh ahmed2022re
+```
+
+  This will create the folder `ahmed2022re` and two subfolders, `openreview` and `journal` along with the boilerplate code.
+
+- Test building your report using [build_all.sh](/2021/build_all.sh) script. This assumes you have the correct texlive distributions installed.
+
+``` bash
+cd 2021/
+./build_all.sh
+```
+
+  You can find the logs in your terminal, as well as saved in `2021/<paper_citekey>/journal/build.log` file.
+  
+- Open the compiled pdf. It will be located at: `2021/<paper_citekey>/journal/article.pdf`.
 
 ### Step 2: Organize your latex code
 
-Now we need to organize your contents a bit so as to make life easier for the editors!
+Now we need to organize your contents a bit so as to make life easier for the editors! 
 
-- Make a new file `packages.tex` in your `openreview` folder, where you add all your import lines in Latex. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/openreview/packages.tex)). Import this file in your main tex file.
+- Add the latex content of your paper in the `openreview` folder of your paper citekey. (You can check your correct folder from [accepted.bib](/2021/accepted.bib))
+- Use the `packages.tex` in your `openreview` folder to add all your import lines in Latex. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/openreview/packages.tex)). Import this file in your main tex file.
 - Convert your main content in a `content.tex` file in the `openreview` folder, and import it in your `main.tex` file. Feel free to re-organize your latex code in different files, as long as everything can be imported in `content.tex`. Your `main.tex` file could look like following:
 
     ``` tex
@@ -88,32 +108,30 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 - In `review` section, paste the url to the OpenReview forum of your paper.
 - Leave the fields `contributors`, `dates`, `article` and `journal` fields blank, as those will be populated by the Area Chairs / ReScience editors.
 
-### Step 4: Compile locally
+You can test your metatdata is correct by running this Python Script:
 
-In the `journal` folder of your paper, first remove the default `metadata.tex` file. Then, run `make` to compile. You should get the output `article.pdf` to be nicely formatted in the ReScience styles.
+``` bash
+python check_yaml.py
+```
+
+
+### Step 5: Submit a PR
+
+Once your compilation is ready, open a Pull Request (PR) to main branch. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
+
+### Troubleshooting
+
+While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
 
 #### :warning: Common Compilation Issues
 
 - Please do not import `xcolor` in your `packages.tex`, as rescience.cls already imports this package
 - Please remove the import of `fontenc` from your `packages.tex`. ReScience uses custom fonts, which breaks when fontenc is loaded on top of it. (Check [#4](https://github.com/ReScience/RC-2020/issues/4) for more discussion)
 
-### Step 5: Submit a PR
-
-Once your compilation is ready, open a Pull Request (PR) to the repository with your files. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
-
-### Troubleshooting
-
-While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
-
-**New: CI with Github Actions**: We have now setup a continuous integration with Github Actions to run after every push and PR. Once you submit your PR, you can check the build logs from the PR right itself (currently we build all projects together, so search the log with the name of your folder). Thanks to [Xavier Bouthillier](https://github.com/bouthilx) for helping to set it up! 
 
 ## MLRC2020
 
 Files and latex sources for MLRC 2020 edition is now moved to [2020](2020/) folder.
-
-## For Editors
-
-- To build all folders, run `./build_all.sh`
 
 ## Contact
 
