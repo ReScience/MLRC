@@ -1,0 +1,21 @@
+\section{Conclusion}
+We were able to confirm two of the three main claims from the original article, as stated in the results. The claim which states that TransATOM outperforms other evaluated state-of-the-art algorithms by a large margin on TOTB was confirmed, as we demonstrated that TransATOM outperforms other trackers that the authors evaluated in their original paper. The second claim was also confirmed, because we showed that the difference in performance of TransATOM and ATOM tracker, which differentiate only on the transparency feature, was significant enough.
+
+However, we were unable to confirm the the last claim, which states that TransATOM effectively handles all challenges for robust target localization due to transparency features. We evidenced multiple cases where the TransATOM tracker fails to handle transparent object tracking adequately. We believe that this is the most audacious claim, because we know that the TOTB dataset contains many difficult challenges that no currently-developed tracker can handle well.
+
+The strength of our strategy was that we attempted to follow the steps outlined in the article. We also chose only the top 10 trackers based on their performance on the TOTB dataset, allowing us to focus more on implementation and evaluation quality. In addition, we compared the current state-of-the-art Stark tracker. We wanted to show that there is still a lot of room for improvement in the field of tracking transparent objects. Because we didn't know which parameters were used in the original article, we used only the default choice of parameters for all trackers. This was a flaw in our approach. We could also do more in-depth qualitative analysis because we could compare three results for each tracker and pick the best one, but we took the best one in the whole TOTB dataset.
+
+\subsection{Recommendations for reproducibility}
+We recommend using the code from \href{https://anonymous.4open.science/r/TOTB-reproducability-009A/}{GitHub} to reproduce the results of the original article or our work. We recommend to look at which evaluation tool the original code is written in for each tracker and use that evaluation tool. We do not recommend reproducing the results for all trackers, but rather selecting the trackers with the best results, because evaluating the trackers takes a lot of time. We have adapted the TOTB dataset for PySOT, py-MDNet, STARK, and VOT21 evaluation tool, and we recommend to download it from \href{https://drive.google.com/drive/folders/1vkrWedoy5_VoRXUmmZwrAu7rv5tImrhl?usp=sharing}{here}.
+
+\nocite{fan2021transparent} 
+\nocite{segmenting}
+\nocite{prdimp}
+\nocite{dimp}
+\nocite{atom}
+\nocite{siammask}
+\nocite{siamrpn}
+\nocite{siamrp}
+\nocite{siam2}
+\nocite{mdnet}
+\nocite{stark}

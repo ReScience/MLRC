@@ -1,0 +1,86 @@
+\section{Methodology}
+We used the author's TransATOM code to reproduce the results, which is available \href{https://hengfan2010.github.io/projects/TOTB/}{here}. Code for evaluation tools and other trackers was obtained from GitHub:
+\begin{itemize}
+\item \href{https://github.com/visionml/pytracking}{PyTracking} tool, which includes code for ATOM, PrDiMP-18, PrDiMP-50, DiMP-18 and DiMP-50.
+\item \href{https://github.com/STVIR/pysot}{PySOT} tool, which includes code for SiamMask, SiamRPN and SiamRPN++.
+\item \href{https://github.com/HyeonseobNam/py-MDNet}{py-MDNet} tool, which includes code for MDNet.
+\item \href{https://github.com/researchmm/Stark}{STARK} tracker with it's own evaluation tool.
+\end{itemize}
+We used an internal server with an Ubuntu 18.04 operating system and a TITAN X graphics card with 12GB VRAM to reproduce the results.
+
+
+\subsection{Model descriptions}
+Here we list hyperlinks to the models' descriptions and all of the parameters we used: \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/atom/default.py}{TransATOM}, \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/atom/default.py}{ATOM}, \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/dimp/prdimp18.py}{PrDiMP-18}, \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/dimp/prdimp50.py}{PrDiMP-50}, \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/dimp/dimp18.py}{DiMP-18}, \href{https://github.com/visionml/pytracking/blob/master/pytracking/parameter/dimp/dimp50.py}{DiMP-50}, \href{https://github.com/STVIR/pysot/blob/master/experiments/siammask_r50_l3/config.yaml}{SiamMask}, \href{https://github.com/STVIR/pysot/blob/master/experiments/siamrpn_alex_dwxcorr_otb/config.yaml}{SiamRPN}, \href{https://github.com/STVIR/pysot/blob/master/experiments/siamrpn_r50_l234_dwxcorr_otb/config.yaml}{SiamRPN++}, \href{https://github.com/hyeonseobnam/py-MDNet/blob/master/tracking/options.yaml}{MDNet} and \href{https://github.com/researchmm/Stark/blob/main/lib/config/stark_s/config.py}{Stark}.
+
+All models have been pre-trained.
+\subsection{Datasets}
+An important part of tracker analysis is to know in which cases the tracker excels and in which cases fails. To this end, the authors have assigned several attributes to each recording. A twelve-dimensional binary vector was provided for each sequence to indicate the presence of an attribute (1 denotes the presence of a certain attribute). From Table \ref{tab:my-table1}, which summarizes TOTB dataset, we can observe number of sequences with a certain attribute (bold diagonal) and number of sequences with combination of different attributes. Table \ref{tab:my-table2} shows the distribution of the following attributes on TOTB dataset: \textit{illumination variation} (IV), \textit{partial occlusion} (PC), \textit{deformation} (DEF), \textit{motion blur} (MB), \textit{rotation} (ROT), \textit{background clutter} (BC), \textit{scale variation} (SV), \textit{full occlusion} (FOC), \textit{fast motion} (FM), \textit{out-of-view} (OV), \textit{low resolution} (LR) and \textit{aspect ratio change} (ARC). The most frequent challenges in TOTB dataset are \textit{rotation}, \textit{partial occlusion} and \textit{scale variation}.
+The TOTB dataset is available for download at the following \href{https://drive.google.com/file/d/1eIbg5wpBoJbGHgv3g-ucW45g-wfQf_Y6/view}{link}.
+
+\begin{table}[h]
+\centering
+\caption{Summary of statistics of the TOTB dataset.}
+\label{tab:my-table1}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Number of videos     & 225      &Number of attributes& 12   \\
+Average duration     & 12.7 seconds &Object categories  &15 \\
+Total frames         & 86,000     &Average frames&  381 \\
+Max frames           & 500         &Min frames   &126    \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Distribution of 12 attributes on the TOTB dataset. The diagonal elements corresponds to the distribution over the entire dataset, each row/column presents the joint distribution for the attribute subset. In other words, the diagonal represents the number of sequences with a specific attribute, while the other values represent the number of sequences with a specific combination of attributes.}
+\label{tab:my-table2}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\toprule
+                         & IV & POC & DEF & MB & ROT & BC & SV & FOC & FM & OV & LR & ARC \\ \midrule
+\multicolumn{1}{l|}{IV}  & \textbf{69} & 24  & 7   & 16 & 43  & 5  & 20 & 2   & 10 & 2  & 3  & 16  \\
+\multicolumn{1}{l|}{POC} & 24 & \textbf{110} & 18  & 38 & 59  & 23 & 48 & 9   & 26 & 7  & 12 & 40  \\
+\multicolumn{1}{l|}{DEF} & 7  & 18  & \textbf{42}  & 6  & 6   & 8  & 24 & 0   & 7  & 0  & 1  & 20  \\
+\multicolumn{1}{l|}{MB}  & 16 & 38  & 6   & \textbf{69} & 50  & 16 & 29 & 7   & 18 & 6  & 5  & 27  \\
+\multicolumn{1}{l|}{ROT} & 43 & 59  & 6   & 50 & \textbf{123} & 21 & 59 & 7   & 27 & 6  & 9  & 61  \\
+\multicolumn{1}{l|}{BC}  & 5  & 23  & 8   & 16 & 21  & \textbf{42} & 17 & 3   & 5  & 1  & 0  & 11  \\
+\multicolumn{1}{l|}{SV}  & 20 & 48  & 24  & 29 & 59  & 17 & \textbf{95} & 0   & 33 & 0  & 14 & 68  \\
+\multicolumn{1}{l|}{FOC} & 2  & 9   & 0   & 7  & 7   & 3  & 0  & \textbf{10}  & 0  & 3  & 0  & 0   \\
+\multicolumn{1}{l|}{FM} & 10  & 26   & 7   & 18  & 27   & 5  & 33  & 0  &  \textbf{44}  & 0  & 11 & 29   \\
+\multicolumn{1}{l|}{OV}  & 2  & 7   & 0   & 6  & 6   & 1  & 0  & 3   & 0  &  \textbf{9}  & 0  & 0   \\
+\multicolumn{1}{l|}{LR}  & 3  & 12  & 1   & 5  & 9   & 0  & 14 & 0   & 11 & 0  &  \textbf{18} & 11  \\
+\multicolumn{1}{l|}{ARC} & 16 & 40  & 20  & 27 & 61  & 11 & 68 & 0   & 29 & 0  & 11 &  \textbf{82} 
+\end{tabular}
+}
+
+
+
+\end{table}
+
+\subsection{Experimental setup and code}
+For each tracker, we used one-pass evaluation (OPE), using three measures: \textit{precision} (PRE), \textit{normalized precision} (NPRE) and  \textit{success} (SUC). \textit{Precision} is defined as the distance between the centers of the bounding boxes (between the groundtruth and the tracking result), with the value varying depending on the threshold (which may be different for each tracker). \textit{Normalized precision} is used to eliminate the influence of different scales by performing normalization with target areas. \textit{Success} compares the intersection over union (IoU) of tracking results and groundtruth boxes, and success score is calculated as the percentage of tracking results with IoU greater than 0.5.
+
+All the code we needed is available on \href{https://anonymous.4open.science/r/TOTB-reproducability-009A/}{GitHub}.
+%\href{https://github.com/trojerz/TOTB-reproducability}{GitHub}
+
+
+\subsection{Computational requirements}
+Table \ref{tab:my-table3} shows the average FPS, maximum FPS, average one pass evaluation (OPE) time and maximum OPE for each tracker. We spent over 85 hours total evaluating all of the trackers on the GPU, as we evaluated each tracker three times.
+
+
+\begin{table}[h]
+\centering
+\caption{Each tracker's average FPS, maximum FPS, average one pass time and maximum OPE. We run each tracker three times.}
+\label{tab:my-table3}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllllllllll@{}}
+\toprule
+Tracker & TransATOM & ATOM & PrDiMP-18 & PrDiMP-50 & DiMP-18 & DiMP-50 & SiamMask & SiamRPN & SiamRPN++ & MDNet & Stark \\ \midrule
+average FPS   & 12  & 25  & 7      & 5      & 7     & 6    & 55     & 42     & 40     & 3    & 70     \\
+maximum FPS & 21  & 32  & 13      & 11      & 9     & 8    & 78     & 64     & 59    & 5    & 98   \\ 
+average OPE & 1 h 59 min & 57 min & 3 h 25 min  & 4 h 45 min  & 3 h 25 min& 3 h 58 min  & 26 min & 35 min & 35 min & 7 h 57 min & 20 min \\
+maximum OPE & 2 h 2 min & 59 min & 3 h 29 min  & 4 h 50 min  & 3 h 29 min& 4 h 04 min  & 28 min & 36 min & 37 min & 8 h 13 min & 21 min \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
