@@ -6,13 +6,13 @@
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
 # Change the default title
-title: "[Re] A report in MLRC 2021"
+title: "[Re] Replicating and Improving GAN2Shape Through Novel Shape Priors and Training Steps"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: John Doe
-    orcid: 0000-0000-000-000
+  - name: Alessio Galatolo
+    orcid: 0000-0002-9289-4659
     email: johndoe@gmail.com
     affiliations: 1,*
 
@@ -26,21 +26,21 @@ authors:
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Hogwarts University
-    address: Hogsmeade, UK
+    name:    KTH Royal Institute of Technology
+    address: Stockholm, Sweden
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords:  rescience c, machine learning, deep learning, python, pytorch
+keywords:  rescience c, machine learning, deep learning, python, pytorch, gan2shape, 3d
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/
+  - url: https://github.com/alessioGalatolo/GAN-2D-to-3D
   - doi: 00.0000/zenodo.0000000
-  - swh: swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  - swh: swh:1:dir:531d1456baa3bb553ce549785158be7005c682c7
 
 # Data URL and DOI (optional if no data)
 data:
@@ -49,13 +49,13 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: "Yoshua Bengio, Yann Lecun, Geoffrey Hinton. All you need is AGI (ICML 2042)."
+ - cite: "Xingang Pan, Bo Dai, Ziwei Liu, Chen Change Loy, Ping Luo. Do 2D GANs Know 3D Shape? Unsupervised 3D Shape Reconstruction from 2D Image GANs (ICLR 2021)."
  - bib:  bengio2042
- - url:  https://arxiv.org/pdf/xxxx.pdf
- - doi:  # Regular digital object identifier
+ - url:  https://arxiv.org/abs/2011.00844
+ - doi:  10.48550/arXiv.2011.00844 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "AGI is not all you need."
+abstract: "Natural images are projections of 3D objects on a 2D image plane. While state-of-the-art 2D generative models like GANs show unprecedented quality in modeling the natural image manifold, it is unclear whether they implicitly capture the underlying 3D object structures. And if so, how could we exploit such knowledge to recover the 3D shapes of objects in the images? To answer these questions, in this work, we present the first attempt to directly mine 3D geometric cues from an off-the-shelf 2D GAN that is trained on RGB images only. Through our investigation, we found that such a pre-trained GAN indeed contains rich 3D knowledge and thus can be used to recover 3D shape from a single 2D image in an unsupervised manner. The core of our framework is an iterative strategy that explores and exploits diverse viewpoint and lighting variations in the GAN image manifold. The framework does not require 2D keypoint or 3D annotations, or strong assumptions on object shapes (e.g. shapes are symmetric), yet it successfully recovers 3D shapes with high precision for human faces, cats, cars, and buildings. The recovered 3D shapes immediately allow high-quality image editing like relighting and object rotation. We quantitatively demonstrate the effectiveness of our approach compared to previous methods in both 3D shape reconstruction and face rotation. Our code is available at this https URL."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -80,7 +80,7 @@ language: Python
 
 # For example, the URL of the GitHub issue where review actually occured
 review:
-  - url: https://openreview.net/forum?id=forum_id
+  - url: https://openreview.net/forum?id=B8mxkTzX2RY
 
 contributors:
   - name: Koustuv Sinha
