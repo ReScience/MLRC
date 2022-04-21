@@ -100,7 +100,6 @@ def check_review(meta):
 if __name__ == "__main__":
     metadata_files = glob.glob("**/journal/metadata.yaml")
     metadata_files = [x for x in metadata_files if "template" not in x]
-    metadata_files = [x for x in metadata_files if "editorial" not in x]
     assert len(metadata_files) >= 1, "No metadata file found"
     for mfile in metadata_files:
         print(f"Validating {mfile} ...")

@@ -2,9 +2,6 @@
 # Build all folders
 # Should be run by the CI
 for key in */; do
-    if [ $key == "editorial/" ]; then
-        continue
-    fi
     if [ $key == "template/" ]; then
         continue
     fi

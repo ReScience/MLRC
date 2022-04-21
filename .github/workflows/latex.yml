@@ -23,3 +23,7 @@ jobs:
             pip3 install pyyaml
             apk add make
             cd 2021 && python check_yaml.py && ./build_all.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Upload compiled pdf
+          path: 2021/*/journal/article.pdf
