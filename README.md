@@ -119,9 +119,13 @@ python check_yaml.py
 
 Once your compilation is ready, open a Pull Request (PR) to main branch. Our Area Chairs will then review and accept the submission, and proceed towards obtaining the journal metadata.
 
+### :bulb: Continuous Integration
+
+This repository is also setup to use Github Actions to automatically compile the reports. After you submit your Pull Request, the CI will run the compilation step, check for errors, and then upload the compiled pdfs as "Artifacts" in the [workflow run](https://github.com/ReScience/MLRC/actions?query=event%3Apull_request) for the commit.
+
 ### Troubleshooting
 
-While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](https://github.com/ReScience/NeurIPS-2019) of our last iteration to narrow down any specific latex issues you are facing.
+While compiling you might face latex issues / errors. In such events, first inspect the log carefully for any offending blocks. If you are unsure, submit your PR anyway, and open an issue linking to your PR, where you attach the logs. To capture the log, pipe the `make` output to a file and add it to the PR (`make > build.log`). Our AC's will gladly help to you fix the issues! Also, do consult the [codebase](2020/) of our last iteration or [previously closed issues](https://github.com/ReScience/MLRC/issues?q=is%3Aissue+is%3Aclosed) to narrow down any specific latex issues you are facing.
 
 #### :warning: Common Compilation Issues
 
