@@ -1,15 +1,15 @@
 # Machine Learning Reproducibility Challenge (MLRC) 2021 Accepted Papers
 
-This repository serves as the editorial venue for [ML Reproducibility Challenge 2021](https://paperswithcode.com/rc2021) accepted papers.
+This repository serves as the editorial venue for [ML Reproducibility Challenge 2021](https://paperswithcode.com/rc2021) accepted papers. If your paper is accepted to the challenge, you must follow the instructions to submit your camera ready paper by **May 4th, 2022, Wednesday EOD**.
 
 ## Instructions for Camera ready
 
 ReScience editorial process consists of porting the existing latex sources into ReScience template, and then adding necessary information relevant for final publication. Authors of RC2021 accepted papers are requested to submit their camera-ready papers as outlined in the steps below. The project structure of this repository is organized as:
  
  - 2021/
-  - `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/accepted.bib)
-    - `openreview`  <-- location for the source files submitted to openreview
-    - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
+   - `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/accepted.bib)
+     - `openreview`  <-- location for the source files submitted to openreview
+     - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
 
 
 ### Step 0: Setup your development environment for Latex
@@ -28,7 +28,7 @@ apt-get install texlive
 
 For Windows: [Download Tex Live](https://www.tug.org/texlive/acquire-netinstall.html) from source.
 
-### Step 1: Initialize files and test CI compilation 
+### Step 1: Setup report folder
 
 - Fork this repository and clone it locally (**Note**: clone recursively using `--recurse-submodules` or `--recursive` flag)
 - Find your `<paper_citekey>` from [accepted.bib](/2021/accepted.bib). It is the key after `@inproceedings`.
@@ -54,7 +54,7 @@ cd 2021/
 
 ### Step 2: Organize your latex code
 
-Now we need to organize your contents a bit so as to make life easier for the editors! 
+Now we need to organize your contents a bit so as to make life easier for the editors! (:bulb: When setting up the folder in Step 1, we already add boilerplate for the following steps to help you understand the import process.)
 
 - Add the latex content of your paper in the `openreview` folder of your paper citekey. (You can check your correct folder from [accepted.bib](/2021/accepted.bib))
 - Use the `packages.tex` in your `openreview` folder to add all your import lines in Latex. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/openreview/packages.tex)). Import this file in your main tex file.
@@ -86,7 +86,7 @@ Now we need to organize your contents a bit so as to make life easier for the ed
 
 ### Step 3: Edit the metadata
 
-In the `journal` folder you will find a `metadata.yaml` file. This file is crucial to fill correctly for the journal to publish your paper correctly. Here is a [reference metadata.yaml file](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/journal/metadata.yaml) from our last iteration.
+In the `journal` folder you will find a `metadata.yaml` file. This file is crucial to fill correctly for the journal to publish your paper correctly. Here is a [reference metadata.yaml file](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/journal/metadata.yaml) from our last iteration. 
 
 - Add the `title` of your paper. The paper title should start with `[Re] `.
 - Add the author information in `authors`. This is a yaml list, so just copy paste the following block for all your authors:
@@ -108,7 +108,7 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 - In `review` section, paste the url to the OpenReview forum of your paper.
 - Leave the fields `contributors`, `dates`, `article` and `journal` fields blank, as those will be populated by the Area Chairs / ReScience editors.
 
-You can test your metatdata is correct by running this Python Script:
+:bulb: You can test your metatdata is correct by running this Python Script:
 
 ``` bash
 python check_yaml.py
