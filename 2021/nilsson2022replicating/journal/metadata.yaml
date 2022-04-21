@@ -13,7 +13,7 @@ title: "[Re] Replicating and Improving GAN2Shape Through Novel Shape Priors and 
 authors:
   - name: Alessio Galatolo
     orcid: 0000-0002-9289-4659
-    email: johndoe@gmail.com
+    email: galatolo@kth.se
     affiliations: 1,*
 
   - name: Foo Bar
@@ -55,7 +55,30 @@ replication:
  - doi:  10.48550/arXiv.2011.00844 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Natural images are projections of 3D objects on a 2D image plane. While state-of-the-art 2D generative models like GANs show unprecedented quality in modeling the natural image manifold, it is unclear whether they implicitly capture the underlying 3D object structures. And if so, how could we exploit such knowledge to recover the 3D shapes of objects in the images? To answer these questions, in this work, we present the first attempt to directly mine 3D geometric cues from an off-the-shelf 2D GAN that is trained on RGB images only. Through our investigation, we found that such a pre-trained GAN indeed contains rich 3D knowledge and thus can be used to recover 3D shape from a single 2D image in an unsupervised manner. The core of our framework is an iterative strategy that explores and exploits diverse viewpoint and lighting variations in the GAN image manifold. The framework does not require 2D keypoint or 3D annotations, or strong assumptions on object shapes (e.g. shapes are symmetric), yet it successfully recovers 3D shapes with high precision for human faces, cats, cars, and buildings. The recovered 3D shapes immediately allow high-quality image editing like relighting and object rotation. We quantitatively demonstrate the effectiveness of our approach compared to previous methods in both 3D shape reconstruction and face rotation. Our code is available at this https URL."
+abstract: "SCOPE OF REPRODUCIBILITY
+
+Pan et al. propose an unsupervised method named GAN2Shape that purportedly is able to recover 3D information stored in the weights of a pre-trained StyleGAN2 model, to produce 3D shapes from 2D images. We aim to reproduce the 3D shape recovery and identify its strengths and weaknesses.
+
+METHODOLOGY
+
+We re-implement the method proposed by Pan et al. with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques. Our code is available at https://anonymous.4open.science/r/GAN-2D-to-3D-03EF. While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
+
+RESULTS
+
+We replicate the results of Pan et al. on a subset of the LSUN Cat, LSUN Car and CelebA datasets and observe varying degrees of success. We perform several experiments and illustrate the successes and shortcomings of the method. Our novel shape priors improve the 3D shape recovery in certain cases where the original shape prior was unsuitable. Our generalized training approach shows initial promise but has to be confirmed with increased computational resources.
+
+WHAT WAS EASY?
+
+The original code is easily runnable on the correct machine type (Linux operating system and CUDA 9.2 compatible GPU) for the specific datasets used by the authors.
+
+
+WHAT WAS DIFFICULT?
+
+Porting the model to a new dataset, problem setting or a different machine type is far from trivial. The poor cohesion of the original code makes interpretation very difficult, and that is why we took care to re-implement many parts of the code using the decoupling principle. The code depends on many external implementations which had to be made runnable, which caused a significant development bottleneck as we developed on Windows machines (contrary to the authors). The exact loss functions and the number of training steps were not properly reported in the original paper, which meant it had to be deduced from their code. Certain calculations required advanced knowledge of light-transport theory, which had no familiarity to us, and had to be mimicked and could not be verified.
+
+COMMUNICATION WITH THE ORIGINAL AUTHORS
+
+We did not communicate with the original authors."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
