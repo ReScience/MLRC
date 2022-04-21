@@ -4,7 +4,7 @@ Write the `<paper_citekey>` here, and as well as rename the PR name to reflect t
 
 ## Compiled PDF
 
-Add the link to the compiled pdf here. Example : [Compiled Pdf][2021/<paper_citekey>/journal/article.pdf]
+Add the link to the compiled pdf here. Example : [Compiled Pdf](2021/<paper_citekey>/journal/article.pdf)
 
 ## Metadata Checklist
 
