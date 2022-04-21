@@ -1,9 +1,0 @@
-\section{Dynamic Structured Sparsity}\label{structured-sparsity}
-
-\input{../openreview/supplementary_sections/table_structured_sparsity.tex}
-
-Present hardware accelerators lack efficient implementations for unstructured sparsity. As a result, in practice, the reduced FLOP requirement of sparse methods rarely translate to wall-clock improvements. In comparison, there are efficient implementations available for structured (or block) sparsity which reach theoretical speedups (\citet{gray2017gpu,Vooturi_2019_ICCV}).\\
-
-Motivated by this, we try modifying \textit{RigL} to explicitly work on structured sparsity. We promote channel sparsity for convolutional layers and keep fully connected layers dense. Mask update steps also operate at the channel level, based on \textit{RigL}'s growth and pruning criterion. We name this method as \textit{RigL}-struct. Such an approach is enticing, as we can remove masked-out channels, and obtain practical speedups on accelerators without needing support for unstructured sparsity.\\
-
-Unfortunately, \textit{RigL}-struct does not preserve the performance of originally proposed \textit{RigL} (Table \ref{tab:structured-sparsity}). In fact, it performs only as good as Small-Dense models, which negates the motivation behind such an experiment---Small-Dense models already achieve the intended speedups.
