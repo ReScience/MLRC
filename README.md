@@ -104,7 +104,7 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 - Again, in the `code` section, provide the link to Software Heritage Foundation archival link to your code in `swh`. To get your SWH identifier, [provide the link to your code](https://archive.softwareheritage.org/save/) in Software Heritage Archive, which will queue it for archival. You can follow the [progress](https://archive.softwareheritage.org/save/#requests) of your request, and once the status changes to "succeeded", you can click on the URL link to arrive at the archived page of your code. From this page, click on the "Permalinks" side-button, and copy the code beginning with `swh`. Place this code in the yaml file under `swh`. ([Reference](https://github.com/ReScience/NeurIPS-2019/blob/master/ferlesReZeroShotKnowledge/journal/metadata.yaml#L46)])
 - In the `replication` section, add the necessary information about the paper you reproduced.
 - Provide your abstract in the `abstract` field (including double quotes)
-- `domain` should contain "ML Reproducibility Challenge 2020"
+- `domain` should contain "ML Reproducibility Challenge 2021"
 - In `review` section, paste the url to the OpenReview forum of your paper.
 - Leave the fields `contributors`, `dates`, `article` and `journal` fields blank, as those will be populated by the Area Chairs / ReScience editors.
 
