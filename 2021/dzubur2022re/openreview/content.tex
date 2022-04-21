@@ -1,0 +1,457 @@
+\section{Reproducibility Summary}
+
+
+\subsection*{Scope of Reproducibility}
+
+The authors of the paper, which we reproduced, introduce a method that is claimed to improve the isotropy (a measure of uniformity) of the space of Contextual Word Representations (CWRs), outputted by models such as BERT or GPT-2. As a result, the method would mitigate the problem of very high correlation between arbitrary embeddings of such models. Additionally, the method is claimed to remove some syntactic information embedded in CWRs, resulting in better performance on semantic NLP tasks. To verify these claims, we reproduce all  experiments described in the paper.
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+\subsection*{Methodology}
+%\footnote{available at \url{https://github.com/Sara-Rajaee/clusterbased_isotropy_enhancement/}}
+We used the authors' Python implementation  of the proposed cluster-based method, which we verified against our own implementation based on the description in the paper. We re-implemented the global method based on the paper from Mu and Viswanath \cite{global}, which the cluster-based method was primarily compared with. Additionally, we re-implemented all of the experiments based on descriptions in the paper and our communication with the authors. 
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+
+\subsection*{Results}
+
+We found that the cluster-based method does indeed consistently noticeably increase the isotropy of a set of CWRs over the global method. However, when it comes to semantic tasks, we found that the cluster-based method performs better than the global method in some and worse in other tasks, or that the improvements are within margin of error. Additionally, the results of one side experiment, which analyzes the structural information of CWRs, also contradict the authors' findings for the GPT-2 model. 
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsection*{What was easy}
+
+The described methods were easy to understand and implement, as they rely on PCA and K-Means clustering.
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+\subsection*{What was difficult}
+
+There were many ambiguities in the paper: which splits of data were used, the procedures of the experiments were not described in detail, some hyperparameters values were not disclosed. Additionally, running the approach on big datasets was too computationally expensive. There was an unhandled edge case in the authors' code, causing the method to fail in rare cases. Some results had to be submitted online, where there is a monthly limit of submissions, causing delays.
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsection*{Communication with original authors}
+
+We exchanged many e-mails with the authors, which were very responsive and helpful in describing the missing information required for reproduction. In the end, we still could not completely identify the sources of some remaining discrepancies in the results, even after ensuring the data, preprocessing and some other implementation details were the same.
+
+\clearpage
+
+\section{Introduction}
+
+Embeddings from popular contextual NLP models such as BERT \cite{bert}, GPT-2 \cite{gpt2}, RoBERTa \cite{roberta}, etc. suffer from the so-called representation degeneration problem \cite{repdeg}, where the individual tokens' embeddings form an anisotropic cone-like shape in the embedding space. This means that even unrelated words can have excessively positive correlations.
+
+Methods which study and attempt to improve the isotropy (a measure of uniformity) of the space on a global level (e.g. \cite{global}) have been predominantly used so far to tackle this problem. However, due to the clustered structure of these Contextual Word Representations (CWRs), the authors of the chosen paper \cite{local} propose a local, cluster-based method, which could further improve on the existing global approaches. 
+
+Apart from further improving isotropy, the method supposedly also removes some local structural and syntactic information within the clusters, improving the CWRs performance on semantic tasks. 
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+Throughout the paper, the authors use contextual embeddings of three models to support their claims: BERT, RoBERTa and GPT-2. Various datasets are used to generate these contextual embeddings, which are then enhanced with the proposed method, evaulated and used to support claims about the performance of the method. Specifically, these claims are: 
+
+%and We verified all such claims by reproducing the respective experiments. The authors make several claims about their method, which they support with empirical results.The claims are as follows: 
+
+
+%Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+%A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+%This is concise, and is something that can be supported by experiments.
+%An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+%This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+\begin{itemize}
+    \item Claim 1: The cluster-based method outperforms the baseline and global method, in all cases in terms of isotropy of CWRs as well as in almost all cases in terms of Spearman correlation performance, on 7 Semantic Textual Similarity (STS) datasets.
+    \item Claim 2: A wide and shallow Multi-Layer Perceptron (MLP) performs the best in terms of accuracy on all 6 chosen binary classification tasks from the GLUE \cite{glue} and SuperGLUE \cite{superglue} benchmarks, when trained on BERT emebeddings which were enhanced by the cluster-based approach.
+    \item Claim 3: A MLP described as in Claim 2 also converges to an optimum in fewer epochs, when the embeddings are enhanced by the cluster-based approach.
+    \item Claim 4: Removing dominant directions from CWRs of punctuations and stop words in sentences with the same syntactic structure (same group) results in fewer nearest neighbors of the CWRs being from the same group, as syntactic information is discarded.
+    \item Claim 5: The cluster-based approach brings together verbs which have the same meaning (sense) but different tense as seen in the SemCor corpus, by decreasing the average euclidean distance between their CWRs, relative to the distance between verbs in the same tense but with a different sense.
+
+\end{itemize}
+
+In our reproduction, we verify all the listed claims by reproducing all the related experiments. \textbf{Claims 1 and 2 are the most important ones} as they directly address the performance of the cluster-based method, while Claims 3, 4 and 5 are essentially  attempted explanations of different side effects of the proposed method.
+
+In addition to these claims, the authors analyze the effect of the number of clusters in the K-Means algorithm on isotropy as well as evaluate the layer-wise isotropy of the contextual models. We have also reproduced these, purely statistical experiments for the sake of completeness of our reproduction.  
+
+%Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+
+The paper referenced a Github repository \footnote{\url{https://github.com/Sara-Rajaee/clusterbased_isotropy_enhancement/}}, in which we found a single Jupyter notebook with the implementation of the cluster-based method, the isotropy metric, as well as an example of evaluating the isotropy and Spearman correlation performance on the STS-B dataset. We first re-implemented the cluster-based method and verified that it works the same way -- however in the end we used the authors implementation due to its slightly better runtime. There was an unhandled edge case in the original implementation however -- if fewer embeddings belonged to some cluster than the number of PCs to be removed, the original implementation would result in an out-of-bounds exception. We fixed this by repeating the clustering step until each cluster was sufficiently represented. The method uses the Scipy library for K-Means clustering and ScikitLearn for PCA. 
+
+As the global method is simply a special case of the cluster-based method with the number of clusters $k=1$, its re-implementation was trivial.
+
+We did however have to re-implement all of the experiments only from their descriptions in the paper and based on the help we got from our correspondence with the authors. We did not require a GPU for any of our experiments. 
+
+
+%Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+\subsection{Model descriptions \& hyperparameters}
+\label{sec:models}
+
+For the contextual models, we used the Transformers library and the default pre-trained weights were used (specifically the casings \textit{bert-base-uncased}, \textit{gpt2} and \textit{roberta-base}). These models all output 768-dimensional embeddings at each of their 12 layers. 
+
+As reported in the original paper, the hyperparameters of the global and local, cluster-based approach were set for each model separately, as seen in Table \ref{tab:params}. These values were used for all experiments.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|ccc}
+\hline
+Model   & k  & \begin{tabular}[c]{@{}c@{}}Removed PCs\\(local)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Removed PCs\\(global)\end{tabular}  \\ 
+\hline
+BERT    & 27 & 12                                                           & 15                                                             \\
+GPT-2   & 10 & 30                                                           & 30                                                             \\
+RoBERTa & 27 & 12                                                           & 25     \\                   \hline                                    
+\end{tabular}
+\caption{The number of clusters for the K-Means clustering local method (k) and number of top principal components removed for both the local and global method, for each contextual model. }
+\label{tab:params}
+
+\end{table}
+
+When it comes to GLUE and SuperGLUE binary classification tasks, the contextual embeddings were used to train a fully-connected MLP. It's structure remains the same across all tasks, using the hyperparameters communicated to us by the authors. Specifically, for a single data sample (which is either a sentence or a pair of sentences), we only consider the first 64 tokens' representations, which we flatten into a vector of length $64 \times 768$, which represents our input layer. The next layer is a 100-dimensional hidden layer with ReLU activation, followed by the output layer -- a single neuron with sigmoid activation. The MLP is trained using binary cross-entropy loss and uses the Adam optimizer with step size 0.005, for a maximum of 10 epochs. The reported results are based on the model which achieves the best validation set score.
+
+For the experiment where we analyze the CWRs of punctuations and stop words, we use the K-nearest-neighbor implementation by ScikitLearn with $k=6$, which is exactly the number of possible neighbors from the same structural group (we only use the first CWR of the respective punctuation or stop word in a sentence). We then calculate the relative part of nearest neighbors belonging to the same group for each individual embedding and average the results. Note that each stop word or punctuation type (e.g. comma) is analyzed separately and the search is performed only amongst CWRs of the same type. 
+
+Lastly, for the verb tense experiment, we consider verbs with multiple meanings (senses) and in two tenses -- present simple and past simple (e.g. "say" and "said" correspond to the same verb in different tenses by our definition). Then, for each verb, we calculate all possible euclidean distances between representations of same tense and same meaning, same tense and different meaning, different tense and same meaning. We then finally average across all distances at the lowest level of hierarchy. We repeat the calculation for the representations enhanced by the cluster-based method.
+
+
+\subsection{Datasets}
+
+For the main experiment on which Claim 1 in Section ~\ref{sec:claims} is based, 7 Semantic Textual Similarity (STS) datasets were used. The STS-2012 to STS-2016 \cite{sts2012,sts2013,sts2014,sts2015,sts2016} as well as STS-B are available at: \url{https://ixa2.si.ehu.eus/stswiki/index.php/Main_Page} , while the SICK-R \cite{sickr} dataset is available at: \url{https://marcobaroni.org/composes/sick.html}. Individual data samples of these datasets are comprised of two sentences, and their semantic similarity/relatedness score, which is a real value on the scale from 0 to 5. In Table \ref{tab:sts}, the total number of data samples for each dataset after filtering is seen. Note that only the English test splits were used, as in the original paper. Four of the seven datasets had some badly encoded samples (no more than 10), which we simply discarded, after preliminary testing which showed that they do not noticeably affect the results. The two sentences of each sample were sent through the contextual models separately.
+
+\setlength{\tabcolsep}{1.5pt}
+\begin{table}[!htb]
+    \begin{minipage}{.37\linewidth}
+      \centering
+      \begin{tabular}{c|c}
+        \hline
+        Dataset  & Test data samples  \\ 
+        \hline
+        STS-2012 & 3101           \\
+        STS-2013 & 2250             \\
+        STS-2014 & 3746           \\
+        STS-2015 & 2983           \\
+        STS-2016 & 1162             \\
+        STS-B    & 1095             \\
+        SICK-R   & 9840            \\
+        \hline
+        \end{tabular}
+        \caption{The number of used data samples in each STS dataset.}
+        \label{tab:sts}
+    \end{minipage}%
+    \hspace{0.01\linewidth}
+    \begin{minipage}{.50\linewidth}
+      \centering
+        \begin{tabular}{c|ccc||c}
+        \hline
+Task  & \begin{tabular}[c]{@{}c@{}}Train split\\(used / total)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Validation split\\(used / total)\end{tabular} & \multicolumn{1}{c}{Test split} & \begin{tabular}[c]{@{}c@{}}Total\\(used)\end{tabular}  \\ 
+\hline
+RTE   & 2490 /~2490                                                       & 277 / 277                                                              & 3000                         & 5767                                                   \\
+CoLA  & 8551 /~8551                                                       & 1043 / 1043                                                            & 1063                         & 10657                                                  \\
+SST-2 & \textcolor[rgb]{0.502,0,0}{7000 }/~67349                          & 872 / 872                                                              & 1821                         & 9693                                                   \\
+MRPC  & 3668 /~3668                                                       & 408 / 408                                                              & 1725                         & 5801                                                   \\
+WiC   & 5428 /~5428                                                       & 638 / 638                                                              & 1400                         & 7466                                                   \\
+BoolQ & \textcolor[rgb]{0.502,0,0}{6000 }/ 9427                           & \textcolor[rgb]{0.502,0,0}{1500 }/ 3270                                & 3245                         & 10745                            \\
+\hline
+\end{tabular}
+\caption{The number of used data samples in each GLUE/SuperGLUE task.}
+\label{tab:glue}
+    \end{minipage} 
+\end{table}
+
+%For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+%Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+
+
+
+For the classification experiment on which Claim 2 in Section ~\ref{sec:claims} is based, a selection of tasks (datasets) from GLUE \cite{glue} (\url{https://gluebenchmark.com/}) and SuperGLUE \cite{superglue} (\url{https://super.gluebenchmark.com/}) were used. In some cases, data samples were composed of pairs of sentences, while in others, a single sentence was given. In the first case, the pairs of sentences were encoded together, by concatenating their tokens and adding special tokens in the following way: [CLS]<sentence1>[SEP]<sentence2>[SEP]. The embeddings of these special tokens were also considered by the MLP classifier. Note that for the purpose of this experiment, we first merged the train, validation and test splits before applying the global or local enhancement method, as did the authors originally. Due to the big size of SST-2 and BoolQ datasets, we had to limit the size of training and/or validation splits by random sub-sampling. The number of samples for each task are seen in Table \ref{tab:glue}. We found that $10745 \times 64$ was near the maximum number of embeddings that we could affoard to run PCA on, given our hardware.
+
+
+For the punctuation / stop word experiment, the authors provided a dataset based on Ravfogel et al. \cite{punc} (available at \url{https://nlp.biu.ac.il/~ravfogs/resources/syntax_distillation/}) which consists of 150000 groups of 6 sentences, where sentences from each group have the same syntactic structure but different semantics. For each of the tokens of interest separately ("the", "of", "," and "."), we randomly sampled 200 groups, where each group contained at least one appearance of the token per sentence.
+
+For the verb tense experiment, we used the SemCor corpus \cite{semcor}, available at \url{http://web.eecs.umich.edu/~mihalcea/downloads.html#semcor}. Out of over 30000 sentences, we used 11838 of them, which contained the verbs we were interested in. Specifically, these were verbs that appeared in present and past tense and also occurred in at least 2 different senses at least 10 times. 
+
+The analysis of layer-wise isotropy and the number of clusters in K-Means is done on the STS-B dev split.
+
+%\subsection{Hyperparameters}
+%Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+
+
+
+\subsection{Experimental setup and code}
+
+The code of our reproduction is available at \url{https://github.com/Benidzu/isotropy_reproduction}.
+
+The isotropy measure (as defined in the original paper), Spearman performance (which is just the Spearman coefficient multiplied by 100) and accuracy were the main metrics used to evaluate our experiments. In order to evaluate the uncertainty in some of the main results, we resorted to bootstrap as well estimation of variance across multiple re-runs of procedures containing stochasticity (e.g. initial positions of centroids in K-Means, initial weights of MLP classifiers). 
+
+
+\subsection{Computational requirements}
+
+The experiments were reproduced on a sytem with the 8-core, 16-thread Ryzen 3700x processor, 16GB of RAM and RTX3060Ti GPU (which was not explicitly used for any experiment). 
+
+On a set of 30000 768-dimensional embeddings, the global method ran for 12.5 seconds and the local, cluster-based method for 14 seconds. On a bigger set of 200000 embeddings, the global method ran for 98.9 seconds and the local method ran for 79.8 seconds. In addition, the local method requires a lot less memory at once, as it performs PCA for each cluster of embeddings separately.
+
+The training of MLP classifiers for the classification experiments required no more than a minute on average. 
+%Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+%For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+%For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+%(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\section{Results}
+\label{sec:results}
+The reproduced results support some of the claims of the original paper. Specifically, the cluster-based method indeed consistently outperforms the global and baseline in terms of isotropy. However, when it comes to Spearman performance on Semantic Textual Similarity tasks, the local method performs better than the global method on some datasets and worse on others. Similar is true for the classification tasks, where the difference in performance is mostly within margin of error. Analyzing verb tense, the Claim 5 from Section ~\ref{sec:claims} is fully supported by our reproduction, while some discrepancies are observed when it comes to Claim 4.
+%Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+\subsection{Results reproducing original paper}
+%For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+%For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+%Logically group related results into sections. 
+
+\subsubsection{Semantic Textual Similarity experiment}
+
+In this section we address Claim 1 from Section~\ref{sec:claims}. In Figure \ref{fig:main} we plot the Spearman correlation performance for each method, contextual model and STS dataset. Due to the random nature of K-Means, we repeat the experiment with the local method 5 times. We plot the results for each of the five repetitions individually. Additionally, we report the averages of these five repetitions in Table \ref{tab:avgs}. Compared to the numbers in Table 2 of the original paper, our results are slightly more pessimistic. Embeddings enhanced by the local method perform noticeably better than those, enhanced by the global method, on some datasets and worse on others. There are also many cases where the difference in performance is within margin of error. 
+
+\begin{figure}[h]
+   \centering
+   \includegraphics[width=1\linewidth]{images/Mainres.pdf}
+    \caption{Spearman correlation performance on STS tasks. The error bars mark $\pm1$ SE, based on 50 bootstrap replications.}
+    \label{fig:main}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccccccc} 
+\hline
+Model   & STS-2012                                                                                                     & STS-2013                                                                         & STS-2014                                                                         & STS-2015                                                                                                     & STS-2016                                                                                                     & SICK-R                                                                  & STS-B                                                                    \\ 
+\hline
+GPT-2   & \begin{tabular}[c]{@{}c@{}}50.21  \\ $\pm$ 0.53\end{tabular}                                      & \begin{tabular}[c]{@{}c@{}}65.66   \\ $\pm$ 0.09\end{tabular} & \begin{tabular}[c]{@{}c@{}}57.17  \\ $\pm$ 0.16\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{\textcolor[rgb]{0.502,0,0}{57.59 }} \\ $\pm$ 0.29\end{tabular} & \begin{tabular}[c]{@{}c@{}}62.82  \\ $\pm$ 0.17\end{tabular}                                      & \begin{tabular}[c]{@{}c@{}}52.36   \\ $\pm$ 0.26\end{tabular} & \begin{tabular}[c]{@{}c@{}}64.47   \\ $\pm$ 0.26\end{tabular}  \\
+\hline
+BERT    & \begin{tabular}[c]{@{}c@{}}\textcolor[rgb]{0.502,0,0}{\textbf{48.29 }}  \\ $\pm$ 3.03\end{tabular} & \begin{tabular}[c]{@{}c@{}}73.96   \\ $\pm$ 0.53\end{tabular}          & \begin{tabular}[c]{@{}c@{}}\textbf{64.37 }  \\ $\pm$ 0.29\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{\textcolor[rgb]{0.502,0,0}{55.65 }} \\ $\pm$ 1.20\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{\textcolor[rgb]{0.502,0,0}{62.83 }} \\ $\pm$ 1.87\end{tabular} & \begin{tabular}[c]{@{}c@{}}62.7  \\ $\pm$ 0.27\end{tabular}   & \begin{tabular}[c]{@{}c@{}}68.18  \\ $\pm$ 0.71\end{tabular}   \\
+\hline
+RoBERTa & \begin{tabular}[c]{@{}c@{}}54.78  \\ $\pm$ 0.51\end{tabular}                                      & \begin{tabular}[c]{@{}c@{}}\textbf{72.83 } \\ $\pm$ 0.46\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{64.63 } \\ $\pm$ 0.1\end{tabular}  & \begin{tabular}[c]{@{}c@{}}\textbf{\textcolor[rgb]{0.502,0,0}{60.67 }}  \\ $\pm$ 0.25\end{tabular} & \begin{tabular}[c]{@{}c@{}}67.87  \\ $\pm$ 0.35\end{tabular}                                      & \begin{tabular}[c]{@{}c@{}}64.98   \\ $\pm$ 0.34\end{tabular} & \begin{tabular}[c]{@{}c@{}}71.73  \\ $\pm$ 0.17\end{tabular}  \\
+\hline
+\end{tabular}
+\caption{Average Spearman correlation performance of 5 repetitions of the local method $\pm$ standard deviation across these repetitions. The results in bold and black represent cases where the local method outperforms the global method with high probability and the results in red vice-versa. }
+\label{tab:avgs}
+\end{table}
+
+
+In Table \ref{tab:iso} we report the isotropy values of CWRs from each of the STS datasets, for each contextual model and enhancement method. These results support the original results achieved by the authors, as seen in Table 6 of the original paper.
+
+\setlength{\tabcolsep}{1.5pt}
+\begin{table*}[h]
+\centering
+\begin{tabular}{llccccccc} 
+\hline
+                                        & Model        & STS 2012       & STS 2013       & STS 2014       & STS 2015       & STS 2016       & SICK-R         & STS-B           \\ 
+\hline
+\multirow{3}{*}{Baseline}               & GPT-2   & 9.3e-16   &   1.4e-120  &   1.5e-79   &    5.9e-92   &    1.5e-14 &   2.1e-121 &  3.7e-116           \\
+                                        & BERT    & 2.5e-5   &   1.0e-4  &   1.1e-4   &    3.8e-5   &    5.3e-4 &   8.6e-5 &  1.1e-4           \\
+                                        & RoBERTa & 5.7e-6   &   3.5e-6  &   4.0e-6   &    5.9e-6   &    4.3e-6 &   5.8e-6 &  6.2e-6           \\ 
+\hline
+\multirow{3}{2cm}{Global appraoch}        & GPT-2   & 0.56   &   0.59  &   0.51   &    0.57   &    0.58 &   0.56 &  0.56           \\
+                                        & BERT    & 0.46   &   0.50  &   0.55   &    0.45   &    0.45 &   0.26 &  0.52           \\
+                                        & RoBERTa & 0.89   &   0.88  &   0.89   &    0.88   &    0.87 &   0.90 &  0.89           \\ 
+\hline
+\multirow{3}{2cm}{Cluster-based approach} & GPT-2   & {\bfseries 0.71}   &   \textbf{0.70}  &   \textbf{0.71}   &    \textbf{0.73}   &    \textbf{0.72} &   \textbf{0.79} &  \textbf{0.69}  \\
+                                        & BERT    & \textbf{0.75}   &   \textbf{0.71}  &   \textbf{0.73}   &    \textbf{0.76}   &    \textbf{0.72} &   \textbf{0.79} &  \textbf{0.76}  \\
+                                        & RoBERTa & \textbf{0.91}   &   \textbf{0.90}  &   \textbf{0.91}   &    \textbf{0.92}   &    \textbf{0.91} &   \textbf{0.95} &  \textbf{0.92}  \\
+\hline
+\end{tabular}
+\caption{Isotropy of contextual word embeddings before and after enhancement with the global and local method.}
+\label{tab:iso}
+\end{table*}
+
+\subsubsection{GLUE \& SuperGLUE classification tasks}
+
+In this section we address Claim 2 from Section~\ref{sec:claims}. In Table \ref{tab:clf} we report average scores (accuracy / Matthew's correlation) of the MLP classifier on the test set based on 5 repetitions. Each repetition, we re-ran the corresponding embedding enhancement method and randomly re-initialized and re-trained the MLP, accounting for both sources of variance. 
+
+It seems that the classifier trained on locally enhanced embeddings achieves the best scores on most of the tasks, however, due to the high uncertainty and small differences between methods, we cannot confidently argue that one method is better than the other. Due to this uncertainty, our results do not fully support the original findings as seen in Table 3 in the paper.
+
+\setlength{\tabcolsep}{5pt}
+\begin{table}[h]
+\centering
+\begin{tabular}{cccccccc} 
+\hline
+                       & RTE                                                & CoLA                                               & SST-2                                              & MRPC                                               & WiC                                                & BoolQ                                               & Average                                              \\ 
+
+\hline
+
+
+Baseline               & \begin{tabular}[c]{@{}c@{}} 54.7 \\ $\pm$ 1.4 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 7.4 \\ $\pm$ 16.5 \end{tabular} & \begin{tabular}[c]{@{}c@{}} \textbf{84.0} \\ $\pm$ 0.3 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 66.8 \\ $\pm$ 0.7 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 53.3 \\ $\pm$ 5.7 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 62.3 \\ $\pm$ 0.05 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 54.75 \\ $\pm$ 4.1 \end{tabular}  \\
+
+\hline
+
+Global approach        & \begin{tabular}[c]{@{}c@{}} 54.3 \\ $\pm$ 2.0 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 39.9 \\ $\pm$ 1.7 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 79.7 \\ $\pm$ 0.3 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} 69.6 \\ $\pm$ 0.8 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} 61.5 \\ $\pm$ 0.8 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} \textbf{63.4} \\ $\pm$ 0.5 \end{tabular}   & \begin{tabular}[c]{@{}c@{}} 61.4 \\ $\pm$ 1.0 \end{tabular}    \\
+
+\hline
+
+Cluster-based approach & \begin{tabular}[c]{@{}c@{}} \textbf{55.1} \\ $\pm$ 1.6 \end{tabular} & \begin{tabular}[c]{@{}c@{}} \textbf{40.1} \\ $\pm$ 1.8 \end{tabular} & \begin{tabular}[c]{@{}c@{}} 83.7 \\ $\pm$ 0.8 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} \textbf{70.2} \\ $\pm$ 1.2 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} \textbf{61.9} \\ $\pm$ 0.8 \end{tabular}  & \begin{tabular}[c]{@{}c@{}} 62.7 \\ $\pm$ 0.6 \end{tabular}   & \begin{tabular}[c]{@{}c@{}} \textbf{62.3} \\ $\pm$ 1.1 \end{tabular}    \\
+
+\hline
+\end{tabular}
+\caption{Results on classification tasks (BERT) in terms of accuracy (except for CoLA: Matthew's correlation). Results are based on averages and standard deviations of 5 runs on the official test set. In bold we mark the highest average score in each column.}
+\label{tab:clf}
+\end{table}
+
+
+\subsubsection{Convergence time}
+In this section we address Claim 3 from Section~\ref{sec:claims}. In Figure \ref{fig:test1}, we plot the per-epoch performance of the MLP for two SuperGLUE tasks on the validation split. Our results support the original claim, as the MLP converges to an optimum in only a few iterations when trained on enhanced embeddings, while the same does not hold for baseline embeddings.
+
+\subsubsection{Punctuation and stop word experiment}
+In this section we address Claim 4 from Section~\ref{sec:claims}. In Figure \ref{fig:test2}, we plot the percentage of nearest neighbors from the same structural (syntactical) group, for baseline and enhanced embeddings. The results line up with the authors' results (Figure 3 in original paper) for BERT and RoBERTa embeddings, where the removal of dominant directions via the method decreases the percentage of neighbors from the same group. However, this does mostly not hold for GPT-2 embeddings in our reproduction. 
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.36\textwidth}
+  \centering
+  \includegraphics[width=1\linewidth]{images/Epochs2.pdf}
+  \captionof{figure}{Impact of cluster-based enhancement on per-epoch performance.}
+  \label{fig:test1}
+\end{minipage}
+\hspace{0.01\textwidth}
+\begin{minipage}{.61\textwidth}
+  \centering
+  \includegraphics[width=1\linewidth]{images/Punc2.pdf}
+  \captionof{figure}{Percentage of nearest neighbours that share similar structural and syntactic knowledge, before and after removing dominant directions.}
+  \label{fig:test2}
+\end{minipage}
+\end{figure}
+
+
+
+\subsubsection{Verb tense experiment}
+In this section we address Claim 5 from Section~\ref{sec:claims}. In Table \ref{tab:tense}, we report the results of the corresponding experiment, described in Section ~\ref{sec:models}. The results support the claim, as they are very similar to authors' results in Table 4 of the original paper.
+
+\setlength{\tabcolsep}{5pt}
+{\renewcommand{\arraystretch}{1.1}
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccclcccc} 
+\hline
+               & \multicolumn{4}{c}{\textbf{Baseline}}                       &  & \multicolumn{4}{c}{\textbf{Removed PCs}}                     \\ 
+\cline{2-5}\cline{7-10}
+\textbf{Model} & \textbf{ST-SM} & \textbf{ST-DM} & \textbf{DT-SM} & Isotropy &  & \textbf{ST-SM} & \textbf{ST-DM} & \textbf{DT-SM} & Isotropy  \\ 
+\hline
+GPT-2          & 39.62          & 38.12          & 42.18          & 2.3e-05  &  & 5.06           & 5.56           & 5.43           & 0.708     \\
+BERT           & 13.43          & 13.69          & 14.04          & 2.41e-05 &  & 10.74          & 11.50          & 11.35          & 0.72      \\
+RoBERTa        & 6.20           & 6.39           & 7.09           & 6.2e-06  &  & 4.10           & 4.48           & 4.46           & 0.82      \\
+\hline
+\end{tabular}
+\caption{Mean Euclidean distance of each occurrence of a verb to all other occurrences of the same verb with same tense and same meaning (ST-SM), the same tense and different meaning (ST-DM), and different tense but same meaning (DT-SM). It is desirable that DT-SM is lower than ST-DM.}
+\label{tab:tense}
+\end{table}}
+
+\subsubsection{Additional isotropy analysis}
+
+In this last section, we report the reproduction results of the additional isotropy analysis of the contextual models' embeddings. The results, analyzing the impact of number of clusters in K-Means and the layer-wise isotropy of the contextual models are seen in Tables \ref{tab:k} and \ref{tab:layers} respectively. Our results support the original results, as seen in Tables 1 and 5 in the original paper.
+
+\begin{table}[!htb]
+    \caption{Additional isotropy analysis. In \ref{tab:k}, we report CWRs isotropy after clustering and zero-centering for different number of clusters ($k$). In \ref{tab:layers} we report per-layer isotropy.  }
+    \begin{subtable}{.5\linewidth}
+      \centering
+        \caption{}
+        \label{tab:k}
+        \begin{tabular}{lccc} 
+            \hline
+                     & GPT-2    & BERT  & RoBERTa  \\ 
+            \hline
+            Baseline & 1.27e-126         & 4.91e-05       & 2.69e-06          \\ 
+            \hline
+            k=1      & 3.62e-220         & 1.91e-05       & 0.015             \\
+            k=3      & 1.21e-73          & 1.15e-04       & 0.318             \\
+            k=6      & 3.36e-61          & 2.97e-03       & 0.512             \\
+            k=9      & \textbf{7.06e-54} & 0.148          & 0.549             \\
+            k=20     & 8.42e-101         & \textbf{0.265} & \textbf{0.579}    \\
+            \hline
+        \end{tabular} 
+    \end{subtable}%
+    \begin{subtable}{.5\linewidth}
+      \centering
+        \caption{}
+        \label{tab:layers}
+        \begin{tabular}{c|ccc} 
+            \hline
+            Layer & GPT-2            & BERT             & RoBERTa           \\ 
+            \hline
+            0     & 8.8e-03          & 4.7e-04          & 9.0e-03           \\ 
+            \hline
+            1     & 9.4e-24          & 9.4e-06          & 2.5e-07           \\
+            2     & \textbf{1.3e-24} & 1.0e-06          & 8.6e-10           \\
+            3     & 5.9e-26          & 8.7e-05          & 4.2e-09           \\
+            4     & 1.5e-27          & 7.4e-06          & 5.4e-12           \\
+            5     & 2.9e-30          & 4.8e-06          & 4.9e-10           \\
+            6     & 1.5e-32          & 3.8e-06          & 3.1e-10           \\
+            7     & 1.3e-37          & 5.1e-06          & 1.3e-10           \\
+            8     & 3.3e-45          & 1.1e-05          & 1.4e-10           \\
+            9     & 5.0e-55          & 2.5e-05          & 1.4e-10           \\
+            10    & 7.0e-34          & 4.3e-06          & 6.5e-11           \\
+            11    & 1.9e-132         & 2.3e-07          & 1.4e-10           \\
+            12    & 1.3e-126         & \textbf{4.9e-05} & \textbf{2.7e-06}  \\
+            \hline
+        \end{tabular}
+    \end{subtable} 
+\end{table}
+
+
+
+%Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+%\subsubsection{Additional Result 1}
+%\subsubsection{Additional Result 2}
+
+\section{Discussion}
+\label{sec:disc}
+
+In general, many of the original authors' claims are supported by our experimentation. The achieved isotropy scores across the reproduced experiments are similar to the original ones, implying that the cluster-based method is working as intended. However, even in situations with seemingly no randomness (extracting baseline embeddings of datasets and evaluating isotropy), we could not perfectly reproduce the original results. This might imply discrepancies on hardware-level computation or due to different versioning of used libraries (e.g. Transformers). Consequently, this perhaps implies that the local method is not robust enough to such variations, to consistently outperform the global method (e.g. in terms of Spearman coefficient performance on STS tasks), as originally claimed. 
+
+Similarly, for the classification tasks, after our own re-implementation, we found out that authors used Keras for the MLP classifier, while we used ScikitLearn (albeit with all hyperparameters set equivalently). This was another source of potential discrepancies, but the similar results reflect that this was not a real issue. A more likely reason for some differences in this experiment might be the fact that, while the authors stated that they re-trained the MLP multiple times before submitting and reporting the results of \textbf{the best classifier} (chosen by validation set performance), we opted for the more robust and less biased score estimation via averaging across multiple submissions and additionally estimating the errors of our estimates. 
+%Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+When it comes to Claims 3 and 5 from Section ~\ref{sec:claims}, our results fully support these claims, although again, we are unable to get exactly the same numbers, perhaps due to the reasons listed above or due to minor differences in implementation. 
+
+Finally, with the punctuation and stop word experiment, we were surprised by the fact that by removing local dominant directions of CWRs from the GPT-2 model, we actually \textit{increased} the percentage of neighbors from the same structural group. Since the percentage of nearest neighbors with the same syntactical structure was relatively low to begin with in this case (compared to BERT and RoBERTa), we believe the dominant directions carried mostly semantic information, and by removing them, the syntactical information in the embeddings became more dominant.
+
+\subsection{Recommendations for further experimentation}
+
+Unfortunately, due to various limitations and our budget, we could not afford much additional experimentation beyond the scope of the paper. However, during our analysis, we came up with some ideas and experiments, which could be further looked into. We list some of these ideas the following. 
+
+Firstly, for the GLUE \& SuperGLUE classification tasks, the authors first merge train and test splits and then run the embedding enhancement method and then train the MLP. In a practical scenario, where we would like to predict the class for a completely new data sample, repeating this whole process becomes computationally infeasible.
+
+Therefore, the following experimental procedure, where the learning step is performed only once (and updated on a less regular basis), could be evaluated and compared to the original one:
+\begin{enumerate}
+    \item Run the cluster-based method on contextual embeddings of the training set. Save the centroids of each cluster in original space as well as its corresponding top principal components to be removed.
+    \item Train the MLP on the enhanced embeddings.
+    \item At prediction time (for test data), extract the contextual embeddings of the new data sample. For each CWR, \textbf{enhance it by doing the following}: assign it to the nearest cluster, based on the saved centroids in step 1, then subtract the centroid and remove the corresponding PCs.
+    \item Pass the enhanced embeddings of the data sample to the MLP for prediction.
+\end{enumerate}
+
+Other additional ideas include experimenting with different MLP architectures, or some of the remaining GLUE / SuperGLUE tasks, namely COPA, QNLI, QQP, etc. Additionally, using a different clustering algorithm or distance measure could prove to be beneficial. 
+
+\subsection{What was easy}
+
+The explanations of the methods and experiments in the original paper were easy to follow. The cluster-based method relies on K-Means clustering and PCA, both of which we were already familiar with. The code present in the referenced repository was therefore easy to understand. 
+
+%Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+%Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\subsection{What was difficult}
+\label{sec:difficult}
+
+Some key implementation details of various experiments and hyperparameters of algorithms were not disclosed in the original paper, making exact re-implementation of the experiments more difficult. Even after receiving the necessary information, there were discrepancies in results which could not be attributed to randomness, differences in data, or some differences in implementation (assuming authors used the published code). 
+
+Due to some big datasets used in some experiments, we had to subsample the number of data samples to be able to run the described algorithms. Our system would in some cases completely freeze due our CPU usage reaching 100\% because of PCA computations. Additionally, extracting embeddings, re-running the methods multiple times and performing expensive procedures such as bootstrap took a lot of time.
+
+The most time-consuming step by far was estimating the performance and error of our estimates on GLUE and SuperGLUE classification tasks. In order to get test split results, one has to manually submit the predictions through the official website. This was an issue in our case due to the restrictions of submissions -- a team is only allowed to make up to two submissions a day and six per month, which dragged out our collection of results.
+
+%List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+%Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\subsection{Communication with original authors}
+
+We exchanged many e-mails with the main author of the paper, in order to enquire about various hyperparameters and other implementation details of each experiment and to ensure we set up our experiments the same way. The author was quite helpful and responsive. Unfortunately, we had to accept that some discrepancies between our results would still be present (see Sections \ref{sec:disc} and \ref{sec:difficult} for our comments on these discrepancies), after much time spent attempting to reduce them.
