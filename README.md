@@ -111,9 +111,10 @@ In the `journal` folder you will find a `metadata.yaml` file. This file is cruci
 - In `review` section, paste the url to the OpenReview forum of your paper.
 - Leave the fields `contributors`, `dates`, `article` and `journal` fields blank, as those will be populated by the Area Chairs / ReScience editors.
 
-:bulb: You can test your metatdata is correct by running this Python Script:
+:bulb: You can test your metadata is correct by running this Python Script:
 
 ``` bash
+cd 2021/
 python check_yaml.py
 ```
 
