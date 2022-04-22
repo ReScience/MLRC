@@ -5,7 +5,6 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-# Change the default title
 title: "[Re] Differentiable Spatial Planning using Transformers"
 
 # List of authors with name, orcid number, email and affiliation
@@ -15,12 +14,12 @@ authors:
     orcid: 0000-0001-7447-2498
     email: ranjanmail.rohit@gmail.com
     affiliations: 1,2,*
-
+    
   - name: Himadri Bhakta
     orcid: 0000-0001-8623-4761
     email: himadribhakta@kgpian.iitkgp.ac.in
     affiliations: 1,2     # * is for contact author
-    
+
   - name: Animesh Jha
     orcid: 0000-0001-6953-3823
     email: jha.animesh01@gmail.com
@@ -36,13 +35,14 @@ authors:
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name: Equal Contribution
-
-  - code:    2
-    name: IIT Kharagpur
+    name:    Equal Contribution
     
+  - code:    2
+    name:    IIT Kharagpur
+    address: India
+
 # List of keywords (adding the programming language might be a good idea)
-keywords:  rescience c, machine learning, deep learning, python, pytorch
+keywords: rescience c, machine learning, deep learning, python, pytorch
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
@@ -50,8 +50,8 @@ keywords:  rescience c, machine learning, deep learning, python, pytorch
 #   see https://guides.github.com/activities/citable-code/
 code:
   - url: https://github.com/sirmisscriesalot/Differentiable-Spatial-Planning-using-Transformers
-  - doi: 00.0000/zenodo.0000000
-  - swh: swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  - doi: 10.5281/zenodo.6475614
+  - swh: 
 
 # Data URL and DOI (optional if no data)
 data:
@@ -60,17 +60,28 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: "Chaplot, Devendra Singh, Deepak Pathak, and Jitendra Malik. Differentiable spatial planning using transformers (ICML PMLR 2021)."
+ - cite: "Chaplot, Devendra Singh, Deepak Pathak, and Jitendra Malik. Differentiable spatial planning using transformers (ICML PMLR 2021)"
  - bib:  chaplot2021differentiable
  - url:  https://arxiv.org/pdf/2112.01010.pdf
- - doi:  https://doi.org/10.48550/arXiv.2112.01010
+ - doi:  10.48550/arXiv.2112.01010
 
 # Don't forget to surround abstract with double quotes
-abstract: "We consider the problem of spatial path planning. In contrast to the classical solutions which optimize a new plan from scratch and assume access to the full map with ground truth obstacle locations, we learn a planner from the data in a differentiable manner that allows us to leverage statistical regularities from past data. We propose Spatial Planning Transformers (SPT), which given an obstacle map learns to generate actions by planning over long-range spatial dependencies, unlike prior data-driven planners that propagate information locally via convolutional structure in an iterative manner. In the setting where the ground truth map is not known to the agent, we leverage pre-trained SPTs in an end-to-end framework that has the structure of mapper and planner built into it which allows seamless generalization to out-of-distribution maps and goals. SPTs outperform prior state-of-the-art differentiable planners across all the setups for both manipulation and navigation tasks, leading to an absolute improvement of 7-19%."
+abstract: "This report covers our reproduction
+effort of the paper ‘Differentiable Spatial Planning
+using Transformers’ by
+DOI Chaplot et al. [chaplot2021differentiable]. In this paper, the
+problem of spatial path planning in a differentiable way is considered. They show that
+their proposed method of using Spatial Planning Transformers outperforms prior data‐
+driven models and leverages differentiable structures to learn mapping without a ground
+truth map simultaneously. We verify these claims by reproducing their experiments
+and testing their method on new data. We also investigate the stability of planning ac‐
+curacy with maps with increased obstacle complexity. Efforts to investigate and verify
+the learnings of the Mapper module were met with failure stemming from a paucity of
+computational resources and unreachable authors."
 
 # Bibliography file (yours)
-bibliography: ../openreview/bibliography.bib
-
+bibliography: bibliography.bib
+  
 # Type of the article
 # Type can be:
 #  * Editorial
@@ -85,12 +96,12 @@ domain: ML Reproducibility Challenge 2021
 # Coding language (main one only if several)
 language: Python
 
-
+  
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review:
+review: 
   - url: https://openreview.net/forum?id=HFUI1pfQnCF
 
 contributors:

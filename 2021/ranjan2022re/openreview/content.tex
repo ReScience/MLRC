@@ -53,10 +53,6 @@ We seek to investigate the following major claims made in the paper:
     Their proposed SPT module outperforms classical mapping and planning baselines under an end-to-end mapping and planning setting.
 \end{itemize}
 
-% Each experiment in Section~\ref{sec: results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
-
-%\jdcomment{To organisers: I asked my students to connect the central claims and the experiments that supported them. For example, in this list above, they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (instead of blindly rerunning each experiment and not considering how it fit into the overall story), but honestly, it seemed hard for the students to understand what I was asking for.}
-
 \section{Methodology}
 The entire codebase is written from scratch for the SPT modules and the synthetic dataset generation in Python 3.6. Pytorch Lightning was used for the SPT modules. For dataset generation, similar parameters were used, as mentioned in the paper, to the maximum extent. The vagueness of parameters in terms of obstacle size allowed us to test out a range of obstacle sizes and the accuracy of the model on them. All runs were logged on the WandB platform. The training was done using NVIDIA Tesla T4 and P10 GPUs on Google Colaboratory Pro.
 \begin{figure}
@@ -66,8 +62,6 @@ The entire codebase is written from scratch for the SPT modules and the syntheti
 \label{fig:ecg}
 \end {center}
 \end{figure}
-
-
 \subsection{Model descriptions}
 Our implementation of the model follows the description provided in the paper taking liberties where details are vague. \\ 
 The input map and the goal map are stacked vertically and then fed into a CNN Encoder. The Encoder has 2 fully connected layers with a kernel size=1 and ReLU activation function. The first layer increases the number of channels from 2 to 64, while the second layer maintains the number of channels and outputs a 64 channel encoded input.\\  
@@ -91,19 +85,18 @@ An extensive hyperparameter grid search led us back to the same hyperparameters 
 \section{Reproducibility Results}
 \label{sec:repo results}
 We reproduced the accuracy for the SPT planner module to within 14.7\% of reported value, which, while outperforming the baselines \cite{lee2018gated} \cite{tamar2016value} in select cases, fails to support the paper's conclusion that it outperforms the baselines. However, we achieve a similar drop-off in accuracy in percentage points over different model settings. We suspect that the vagueness in the accuracy metric leads to the absolute difference of 14.7\% despite the paper being reproducible. The Mapper module's accuracy could not be tested.
-
 \begin{table}
 \begin{center}
 \begin{tabular}{@{}ccccccccc@{}}
-\toprule
-                                  & \multicolumn{3}{c}{Navigation} &  & \multicolumn{2}{c}{Manipulation} &  & Overall \\ \midrule
-Method                            & M=15     & M=30     & M=50     &  & M=18            & M=36           &  &         \\ \midrule
+
+                                  & \multicolumn{3}{c}{\textbf{Navigation}} &  & \multicolumn{2}{c}{\textbf{Manipulation}} &  & \textbf{Overall} \\ 
+\textbf{Method}                            & \textbf{M=15}     & \textbf{M=30}     & \textbf{M=50}     &  & \textbf{M=18}            & \textbf{M=36}           &  &         \\ 
 \multicolumn{1}{c|}{VIN (Paper)}  & 86.19    & 83.62    & 80.84    &  & 75.06           & 74.27          &  & 80.00   \\
 \multicolumn{1}{c|}{GPPN (Paper)} & 97.10    & 96.17    & 91.97    &  & 89.06           & 87.23          &  & 92.31   \\
 \multicolumn{1}{c|}{SPT (Paper)}  & 99.07    & 99.56    & 99.42    &  & 99.24           & 99.78          &  & 99.41   \\
 % \multicolumn{1}{c|}{VIN (Ours)}   &          &          &          &  &                 &                &  &         \\
 % \multicolumn{1}{c|}{GPPN (Ours)}  &          &          &          &  &                 &                &  &         \\
-\multicolumn{1}{c|}{\textbf{SPT (Ours)}}   & \textbf{84.40}    & \textbf{84.83}    &\textbf{ *  }      &  & \textbf{86.49}           & \textbf{*}              &  & \textbf{84.74}        \\ \bottomrule
+\multicolumn{1}{c|}{\textbf{SPT (Ours)}}   & \textbf{84.40}    & \textbf{84.83}    &\textbf{ *  }      &  & \textbf{86.49}           & \textbf{*}              &  & \textbf{84.74}        \\ 
 \end{tabular}
 \end{center}
 \caption{Reproducibility Results.}
@@ -137,16 +130,17 @@ We also see an increase in accuracy with increasing CNN Encoder layers. layers =
 \begin{table}[]
 \begin{center}
 \begin{tabular}{@{}cccccccc@{}}
-\toprule
-           &          & \multicolumn{3}{c}{M=15}            &                &                 &  \\ \midrule
-           & Accuracy & Validation Loss &  &                & Accuracy       & Validation Loss &  \\ \cmidrule(r){1-3} \cmidrule(l){5-8} 
-layers = 2 & 84.40    & 1.537           &  & d\_model = 32  & 84.76          & 1.201           &  \\
-layers = 4 & 84.88    & 1.166           &  & d\_model = 64  & 84.40          & 1.537           &  \\
-layers = 8 & \textbf{84.90}    & \textbf{1.033}           &  & d\_model = 128 & \textbf{85.00} & \textbf{0.79}   &  \\ \bottomrule
+
+           &          & \multicolumn{3}{c}{\textbf{M=15}}            &                &                 &  \\ 
+           & \textbf{Accuracy} & \textbf{Validation Loss} &  &                & \textbf{Accuracy}       & \textbf{Validation Loss} &  \\  
+\textbf{layers = 2} & 84.40    & 1.537           &  & \textbf{d\_model = 32}  & 84.76          & 1.201           &  \\
+\textbf{layers = 4} & 84.88    & 1.166           &  & \textbf{d\_model = 64}  & 84.40          & 1.537           &  \\
+\textbf{layers = 8} & \textbf{84.90}    & \textbf{1.033}           &  & \textbf{d\_model = 128} & \textbf{85.00} & \textbf{0.79}   &  \\ 
 \end{tabular}
 \end{center}
 \caption{Investigation Results on CNN Encoder parameters.}
 \end{table}
+
 
 \subsubsection{Obstacle Complexity}
 Obstacle complexity refers to the distribution of obstacles in the input map. The paper only cites results on input maps with a normal distribution of up to 5 obstacles. We found it crucial to test the SPT's spatial awareness and learning capabilities as this complexity is heightened. For this purpose, we created two new datasets with a higher distribution of obstacles. Table 3 lists our investigation results on these datasets.\\ 
@@ -154,12 +148,12 @@ We achieved the best accuracy on the distribution with up to 15 obstacles. Howev
 \begin{table}[]
 \begin{center}
 \begin{tabular}{@{}ccc@{}}
-\toprule
-\multicolumn{3}{c}{M=15}                                \\ \midrule
-                     & Accuracy       & Validation Loss \\ \midrule
-obstacles = N (0,5)  & 84.40          & \textbf{1.537}  \\
-obstacles = N (0,10) & 84.31          & 2.327           \\
-obstacles = N (0,15) & \textbf{84.67} & 1.614           \\ \bottomrule
+
+\multicolumn{3}{c}{\textbf{M=15}}                                \\
+                     & \textbf{Accuracy}       & \textbf{Validation Loss} \\
+\textbf{obstacles = N (0,5)}  & 84.40          & \textbf{1.537}  \\
+\textbf{obstacles = N (0,10)} & 84.31          & 2.327           \\
+\textbf{obstacles = N (0,15)} & \textbf{84.67} & 1.614           \\ 
 \end{tabular}
 \end{center}
 \caption{Investigation Results on increasing obstacle complexity and number.}
@@ -187,12 +181,11 @@ The best accuracy is achieved with $n_{heads}$ = 4 and $n_{layers}$ = 8. A sever
 \begin{table}[]
 \begin{center}
 \begin{tabular}{@{}ccccccc@{}}
-\toprule
-\multicolumn{7}{c}{M=15}                                                                                \\ \midrule
-              & Accuracy       & Validation Loss &  &                & Accuracy       & Validation Loss \\ \cmidrule(r){1-3} \cmidrule(l){5-7} 
-n\_heads = 4  & \textbf{84.65} & \textbf{1.471}  &  & n\_layers = 5  & 84.40          & 1.537           \\
-n\_heads = 8  & 84.40          & 1.537           &  & n\_layers = 8  & \textbf{84.96} & \textbf{1.009}  \\
-n\_heads = 16 & 84.24          & 1.762           &  & n\_layers = 12 & 52.33          & 40.469          \\ \bottomrule
+\multicolumn{7}{c}{\textbf{M=15}}                                                                                \\ 
+              & \textbf{Accuracy}       & \textbf{Validation Loss} &  &                & \textbf{Accuracy}       & \textbf{Validation Loss} \\  
+\textbf{n\_heads = 4}  & \textbf{84.65} & \textbf{1.471}  &  & \textbf{n\_layers = 5}  & 84.40          & 1.537           \\
+\textbf{n\_heads = 8}  & 84.40          & 1.537           &  & \textbf{n\_layers = 8}  & \textbf{84.96} & \textbf{1.009}  \\
+\textbf{n\_heads = 16} & 84.24          & 1.762           &  & \textbf{n\_layers = 12} & 52.33          & 40.469          \\ 
 \end{tabular}
 \end{center}
 \caption{Investigation Results on Transformer Encoder parameters.}
@@ -221,4 +214,3 @@ The authors of the paper could not be reached even after multiple attempts.
 \section{Conclusion}
 We have tried to reproduce the paper to the best of our abilities, following the textual descriptions for source code and dataset generation to the maximum extent. We were able to improve the reproduced accuracy and loss of the SPT Planner Module by 0.87\% and 57.64\%, respectively, by increasing the CNN Encoder depth, embedding size and Transformer Encoder complexity. This provides ground for further research into increased complexities models that might draw deeper insights and plan more accurately. \\ 
 We could not train the End-to-End Mapper and Planner Module due to a paucity of computational resources. The results that could not be reproduced are so prohibitively expensive that only very few can afford it, hence it would be better for the community if subsequent authors to this topic make their code and dataset public.
-
