@@ -7,7 +7,7 @@ This repository serves as the editorial venue for [ML Reproducibility Challenge 
 ReScience editorial process consists of porting the existing latex sources into ReScience template, and then adding necessary information relevant for final publication. Authors of RC2021 accepted papers are requested to submit their camera-ready papers as outlined in the steps below. The project structure of this repository is organized as:
  
  - 2021/
-   - `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/accepted.bib)
+   - `<paper_citekey>` <-- OpenReview citekey of the accepted paper at RC2020. List of accepted papers in [`accepted.bib`](/2021/accepted.bib)
      - `openreview`  <-- location for the source files submitted to openreview
      - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
 
@@ -17,7 +17,7 @@ ReScience editorial process consists of porting the existing latex sources into 
 Some of you may have used Overleaf to write and submit your papers. We recommend to setup the Latex development pipeline locally in your system for full control over the editorial process. If you use a Mac, then use the following Homebrew formula:
 
 ``` sh
-brew cask install mactex
+brew install --cask mactex
 ```
 
 For Ubuntu/Debian:
