@@ -306,10 +306,11 @@ the learned references generalizes well, as claimed in the paper.
 
 \begin{table*}
 	\centering\small
+    \setlength{\tabcolsep}{4pt}
 	\begin{tabular}{lccc}
 		\toprule
-		& \multicolumn{3}{c}{Evaluated on}\\
-		Trained on & MNIST& FMNIST& CIFAR-10\\
+		Trained & \multicolumn{3}{c}{Evaluated on}\\
+		on & MNIST& FMNIST& CIFAR-10\\
 		\midrule
 		MNIST & $66.53\pm 14.98\;\;(\alpha=1.177)$& $ 40.62\pm 12.66\;\;(\alpha=0.795)$ & $31.71 \pm \phantom{0}9.00\;\;(\alpha=0.950)$ \\
 		FMNIST & $40.75\pm 14.45\;\;(\alpha=0.730)$ & $ 57.88\pm 19.36\;\;(\alpha=1.320)$ & $40.72 \pm  16.93\;\;(\alpha=1.870)$  \\
@@ -387,27 +388,27 @@ Overall, we can validate the reported results from~\cite{hyder2020solving}, in p
 	\begin{subfigure}{\textwidth}
 		\centering
 		% left bottom right top
-		\includegraphics[trim=270 35 270 200, width=9.5cm]{data/original-std.pdf}
+		\includegraphics[trim=270 35 270 200, width=7.8cm]{data/original-std.pdf}
 		\caption{Ground truth images}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[trim=270 35 270 120, width=9.5cm]{data/rec-celeb-std.pdf}
+		\includegraphics[trim=270 35 270 120, width=7.8cm]{data/rec-celeb-std.pdf}
 		\caption{Reconstruction using a rescaled reference trained on CelebA}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[trim=270 35 270 120, width=9.5cm]{data/rec-cifar-std.pdf}
+		\includegraphics[trim=270 35 270 120, width=7.8cm]{data/rec-cifar-std.pdf}
 		\caption{Reconstruction using a rescaled reference trained on CIFAR-10}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[trim=270 35 270 120, width=9.5cm]{data/rec-random-std.pdf}
+		\includegraphics[trim=270 35 270 120, width=7.8cm]{data/rec-random-std.pdf}
 		\caption{Reconstruction using a random reference with uniformly distributed entries}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[trim=270 35 270 120, width=9.5cm]{data/rec-geometric-std.pdf}
+		\includegraphics[trim=270 35 270 120, width=7.8cm]{data/rec-geometric-std.pdf}
 		\caption{Reconstruction using a handcrafted reference }
 	\end{subfigure}
 	\caption{Reconstruction results on benchmark images using different references (PSNR on top). From top to bottom: ground truth, our trained CelebA reference, our trained CIFAR-10 reference,  best random reference (uniform distributed, evaluation on $100$ references per image), best handcrafted reference.}
@@ -420,7 +421,7 @@ Overall, we can validate the reported results from~\cite{hyder2020solving}, in p
 In this section, we validate the reported results of the hybrid-input-output algorithm (HIO)~\cite{Fienup:82} and extend the experimental evaluation by including two more baseline phase retrieval algorithms: Fienup's input-output and the Gerchberg-Saxton (GS) algorithm~\cite{Gerchberg1972APA}. We re-implement all three algorithms from scratch using NumPy~\cite{numpy}. We oversample the test images four times in spatial domain and run the algorithms for $100$ iterations on each image with a step size of $\beta=0.8$ for input-output~\cite{Fienup:82} and HIO~\cite{Fienup:82}. Also, the reconstructions are clipped to intensity values in range $[0, 1]$. For each image, we select the best PSNR from the cropped reconstruction and the cropped, flipped and shifted one. Tab.~\ref{results:baseline} shows the results on the different datasets. Overall, we can validate the claim by Hyder et al.~\cite{hyder2020solving}, even though our HIO~\cite{Fienup:82} implementation performs slightly better than the one reported in the original work.
 
 \begin{table*}
-	\centering\small
+	\centering\tiny
 	\begin{tabular}{llccccc}
 		\toprule
 		& Algorithm & MNIST& EMNIST& FMNIST & SVHN & CIFAR-10 \\
@@ -433,9 +434,6 @@ In this section, we validate the reported results of the hybrid-input-output alg
 		& HIO  & $10.53\pm \phantom{0}3.81 $& $10.81\pm \phantom{0}3.93$ & $14.06 \pm \phantom{0}8.54$ &  $31.90 \pm 16.45$ & $28.33 \pm 13.92$ \\
 		\midrule
 		\multirow{1}{*}{Hyder et al. \cite{hyder2020solving}} & HIO & $\phantom{0}9.04$ & $\phantom{0}8.42 $ & $\phantom{0}9.65$ & $19.87$ & $14.70$ \\
-
-		%& Proposed method &  $66.54$ & $ 58.72$ & $57.81$ & $57.51$ & $41.60 $ \\
-
 		\bottomrule
 	\end{tabular}
 	\caption{Comparison of mean PSNR values (with standard deviation) by the baseline methods without use of a reference signal. Additionally, to the results of the HIO algorithm, we report the results for the input-output and the GS algorithm.}
