@@ -56,29 +56,27 @@ report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END OF SUMMARY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Submission Checklist}
+%\subsection{Submission Checklist}
 
-Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+%Double check the file \texttt{journal/metadata.yaml} to contain the following information:
 
-\begin{itemize}
-\item Title should start with "\texttt{[Re]}"
-\item Author information, along with ORCID id
-\item Author affiliations
-\item Code URL, Software Heritage Foundation link
-\item Abstract
-\item Review URL (the OpenReview URL of your report)
-\end{itemize}
+%\begin{itemize}
+%\item Title should start with "\texttt{[Re]}"
+%\item Author information, along with ORCID id
+%\item Author affiliations
+%\item Code URL, Software Heritage Foundation link
+%\item Abstract
+%\item Review URL (the OpenReview URL of your report)
+%\end{itemize}
 
-\subsection{Continuous Integration}
+%\subsection{Continuous Integration}
 
-We use Github Actions CI to check your submission and compile the pdf file subsequently.
-You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+%We use Github Actions CI to check your submission and compile the pdf file subsequently.
+%You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
 
-\clearpage
+%\clearpage
 
 
-
-\newpage
 % \textit{\textbf{
 % The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
 % }}
@@ -419,9 +417,9 @@ Overall, we can validate the reported results from~\cite{hyder2020solving}, in p
 
 %Experiment~4.6 from~\cite{hyder2020solving} compares the proposed method to other phase retrieval methods and show that their approach performs best in comparison.
 In this section, we validate the reported results of the hybrid-input-output algorithm (HIO)~\cite{Fienup:82} and extend the experimental evaluation by including two more baseline phase retrieval algorithms: Fienup's input-output and the Gerchberg-Saxton (GS) algorithm~\cite{Gerchberg1972APA}. We re-implement all three algorithms from scratch using NumPy~\cite{numpy}. We oversample the test images four times in spatial domain and run the algorithms for $100$ iterations on each image with a step size of $\beta=0.8$ for input-output~\cite{Fienup:82} and HIO~\cite{Fienup:82}. Also, the reconstructions are clipped to intensity values in range $[0, 1]$. For each image, we select the best PSNR from the cropped reconstruction and the cropped, flipped and shifted one. Tab.~\ref{results:baseline} shows the results on the different datasets. Overall, we can validate the claim by Hyder et al.~\cite{hyder2020solving}, even though our HIO~\cite{Fienup:82} implementation performs slightly better than the one reported in the original work.
-
+\begin{landscape}
 \begin{table*}
-	\centering\tiny
+	\centering\small
 	\begin{tabular}{llccccc}
 		\toprule
 		& Algorithm & MNIST& EMNIST& FMNIST & SVHN & CIFAR-10 \\
@@ -439,6 +437,7 @@ In this section, we validate the reported results of the hybrid-input-output alg
 	\caption{Comparison of mean PSNR values (with standard deviation) by the baseline methods without use of a reference signal. Additionally, to the results of the HIO algorithm, we report the results for the input-output and the GS algorithm.}
 	\label{results:baseline}
 \end{table*}
+\end{landscape}
 
 \subsection{Hyperparameter Search}
 \label{sec:hyperp-search}
