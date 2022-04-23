@@ -14,7 +14,7 @@
 
 % Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
 
-We re-implement the method proposed by \cite{gan2shape} with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques\footnote{Our code is available at \url{https://anonymous.4open.science/r/GAN-2D-to-3D-03EF}.} While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported\footnote{All depencies are declared in \autoref{sec:methodology}}. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
+We re-implement the method proposed by \cite{gan2shape} with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques\footnote{Our code is available at \url{https://github.com/alessioGalatolo/GAN-2D-to-3D}.} While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported\footnote{All depencies are declared in \autoref{sec:methodology}}. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
 
 \subsection*{Results}
 
@@ -319,7 +319,7 @@ The number of epochs for the depth network pretraining was varied within $\{100,
 % Provide a link to your code.
 For each dataset we run our implementation of the framework from \cite{gan2shape} on the images that were selected by the authors, the procedure saves a checkpoint for each network. These checkpoints are later fed the original image to get the generated result. The evaluation of the results was only qualitative as all the datasets we explored do not have a ground truth for comparison. We instead relied on a manual evaluation.
 
-Our code is available at \url{https://anonymous.4open.science/r/GAN-2D-to-3D-03EF.} Our results are available interactively under the \lstinline{docs} folder.
+Our code is available at \url{https://github.com/alessioGalatolo/GAN-2D-to-3D}. Our results are available interactively under the \lstinline{docs} folder and at \href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{alessiogalatolo.github.io/GAN-2D-to-3D/}.
 \subsection{Computational requirements}
 % Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
 % For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
@@ -333,9 +333,7 @@ The model correctly learned the shape and the texture of many images, while some
 % The model is, unsurprisingly, biased towards predicting an ellipsoid shape and in some cases fails to capture the details in the image. The problem is worse when the ellipsoid shape is even less applicable, such as for some cars.
 
 In the following sections we show the reconstructed depth map and 3D projection of some images chosen as representative of the dataset. All of the images that follow have the background cut from the actual object, this was only done for ease of illustration and was not done for the actual training process since the original authors do not mask the background in all cases. It is also difficult to illustrate the results fairly in 2D images, so we invite the reader to visit our website %\href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{our website} 
-with \textit{interactive} 3D plots
-%\footnote{\href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{alessiogalatolo.github.io/GAN-2D-to-3D/}}
-\footnote{Due to the anonymization of the report, we instead refer to the html files under the \lstinline{docs} folder in our code}.
+with \textit{interactive} 3D plots\footnote{\href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{alessiogalatolo.github.io/GAN-2D-to-3D/}}.
 
 \subsection{Results reproducing original paper}
 % For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
