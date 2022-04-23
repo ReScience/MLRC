@@ -46,7 +46,7 @@ def check_affiliations(meta):
     for aff in meta["affiliations"]:
         check_ne(aff, "code", "Metadata.affiliations")
         check_ne(aff, "name", "Metadata.affiliations")
-        check_ne(aff, "address", "Metadata.affiliations")
+        # check_ne(aff, "address", "Metadata.affiliations")
 
 
 def check_keywords(meta):
