@@ -141,7 +141,7 @@ For each $\mathbf{I_{i}^{'}}$ we predict $\Delta \mathbf{w_i} = E(\mathbf{I_{i}^
     \label{eq:step3_loss}
 \end{equation}
 
-\textbf{Stages.} The steps are repeated for a number of \textit{stages}. In each, the steps are trained for a different number of iterations (see \autoref{tab:stages} in \autoref{Appendix} for details).
+\textbf{Stages.} The steps are repeated for a number of \textit{stages}. In each, the steps are trained for a different number of iterations (see \autoref{tab:stages} in \autoref{appendix} for details).
 
 \begin{figure}[!htb]
     \centering
@@ -194,29 +194,27 @@ The last prior we tested is obtained by normalizing the score (or "confidence") 
 
 \autoref{fig:different_priors} shows a visual representation of the prior shapes used for an example image taken from the Celeba dataset.
 \begin{figure}[!htb]
-\centering
-\begin{subfigure}[t]{0.20\textwidth}
-    \includegraphics[width=\textwidth]{../openreview/images/priors/prior_ellipsoid.png}
-    \caption{Ellipsoid (original)}
-    \label{}
-\end{subfigure}
-\begin{subfigure}[t]{0.20\textwidth}
-    \includegraphics[width=\textwidth]{../openreview/images/priors/prior_masked.png}
-    \caption{Masked box}
-    \label{}
-\end{subfigure}
-\begin{subfigure}[t]{0.20\textwidth}
-    \includegraphics[width=\textwidth]{../openreview/images/priors/prior_smoothed_box.png}
-    \caption{Masked and  smoothed box
-    }
-    \label{subfig:c}
-\end{subfigure}
-\begin{subfigure}[t]{0.20\textwidth}
-    \includegraphics[width=\textwidth]{../openreview/images/priors/prior_confidence.png}
-    \caption{Confidence based
-    }
-    \label{subfig:d}
-\end{subfigure}
+    \centering
+    \begin{subfigure}[t]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{../openreview/images/priors/prior_ellipsoid.png}
+        \caption{Ellipsoid (original)}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{../openreview/images/priors/prior_masked.png}
+        \caption{Masked box}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{../openreview/images/priors/prior_smoothed_box.png}
+        \caption{Masked and  smoothed box
+        }
+        \label{subfig:c}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{../openreview/images/priors/prior_confidence.png}
+        \caption{Confidence based
+        }
+        \label{subfig:d}
+    \end{subfigure}
     \caption{Original vs. our novel shape priors, shown on the Celeba (face) dataset}
     \label{fig:different_priors}
 \end{figure}
@@ -350,61 +348,61 @@ We present the results on LSUN Car dataset in \autoref{fig:result-car-cat}. Most
 \begin{figure}[h]
     \centering
     \begin{subfigure}{0.80\textwidth}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_0.png}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_4.png}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_5.png}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_0.png}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_1.png}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_2.png}
-    \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_0.png}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_4.png}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_5.png}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_0.png}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_1.png}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_2.png}
+        \end{subfigure}
     
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_0__it_stage_.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_4__it_stage_.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_5__it_stage_.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_0__it_stage_.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_1__it_stage_.png}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}{0.16\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_2__it_stage_.png}
-        \caption{}
-    \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_0__it_stage_.png}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_4__it_stage_.png}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_5__it_stage_.png}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_0__it_stage_.png}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_1__it_stage_.png}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.16\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_2__it_stage_.png}
+            \caption{}
+        \end{subfigure}
     
     \end{subfigure}
     \caption{LSUN Car and Cat}
@@ -444,14 +442,14 @@ The second experiment was executed on the LSUN Cat dataset. The results are a sl
 %     \label{fig:result-cat}
 % \end{figure}
 
-Additional results such as for the Celeba dataset, can be found in the \autoref{Appendix}.
+Additional results such as for the Celeba dataset, can be found in the \autoref{appendix}.
 
 \subsection{Results beyond the original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
 
 \subsubsection{The effects of shape priors}
 \label{sec:results_priors}
-\textbf{No prior.} To confirm our suspicions that this method would not work at all without a shape prior, briefly mentioned in \ref{sec:train}, we ran a test on one image from the LSUN Car dataset without any prior pre-training, and with random initialization. The reconstruction objective is still satisfied very well, but it has converged to an extremely noisy depth map (see \autoref{fig:no_prior} in \autoref{Appendix}). It shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
+\textbf{No prior.} To confirm our suspicions that this method would not work at all without a shape prior, briefly mentioned in \ref{sec:train}, we ran a test on one image from the LSUN Car dataset without any prior pre-training, and with random initialization. The reconstruction objective is still satisfied very well, but it has converged to an extremely noisy depth map (see \autoref{fig:no_prior} in \autoref{appendix}). It shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
 % This is intuitively expected, because the network has to choose from infinite depth configurations that could lead to the image when projected onto 2D, and it shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
 
 % The original paper did not specify the exact reasons for choosing an ellipsoid prior for the pretraining of the depth net, therefore we decided to experiment with multiple prior shapes. The most promising ones were obtained by:
@@ -462,7 +460,7 @@ Additional results such as for the Celeba dataset, can be found in the \autoref{
 % Further, the original method is instance-based implying a time of more than one hour every time a new image needs to be projected. The authors only briefly mention a `joint-training' to improve on the generalization capabilities of the method without actually showing any results or experiments supporting this claim. Without an accurate description of the `joint-training' we redesigned the training process trying to improve the generalization abilities of the method. See \autoref{fig:oldtrainerFlowchart} and \autoref{fig:trainerFlowchart} for a visual representation of the original training process and the one revised by us, respectively.
 
 \textbf{Smoothed Box Prior.}
-The first experiment was done by testing the first of the prior shapes presented, the smoothed box prior. \autoref{fig:ellips_vs_box} shows the smoothed box prior tested on the LSUN Cat and Celeba dataset where it can be seen how it is better at understanding the structure of the nose and face in general (see \autoref{Appendix} for more details). \begin{figure}[!htb]
+The first experiment was done by testing the first of the prior shapes presented, the smoothed box prior. \autoref{fig:ellips_vs_box} shows the smoothed box prior tested on the LSUN Cat and Celeba dataset where it can be seen how it is better at understanding the structure of the nose and face in general (see \autoref{appendix} for more details). \begin{figure}[!htb]
     \centering
     \begin{subfigure}{0.40\textwidth}
         \begin{subfigure}{0.48\textwidth}
@@ -535,7 +533,6 @@ Training step 1 was not changed and it is allowed to converge in the first stage
 \begin{subfigure}{0.24\textwidth}
     \centering
     \includegraphics[width=\textwidth]{../openreview/images/cat/gen_init_iter/train/plotly__im_8_rev.png}
-    \label{}
 \end{subfigure}
 \caption{Reconstruced 3D image}
 \end{subfigure}
@@ -580,7 +577,7 @@ Another challenge with this method is the lack of objective quantitative metrics
 \subsubsection{Variability of the results}
 \label{sec:variability}
 We observed that the method is very sensitive to various random factors and identical runs may yield different results, see \autoref{fig:variability}. One factor may be the random initialization of the networks, but we do not believe it is the dominating factor, since the depth network is pre-trained on a fixed prior shape each run. Rather, as mentioned by the authors \cite{gan2shape}, the quality of the projected samples varies. 
-Additionally, we only sample $8-16$ different view-light directions in each step 2 iteration, which may be too few projected samples for a robust model. Since this sampling is random, increasing the number of samples should assure the inclusion of meaningful view and light projections (experimental backing in the \autoref{Appendix}).
+Additionally, we only sample $8-16$ different view-light directions in each step 2 iteration, which may be too few projected samples for a robust model. Since this sampling is random, increasing the number of samples should assure the inclusion of meaningful view and light projections (experimental backing in the \autoref{appendix}).
 % We speculate that with increased resources, the number of projected samples could be upped by orders of magnitude to increase robustness.
 
 \subsubsection{Catastrophic forgetting}

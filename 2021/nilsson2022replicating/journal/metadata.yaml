@@ -57,10 +57,31 @@ replication:
  - doi:  10.48550/arXiv.2011.00844 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Pan et al. [pan20202d] propose with their article `Do 2D GANs Know 3D Shape? Unsupervised 3D Shape Reconstruction from 2D Image GANs' an unsupervised method named GAN2Shape
- that purportedly is able to recover 3D information stored in the weights of a pre-trained StyleGAN2 model, 
- to produce 3D shapes from 2D images. We aim to reproduce the 3D shape recovery and identify its strengths and weaknesses."
+abstract: "
+SCOPE OF REPRODUCIBILITY
 
+Pan et al. propose an unsupervised method named GAN2Shape that purportedly is able to recover 3D information stored in the weights of a pre-trained StyleGAN2 model, to produce 3D shapes from 2D images. We aim to reproduce the 3D shape recovery and identify its strengths and weaknesses.
+
+METHODOLOGY
+
+We re-implement the method proposed by Pan et al. with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques. Our code is available at https://anonymous.4open.science/r/GAN-2D-to-3D-03EF. While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
+
+RESULTS
+
+We replicate the results of Pan et al. on a subset of the LSUN Cat, LSUN Car and CelebA datasets and observe varying degrees of success. We perform several experiments and illustrate the successes and shortcomings of the method. Our novel shape priors improve the 3D shape recovery in certain cases where the original shape prior was unsuitable. Our generalized training approach shows initial promise but has to be confirmed with increased computational resources.
+
+WHAT WAS EASY?
+
+The original code is easily runnable on the correct machine type (Linux operating system and CUDA 9.2 compatible GPU) for the specific datasets used by the authors.
+
+
+WHAT WAS DIFFICULT?
+
+Porting the model to a new dataset, problem setting or a different machine type is far from trivial. The poor cohesion of the original code makes interpretation very difficult, and that is why we took care to re-implement many parts of the code using the decoupling principle. The code depends on many external implementations which had to be made runnable, which caused a significant development bottleneck as we developed on Windows machines (contrary to the authors). The exact loss functions and the number of training steps were not properly reported in the original paper, which meant it had to be deduced from their code. Certain calculations required advanced knowledge of light-transport theory, which had no familiarity to us, and had to be mimicked and could not be verified.
+
+COMMUNICATION WITH THE ORIGINAL AUTHORS
+
+We did not communicate with the original authors."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
