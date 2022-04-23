@@ -1,0 +1,253 @@
+
+\section{Introduction}
+Machine Learning models have shown impressive performance in countless domains in the last decade. However, it has been demonstrated that an adversary can input carefully-crafted perturbations to subvert the predictions of these models. The area of Adversarial Machine Learning has emerged to study vulnerabilities of machine learning approaches in adversarial settings and to develop techniques that make them robust against malicious attacks.
+
+Most of the research has focused on studying malign interventions that degrade the accuracy of a system: imagine, for example, the consequences of inducing wrong predictions in an autonomous driving system. Only recently, fairness has become a rising concern for the performance of machine learning models, especially for sensitive fields such as criminal justice and loan decisions. Along these lines, “Exacerbating Algorithmic Bias through Fairness Attacks” \citep{originalpaper} proposes two families of poisoning attacks that inject malicious points into the models’ training sets and intentionally target the fairness of a classification model.
+
+The first, the \textit{influence} attack, extends the optimization-based technique introduced by \citet{koh2018} by incorporating in the loss function a constraint for fair classification. An attacker can hence harm both accuracy and fairness simultaneously, with a trade-off regularized via a parameter $\lambda$. The second type of attack, the \textit{anchoring} attack, affects solely fairness and aims to place poisoned data points to bias the decision boundary without modifying the attacker loss. Depending on whether the target point is chosen at random, anchoring attacks are classified as \textit{random} or \textit{non-random}.
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+This report investigates the reproducibility of the original paper by Mehrabi et al. and aims to verify its main claims. Since these heavily rely on the datasets and metrics used by the authors, the reader is invited to consult Sections \ref{sec:datasets} and \ref{sec:metrics} -- respectively -- for a refresh of such concepts. Then, the main claims can be summarized as follows:
+
+\textbf{--\hspace{2mm}\textit{Influence} Attack on Fairness (IAF)}:
+    \begin{itemize}
+    \itemsep0.0em 
+        \item \hypertarget{claim-1}{\textit{Claim 1:}} Increasing the parameter $\lambda$ results in stronger attacks against fairness. Contrarily, for lower values the model acts similarly to the original influence attack \citep{koh2018} targeted towards accuracy;
+        \item \hypertarget{claim-2}{\textit{Claim 2:}} The proposed IAF outperforms the attack of \citet{koh2018} in affecting both fairness metrics (SPD and EOD), on all three datasets;
+        \item \hypertarget{claim-3}{\textit{Claim 3:}} The proposed IAF also outperforms the attack based on the loss function proposed by \citet{solans2020} in affecting SPD and EOD, on all tested datasets.
+    \end{itemize}
+\textbf{--\hspace{2mm}\textit{Anchoring} Attack}:
+    \begin{itemize}
+    \itemsep0.0em 
+        \item \hypertarget{claim-4}{\textit{Claim 4:}} Both random and non-random anchoring attacks (RAA and NRAA, respectively) outperform \citet{koh2018} in degrading the SPD and EOD of the classification model, on all three datasets;
+        \item \hypertarget{claim-5}{\textit{Claim 5:}} On the German and Drug Consumption datasets, RNAA and NRAA have a greater impact on fairness metrics (SPD and EOD) compared to the attack based on \citet{solans2020}. However, the latter outperforms the proposed anchoring attack in affecting fairness when classification is performed on the COMPAS dataset.
+    \end{itemize}
+\section{Methodology}
+\label{sec:methodology}
+
+The authors provided an open-source implementation of their code on GitHub \citep{original_github}. Unfortunately, the repository has several issues: dependencies are not sufficiently specified, and simply running the code in the given environment results in conflicts. Furthermore, the code does not provide an option to run baseline methods used in the paper, nor does it include the essential hyperparameter $\lambda$, which is used in the experiments. 
+
+The majority of the code is based on \citet{koh2018}'s public implementation \citep{koh2018_github}, and a code coverage analysis revealed that more than 50\% is not used for running experiments related to this paper\footnote{The \texttt{coverage.py} tool \citep{coverage_py} was used to measure code coverage, and the study was performed considering all possible attacks-datasets combinations.}. Moreover, the repository comes with pre-processed datasets and while this may sound advantageous, there is no mention of the processing procedure in the paper nor on GitHub. Finally, the code is generally complex and hard to understand due to insufficient comments and documentation.
+
+Therefore, we used the codebase provided by the authors and customized it for our purposes. First, to aid maintainability and scalability, as well as to ensure future reproducibility of the original experiments, the code was modernized and made compatible with the latest version of \textit{every} dependency. This involved major changes to migrate from \texttt{Tensorflow 1.12.0} to \texttt{2.6.2} and to update \texttt{CVXpy} from version \texttt{0.4.11} to \texttt{1.1.18}\footnote{In our repository we provide a YAML configuration file to quickly set up the required environment.}. Secondly, datasets were downloaded from the original sources \citep{german_drug_dataset, compas_dataset} and processed from scratch. The procedure is thoroughly reported in Section \ref{sec:datasets}. Furthermore, the code was trimmed down to the essential, and the user was given the option to choose any of the available models and the corresponding parameters. Lastly, we added comprehensive documentation to make the code more interpretable.
+
+
+\subsection{Model descriptions}
+\label{sec:model_descriptions}
+
+It appears that the authors of the original paper do not specify the model that they use for the given classification task. From the implementation details given in \citet{koh2018}, as well as from \citep{originalpaper}'s codebase, we assume the use of a Support Vector Machine (SVM) trained with a smooth hinge loss and L2 regularization (refer to \cite{koh2018} for further details). Additionally, the optimization algorithm is not indicated; we assumed it to be Newtons Conjugate Gradient (Newton-CG) method, as suggested by the codebase. Such a method is used for both the minimization of the parameters on the training set and the update step of the poisoned points (for attacks utilizing an adversarial loss). The gradient is computed using the full datasets, i.e., without using mini-batches. Although hardly recognizable, this follows the implementation of the original paper: from our interpretation of the code, it seems that the authors define a variable containing the size of the mini-batch size and the necessary functionality, but then never use it. 
+
+Our base algorithmic setup for the IAF, RAA, and NRAA attacks is described in the \textit{Methods} section of the original paper. However, the authors omitted important details that we consequently had to assume based on more or less concrete evidence. First, an advantaged and disadvantaged group for the sensitive attribute (i.e., gender, as per the original work) has to be specified for all attacks. Since the rationale behind this choice does not seem to be included in the paper, we infer from the codebase that the authors did it automatically and deduced it from the datasets. More specifically, we assume that the advantaged group is chosen as the group with the highest ratio of data points with positive label ($y=1$), regardless of the actual class label it corresponds to.  This method is simple yet fallacious: for instance, it means that the group taking on the label "likely to perform a crime soon" more often (in the context of the COMPAS dataset) is considered "advantaged" in terms of the algorithm. 
+
+Secondly, for the computation of the feasible set using an anomaly detector $B$, we assume that the intersection of the Slab defense and the L2 defense was originally employed, as described in \citet{koh2018}. For reprojecting poisoned data points into the feasible set, we again use the approach of \citep{koh2018}, which incorporates LP rounding for discrete variables.
+
+Moreover, we implement two baselines. The three proposed attacks are compared against the original accuracy-targeting attack proposed by \citet{koh2018}, and another attack that uses a loss function proposed by \citet{solans2020}, which targets fairness\footnote{For simplicity, we will refer to the influence attack presented in \citep{koh2018} as the Koh attack, and we will also refer to the attack presented in \citep{solans2020} as the Solans attack.}. Lastly, the model-specific changes/improvements are presented below:
+
+\paragraph{IAF.} As mentioned before, we modified the code to include the hyperparameter $\lambda$ which controls the trade-off between the accuracy and the fairness loss in the adversarial loss.
+
+\paragraph{Koh attack.} We were not able to find a way of running this baseline attack using the given codebase. We have decided to implement it from scratch, treating it as the limiting case of the IAF attack when $\lambda=0$ (meaning no fairness loss in the adversarial loss function). Consequently, it is not exactly as presented in \cite{koh2018}: in the original Koh attack sampling, the initial poisoned points are not drawn from advantaged and disadvantaged groups, contrary to the IAF attack. However, we argue that equalizing the sampling method provides a stronger comparison between the two methods, as we alleviate the issue of the missing inductive bias from the original Koh influence attack.  
+
+\paragraph{Solans attack.} This attack serves as the second baseline. We could not find it in the codebase, thus we implemented it by replacing the adversarial loss in the IAF attack with a weighted sum loss, as presented in \citep{solans2020}. Implementing this change posed a bigger issue than expected, due to the inflexibility of the TensorFlow-based implementation. Thus, major revisions were required.  
+
+\subsection{Datasets}
+\label{sec:datasets}
+The authors provide compressed \texttt{npz} files of the three real-world datasets used for their experiments -- the German Credit Dataset \citep{german_drug_dataset}, the COMPAS Dataset \citep{compas_dataset} and the Drug Consumption Dataset \citep{german_drug_dataset}. However, these are already pre-processed, and the processing procedure is not reported nor documented in the code. This constitutes an important reproducibility barrier, because raw datasets\footnote{The German Credit Dataset and the Drug Consumption Dataset can be downloaded from the UCI machine learning repository \citep{german_drug_dataset}, while the COMPAS can be found in the corresponding GitHub repository\citep{compas_dataset}.} are not directly usable with the given codebase. 
+
+In this section, we present our pre-processing pipeline, which was mainly determined by reverse engineering of the given files. Like the authors, we provide a set of \texttt{npz} files containing already-processed data to run our implementation, but we also include the scripts used to pre-process each dataset in the \texttt{Custom\_data\_preprocessing} directory. Lastly, to run the attacks, we assume that the advantaged and disadvantaged groups are males and females respectively. We accordingly map them to 0 and 1 to create the \texttt{group\_label} binary array.\\
+In the rest of this section, we outline our dataset-specific details of the pre-processing pipeline and the assumptions that were made for the sake of reproducibility of the original results.
+
+\paragraph{German Credit Dataset.} The dataset contains the credit profile of 1000 individuals with 20 attributes associated with each person.
+In our experiments, we use all of them, as in \citep{originalpaper}. The attributes are both numerical and categorical, and we assumed the original authors used \textit{one-hot} representations to encode the latter. The assumption was based on an extensive study of the provided datasets, with particular attention to their shapes. We then autonomously standardize the data, as it is common practice in Machine Learning, and split the data into an 80-20 train and test split, as indicated in the original paper.
+
+\paragraph{COMPAS Dataset.} ProPublica’s COMPAS dataset \citep{compas_dataset} contains information about 7214 defendants from Broward County. We use the features specified in Table 1 of \citep{originalpaper}.
+In this case, based on the provided dataset, we concluded that the authors must have used \textit{numerical label} encoding to represent the categorical attributes. Finally, we standardize the data and split it into an 80-20 train and test split.
+
+\paragraph{Drug Consumption Dataset.} The dataset contains information about the drug consumption of 1885 individuals \citep{fehrman2017factor}. We use the attributes indicated in Table 1 of the original paper. The pre-processing procedure is as follows: first, we binarize the categorical data linked to cocaine consumption into \textit{users} and \textit{non-users}. Intuitively, non-users should be mapped to 0 (and 1 in the opposite case), but an inspection of the provided \texttt{npz} file suggests that the authors reversed the mapping. We decided to adhere to their choice for the sake of reproducibility. Moreover, we suspect that the dataset was shuffled before splitting it into training and test sets\footnote{The main author followed a similar pre-processing procedure in another project that is publicly available on their GitHub \cite{second_github}.}. By doing so, we obtain similar results in the experiments. Finally, we standardize the data. The original processing of this dataset was particularly difficult to replicate, because contrary to what was reported in the paper, the authors did not follow an exact 80-20 train and test split. Rather, the two contained 1500 and 385 data points respectively.
+
+To conclude, it is noteworthy that even the pre-processed datasets provided by the authors are not immediately usable: the position (specified as index) of the sensitive feature (i.e., gender) is different for each dataset and is only given for the German dataset in the running instructions. To account for this unnecessary confusion, our custom pre-processing procedure includes the moving of the gender column to the $0^{th}$ index, which is taken as default by the main function. In this way, we simplify the running instructions and make them coherent across datasets. Still, the user is given the ability to pass the sensitive feature index as an argument, to facilitate future experiments on different and untested data.
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+The attacks are evaluated in terms of accuracy and fairness. Along with classification (test) error, the original paper uses two important metrics to evaluate the attack in terms of fairness: Statistical Parity Difference and Equality of Opportunity Difference.
+
+\paragraph{Statistical Parity Difference.} Statistical Parity Difference (SPD) was first introduced by \citet{SPD-measure} and is used to capture the predictive outcome differences between different (advantaged and disadvantaged) demographic groups. The mathematical formulation is reported in Equation \ref{eq:spd}.
+\begin{equation}
+    SPD=\left|\;p\left(\hat{Y}=+1 \mid x \in \mathcal{D}_{a}\right)-p\left(\hat{Y}=+1 \mid x \in \mathcal{D}_{d}\right)\right| \label{eq:spd} 
+\end{equation}
+where $\mathcal{D}_{a}$ denotes the advantageous group and $\mathcal{D}_{d}$ denotes the disadvantageous group.
+
+\paragraph{Equality of Opportunity Difference.} Equality of Opportunity Difference (EOD) (\citet{EOD-measure}) captures differences in the true positive rate between different (advantaged and disadvantaged) demographic groups. It is defined as shown in Equation \ref{eq:eod}.
+\begin{equation}
+    EOD=\left|\;p\left(\hat{Y}=+1 \mid x \in \mathcal{D}_{a}, Y=+1\right) -p\left(\hat{Y}=+1 \mid x \in \mathcal{D}_{d}, Y=+1\right) \right| \label{eq:eod} 
+\end{equation}
+
+\subsection{Experimental setup and hyperparameters}
+All experiments shown in this paper can easily be reproduced using our code, which is publicly available on GitHub\footnote{\url{https://anonymous.4open.science/r/MLRC2021_fairness_attack/}}. There we also provide technical details on how to run experiments and test different attacks in various settings. In this section, however, we list some additional details necessary to replicate the exact setup. 
+\begin{itemize}%[leftmargin=*]
+    %\itemsep0.0em 
+    
+    \item The original code constrains the maximum iterations of an attack to 10000 and uses early stopping to interrupt training if the accuracy on the test set does not decrease for a specific number of iterations, which is hardcoded to be 2. We follow this strategy but adapt it for our experiments. First, we implement early stopping on both accuracy and fairness, meaning that the user can also choose to stop training in the absence of changes in fairness. We utilize \textit{average fairness} $(SPD+EOD)/2$ as the stopping criteria\footnote{In the rest of the paper, we might refer to it simply as the \textit{fairness} stopping metric.} since the two metrics have similar behavior and equal range $[0,1]$. Then, we set the early stopping patience as a controllable hyperparameter.
+    
+    \item It is unclear from the paper how the best-performing model was selected by the authors. The code suggests the usage of the model after the last attack iteration and training of the model parameters. Instead, we decided to save the best-performing model on the test set according to the chosen stopping metric (average fairness or accuracy), to better reflect the actual best performance. By selecting the best model based on fairness, we hope to choose more relevant states of the poisoned data affecting the fairness metrics. We compare the results in Section \ref{sec:results}.
+    
+    \item The computation of the feasible set and the reprojection of poisoned points onto it is handled as a convex optimization problem (see \cite{koh2018}). Since we upgraded \texttt{CVXpy} to its newest version, we can let the library select the most appropriate solver for the given problem, instead of specifying one (the authors of \cite{originalpaper} seem to have used the \texttt{SCS} solver).
+    
+    \item Following the original implementation, we utilize the \texttt{fmin\_ncg} optimizer of the \texttt{scipy} library \citep{scipy} for the Newton-CG optimization. We comply with the choices of the authors and set the convergence threshold of the fmin optimizer to $10^{-8}$, and the maximum number of iterations to 100. We follow the implementation details specified in \cite{koh2018} for computing the inverse Hessian-vector.
+    
+    \item During training, the temperature of the smooth hinge loss is chosen to be $0.001$, as found hardcoded in the original implementation. The value for the weight decay is set to 0.09 for all datasets (apart from the code of the authors, this assumption is also backed up by the main experiments of \citet{koh2018}). The step size utilized in the IAF algorithm (and thus also in the Koh and Solans attack) is set to $0.1$ for all experiments, as found in the codebase.
+    
+    \item The threshold of the anomaly detector (see \cite{koh2018}) is controlled by a hyperparameter named "\texttt{percentile}", which specifies the percentage of the data left after applying the anomaly detector. We first experimented with a value of 95 as suggested by \citet{koh2018} but, as this seemed to lead to some training failings, we settled on 90 (the default value given in the codebase).
+    
+    \item The number of injected poisoned points is proportional to the number of clean data points, such that $|\mathcal{D}_p| = \epsilon|\mathcal{D}_p|$ (where $\mathcal{D}_c$ and $\mathcal{D}_p$ are the set of clean and poisoned data points respectively). The authors control such quantity by using the proportionality factor $\epsilon$ as a changeable parameter. Accordingly, we do the same and also make $\lambda$ a controllable parameter.
+    
+    \item After careful inspection and testing of the authors' code, the EOD metric calculation was found to be faulty and was consequently re-implemented. Our adaptation is based on the paper that originally proposed it \cite{EOD-measure} and inspired by the implementation found in the \texttt{AIF360} library \citep{aif360}.
+    
+    \item Finally, the distance to original points in anchoring attacks $\tau$ was set to 0 for all experiments, as in the original paper. 
+    
+    \item The random seed in all experiments was set to 1.
+    
+\end{itemize}
+
+\subsection{Computational requirements}
+
+To give a complete overview of our experimental setup, we collect the average runtimes per iteration for different datasets and types of attacks. These are presented in Table \ref{tab:runtime}. All models have been trained on a local machine with an AMD Ryzen 5 5600x CPU (6 cores, Base clock 3.7 GHz). Since the datasets are small, there is no need for more than 4Gb of RAM. In this sense, training should be virtually possible on any entry-level PC. 
+\begin{table}[t!]
+    \begin{minipage}{.65\textwidth}%
+        \centering
+        \resizebox{\textwidth}{!}{\begin{tabular}{lccc}
+        \toprule 
+        \textbf{Attack} & \textbf{German dataset $\mathbf{[s]}$}& \textbf{COMPAS dataset $\mathbf{[s]}$}& \textbf{Drug dataset $\mathbf{[s]}$} \\
+         \midrule
+         IAF & $0.870$   & $0.265$  & $0.312$ \\ 
+         
+         NRAA & $1.123$  & $106.23$  & $3.678$  \\
+         
+         RAA & $0.934$  & $0.306$  & $0.324$  \\
+         
+         Koh & $0.474$  & $0.267$  & $0.201$  \\
+         
+         Solans & $0.862$  & $0.332$  & $0.262$  \\ 
+         \bottomrule\\
+        
+         \end{tabular}}
+         \caption{Average runtime per iteration for different attack types and datasets. All values are stated in units of seconds.}
+        \label{tab:runtime}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.3\textwidth}%
+        \centering
+        \resizebox{0.82\textwidth}{!}{\begin{tabular}{lc}
+        \addlinespace[0.8mm] 
+        \toprule
+        \textbf{Claim} & \textbf{Reproducible?} \\ \midrule
+        \hyperlink{claim-1}{\textit{Claim 1}}        & Yes          \\
+        \hyperlink{claim-2}{\textit{Claim 2}}        & Yes          \\
+        \hyperlink{claim-3}{\textit{Claim 3}}        & No          \\
+        \hyperlink{claim-4}{\textit{Claim 4}}        & Yes          \\
+        \hyperlink{claim-5}{\textit{Claim 5}}        & No \\ \bottomrule    \\    
+        \end{tabular}}
+        \caption{Summary of the claims investigation under our specific setup.}
+        \label{tab:claims}
+    \end{minipage} 
+\end{table}
+
+
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Figure_3_german.pdf}
+    \caption{Influence of $\lambda$ on the different metrics for different $\epsilon$ on the German dataset, using accuracy as the stopping criteria during training.}
+    \label{fig:effect-lambda-german}
+\end{figure}
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Results reproducing original paper}
+As stated in Section \ref{sec:claims}, five main claims were identified in the original paper. In our specific setting, we were able to reproduce three of these, as summarized in Table \ref{tab:claims}. In this section we elaborate on our reproduction results: first, in section \ref{sec:lambda} we show the effect of the hyperparameter $\lambda$ on various metrics (\hyperlink{claim-1}{\textit{Claim 1}}). In section \ref{sec:results-comparison} we compare the newly proposed attacks and the baselines (\hyperlink{claim-2}{\textit{Claims 2-5}}). 
+
+\subsubsection{Effect of $\lambda$ on the different metrics}
+\label{sec:lambda}
+To verify \hyperlink{claim-1}{\textit{Claim 1}}, we conducted the same experiment as the authors. We run an IAF attack for each dataset using different $\epsilon$ values and increasing $\lambda$, to recreate Figure 3 of the original paper (see Appendix \ref{app:orig-figs}, Fig. \ref{fig:orig-fig3}). However, compared to the original experiment we test a larger range of $\lambda$ values (from 0.0 to 2.0) to gain better insights into its effects. As depicted in Figure \ref{fig:effect-lambda-german}, increasing $\lambda$ does result in stronger attacks against fairness. Here we use the German dataset and accuracy as the stopping metric, but similar trends were observed on the other datasets and using fairness for early stopping. The plots are included in Appendix \ref{app:lambda} for the sake of completeness. Therefore in this specific setup, we were able to reproduce the claim.
+
+\subsubsection{Comparison between the proposed attacks and the baselines}\label{sec:results-comparison}
+
+To investigate \hyperlink{claim-2}{\textit{Claims 2-5}} we design an experiment that is heavily inspired by the work of the authors. We perform each attack on each dataset, fixing $\lambda=1$ and gradually increasing $\epsilon$ (from 0.0 to 1.0, with steps of 0.1), and repeat this procedure for each stopping metric. The results essentially replicate Figure 2 of the original paper (as seen in Appendix \ref{app:orig-figs}, Fig. \ref{fig:orig-fig2}) and are collected in Figures \ref{fig:3-stop-accuracy} and \ref{fig:3-stop-fairness} of Appendix \ref{app:comparative}. However, to facilitate a comparative study between the proposed attacks and the baselines, we average the metrics over the $\epsilon$ values and report the results in Table \ref{tab:avg_results}. In this way, we can base our observations on quantifiable measures instead of solely using visual inspection.\\
+Assuming that the authors used \textit{accuracy} as the early stopping criteria, the corresponding values in the table reveal that -- in this specific setting:
+\begin{itemize}%[leftmargin=5mm]
+    %\itemsep0em
+    \item \hyperlink{claim-2}{\textit{Claim 2}} is reproducible. On average, IAF has a much stronger influence on SPD and EOD compared to Koh's attack, on all three datasets. 
+    \item \hyperlink{claim-3}{\textit{Claim 3}} is not reproducible, because Solan's attack outperformed IAF in affecting the EOD on the Compas dataset.
+    \item \hyperlink{claim-4}{\textit{Claim 4}} is reproducible. NRAA and RAA were found to degrade the fairness metrics (SPD and EOD) more than Koh's attack, on all three datasets.
+    \item \hyperlink{claim-5}{\textit{Claim 5}} is not reproducible. Solans' attack had a greater impact on the SPD than NRAA on the German and greater impact than NRAA on both SPD and EOD on the Compas dataset. It also has a greater impact on the EOD than the RAA attack on the Compas dataset.
+\end{itemize}
+
+% Table with the average metrics results
+\begin{table}[t!]
+\resizebox{\columnwidth}{!}{\begin{tabular}{llccccccccccc}
+       &  & \multicolumn{3}{c}{German Dataset} & \multicolumn{1}{l}{} & \multicolumn{3}{c}{Compas Dataset} & \multicolumn{1}{l}{} & \multicolumn{3}{c}{Drug Dataset}   \\ \cmidrule[\heavyrulewidth]{1-13}
+\textbf{Attack} &  & \textbf{Test error} & \textbf{SPD}       & \textbf{EOD}       &                      & \textbf{Test Error} & \textbf{SPD}       & \textbf{EOD}       &                      & \textbf{Test error} & \textbf{SPD}       & \textbf{EOD}       \\
+       &  & \multicolumn{3}{c}{\footnotesize \textit{(Stopping metric: Fairness / Accuracy)}} & \multicolumn{1}{l}{} & \multicolumn{3}{c}{\footnotesize \textit{(Stopping metric: Fairness / Accuracy)}} & \multicolumn{1}{l}{} & \multicolumn{3}{c}{\footnotesize \textit{(Stopping metric: Fairness / Accuracy)}}   \\ \cmidrule(r){1-1} \cmidrule(r){3-5} \cmidrule(r){7-9} \cmidrule(r){11-13}
+\textbf{IAF}    &  & $0.40/\mathbf{0.47}$  & $\mathbf{0.84}/0.68$ & $\mathbf{0.88}/0.74$ &                      & $0.46/\mathbf{0.47}$  & $\mathbf{0.83}/0.75$ & $\mathbf{0.87}/0.77$ &                      & $0.43/\mathbf{0.45}$  & $\mathbf{0.89}/0.75$ & $\mathbf{0.90}/0.76$ \\
+\textbf{NRAA}   &  & $0.26/0.26$  & $\mathbf{0.26}/0.25$ & $\mathbf{0.36}/0.33$ &                      & $0.41/\mathbf{0.42}$  & $0.59/0.59$ & $0.64/0.64$ &                      & $0.39/0.39$  & $0.53/0.53$ & $0.53/0.53$ \\
+\textbf{RAA}    &  & $0.27/\mathbf{0.28}$  & $\mathbf{0.24}/0.17$ & $\mathbf{0.36}/0.19$ &                      & $0.47/0.47$  & $\mathbf{0.84}/0.73$ & $\mathbf{0.87}/0.75$ &                      & $0.42/\mathbf{0.44}$  & $\mathbf{0.66}/0.55$ & $\mathbf{0.68}/0.57$ \\
+\textbf{Koh}    &  & $0.27/\mathbf{0.61}$  & $\mathbf{0.17}/0.08$ & $\mathbf{0.13}/0.12$ &                      & $0.45/\mathbf{0.53}$  & $\mathbf{0.81}/0.46$ & $\mathbf{0.85}/0.48$ &                      & $0.40/\mathbf{0.56}$  & $\mathbf{0.56}/0.26$ & $\mathbf{0.56}/0.29$ \\
+\textbf{Solans} &  & $0.40/\mathbf{0.48}$  & $\mathbf{0.65}/0.44$ & $\mathbf{0.49}/0.16$ &                      & $0.44/\mathbf{0.45}$  & $\mathbf{0.76}/0.73$ & $\mathbf{0.83}/0.78$ &                      & $0.40/\mathbf{0.56}$  & $\mathbf{0.53}/0.28$ & $\mathbf{0.55}/0.32$ \\ \cmidrule[\heavyrulewidth]{1-13} \addlinespace[0.2cm] 
+\end{tabular}}
+\caption{Average metrics over $\epsilon$ values, obtained for each measure-attack combination and each dataset. We report one pair of values in each entry, corresponding to the two stopping criteria (average fairness and accuracy), and highlight the greatest one.}\label{tab:avg_results}
+\end{table}
+
+\subsection{Results beyond the original paper: using fairness as the early stopping metric}
+While the original codebase seems to use \textit{accuracy} as the early stopping metric (and hence for selecting and saving the best model), we investigate the change in the results if \textit{fairness} is used instead. The main motivation behind such an experiment lies in the assumption that interrupting training based on the fairness measures supposedly yields more relevant states of the poisoned data, effectively resulting in more efficient attacks against fairness. Since the SPD and EOD have similar behavior and equal range $[0,1]$, we employ \textit{average} fairness $(SPD + EOD)/2$ for the task at hand. 
+
+Figure \ref{fig:stopping-metrics} depicts the test accuracy and the average fairness over epochs for two different dataset-attack combinations. An analysis of the curves confirms that the maximum achievable average fairness is much greater than the same measure at the point of minimal accuracy (see Table \ref{tab:stopping-metrics}). The same phenomenon is observed for \textit{any} dataset-attack combinations, as reported in Table \ref{tab:avg_results}: fairness undergoes a stronger degradation if average fairness is used to interrupt the training process and save the best model. This is reflected in the corresponding values of the fairness measures, which appear much higher compared to when accuracy is used.
+
+\begin{table}
+  \begin{minipage}[b]{0.55\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/fairness-early-stopping.pdf}
+    \captionof{figure}{Difference between the two stopping metrics (accuracy and average fairness) for the Solans attack on the German dataset (left), IAF attack on the Drug dataset (right).}
+    \label{fig:stopping-metrics}
+  \end{minipage}
+  \hfill
+  \begin{varwidth}[b]{0.4\linewidth}
+    \centering
+    \resizebox{\columnwidth}{!}{\begin{tabular}{lll}                          \textbf{Value}                                                  & \textbf{\begin{tabular}[c]{@{}l@{}}German\\ (Solans)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Drug\\ (IAF)\end{tabular}} \\ \addlinespace[0.15cm] \toprule \addlinespace[0.15cm] 
+    Min. test accuracy                                                                            & 0.465                    & 0.506                 \\ \midrule[0.1mm]
+    \begin{tabular}[c]{@{}l@{}}Avg. fairness at the point\\ of min. accuracy\end{tabular} & 0.229                    & 0.822                 \\ \midrule[0.1mm]
+    \begin{tabular}[c]{@{}l@{}}Actual max. average\\ fairness\end{tabular}                  & 0.619                    & 1.000            \\ \bottomrule    \\
+    \end{tabular}}
+    \caption{Minimum accuracy, the value of the average fairness at the point of minimum accuracy, and maximum achievable average fairness of the plots of Figure \ref{fig:stopping-metrics}.\\}
+    \label{tab:stopping-metrics}
+  \end{varwidth}%
+\end{table}
+
+\section{Discussion}
+
+Our reproduction reveals that although the proposed methods represent valid novel attacks against the fairness of a model, they are not always superior to other methods in the literature. IAF showed important performance in terms of SPD and EOD degradation, but anchoring attacks were outperformed by the baseline models on multiple occasions. This result conflicts with the findings of the main paper (see Appendix \ref{app:orig-figs}, Fig.\ref{fig:orig-fig2}) where the baselines are generally inferior to the proposed attacks. We had to make several assumptions to solve issues and inconsistencies between the original paper and corresponding implementation (many of which have already been mentioned throughout the report, but we systematically collect them in Appendix \ref{app:issues}). These assumptions are, by definition, uncertain and might have been the cause of the discrepant results. To better understand the source of discrepancy, we initially planned to perform an ablation study, which would have also unveiled more information regarding the model's behavior. This was ultimately not possible, given the time constraints and the contingencies encountered in the reproduction process.
+
+In the remainder of this section, we elaborate on the main claims and our ability to reproduce them. We then present some personal reflections on the overall execution of the work and conclude with a summary and look into future works.
+
+\subsection{Discussion of the results}
+The first claim was found to be reproducible under our experimental setup, as we expected. The parameter $\lambda$ is specifically designed to control the trade-off between accuracy and fairness, hence a rejection of the claim would have implied a major flaw in the core idea of the paper. The other claims focused on the comparison with the two baselines and, while the results presented in Section \ref{sec:results-comparison} are explicative enough, some remarks are still noteworthy.
+
+In general, better statistics of the results would give us a clearer insight into the relative performance of the models. However, only four weeks were allocated for this project and we were unable to re-run the experiments with multiple seeds. For example, the Solans attack outperformed the IAF attack in terms of EOD metric on the Compas dataset (when using accuracy as the stopping method) and led to the non-reproducibility of \hyperlink{claim-3}{\textit{Claim 3}}. Yet, this difference is relatively small and a measure of uncertainty could potentially reverse our decision. 
+
+Furthermore, it was shown that the final fairness metrics can highly vary depending on the chosen stopping method. This is especially prominent for \hyperlink{claim-4}{\textit{Claim 4}}, which was accepted under the assumption that accuracy was used for stopping and saving the best model. In reality, Koh attack outperforms NRAA on both Compas and Drug datasets in the terms of SPD/EOD metrics, if fairness is used instead. Since the validity of the claim depends on the stopping metric of choice, we argue that the claim is much weaker than originally proposed. Similarly, compare the IAF and the Koh attack in terms of fairness measures, using accuracy as the stopping criteria. On the Drug dataset, IAF's SPD/EOD metrics are respectively $2.89\times$/$2.62\times$ higher than Koh's. This gap tightens if fairness is used: IAF's SPD/EOD metrics become $1.022\times$/$1.024\times$ higher. Although these numbers indicate the same result, we find the claim to be weaker than proposed, as the superior performance of the IAF attack is diminished by the use of a different stopping metric.
+
+Finally it is important to notice the different behavior of the test accuracy and the average fairness (Fig. \ref{fig:stopping-metrics}) used as stopping criteria. While the latter has a relatively high variance, the former is pretty constant, meaning that using fairness as the stopping metric does not result in significant variations in the model's accuracy. Contrarily, as empirically proved by our experiments, it can be highly beneficial for the fairness measures. 
+
+\subsection{Reflection: What was easy? What was difficult?}
+The new methods presented in the paper were described both intuitively and formally, with a clear mathematical structure. The authors also provided figures to aid the intuition on how new attacks can affect decision boundaries, which allowed us to easily understand the core novel ideas presented in the publication.
+
+However, it was not trivial to re-implement the proposed methods, because many details required for the implementation do not appear in the paper. The provided open-source implementation was ultimately hard to follow due to its convoluted organization, lack of documentation, poorly named functions/variables, and abundance of unused code. Even setting up a working environment using the authors-given dependencies took longer than one would expect, prompting us to get help from the authors. Eventually, the hope to aid future experiments motivated the decision to make the code compatible with up-to-date dependencies. This was one of the biggest struggles because the codebase heavily relies on packages that underwent major updates (e.g. \texttt{TensorFlow} and \texttt{CVXpy}).
+
+The authors also provided pre-processed datasets. We spent a considerable amount of time trying to replicate their exact pipeline through reverse-engineering of the given files. Additionally, after recognizing some imperfections in the code and inconsistencies with the paper, we verified all of the existing implementation details to make sure that no further errors were made. This was a daunting task, given the complete lack of documentation and intuitive variable use.
+
+\subsection{Communication with original authors}
+To reiterate, we have initially contacted the main author to aid us with the dependency issues, who helped us with setting up a working environment. We then had additional contacts regarding the dataset pre-processing procedure. The author provided us with some indications on the pipeline and pointed at some useful resources. Eventually, we decided to gain a better understanding of the datasets through reverse-engineering.
+
+\subsection{Conclusion}
+In this paper, we have presented a reproducibility study of "Exacerbating Algorithmic Bias through Fairness Attacks", whereon we can draw some conclusions. Due to all the mentioned issues and inconsistencies (collected in Appendix \ref{app:issues}), we find it not possible to reproduce the original results from sole use of the paper, and difficult even in possession of the provided codebase. Yet, we managed to obtain similar findings that supported three out of the five main claims of the publication, albeit using partial re-implementations and numerous assumptions. Ascertaining the validity of such assumptions is therefore important for future works. Moreover, further studies could extend the classifier to work with multiple demographic groups and investigate the results using different fairness metrics.
