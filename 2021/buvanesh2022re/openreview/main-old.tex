@@ -1,3 +1,109 @@
+\documentclass{article}
+
+\usepackage{graphicx,booktabs,array}
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[dvipsnames]{xcolor}
+\usepackage[]{neurips_2019}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{amsthm}
+\usepackage{amssymb} % for the checkmark in our contribution table
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+%Splitting footnotes into 2 columns
+\usepackage{dblfnote}
+\usepackage[nopar]{lipsum}% dummy text
+
+
+% different column sizes. Use directly in tabular directive with c, l, r. Overflowing text wraps automatically.
+% \newcolumntype{L05}{>{\centering\arraybackslash}m{0.5cm}}
+% \newcolumntype{L1}{>{\centering\arraybackslash}m{1cm}}
+% \newcolumntype{L2}{>{\centering\arraybackslash}m{2cm}}
+% \newcolumntype{L3}{>{\centering\arraybackslash}m{3cm}}
+
+% \usepackage[backend=biber, style=numeric]{biblatex}
+
+
+% \addbibresource{Bibliography.bib} %Imports bibliography file
+% to avoid loading the natbib package, add option nonatbib:
+    % \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[normalem]{ulem}
+\newif{\ifhidecomments}
+
+\makeatletter
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
+
+\title{[Re] AdaBelief Optimizer: Adapting Stepsizes by the
+Belief in Observed Gradients}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  David S.~Hippocampus\thanks{Use footnote for providing further information
+    about author (webpage, alternative address)---\emph{not} for acknowledging
+    funding agencies.} \\
+  Department of Computer Science\\
+  Cranberry-Lemon University\\
+  Pittsburgh, PA 15213 \\
+  \texttt{hippo@cs.cranberry-lemon.edu} \\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+\begin{document}
+
+\maketitle
+
 \section*{\centering Reproducibility Summary}
 
 % \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
@@ -474,7 +580,7 @@ Apollo \cite{Apollo} is another optimizer that claims to achieve better converge
 
 \subsubsection{ Evaluating GAN training stability} 
 \label{lab:training_stability}
-To assess stability of AdaBelief while training GANs, we look into difference between SN-GAN's generator and discriminator training losses on CIFAR-10. We do this for AdaBelief, Adam and RMSProp (since they have top-2 FID scores on SN-GAN) in the adaptive family, and with SGD for a comparison. Fig. 12 in supplementary plots the generator and discriminator training losses. We observe that the adaptive methods are more stable than SGD and within the adaptive family the order of stability from most stable to least stable varies as RMSProp, AdaBelief, Adam.
+To assess stability of AdaBelief while training GANs, we look into difference between SN-GAN's generator and discriminator training losses on CIFAR-10. We do this for AdaBelief, Adam and RMSProp (since they have top-2 FID scores on SN-GAN) in the adaptive family, and with SGD for a comparison. Fig. \ref{table:gen_disc_loss_gap} plots the generator and discriminator training losses. We observe that the adaptive methods are more stable than SGD and within the adaptive family the order of stability from most stable to least stable varies as RMSProp, AdaBelief, Adam.abl
 
 \subsubsection{ Evaluating generalization ability}
 \label{lab:generalization_ability}
@@ -646,21 +752,21 @@ Based on our experiments, ablation studies and analysis, we find that AdaBelief 
 % + adabelief is a promising optimizer \\
 % + repeat the brief results: stable for GAN, best for LSTM..... \\ \\
 
-% \begin{table}[htbp]
-%     \begin{center}
-%     \begin{tabular}{c c}
-%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_AdaBelief.png} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_SGD.png} \\
-%     (a) AdaBelief & (b) SGD \\
-%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_Adam.png} &
-%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_RMSProp.png} \\ 
-%     (c) Adam & (d) RMSProp \\
-%     \end{tabular}
-%     \vspace{2mm}
-%     \captionof{figure}{SN-GAN Generator Discriminator loss after smoothing the curves with $\beta$ = 0.95} 
-%     \label{table:gen_disc_loss_gap}
-%     \end{center}
-% % \end{sidewaystable}
-% \end{table}
+\begin{table}[htbp]
+    \begin{center}
+    \begin{tabular}{c c}
+    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_AdaBelief.png} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_SGD.png} \\
+    (a) AdaBelief & (b) SGD \\
+    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_Adam.png} &
+    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_RMSProp.png} \\ 
+    (c) Adam & (d) RMSProp \\
+    \end{tabular}
+    \vspace{2mm}
+    \captionof{figure}{SN-GAN Generator Discriminator loss after smoothing the curves with $\beta$ = 0.95} 
+    \label{table:gen_disc_loss_gap}
+    \end{center}
+% \end{sidewaystable}
+\end{table}
 
 
 
@@ -974,3 +1080,9 @@ Based on our experiments, ablation studies and analysis, we find that AdaBelief 
 % \printbibliography
 \bibliographystyle{plain}
 \bibliography{Bibliography}
+
+
+
+\end{document}
+
+

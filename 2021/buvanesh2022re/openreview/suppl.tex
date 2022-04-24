@@ -1,5 +1,127 @@
-\newpage
-\section*{Appendix}
+\documentclass{article}
+
+\usepackage{graphicx,booktabs,array}
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[]{neurips_2019}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+%added
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tabu}
+\tabulinesep=2.0mm
+\usepackage{float}
+\usepackage{rotating}
+% \usepackage{adjustbox}
+
+
+% \usepackage[backend=biber, style=numeric]{biblatex}
+
+
+% \addbibresource{Bibliography.bib} %Imports bibliography file
+% to avoid loading the natbib package, add option nonatbib:
+    % \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[normalem]{ulem}
+\newif{\ifhidecomments}
+
+
+\title{Supplementary for: [Re] AdaBelief Optimizer, Adapting Stepsizes by the
+Belief in Observed Gradients}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  David S.~Hippocampus\thanks{Use footnote for providing further information
+    about author (webpage, alternative address)---\emph{not} for acknowledging
+    funding agencies.} \\
+  Department of Computer Science\\
+  Cranberry-Lemon University\\
+  Pittsburgh, PA 15213 \\
+  \texttt{hippo@cs.cranberry-lemon.edu} \\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+\begin{document}
+
+\maketitle
+
+
+
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ccc}
+    
+%     \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
+    
+    
+%     \end{tabular}
+%  %                 
+%     \caption{\label{tab:LSTM_PTB_Plots} Left to right: perplexity ([$\mu \pm \sigma$]) on Penn Treebank for 1,2,3-layer LSTM. Lower is better}
+%     \end{center}
+% \end{table}
+
+
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/fig_lstm.png}
+% 	\caption[Mask color palette]{Mask color palette}
+% 	\label{fig:Color_palette}
+% \end{figure}
+
+
+% LSTM train ppl
 \section{Experiments on language modeling}
 \label{sec:LSTM}
 \subsection{Penn Treebank dataset}
@@ -8,7 +130,7 @@ We ran experiments using LSTM \cite{LSTM} models on Penn Treebank dataset \cite{
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5atrain.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5btrain.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5ctrain.png} \\
     \end{tabular}
     \vspace{2mm}
@@ -20,7 +142,7 @@ We ran experiments using LSTM \cite{LSTM} models on Penn Treebank dataset \cite{
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5atest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5btest.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5ctest.png} \\
     \end{tabular}
     \vspace{2mm}
@@ -35,7 +157,7 @@ We perform experiments on WikiText-2 dataset \cite{WikiText_2} using LSTM models
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_one_layertrain.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_two_layertrain.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_three_layertrain.png} \\
     \end{tabular}
     \vspace{2mm}
@@ -47,7 +169,7 @@ We perform experiments on WikiText-2 dataset \cite{WikiText_2} using LSTM models
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_one_layertrain.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_two_layertrain.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_three_layertrain.png} \\
     \end{tabular}
     \vspace{2mm}
@@ -58,12 +180,12 @@ We perform experiments on WikiText-2 dataset \cite{WikiText_2} using LSTM models
 % \begin{table}[htbp]
 %     \begin{center}
 %     \begin{tabular}{ccc}
-
+    
 %     \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
-
-
+    
+    
 %     \end{tabular}
-%  %
+%  %                 
 %     \captionof{figure}{I don't want a table: My way} \label{table:mul}
 %     \end{center}
 % \end{table}
@@ -71,12 +193,12 @@ We perform experiments on WikiText-2 dataset \cite{WikiText_2} using LSTM models
 % \begin{table}[htbp]
 %     \begin{center}
 %     \begin{tabular}{ccc}
-
+    
 %     \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
-
-
+    
+    
 %     \end{tabular}
-%  %
+%  %                 
 %     \captionof{figure}{I don't want a table: My way} \label{table:mul}
 %     \end{center}
 % \end{table}
@@ -110,7 +232,7 @@ We ran experiments on Cifar10 and Cifar100 on VGG11 \cite{VGG}, ResNet34 \cite{R
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4aTrain.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4bTrain.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4cTrain.png} \\
     (a) VGG11 on Cifar10 & (b) Resnet34 on Cifar10 & (c) Densenet121 on Cifar10 \\
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4dTrain.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4eTrain.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4fTrain.png} \\
@@ -125,7 +247,7 @@ We ran experiments on Cifar10 and Cifar100 on VGG11 \cite{VGG}, ResNet34 \cite{R
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4atest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4btest.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4ctest.png} \\
     (a) VGG11 on Cifar10 & (b) Resnet34 on Cifar10 & (c) Densenet121 on Cifar10 \\
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4dtest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4etest.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4ftest.png} \\
@@ -139,11 +261,11 @@ We ran experiments on Cifar10 and Cifar100 on VGG11 \cite{VGG}, ResNet34 \cite{R
 \section{Experiments on generative modeling}
 \label{sec:GANs}
 \subsection{WGAN}
-We run experiments on Cifar10 dataset using WGAN \cite{WGAN} for the task of generative modelling. We present a collage of fake images output by WGAN for each optimizer (Fig. \ref{table:WGAN_fake_all}).
+We run experiments on Cifar10 dataset using WGAN \cite{WGAN} for the task of generative modelling. We present a collage of fake images output by WGAN for each optimizer (Fig. \ref{table:WGAN_fake_all}). 
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_adabelief.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_adabound.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_adam.png} \\
     (a) AdaBelief & (b) AdaBound & (c) Adam \\
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_msvag.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_fromage.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_radam.png} \\
@@ -157,11 +279,11 @@ We run experiments on Cifar10 dataset using WGAN \cite{WGAN} for the task of gen
 \end{table}
 
 \subsection{WGAN-GP}
-We run experiments on Cifar10 dataset using WGAN-GP \cite{WGAN-GP}. We present a collage of fake images output by WGAN-GP for each optimizer (Fig. \ref{table:WGAN-GP_fake_all}). Fig. \ref{table:WGAN-GP_fake_all_partials} shows the images obtained from training Padam \cite{padam} using different partials.
+We run experiments on Cifar10 dataset using WGAN-GP \cite{WGAN-GP}. We present a collage of fake images output by WGAN for each optimizer (Fig. \ref{table:WGAN-GP_fake_all}). Fig. \ref{WGAN-GP_fake_all_partials} shows the images obtained from training Padam \cite{padam} using different partials. 
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_adabelief.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_adabound.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_adam.png} \\
     (a) AdaBelief & (b) AdaBound & (c) Adam \\
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_msvag.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_fromage.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_radam.png} \\
@@ -179,7 +301,7 @@ We run experiments on Cifar10 dataset using WGAN-GP \cite{WGAN-GP}. We present a
 % \begin{table}[h]
 % 	\centering
 % 	\begin{tabu} to \textwidth {  X[c,m]  X[c,m]  X[c,m]  }
-
+		
 % 		\includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_Padam_0.0625.png} &
 % 		\includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_Padam_0.125.png} &
 % 		\includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_Padam_0.2.png}  \\
@@ -199,7 +321,7 @@ We run experiments on Cifar10 dataset using WGAN-GP \cite{WGAN-GP}. We present a
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c c}
-
+    
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/real_samples.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.125.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.2.png} \\
     (a) Real & (b) $p=0.125$ & (c) $p=0.2$ \\
     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.0625.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.25.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.4.png} \\
@@ -217,8 +339,8 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c}
-
-    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adabelief_Q.jpeg} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adam_Q.jpeg}  \\
+    
+    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adabelief_Q.jpeg} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adam_Q.jpeg}  \\ 
     \end{tabular}
     \vspace{2mm}
     \captionof{figure}{Q value on RL toy experiment using different optimizer} \label{table:Q_value}
@@ -228,8 +350,8 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 \begin{table}[htbp]
     \begin{center}
     \begin{tabular}{c c}
-
-    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adabelief_Reward.jpeg} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adam_Reward.jpeg}  \\
+    
+    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adabelief_Reward.jpeg} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/RL/Adam_Reward.jpeg}  \\ 
     \end{tabular}
     \vspace{2mm}
     \captionof{figure}{Reward function on RL toy experiment using different optimizer} \label{table:Reward_value}
@@ -245,7 +367,7 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 % \begin{table}[htbp]
 %     \begin{center}
 %     \begin{tabular}{c c c}
-
+    
 %     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/WT-2_one_layertest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.125.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.2.png} \\
 %     (a) Real & (b) $p=0.125$ & (c) $p=0.2$ \\
 %     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.0625.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.25.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.4.png} \\
@@ -264,7 +386,7 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 % \begin{table}[htbp]
 %     \begin{center}
 %     \begin{tabular}{c c c}
-
+    
 %     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5a_reruntest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5b_reruntest.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5c_reruntest.png} \\
 %     \end{tabular}
 %     \vspace{2mm}
@@ -281,7 +403,7 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 % \begin{table}[htbp]
 %     \begin{center}
 %     \begin{tabular}{c c c}
-
+    
 %     \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5atest.png} & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5btest.png}  & \includegraphics[width=0.305\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5ctest.png} \\
 %     \end{tabular}
 %     \vspace{2mm}
@@ -302,7 +424,7 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 % \begin{table}[h]
 %   \centering
 %   \begin{tabu} to \textwidth {  X[c,m]  X[c,m]  X[c,m]  }
-
+    
 %     \includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/real_samples.png} &
 %     \includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.125.png} &
 %     \includegraphics[scale=0.25]{Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_Padam_0.2.png}  \\
@@ -329,25 +451,25 @@ We train an agent to learn to play Space Invaders (Atari Game) using DQN \cite{D
 
 % table with convergence epoch of each optimizer
 
-\section{Stability Analysis}
-\subsection{SN-GAN}
-To analyse the stability of GANs we measure the gap between generator and discriminator losses at different stages of training in SN-GAN \cite{SN-GAN} on Cifar10 dataset. We do this exercise for AdaBelief \cite{zhuang_adabelief_2020}, SGD \cite{SGD}, Adam \cite{Adam}, RMSProp \cite{RMSProp}. Figure \ref{table:gen_disc_loss_gap} highlights the difference in \textcolor{red}{red}. A higher gap is attributed to unstable training and a small gap means that the training is stable. From this we can see that the order of stability from most to least follows as: RMSProp, AdaBelief, Adam, SGD.
+% \section{Stability Analysis}
+% \subsection{SN-GAN}
+% To analyse the stability of GANs we measure the gap between generator and discriminator losses at different stages of training in SN-GAN \cite{SN-GAN} on Cifar10 dataset. We do this exercise for AdaBelief \cite{zhuang_adabelief_2020}, SGD \cite{SGD}, Adam \cite{Adam}, RMSProp \cite{RMSProp}. Figure \ref{table:gen_disc_loss_gap} highlights the difference in \textcolor{red}{red}. A higher gap is attributed to unstable training and a small gap means that the training is stable. From this we can see that the order of stability from most to least follows as: RMSProp, AdaBelief, Adam, SGD.
 
-\begin{table}[htbp]
-    \begin{center}
-    \begin{tabular}{c c}
-    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_AdaBelief.png} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_SGD.png} \\
-    (a) AdaBelief & (b) SGD \\
-    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_Adam.png} &
-    \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_RMSProp.png} \\
-    (c) Adam & (d) RMSProp \\
-    \end{tabular}
-    \vspace{2mm}
-    \captionof{figure}{SN-GAN Generator Discriminator loss after smoothing the curves with $\beta$ = 0.95}
-    \label{table:gen_disc_loss_gap}
-    \end{center}
-% \end{sidewaystable}
-\end{table}
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{c c}
+%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_AdaBelief.png} & \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_SGD.png} \\
+%     (a) AdaBelief & (b) SGD \\
+%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_Adam.png} &
+%     \includegraphics[width=0.45\textwidth]{Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_RMSProp.png} \\ 
+%     (c) Adam & (d) RMSProp \\
+%     \end{tabular}
+%     \vspace{2mm}
+%     \captionof{figure}{SN-GAN Generator Discriminator loss after smoothing the curves with $\beta$ = 0.95} 
+%     \label{table:gen_disc_loss_gap}
+%     \end{center}
+% % \end{sidewaystable}
+% \end{table}
 
 \section{Convergence Analysis}
 \subsection{Cifar10, Cifar100, LSTM}
@@ -396,3 +518,9 @@ To understand convergence abilites of different optimizers we make use of defini
 % \printbibliography
 \bibliographystyle{plain}
 \bibliography{supp_bibliography}
+
+
+
+\end{document}
+
+
