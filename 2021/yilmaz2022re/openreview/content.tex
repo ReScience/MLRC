@@ -22,8 +22,6 @@ The paper is well-written. The main components of the LiftedGAN was open-source,
 \subsection*{Communication with original authors}
 We were in contact with the authors since the beginning of the challenge. We could not achieve to reproduce 3D evaluation and reconstruction parts, fortunately, the authors swiftly answered our questions regarding the topic.
 
-\newpage
-
 \section{Introduction}
 
 The paper \cite{shi2021lifting} proposes a framework that disentangles the latent space of a pre-trained StyleGAN2 \cite{karras2020analyzing} for 3D-aware face generation. The previous approaches are trained to generate random faces, thus they do not offer direct manipulation over the semantic attributes such as lighting or pose in the generated image. A number of studies exists that aims to manipulate the semantic attributes of the generated images directly \cite{tian2018crgan, 8099624, 8578974, deng2020disentangled, nguyenphuoc2019hologan}. Although these feature manipulation methods have shown ability to generate faces with high visual quality under assigned poses, it is unclear whether other features such as identity are preserved when we change the pose parameters. In the paper \cite{shi2021lifting}, to overcome this problem, a pre-trained StyleGAN2 is distilled into a 3D-aware generator, which outputs the generated image with its viewpoints, light direction and 3D information. 
@@ -44,7 +42,7 @@ The proposed framework, namely LiftedGAN, claims to provide on-par performance t
     \item Are the qualitative results visually-plausible?
     \item Could our replication obtain similar qualitative results compared to the reported qualitative results in the original paper?
     \item Could our replication obtain similar FID scores compared to the reported results in the original paper?
-    \item How does the architecture perform when trained on other datasets (e.g. CelebA)?
+    \item How does the architecture perform when trained on other datasets (\textit{e.g.}, CelebA)?
 \end{itemize}
 
 %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
@@ -61,12 +59,12 @@ In this section, we introduce the implementation details of LiftedGAN, the point
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=1\linewidth]{../openreview/images/LiftedGAN.png}
+\includegraphics[width=1\linewidth]{images/LiftedGAN.png}
 \caption{Overview of LiftedGAN architecture. The purple blocks indicate the modules from the pre-trained StyleGAN2, which are not updated during training. The blue blocks are the modules to be trained. Obtained from the original paper \cite{shi2021lifting}.}
 \label{fig:LiftedGAN}
 \end{figure}
 
-The main idea of LiftedGAN is to train a 3D generative network by leveraging the knowledge in pre-trained StyleGAN2. The StyleGAN2 network is composed of two parts: a multi-layer perceptron (MLP) that maps a latent code $z \in Z$ to a style code $w \in W$, and a 2D generator $G_{2D}$ that synthesizes a face image from the style code $w$. LiftedGAN aims to build a 3D generator that disentangles the generation process of $G_{2D}$ into different 3D modules, including texture, shape, lighting and pose, which are then utilized to render a 2D face image. As shown in the Figure \ref{fig:LiftedGAN}, the framework involves two pathways, which are the reconstruction pathway and style manipulation (\textit{i.e.} perturbation) pathway. 
+The main idea of LiftedGAN is to train a 3D generative network by leveraging the knowledge in pre-trained StyleGAN2. The StyleGAN2 network is composed of two parts: a multi-layer perceptron (MLP) that maps a latent code $z \in Z$ to a style code $w \in W$, and a 2D generator $G_{2D}$ that synthesizes a face image from the style code $w$. LiftedGAN aims to build a 3D generator that disentangles the generation process of $G_{2D}$ into different 3D modules, including texture, shape, lighting and pose, which are then utilized to render a 2D face image. As shown in the Figure \ref{fig:LiftedGAN}, the framework involves two pathways, which are the reconstruction pathway and style manipulation (\textit{i.e.}. perturbation) pathway. 
 
 \subsubsection{3D Generator}
 As shown in Figure \ref{fig:LiftedGAN}, the 3D generator, denoted as $G_{3D}$, is composed of five trainable sub-networks: $D_V$ , $D_L$, $D_S$, $D_T$, $M$, a pre-trained StyleGAN2 $G_{2D}$ and a differentiable renderer $R$. $M$ is used as style manipulation network that transfers a style code $\hat{W}$ to a new style code with a specified lighting and viewpoint. This approach creates $w_0 = M(\hat{w}, L_0, V_0)$ thus, $G_{2D}(w_0)$ outputs a lighting and viewpoint neutralized face image. The rest of the sub-networks $D_V$, $D_L$, $D_S$, $D_T$ are responsible from the viewpoint, lighting, depth and shape representation, respectively. Finally, $R$ is used to output a rendered image $I_w = R(A,S,T,V,L)$ where $A$ is the face image with neutral viewpoint and lighting, $S$, $T$, $V$, $L$ are the depth, shape representation, desired viewpoint and desired lighting, respectively.
@@ -81,13 +79,12 @@ L_{rec} = || I_w - \hat{I}_w ||_1 + \lambda_{perc}  L_{perc}(I_w, \hat{I}_w)
 where $L_{perc}$ refers to the perceptual loss \cite{johnson2016perceptual} using a pre-trained VGG-16 network \cite{simonyan2015deep}, $\hat{I}_w$ is the proxy image output by StyleGAN2 and $I_w$ is the image rendered by $R$. $L_{flip}$ has the same formulation as $L_{rec}$ except that it uses flipped albedo and shape maps during the rendering.
 
 Perturbation loss is defined as following:
-\begin{equation}
-    \begin{split}
-    L_{LV_{cyc}} &= || \tilde{V}' - V' ||^2  + || \tilde{L}'  - L' ||^2 \\
-    L^{(a)}_{perturb} = d(I'_w, G_{2D}(w')) + \beta \frac{{||w'- \mu_w||}^2}{2\sigma^2_w} &, L^{(b)}_{perturb} = d(R(A,S,T,V',L'), \hat{I}_w') + \lambda_{LV_{cyc}}L_{LV_{cyc}} \\
-    L_{perturb} &= L^{(a)}_{perturb} +  L^{(a)}_{perturb}
-    \end{split}
-\end{equation}
+\begin{gather}
+    L_{LV_{cyc}} = || \tilde{V}' - V' ||^2  + || \tilde{L}'  - L' ||^2 \\
+    L^{(a)}_{perturb} = d(I'_w, G_{2D}(w')) + \beta \frac{{||w'- \mu_w||}^2}{2\sigma^2_w} \\
+    L^{(b)}_{perturb} = d(R(A,S,T,V',L'), \hat{I}_w') + \lambda_{LV_{cyc}}L_{LV_{cyc}} \\
+    L_{perturb} = L^{(a)}_{perturb} +  L^{(a)}_{perturb}
+\end{gather}
 where $\hat{w}$ is a randomly sampled style code, $w'$ is the manipulated style code,
 %= M(\hat{w}, V', L')$,
 $\hat{I}_{w'}$ represents the proxy image generated by the manipulated style code,
@@ -113,7 +110,7 @@ The hyper-parameters used in the original work are mostly the objective function
 %As mentioned in the original work, the hyper-parameters $\lambda_{rec}$, $\lambda_{perc}$, $\lambda_{flip}$, $\lambda_{perturb}$, $\beta$, $\lambda_{LVcyc}$ , $\lambda_{idt}$ and $\lambda_{regA}$ are set to $5.0$, $1.0$, $0.8$, $2.0$, $0.5$, $2.0$, $1.0$ and $0.01$ respectively for all FFHQ and CelebA settings. For the AFHQ Cat dataset experiments we used the hyperparameters $\lambda_{rec}$, $\lambda_{perc}$, $\lambda_{flip}$, $\lambda_{perturb}$, $\beta$, $\lambda_{LVcyc}$ , $\lambda_{idt}$ and $\lambda_{regA}$ as $5.0$, $1.0$, $0.8$, $2.0$, $4.0$, $0.0$, $1.0$ and $5e-3$ respectively.%
 We have also considered the batch size and learning rate as hyper-parameters, and they are set to $8$ and $1e-4$, respectively for all of our experiments.
 
-\begin{table}[h!]
+\begin{table}[t!]
 \centering
 \caption{Objective function coefficients}
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
@@ -135,9 +132,9 @@ Following the paper, we have conducted our experiments on two well-known dataset
 \begin{tabular}{|l|c|c|c|}
 \hline
 \multicolumn{1}{|c|}{\textbf{Dataset Name}} & \textbf{Sample Size} & \textbf{Image Dimension} & \textbf{Training Dimension} \\ \hline
-FFHQ                                        & 70,000               & 1024 \times 1024     & 256 \times 256          \\ \hline
-AFHQ Cat                                    & 5,000                 & 512 \times 512  & 256 \times 256              \\ \hline
-CelebA                                      & 202,599              & 178 \times 218     & 256 \times 256             \\ \hline
+FFHQ                                        & 70,000               & $1024 \times 1024 $    & $256 \times 256$          \\ \hline
+AFHQ Cat                                    & 5,000                 & $512 \times 512$  & $256 \times 256$              \\ \hline
+CelebA                                      & 202,599              & $178 \times 218$     & $256 \times 256$             \\ \hline
 \end{tabular}
 \label{tab:datasets}
 \end{table}
@@ -145,7 +142,7 @@ CelebA                                      & 202,599              & 178 \times 
 \subsection{Experimental setup and code}
 In this study, we have followed the same protocol described in the original paper and the official repository for the FFHQ and AFHQ Cat experiments. For the additional experiments on CelebA, we have re-trained StyleGAN2 before training the LiftedGAN, which requires a pre-trained StyleGAN2.
 
-We have used Fr\'echet Inception Distance (FID) score to measure the quantitative results, as in the original work. Our implementation and the trained weights are open-sourced, and can be found at: \url{https://anonymous.4open.science/r/lifting-2d-stylegan-for-3d-aware-face-generation-4B11}
+We have used Fr\'echet Inception Distance (FID) score to measure the quantitative results, as in the original work. The trained weights are open-sourced, and can be found at our repository.
 
 
 \subsection{Computational requirements}
@@ -161,9 +158,9 @@ We have conducted all experiments by following the descriptions given in the pap
 
 %\begin{figure}[h!]%
 %    \centering
-%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/original_faces.png} }}%
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_faces.png} }}%
 %    \qquad
-%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/re_faces.png} }}%
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_faces.png} }}%
  %   \caption{FFHQ dataset face generation example.}%
 %    \label{fig:example}%
 %\end{figure}    
@@ -171,29 +168,29 @@ We have conducted all experiments by following the descriptions given in the pap
 \subsection{Results reproducing the original work}
 \subsubsection{Qualitative results}
 
-As shown in Figure \ref{fig:original_vs_re_faces}, we have achieved visually on-par face generation performance on FFHQ. Although there are slight differences in our results compared to the results presented in the original work (\textit{e.g.} the absence of glasses in the second column and the first row), they do not reduce the face generation quality and the identical features for all samples are mostly preserved. We provide more face generation examples for more extensive comparison in our supplementary materials and the reproduction repository.
+As shown in Figure \ref{fig:original_vs_re_faces}, we have achieved visually on-par face generation performance on FFHQ. Although there are slight differences in our results compared to the results presented in the original work (\textit{e.g.}, the absence of glasses in the second column and the first row), they do not reduce the face generation quality and the identical features for all samples are mostly preserved. We provide more face generation examples for more extensive comparison in our supplementary materials and the reproduction repository.
 
-\begin{figure}[b]
+\begin{figure}[t!]
     \centering
-    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/original_faces.png}} 
-    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/re_faces.png}} 
+    \subfigure{\includegraphics[width=\textwidth]{images/original_faces.png}} 
+    \subfigure{\includegraphics[width=\textwidth]{images/re_faces.png}} 
     \caption{Face generation example on FFHQ. The first row is the results produced by the original weights, the second row is the results produced by our reproduced weights.}
     \label{fig:original_vs_re_faces}
 \end{figure}
 
+Figure \ref{fig:rotation} demonstrates the comparison of the viewpoint rotation between the outputs obtained by using the weights given by the authors and the outputs reproduced by our work. At this point, we validate that LiftedGAN achieves to change the viewpoints in the generated images without affecting the other visual features. Moreover, in Figure \ref{fig:lighting}, we show both qualitative results of the original work and our reproduction study on changing the direction of the light source task on FFHQ dataset. We can state that LiftedGAN also achieves to change the direction of the light source in generated images. In our study, we were able to reproduce these results.
+
 \begin{figure}[h!]%
     \centering
-    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/original_yaw.png} }
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/original_pitch.png} }}%
+    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{images/original_yaw.png} }
+    {\includegraphics[width=0.47\linewidth]{images/original_pitch.png} }}%
     \qquad
-    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/re_yaw.png} }
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/re_pitch.png} }}%
+    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{images/re_yaw.png} }
+    {\includegraphics[width=0.47\linewidth]{images/re_pitch.png} }}%
     %https://www.overleaf.com/project/61ed17d700805941b9f7c052
     \caption{The viewpoint rotation examples on FFHQ. The images on left demonstrate the changes in the yaw axis, while the images on right present the results of changing the pitch axis.}%
     \label{fig:rotation}%
 \end{figure}
-
-Figure \ref{fig:rotation} demonstrates the comparison of the viewpoint rotation between the outputs obtained by using the weights given by the authors and the outputs reproduced by our work. At this point, we validate that LiftedGAN achieves to change the viewpoints in the generated images without affecting the other visual features. Moreover, in Figure \ref{fig:lighting}, we show both qualitative results of the original work and our reproduction study on changing the direction of the light source task on FFHQ dataset. We can state that LiftedGAN also achieves to change the direction of the light source in generated images. In our study, we were able to reproduce these results.
 
 In the original work, the examples of face generation results between interpolated latent codes are demonstrated. The main claim in the paper is that LiftedGAN can achieve a smooth change between two disparate samples. To validate this claim, we have generated the face images by using the interpolated latent codes, and observed the effect of the viewpoint rotation strategy, as in the original work. Our reproduced weights can generate similar faces to the ones produced by the original weights with the same viewpoint rotations, as presented in Figure \ref{fig:interpolation}. 
 
@@ -201,17 +198,17 @@ Qualitative results of the ablation study for our reproduction are shown in Figu
 
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/original_yaw.png}} 
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/re_yaw.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/original_yaw.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_yaw.png}} 
 %    \caption{FFHQ dataset rotate (yaw) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
 %    \label{fig:original_vs_re_yaw}
 %\end{figure}
 
 %\begin{figure}[h!]%
 %    \centering
-%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/original_pitch.png} }}%
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_pitch.png} }}%
 %    \qquad
-%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/re_pitch.png} }}%
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_pitch.png} }}%
 %    \caption{FFHQ dataset rotate (pitch) example.}%
 %    \label{fig:example}%
 %\end{figure}
@@ -219,8 +216,8 @@ Qualitative results of the ablation study for our reproduction are shown in Figu
 
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/original_pitch.png}} 
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/re_pitch.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/original_pitch.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_pitch.png}} 
 %    \caption{FFHQ dataset rotate (pitch) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
 %    \label{fig:original_vs_re_pitch}
 %\end{figure}
@@ -228,17 +225,17 @@ Qualitative results of the ablation study for our reproduction are shown in Figu
 
 %\begin{figure}[h!]%
 %    \centering
-%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/original_light.png} }}%
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_light.png} }}%
 %    \qquad
-%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/re_light.png} }}%
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_light.png} }}%
 %    \caption{FFHQ dataset light source example.}%
 %    \label{fig:example}%
 %\end{figure}
 
 \begin{figure}[t]
     \centering
-    \subfigure{\includegraphics[width=0.6\textwidth]{../openreview/images/original_light.png}} 
-    \subfigure{\includegraphics[width=0.6\textwidth]{../openreview/images/re_light.png}} 
+    \subfigure{\includegraphics[width=0.6\textwidth]{images/original_light.png}} 
+    \subfigure{\includegraphics[width=0.6\textwidth]{images/re_light.png}} 
     \caption{Changing the direction of the light source on FFHQ. The first row shows the results produced by the original weights, and the second row presents the results produced by our reproduced weights.}
     \label{fig:lighting}
 \end{figure}
@@ -246,8 +243,8 @@ Qualitative results of the ablation study for our reproduction are shown in Figu
 
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/orijinal_interpolation.png}} 
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/re_interpolation.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/orijinal_interpolation.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_interpolation.png}} 
 %    \caption{Example generation results between interpolated latent codes. First two rows are the results generated with original weights, third and fourth rows are the results generated with reproduced weights.}
 %    \label{fig:interpolation}
 %\end{figure}
@@ -258,10 +255,10 @@ Qualitative results of the ablation study for our reproduction are shown in Figu
 \begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{Experiment Name} & \multicolumn{1}{l|}{\textbf{Dataset}} & \multicolumn{1}{l|}{\textbf{FID (Reprod.)}} & \multicolumn{1}{l|}{\textbf{FID (Orig.)}} \\ \hline
-LiftedGAN wo\_flip        & FFHQ                                  & 15.50                             & 28.69                                    \\ \hline
-LiftedGAN wo\_perturb     & FFHQ                                  & 19.78                             & 21.3                                    \\ \hline
-LiftedGAN wo\_idt         & FFHQ                                  & 24.44                             & 30.63                                 \\ \hline
-LiftedGAN wo\_rega        & FFHQ                                  & 24.28                              & 27.34                                      \\ \hline
+LiftedGAN \textit{wo\_flip}        & FFHQ                                  & 15.50                             & 28.69                                    \\ \hline
+LiftedGAN \textit{wo\_perturb}     & FFHQ                                  & 19.78                             & 21.3                                    \\ \hline
+LiftedGAN \textit{wo\_idt}         & FFHQ                                  & 24.44                             & 30.63                                 \\ \hline
+LiftedGAN \textit{wo\_rega}        & FFHQ                                  & 24.28                              & 27.34                               \\ \hline
 LiftedGAN                 & FFHQ                                  & 25.54                             & 29.81                                  \\ \hline
 \end{tabular}
 \label{tab:fid}
@@ -273,16 +270,16 @@ In this section, we present our quantitative results of this reproduction study 
 
 \begin{figure}[t!]%
     \centering
-    {\includegraphics[width=0.5\linewidth]{../openreview/images/ablation_qialitative.png} }%
+    {\includegraphics[width=0.5\linewidth]{images/ablation_qialitative.png} }%
     \caption{Reproduced qualitative results of ablation study.}%
     \label{fig:ablation_qual}%
 \end{figure}
 
 \begin{figure}[t!]%
     \centering
-    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/orijinal_interpolation.png} }}%
+    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{images/orijinal_interpolation.png} }}%
     \qquad
-    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/re_interpolation.png} }}%
+    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{images/re_interpolation.png} }}%
     \caption{Examples of using the interpolated latent codes for generating the rotated faces.}%
     \label{fig:interpolation}%
 \end{figure}
@@ -293,52 +290,27 @@ In this section, we present our quantitative results of this reproduction study 
 
 In the original work, a controlled generation strategy on cat heads has been followed in order to demonstrate that the framework is object-agnostic. However, this experiment is limited, and conducted on only the viewpoint manipulation on yaw axis. We present the visual results of our controlled generation on cat heads in Figure \ref{fig:afhq_view} (for the viewpoint manipulation in yaw and pitch axes) and in Figure \ref{fig:afhq_light} (for changing the light direction). At this point, we can validate that the framework is able to work well on different objects, not only human faces.
 
-    
-\begin{figure}[h!]%
-    \centering
-    \subfloat[\centering Original]{
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_yaw_original.png} }}%
-     \subfloat[\centering Original]{
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_pitch_original.png} }}%
-    \qquad
-    \subfloat[\centering Reproduced]{
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_yaw_re.png} }}%
-     \subfloat[\centering Reproduced]{
-    {\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_pitch_re.png} }}%
-    \caption{The viewpoint rotation examples on AFHQ Cat dataset. Left: Yaw axis, Right: Pitch axis.}%
-    \label{fig:afhq_view}%
-\end{figure}
-
-\begin{figure}[b!]%
-    \centering
-    \subfloat[\centering Original]{{\includegraphics[width=0.44\linewidth]{../openreview/images/afhq_cat_light_original.png} }}%
-    \qquad
-    \subfloat[\centering Reproduced]{{\includegraphics[width=0.44\linewidth]{../openreview/images/afhq_cat_light_re.png} }}%
-    \caption{Changing the direction of the light source on AFHQ Cat dataset.}%
-    \label{fig:afhq_light}%
-\end{figure}
-
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/afhq_cat_yaw_original.png}} 
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/afhq_cat_yaw_re.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_yaw_original.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_yaw_re.png}} 
 %    \caption{AFHQ Cat dataset rotate (yaw) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
 %    \label{fig:original_vs_re_cat_yaw}
 %\end{figure}
 
 % \begin{figure}[h!]%
 %     \centering
-%     \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_pitch_original.png} }}%
+%     \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_original.png} }}%
 %     \qquad
-%     \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{../openreview/images/afhq_cat_pitch_re.png} }}%
+%     \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_re.png} }}%
 %     \caption{AFHQ Cat dataset rotate (pitch) example.}%
 %     \label{fig:example}%
 % \end{figure}
 
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/afhq_cat_pitch_original.png}} 
-%    \subfigure{\includegraphics[width=\textwidth]{../openreview/images/afhq_cat_pitch_re.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_original.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_re.png}} 
 %    \caption{AFHQ Cat dataset rotate (pitch) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
 %    \label{fig:original_vs_re_cat_pitch}
 %\end{figure}
@@ -350,20 +322,44 @@ In the original work, a controlled generation strategy on cat heads has been fol
 To extend the scope of the experiments in the original work, and validate the generalization ability of the architecture, we have re-trained the framework from scratch on CelebA. The visual results of this experiment can be seen in Figure \ref{fig:celeba_results}. The main observations for this experiment are as follows: (1) the overall performance is similar to the one for FFHQ, (2) the outputs for the face generation is visually-plausible, (3) the viewpoint manipulation can be achieved on this dataset, (4) there are some visual artifacts in the outputs for the task of changing the light direction.
 
 
+\begin{figure}[h!]%
+    \centering
+    \subfloat[\centering Original]{
+    {\includegraphics[width=0.47\linewidth]{images/afhq_cat_yaw_original.png} }}%
+     \subfloat[\centering Original]{
+    {\includegraphics[width=0.47\linewidth]{images/afhq_cat_pitch_original.png} }}%
+    \qquad
+    \subfloat[\centering Reproduced]{
+    {\includegraphics[width=0.47\linewidth]{images/afhq_cat_yaw_re.png} }}%
+     \subfloat[\centering Reproduced]{
+    {\includegraphics[width=0.47\linewidth]{images/afhq_cat_pitch_re.png} }}%
+    \caption{The viewpoint rotation examples on AFHQ Cat dataset. Left: Yaw axis, Right: Pitch axis.}%
+    \label{fig:afhq_view}%
+\end{figure}
+
+\begin{figure}[h!]%
+    \centering
+    \subfloat[\centering Original]{{\includegraphics[width=0.44\linewidth]{images/afhq_cat_light_original.png} }}%
+    \qquad
+    \subfloat[\centering Reproduced]{{\includegraphics[width=0.44\linewidth]{images/afhq_cat_light_re.png} }}%
+    \caption{Changing the direction of the light source on AFHQ Cat dataset.}%
+    \label{fig:afhq_light}%
+\end{figure}
+
 \begin{figure}[t!]
     \centering
-    \subfigure{\includegraphics[width=0.6\textwidth]{../openreview/images/celeba_faces.png}} 
-    \subfigure{\includegraphics[width=0.6\textwidth]{../openreview/images/celeba_yaw.png}}
-    \subfigure{\includegraphics[width=0.6\textwidth]{../openreview/images/celeba_pitch.png}}
-    \subfigure{\includegraphics[width=0.4\textwidth]{../openreview/images/celeba_light.png}}
+    \subfigure{\includegraphics[width=0.6\textwidth]{images/celeba_faces.png}} 
+    \subfigure{\includegraphics[width=0.6\textwidth]{images/celeba_yaw.png}}
+    \subfigure{\includegraphics[width=0.6\textwidth]{images/celeba_pitch.png}}
+    \subfigure{\includegraphics[width=0.4\textwidth]{images/celeba_light.png}}
     \caption{The qualitative results on CelebA dataset. Rows: (1) face generation, (2) rotation on yaw axis, (3) rotation on pitch axis, (4) the light direction.}
     \label{fig:celeba_results}
 \end{figure}
 
 %\begin{figure}[h!]
 %    \centering
-%    \subfigure{\includegraphics[width=0.75\textwidth]{../openreview/images/afhq_cat_light_original.png}} 
-%    \subfigure{\includegraphics[width=0.75\textwidth]{../openreview/images/afhq_cat_light_re.png}} 
+%    \subfigure{\includegraphics[width=0.75\textwidth]{Reproducibility_Challenge_2020/afhq_cat_light_original.png}} 
+%    \subfigure{\includegraphics[width=0.75\textwidth]{Reproducibility_Challenge_2020/afhq_cat_light_re.png}} 
 %    \caption{AFHQ Cat dataset light source example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
 %    \label{fig:original_vs_re_cat_light}
 %\end{figure}
@@ -385,3 +381,4 @@ Since the 3D evaluation and reconstruction scripts are not available in the offi
 
 \subsection{Communication with original authors}
 We were in contact with the authors since the beginning of the challenge. We could not succeed to reproduce the 3D reconstruction task, fortunately, they swiftly answered our questions, and provided more information for reproducing the task.
+
