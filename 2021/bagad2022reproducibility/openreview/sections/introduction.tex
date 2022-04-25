@@ -1,0 +1,55 @@
+\section{INTRODUCTION}
+% Points:
+% - In summary, reworked first 3 sections.
+% - Main claims and remainder work introduction.
+% - Restructured methodology: First CGN in separate section as background.
+
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+Despite the considerable popularity of deep learning models within the field of artificial intelligence, recent literature suggests that these networks have a tendency of learning simple correlations that perform well on a benchmark dataset, instead of more complex relations that generalize better \cite{alcorn2019strike, ming2021impact, rosenfeld2018elephant}. This phenomenon, which is referred to as shortcut learning by~\citet{geirhos2020shortcut}, makes these models more sensitive to input perturbation and unseen input contexts.
+
+In order to enhance the robustness and interpretability of classifiers, \citet{Sauer2021ICLR} introduce the idea of a \emph{Counterfactual Generative Network} (CGN).
+% , which is capable of augmenting training datasets with generated counterfactual images by using appropriate inductive biases to disentangle separate components within the input images, such as object shape, object texture, and background.
+Using appropriate inductive biases to disentangle separate components within the input images, such as object shape, object texture, and background, this model is capable of augmenting training data with generated counterfactual images.
+The authors claim that, using this model, they were able to improve out-of-distribution (OOD) robustness with only a marginal performance decrease for the original classification task.
+
+In this work, we aim to reproduce their findings, verify their claims, and perform additional experimental results to provide further evidence to support their claims. In summary, this work makes the following contributions:
+\begin{itemize}
+    \item We reproduce the main experiments conducted by \citet{Sauer2021ICLR} to identify which parts of the experimental results supporting their claims can be reproduced, and at what cost in terms of resources (e.g., computational cost, development effort, and communication with the authors).
+    \item We improve the performance consistency of the CGN during training.
+    \item We extend upon the work of \citeauthor{Sauer2021ICLR} by empirically analyzing the decisions made by classifiers based on their proposed model. Based on this analysis, we propose a method to quantify the robustness of such classifiers against spurious correlations.
+\end{itemize}
+
+\subsection{Scope of Reproducibility} \label{ssec:scope}
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+% The original paper proposes a CGN that is able to decompose the image generation process into several \emph{independent mechanisms}, each controlling a single factor of variation (FoV) of the image. These mechanism enable the generation of  \emph{counterfactual images} by disentangling the object shape, object texture, and background. The counterfactual images can then be used to train an ensemble of invariant classifiers, such that each classifier relies on a single mechanism.
+
+
+% Paper: In this work, we take a step towards more robust and interpretable classifiers that explicitly expose the task’s causal structure. Building on current advances in deep generative modeling, we propose to decompose the image generation process into independent causal mechanisms that we train without direct supervision. By exploiting appropriate inductive biases, these mechanisms disentangle object shape, object texture, and background; hence, they allow for generating counterfactual images.
+
+% The problem setting considers a dataset $\mathcal{D} = \{(\mathbf{x}, y)\}$ where $\mathbf{x}$ are high-dimensional inputs (e.g. images) and can be represented in low-dimensional space via latent variables $\mathbf{z}$. The authors propose to learn the data generation process through a structural causal model (SCM) with disentangled independent mechanisms (IMs) such as object shape, texture, background. By learning such an SCM, we can generate new samples by changing these IMs and these generated samples can be used to instil invariance in image classifiers.
+Distinguishing between spurious and causal correlation is an active topic in causality research \cite{kaushik2019learning, olson2021counterfactual}. One central principle in causal inference is the assumption of independent mechanisms (IMs), which states that a causal generative process is composed of autonomous modules that do not influence each other \cite{pearl2009causality, Sauer2021ICLR, scholkopf2019causality}. The CGN introduced in the original paper exploits this idea to decompose the image generation process into three IMs, each controlling one factor of variation (FoV), namely the shape, texture, and background. Using this, the authors take a step towards more robust and interpretable classifiers that explicitly expose the causal structure of the classification task. In this reproducibility study, our main goal is to verify the following claims of the original paper:
+% In the above setting, the original paper makes the following main claims:
+\begin{itemize}
+    \item \textbf{High-Quality Counterfactuals (HQC)}: By exploiting proper inductive biases, the CGN is able to reliably learn the independent mechanisms, which allow for the generation of high-quality counterfactual images by disentangling the shape, texture and background of the image.
+    \item \textbf{Inductive Bias Requirements (IBR)}: Each independent mechanism has to be considered, and jointly optimizing all of them end-to-end is needed for high-quality images.
+    \item \textbf{Out-of-Distribution Robustness (ODR)}: Despite being synthetic, the counterfactual images can improve out-of-distribution performance of classifiers by making them invariant to spurious signals.
+    % \item The generative model can be trained efficiently on a single GPU, exploiting common pretrained models as inductive biases.
+\end{itemize}
+
+The remainder of this work is structured as follows. In \cref{sec:cgn}, we introduce the model proposed in the original paper to provide the reader with the required background knowledge. \cref{sec:methodology} then summarizes our approach to reproduce the original paper. Subsequently, \cref{sec:results} presents the replicated results and compares them to the original paper. \cref{sec:discussion} concludes this work by discussing our experience with reproducing the research by \citet{Sauer2021ICLR}.
+
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
