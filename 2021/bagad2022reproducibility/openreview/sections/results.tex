@@ -59,15 +59,15 @@ The results in \cref{tab:loss-ablation} indicate that the inception scores follo
 
 
 \begin{table}[H]
-\begin{minipage}{.4\linewidth}
     \captionsetup{skip=1mm,  width=.8\textwidth}
      \caption{\textbf{Loss Ablation Study.} We turn off one loss at the time.}
     \label{tab:loss-ablation}
     \centering
-    \tiny
+    \footnotesize
     \setlength{\aboverulesep}{0.88pt}
     \setlength{\belowrulesep}{0.88pt}
     \setlength\tabcolsep{3pt}
+
 \begin{tabular}{cccccc}
 \toprule
 $\mathcal{L}_{shape}$ & $\mathcal{L}_{text}$  & $\mathcal{L}_{bg}$    & $\mathcal{L}_{rec}$   & IS $\Uparrow$ & $\mu_{mask}$ \\
@@ -85,15 +85,17 @@ $\mathcal{L}_{shape}$ & $\mathcal{L}_{text}$  & $\mathcal{L}_{bg}$    & $\mathca
 \multicolumn{4}{c}{BigGAN (Upper Bound)} & \colorbox{blue!10}{\makebox(10, 3){202.9}} & - \\
 \arrayrulecolor{black}\bottomrule
 \end{tabular}
-\end{minipage}%
-\begin{minipage}{.6\linewidth}
+\end{table}
+
+\begin{table}[H]
     \centering
     \captionsetup{skip=1mm}
     \caption{\textbf{MNIST classification.} In the test-set, the texture and background are randomized; only the digits shape corresponds to the class.}
-    \tiny
+    \footnotesize
     \setlength{\aboverulesep}{0.95pt}
     \setlength{\belowrulesep}{0.95pt}
     \label{tab:mnist-classifiers}
+
 \begin{tabular}{rcccccc@{}}
 \toprule
 \multicolumn{1}{r}{\textbf{Setting}} & \multicolumn{2}{c}{\textbf{C-MNIST}}                            & \multicolumn{2}{c}{\textbf{DC-MNIST}}                     & \multicolumn{2}{c}{\textbf{W-MNIST}}                           \\ \arrayrulecolor{black}\cmidrule(l){2-7}
@@ -109,8 +111,6 @@ O + GAN & 99.6 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{99.8}}} & 
 O + CGN & 99.2 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{99.7}}} & 95.9 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{95.1}}} & 96.9 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{97.4}}} & 85.5 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{89.0}}} & 96.8 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{99.2}}} & 62.8 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Red}{85.7}}} \\
 \arrayrulecolor{black}\bottomrule
 \end{tabular}
-
-\end{minipage}
 \end{table}
 
 
@@ -121,14 +121,14 @@ To evaluate the invariance in classifier heads on IN-mini, we first reproduce th
 Note that, although IN-mini was used for the training set instead of IN-1k , the evaluation has been performed using the same datasets as in the paper.
 
 \begin{table}[H]
-    \begin{minipage}{.4\linewidth}
-     \captionsetup{skip=1mm}
-      \caption{\textbf{Shape vs. texture.} Evaluation of shape biases of independent classifiers.}
-      \label{tab:mini-shape}
-      \centering
-\scriptsize
-\setlength{\aboverulesep}{0.95pt}
-\setlength{\belowrulesep}{0.95pt}
+    \captionsetup{skip=1mm}
+    \caption{\textbf{Shape vs. texture.} Evaluation of shape biases of independent classifiers.}
+    \label{tab:mini-shape}
+    \centering
+    \footnotesize
+    \setlength{\aboverulesep}{0.95pt}
+    \setlength{\belowrulesep}{0.95pt}
+
 \begin{tabular}{lccc@{}}
 \toprule
 \textbf{Trained on} & \textbf{Shape Bias} & \textbf{top-1} $\Uparrow$ & \textbf{top-5} $\Uparrow$ \\ \midrule
@@ -145,16 +145,17 @@ IN-mini + GCN/Text & 20.5 & 56.2 & 79.1 \\
 IN-mini + GCN/Bg & 25.7 & & \\
 \arrayrulecolor{black}\bottomrule
 \end{tabular}
+\end{table}
 
-    \end{minipage}%
-    \begin{minipage}{.6\linewidth}
-      \centering
-       \captionsetup{skip=1mm, width=.85\textwidth}
-        \caption{\textbf{Backgrounds Challenge.} Evaluation of robustness against adversarially chosen backgrounds.}
-        \scriptsize
-        \setlength{\aboverulesep}{0.95pt}
-        \setlength{\belowrulesep}{0.95pt}
-        \label{tab:mini-classifiers}
+\begin{table}[H]
+    \centering
+    \captionsetup{skip=1mm, width=.85\textwidth}
+    \caption{\textbf{Backgrounds Challenge.} Evaluation of robustness against adversarially chosen backgrounds.}
+    \footnotesize
+    \setlength{\aboverulesep}{0.95pt}
+    \setlength{\belowrulesep}{0.95pt}
+    \label{tab:mini-classifiers}
+
 \begin{tabular}{lcccc@{}}
 \toprule
 \textbf{Trained on} & \textbf{IN-9} $\Uparrow$ & \textbf{Mixed-Same} $\Uparrow$ & \textbf{Mixed-Rand} $\Uparrow$ & \textbf{BG-Gap} $\Downarrow$     \\ \arrayrulecolor{black}\midrule
@@ -169,8 +170,6 @@ IN-mini + GCN/Bg & 25.7 & & \\
 IN-mini + CGN & 86.8 & 73.2 & 68.3 & 4.9 \\
 \arrayrulecolor{black}\bottomrule
 \end{tabular}
-
-    \end{minipage}
 \end{table}
 To evaluate the effect of using more counterfactual datapoints or generating more counterfactual images per sampled noise, \citeauthor{Sauer2021ICLR} performed an MNIST Ablation Study in the original paper. Our reproduction for this experiment, along with a more detailed description regarding the experiment and results, can be found in \cref{sec:mnist_ablation_study}.
 
@@ -266,11 +265,12 @@ In order to provide further evidence for the claim ODR, we test the model perfor
 % Apart from the explainability, models trained with counterfactual samples are also expected to show better out-of-distribution (OOD) generalization. This also is an important claim in the paper. We test this on variants of ImageNet dataset designed to evaluate OOD, such as, ImageNet-A (natural adversarial examples) \cite{imagenet-a}, ImageNet-Sketch \cite{imagenet-sketch} and Stylized-ImageNet \cite{imagenet-stylized}. We compare against a ResNet-50 pretrained on IN-1k. Surprisingly, we find that finetuning the CGN-based ensemble performs worse than the baseline  as in \cref{tab:ood}.
 
 \begin{table}[H]
-\centering
-\scriptsize
-\captionsetup{font=footnotesize,skip=1mm}
-\caption{Comparison of top-1 accuracy of invariant classifier with pretrained ResNet on OOD benchmarks.}
-\label{tab:ood}
+    \centering
+    \footnotesize
+    \captionsetup{font=footnotesize,skip=1mm}
+    \caption{Comparison of top-1 accuracy of invariant classifier with pretrained ResNet on OOD benchmarks.}
+    \label{tab:ood}
+
 \begin{tabular}{@{}lllrrrr@{}}
 \toprule
 \textbf{Model} & \textbf{Pretrained} & \textbf{Finetuned} & \textbf{IN-mini} $\Uparrow$ & \textbf{IN-A} $\Uparrow$ & \textbf{IN-Sketch} $\Uparrow$ & \textbf{IN-Stylized} $\Uparrow$ \\ \midrule
