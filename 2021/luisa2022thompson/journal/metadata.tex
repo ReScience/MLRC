@@ -20,12 +20,17 @@
 \def \articleBIBLIOGRAPHY{bibliography.bib}
 \def \articleYEAR{2022}
 \def \reviewURL{https://openreview.net/forum?id=r5LS3fmh0t}
-\def \articleABSTRACT{Test abstract baiuhduodhquodhqouwhdoqhdowhdohouhauhuiacuidsssssssssssdihiuhviwuhvihvwuioooooooooooooooooooooooooooooo}
+\def \articleABSTRACT{Scope of Reproducibility This report covers our reproduction of the paper `Thompson Sampling for Bandits with Clustered Arms' by Carlsson et al. (IJCAI 2021). The authors propose a new set of algorithms for the stochastic multi-armed bandit problem (and its contextual variant with linear expected rewards) in settings when the arms are clustered. They show both theoretically and empirically that exploiting the cluster structure significantly improves the obtained regret over the traditional assumption with non-clustered arms. Furthermore, they compare the proposed algorithms to previously proposed and well-known benchmarks for the bandit problem. We aim to reproduce just the empirical evaluations.
+Methodology Given that no code was provided alongside the original paper (and neither for any of the benchmarks used for comparison), we implement everything from scratch. We write our code in R, the well-known programming language for statistical computing, and use some of its basic libraries. We run the experiments on a laptop with a dual-core Intel i7 processor and 8 GB of RAM. We don't use any GPU.
+Results There are no exact numbers in the original paper to precisely reproduce, rather the main claims are supported with some visualisations. With this in mind, our reproduction confirms the advantage provided by clustering over the assumption of independent arms, as well as the newly proposed algorithms outperforming the referenced benchmarks. We repeat all the experiments with multiple seeds to obtain robust estimates of the algorithms' performance and reduce the risk of drawing any conclusions out of results obtained by chance.
+What was easy The authors have included in the paper all the necessary details to reimplement their proposed algorithms, recreate the synthetic datasets, and reproduce the experiments for the first part, i.e. the traditional multi-armed bandits setting.
+What was difficult It is much harder to reimplement some of the referenced benchmarks. The main reasons for these struggles are the inconsistent nomenclature, important details missing in the referenced papers, and some of the compared benchmarks being originally designed to run in a different setting. Furthermore, some additional research into the field of contextual bandits is needed to reproduce the second part of the experiments.
+Communication with original authors There has been no communication neither with the authors of the original article nor with any authors of the referenced papers.}
 \def \replicationCITE{Carlsson, Emil and Dubhashi, Devdatt and Johansson, Fredrik D. Thompson Sampling for Bandits with Clustered Arms (IJCAI 2021).}
 \def \replicationBIB{bandits}
 \def \replicationURL{https://www.ijcai.org/proceedings/2021/0305.pdf}
 \def \replicationDOI{10.24963/ijcai.2021/305}
-\def \contactNAME{Andra≈æ De~Luisa}
+\def \contactNAME{Andraû De~Luisa}
 \def \contactEMAIL{ad9366@student.uni-lj.si}
 \def \articleKEYWORDS{Multi-armed bandits, Thompson sampling, R, rescience c, machine learning}
 \def \journalNAME{ReScience C}
@@ -33,10 +38,10 @@
 \def \journalISSUE{1}
 \def \articleNUMBER{}
 \def \articleDOI{10.0000/zenodo.0000000}
-\def \authorsFULL{Andra≈æ De~Luisa}
+\def \authorsFULL{Andraû De~Luisa}
 \def \authorsABBRV{A. De~Luisa}
 \def \authorsSHORT{De~Luisa}
 \title{\articleTITLE}
 \date{}
-\author[1,\orcid{0000-0002-5638-9823}]{Andra≈æ De~Luisa}
-\affil[1]{Faculty of Computer and Information Science, University of Ljubljana, Ljubljana, SLO}
+\author[1,\orcid{0000-0002-5638-9823}]{Andraû De~Luisa}
+\affil[1]{University of Ljubljana, Faculty of Computer and Information Science, Vecna pot 113, 1000 Ljubljana, SLO}
