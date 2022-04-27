@@ -13,9 +13,9 @@ def check_ne(store, key, storename):
 
 def check_title(meta):
     check_ne(meta, "title", "Metadata")
-    assert meta["title"].startswith(
-        "[Re] "
-    ), "title in metadata should start with `[Re]`"
+    assert meta["title"].startswith("[Re] ") or meta["title"].startswith(
+        "[¬Re] "
+    ), "title in metadata should start with `[Re]` or `[¬Re]`"
 
 
 def check_authors(meta):
