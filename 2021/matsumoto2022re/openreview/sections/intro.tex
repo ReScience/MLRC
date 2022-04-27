@@ -1,0 +1,20 @@
+%%% INTRODUCTION %%%
+
+\section{Introduction} \label{sec:intro}
+
+The singular value decomposition (SVD) remains a fundamental dimensionality reduction technique in machine learning and continues to be used in a variety of applications. In a traditional formulation, the entirety of the matrix to be decomposed is available at the time of application of the SVD. However, certain applications, such as latent semantic indexing (LSI) and recommender systems, have matrices that are subject to the periodic addition of new rows and/or columns. A na\"{i}ve solution is to recalculate the SVD each time the matrix is updated, but such an approach quickly becomes impractical when updates are frequent. For this reason, algorithms that exploit information on the previous SVD of the matrix to calculate the SVD of the updated matrix are crucial. Such schemes have been proposed for both the full SVD and rank-$k$ SVD. The algorithm presented in \cite{Kalantzis2021}, which is the focus of our study, is for the rank-$k$ truncated SVD case.
+
+Following the notation introduced in \cite{Kalantzis2021}, the problem of updating the rank-$k$ truncated SVD of an updated matrix is as follows. Let $B\in\Ctwo{m}{n}$ be a matrix for which a rank-$k$ SVD $\Bk = \Uk \Sigk \Vk^H = \sum_{j=1}^k \sigj{j} \uj{j} (\vj{j})^H$ where $\Uk = [\uj{1}, \dots, \uj{k}]$, $\Vk = [\vj{1}, \dots, \vj{k}]$, and $\Sigk = \verb|diag| (\sigj{1}, \dots, \sigj{k})$ where $\sigj{1} \geq \sigj{2} \geq \dots \geq \sigj{k} > 0$ is known. The goal is to approximate the rank-$k$ SVD $\Ak = \hU_k \hSigma_k \hV_k^H = \sum_{j=1}^k \hsigj{j} \huj{j} (\hvj{j})^H$ of the updated matrix
+\begin{equation*}
+    A= 
+    \begin{pmatrix}
+        B \\ E
+    \end{pmatrix},\text{ or }
+    A=
+    \begin{pmatrix}
+        B & E
+    \end{pmatrix}
+\end{equation*}
+where $E\in\Ctwo{s}{n}$ or $E\in\Ctwo{m}{s}$ is the matrix containing the newly added rows or columns, respectively. We focus on the row-update case in this study as is the case in \cite{Kalantzis2021}.
+
+The remainder of this study is outlined as follows. In Section \ref{sec:scope}, we introduce the central claim of the original paper that we tested in our study. Following that, in Section \ref{sec:alg}, we introduce the necessary background prior to describing the proposed algorithm. In Section \ref{sec:methods}, we describe the experimental setup: our implementation of the algorithm, datasets used, and experiments run. We present the experimental results in Section \ref{sec:results} along with our interpretation of the results and thoughts on the overall study in Section \ref{sec:discussion}.

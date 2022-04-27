@@ -1,0 +1,25 @@
+%%% RESULTS %%%
+\section{Results} \label{sec:results}
+
+\paragraph{Relative error and residual norms of singular triplets}
+
+The relative error and residual norm of the leading $k=50$ singular triplets for the CRAN dataset at $\phi=1,5,10$ using Algorithms 2.1, 2.2, and \verb|FrequentDirections| are shown in Figure \ref{fig:cran_relerr_resnorm}. Due to the large number of figures, the complete set of plots for the standard experiments are presented in Sections A to E in the Supplementary Materials. When comparing the relative error and residual norm plots for Algorithm 2.1 on CRAN, CISI, and MED, our results matched those of \cite{Kalantzis2021} exactly. For Algorithm 2.2, the plots did not match exactly, though the differences never exceeded half an order of magnitude and are attributable to the randomness inherent in Algorithm 2.2. 
+
+\input{sections/figs_cran_report_relres}
+
+Our comparison of the relative error and residual norm of the $k=50$-th singular triplet for Algorithm 2.2 with various values of $r$ revealed a similar result to \cite{Kalantzis2021} – across the three methods, Algorithm 2.2 had the lowest errors, and within variations of Algorithm 2.2, larger values of $r$ yielded higher accuracy.
+
+\input{sections/table_metrics_50}
+
+\paragraph{Runtime}
+
+For all three of the datasets which we measured runtimes on, we found Algorithm 2.2 to require a substantially longer amount of time to complete all of its updates. Algorithm 2.1 and \verb|FrequentDirections| required a similar length of time, though Algorithm 2.1 was consistently faster than \verb|FrequentDirections| by a small margin. The runtime plots for the standard experiments are shown in Section F of the Supplementary Materials. 
+
+\input{sections/figs_runtime}
+
+\paragraph{Number of batches and rank} 
+
+Due to space-related constraints, we chose to only include two examples from the array of plots generated (Figure \ref{fig:cran_variations}). Despite the large variation in the parameters, we can see that the residual norm for overlapping update numbers and $k$ share very similar values.
+
+\input{sections/figs_variations}
+
