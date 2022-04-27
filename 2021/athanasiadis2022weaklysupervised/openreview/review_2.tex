@@ -1,0 +1,80 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{mathptmx}
+
+\title{\begin{figure}[h]
+    \centering
+    \includegraphics[width=2.5cm]{kthlogo.png}
+    \label{fig:viterbi trace}
+\end{figure} \\ \\
+
+Peer Review to the work proposed by Group 23}
+\author{
+  Ioannis, Athanasiadis\\
+  \texttt{\href{mailto:iath@kth.se}{iath@kth.se}}
+  \and
+   Georgios, Moschovis\\
+  \texttt{\href{mailto:geomos@kth.se}{geomos@kth.se}}
+  \and 
+  Alexander, Tuoma \\
+  \texttt{\href{mailto:tuoma@kth.se}{tuoma@kth.se}}
+}
+
+\usepackage{natbib}
+\usepackage{graphicx, wrapfig, subcaption, setspace, booktabs}
+\usepackage{xcolor}
+
+\begin{document}
+
+\maketitle
+
+
+\section {Questions}
+We are Group $25$ and we are reviewing the project report of group 23 as part of the \textbf{DD2412 Deep Learning Advanced Course} course at KTH Royal Institute of Technology. Hereunder follow some particular questions and our short notes about the points raised in each of them.
+
+\subsection{In one sentence summarize the main findings of this project.}
+The authors of this study employed the full-batch Hamiltonian Monte Carlo (HMC) to approximate the Bayesian model average (BMA) which is required to train BNNs. Various experiments were conducted on multiple datasets investigating the effect of the scales in the prior distribution. Additionally, the performance was evaluated under covariance shift via test set corruption. Finally, they concluded that BNNs outperform standard training and deep ensembles while the former method is lacking in the presence of covariance shift. Additionally, the experiments carried out by the essayists, suggest that BNNs are robust with respect to the assumed scale of the prior and that using a single HMC chain results in a similar performance to using multiple ones. It is important given the time and computational resources constraints, since the group had limited access to GPU resources as stated in section 5, that they managed to conduct their experiments in CPU clusters and present different results.
+
+
+
+\subsection{Which part of the report was most clearly written?}
+In our view the most clearly written section of the project is the introduction. The authors there describe several \textit{unresolved questions about Bayesian deep learning practice} and refer to all the different aspects and methods that they address in their work, where they \textit{use multi-chain full-batch Hamiltonian Monte Carlo to explore fundamental
+problems in Bayesian deep learning}, while also giving an overview of their investigation of the reasons why Bayesian Neural Networks fail to generalize in cases of covariance shift.
+
+
+\subsection{Which part/section of the report was least clear? Was it possible to
+understand the material presented in this section? Please expand with
+a sentence or two?}
+We believe that a rather unclear section of the report is 4.1 that elaborates on how $\hat{R}$ potential-scale-reduction diagnostic was implemented. Precisely it is claimed that \textit{the bulk of $\hat{R}$ in the function space is concentrated around 1} and that \textit{some parameters still have very large $\hat{R}$} but the authors give barely any details on how the $\hat{R}$ values are being computed and what sort of information this diagnostic captures and thus prior knowledge on this topic is required from the reader. In the same direction, other claims include that \textit{a single chain can capture the predicted diversity of most test data points of multiple chains} and that \textit{that there is a direction in which chains cannot be mixed} without any details on how the chains are produced.
+
+\subsection{Did the report give you a better understanding of the problem/thepaper/common evaluations/ comparison to other appro-aches?}
+The essay provided us with some basic understanding regarding the concepts of training and evaluating BNNs. Precisely, it presents the conceptual ideas, the experiments as well as the findings of the main paper. However, in our opinion, including a background section (similar to 2$^{nd}$ section of the main paper) would have made it a bit easier for the readers to grasp the main concept.
+
+
+\subsection{What was the most impressive experimental result presented in the
+project and why?}
+We found the experiment regarding the effect of prior’s scale in the performance of BNNs to be the most interesting finding of this work as described in section 4.2. More specifically, the authors argued the reasoning behind the lacking performance when setting the scale to a very small value (too strong regularization). Finally, they also convincingly accounted for the relative robustness of the BNNs in the case of large-scale values.
+
+
+\subsection{What was the most interesting or surprising experimental result presented in the project and why?}
+The most surprising result is the considerably lacking performance of BNNs in the presence of covariate shift via introducing noise in the test set. The aforementioned finding is particularly surprising when considering that although BNNs outperform the standard approaches in the regular scenario, they are less robust when shifting the test-set distribution.
+
+\subsection{Which experiment(s) would you like the project group to complete if
+they were to continue with this project.}
+We think that the group has done some extensive work in designing experiments but due to computational resources they ran a limited amount of them. In detail, when evaluating the effect of prior’s scale they assumed a Gaussian distribution, however it would have been interested to experiment with other priors as well similar to the experiment conducted in the main paper (e.g. MoG). Moreover, in section 4.4 they performed an extensive study on the covariate shift \textit{vs.} robustness trade-off in Bayesian Neural Networks, introducing an empirical covariance (EmpCov) prior but their experiments are limited to the MNIST dataset so their conclusions for instance regarding Bayesian Networks not having \textit{significant advantages compared to deep ensembles and even MAP} and \textit{bad BNNs performance on covariate shift} may not generalize for other datasets; thus that would be something to be taken into consideration in potential future works with more computational resources.
+
+\subsection{Mention two things you liked about the project report .}
+One important finding of this project is the fact that \textit{the choice of architecture will definitely have a significant impact on performance, while the prior distribution over parameters $p(w)$ shows minor effect on performance}. Although the former part of this conclusion was already expected to be the case in Bayesian Neural Networks, the former part is rather interesting, as the prior is a fundamental part of Bayesian Networks. Finally, the group provided a well-written and coherent report with no syntax errors which allow for a pleasant read. 
+
+\subsection{Is there any reference or paper that you recommend the projectgroup check out after having read the paper.}
+Last but not least, regarding the group's findings regarding the prior distrubution's effect in performance, which we mention above, we would like to make the group aware that there are several works such as \textit{VAE with a VampPrior} by Tomzak, J. and Welling, M., which actually highlights the importance of a well-defined prior in another architecture (Variational Autoencoders).
+ 
+\begin{flushright}
+Stockholm, December 17$^{th}$, 2021
+\end{flushright}
+
+%\bibliographystyle{plain}
+%\bibliography{references}
+\end{document}

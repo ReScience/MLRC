@@ -1,0 +1,154 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2020
+
+% ready for submission
+%\usepackage{neurips_2020}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2020}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+     \usepackage[final]{neurips_2020}
+
+% to avoid loading the natbib package, add option nonatbib:
+    % \usepackage[nonatbib]{neurips_2020}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+% \usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+% \usepackage{graphicx}       % Allows including images
+\usepackage{amsmath}
+\usepackage{bm}             % bold and italics maths at the same time
+\usepackage{amssymb}        % the definition equal triangle symbol
+\usepackage{xcolor}         % colors
+\usepackage{hyperref}       % links
+% \usepackage{babel,blindtext} % test gia figure horizontally
+\usepackage{babel} % test gia figure horizontally
+\usepackage{float} % fix position
+
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbold}
+\usepackage{amsthm}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{commath}
+\usepackage{subfig}
+\usepackage{subfigure}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{capt-of}
+\usepackage{multirow}
+\usepackage{booktabs} % for professional tables
+
+\usepackage{caption}
+\usepackage{makecell}
+
+\newcommand\m[1]{\begin{pmatrix}#1\end{pmatrix}} 
+\newtheorem{theorem}{Theorem}[]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\hypersetup{                % with colors
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\title{Peer review on "Study of Bayesian neural network with Hamiltonian Monte Carlo"}
+% \\Deep Learning Advanced Course DD2412}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+   Athanasiadis Ioannis, Moschovis Georgios, Tuoma Alexander \\
+%   \thanks{Use footnote for providing further information
+%     about author (webpage, alternative address)---\emph{not} for acknowledging
+%     funding agencies.} \\
+  Department of Electrical and Computer Engineering\\
+  KTH Royal Institute of Technology\\
+  Stockholm, SE 11428 \\
+  \texttt{\{iath,geomos,tuoma\}@kth.se} \\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+} 
+
+% Update history:
+% - 12/16/21 The peer-review report draft was designed - Alex
+% - 12/16/21 A 4 lines paragraph was added addressing the 3rd question - Alex
+% - 12/16/21 An update list was created - Ioannis
+% - 12/17/21 A 4 lines paragraph was addded addressing the 4th question - Ioannis
+% - 12/17/21 A 4 lines paragraph was addded addressing the 5th question - Ioannis
+% - 12/17/21 A 4 lines paragraph was addded addressing the 6th question - Ioannis
+
+\begin{document}
+
+\maketitle
+
+\section{In a few sentences summarize the main findings of this project.}
+The main findings is that BNN can increase the performance compared to traditional training methods. Another main finding is that BNN is less robust to covariate shift. -Alex
+
+\section{Which part of the report was most clearly written?}
+The most clearly written part was the first part of the section "Effects of covariate shift on robustness of BNN". The setup for the experiments is easy to understand and the figure is well explained. -Alex
+
+\section{Which part/section of the report was least clear?}
+%Was it possible to understand the material presented in this section? expand with a sentence or two.
+
+The least clear section of the report was the section "Methods & Data". The report includes two figures with the pseudo code of the algorithms, but the algorithms are not describe in enough detailed. In addition, the report do not well describe the dataset CIFAR-10 such as number of classes, split for training and validation, etc. The dataset IMDB is not described and is lacking a reference. -Alex
+
+Furthermore, some methods in the paper are not described in the method section at all such as EmpCov prior, which is first introduced in section "Experiments and findings". - Alex
+
+
+\section{Did the report give you a better understanding of the problem/the paper/common evaluations/ comparison to other approaches?}
+The essay provided us with some basic understanding of the concepts of training and evaluating BNNs. The current essay presents the conceptual ideas, the experiments as well as the findings of the main paper. However, in our opinion, including a background section (similar to 2nd section of the main paper) would have made it a bit easier for the readers to grasp the main concept. -Ioannis
+
+\section{What was the most impressive experimental result presented in the project and why?}
+We found the experiment regarding the effect of prior’s scale in the performance of BNNs to be the most interesting finding of this work. More specifically, the essay argues the reasoning behind the lacking performance when setting the scale to a very small value (too strong regularization). Finally, it has also convincingly accounted for the relative robustness of the BNNs in the case of large-scale values. -Ioannis
+
+\section{What was the most interesting or surprising experimental result presented in the project and why?}
+The most surprising result is the considerably lacking performance of BNNs in the presence of covariate shift via introducing noise in the test set. The aforementioned finding is particularly surprising when considering that although BNNs outperform the standard approaches in the regular scenario, they are less robust when shifting the test-set distribution. -Ioannis
+
+\section{Which experiment(s) would you like the project group to complete if they were to continue with this project.}
+
+\section{Mention two things you liked about the project report.}
+
+\section{(Optional) Is there any reference or paper that you recommend the project group check out after having read the paper.}
+
+\end{document}
+
+
