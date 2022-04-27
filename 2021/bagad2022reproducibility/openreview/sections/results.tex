@@ -87,6 +87,9 @@ $\mathcal{L}_{shape}$ & $\mathcal{L}_{text}$  & $\mathcal{L}_{bg}$    & $\mathca
 \end{tabular}
 \end{table}
 
+On MNIST variants, we identify an inconsistency in the experimental setup stated in the paper and code.
+The paper seems to suggest using a combination of original and CF dataset, but the code only uses CF data. As reported in \cref{tab:mnist-classifiers}, we experiment with both and observe similar results for C-MNIST and DC-MNIST. Surprisingly, for CGN, adding original data hurts the performance for W-MNIST (62.9 vs. 81.4). Apart from that, the majority of our results are within 5\% variation from those reported in the paper (marked as \colorbox{blue!10}{\textcolor{Green}{x}}), which supports the broader claim of better generalization even in the presence of spurious correlations (e.g., texture in case of colored MNIST).
+
 \begin{table}[H]
     \centering
     \captionsetup{skip=1mm}
@@ -112,10 +115,6 @@ O + CGN & 99.2 | \colorbox{blue!10}{\makebox(10, 3){\textcolor{Green}{99.7}}} & 
 \arrayrulecolor{black}\bottomrule
 \end{tabular}
 \end{table}
-
-
-On MNIST variants, we identify an inconsistency in the experimental setup stated in the paper and code.
-The paper seems to suggest using a combination of original and CF dataset, but the code only uses CF data. As reported in \cref{tab:mnist-classifiers}, we experiment with both and observe similar results for C-MNIST and DC-MNIST. Surprisingly, for CGN, adding original data hurts the performance for W-MNIST (62.9 vs. 81.4). Apart from that, the majority of our results are within 5\% variation from those reported in the paper (marked as \colorbox{blue!10}{\textcolor{Green}{x}}), which supports the broader claim of better generalization even in the presence of spurious correlations (e.g., texture in case of colored MNIST).
 
 To evaluate the invariance in classifier heads on IN-mini, we first reproduce the experiment regarding shape bias from the original paper. The shape bias is defined as the fraction of test samples for which the predicted label matches the shape label of the input image \cite{cue_conflict}. In this case, we evaluate labels with predictions from each head. As reported in \cref{tab:mini-shape}, our results are smaller in comparison to the IN-1k results reported in the original paper. Nonetheless, the overall trend does support claim ODR. Additionally, we replicate the experiment regarding the evaluation of background robustness. The paper uses the notion of BG-gap that measures classifiers' reliance on background signal \cite{bg_gap}. Our results, shown in \cref{tab:mini-classifiers}, again slightly deviate from the original paper but the trend supports claim ODR.
 Note that, although IN-mini was used for the training set instead of IN-1k , the evaluation has been performed using the same datasets as in the paper.
