@@ -1,45 +1,30 @@
-% \section*{\centering Reproducibility Summary}
+\section{Reproducibility Summary}
 
-% % \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
-% % }
+\subsection{Scope of Reproducibility}
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+In this work, we experimented with Layer-wise Relevance Propagation and combined it with back-propagation to perform classification and semantic segmentation, following the approach proposed by Chefer H. et al., in \cite{mainpaper} for computer vision. Moreover, we incorporated the concept of pixel affinities, by using ViT-based explainability as visual seeds to drive the generation of pseudo segmentation masks by computing pixel affinities, following the approach described by Ahn J. et al. in \cite{ahn2018learning}.
 
-% \subsection*{Scope of Reproducibility}
-% % State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.
-% In this work, we experimented with Layer-wise Relevance Propagation and combined it with back-propagation to perform classification and semantic segmentation, following the approach proposed by Chefer H. et al., in \cite{mainpaper} for computer vision. Moreover, we incorporated the concept of pixel affinities, by using ViT-based explainability as visual seeds to drive the generation of pseudo segmentation masks by computing pixel affinities, following the approach described by Ahn J. et al. in \cite{ahn2018learning}.
+\subsection{Methodology}
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments.
+In order to reproduce the experiments presented in \cite{mainpaper} and \cite{ahn2018learning}, we initially examined the authors' code thoroughly and based on our understanding, we tried to replicate most parts of the pipeline apart from evaluation metrics for positive and negative perturbation area-under-curve (AUC) results for the predicted and target classes on the ImageNet~\cite{russakovsky2015ImageNet} validation set, as well as Segmentation performance on the ImageNet-segmentation~\cite{imagenet-seg} dataset, which we borrowed from the authors' repository for the work of Chefer H. et al., in \cite{mainpaper}. Regarding hardware, we used private resources to train our ViT-hybrid architecture and Affinity network, as well as perform inference for all our models; Finally, it took roughly 15 GPU hours to reproduce the vision-related results of \cite{mainpaper} whereas it took about 40 GPU hours to train and evaluate the AffinityNet on the Hybrid-ViT architecture.
 
-% \subsection*{Methodology}
-% % Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments.
-% In order to reproduce the experiments presented in \cite{mainpaper} and \cite{ahn2018learning}, we initially examined the authors' code thoroughly and based on our understanding, we tried to replicate most parts of the pipeline apart from evaluation metrics for positive and negative perturbation area-under-curve (AUC) results for the predicted and target classes on the ImageNet~\cite{russakovsky2015ImageNet} validation set, as well as Segmentation performance on the ImageNet-segmentation~\cite{imagenet-seg} dataset, which we borrowed from the authors' repository for the work of Chefer H. et al., in \cite{mainpaper}. Regarding hardware, we used private resources to train our ViT-hybrid architecture and Affinity network, as well as perform inference for all our models; Finally, it took roughly 15 GPU hours to reproduce the vision-related results of \cite{mainpaper} whereas it took about 40 GPU hours to train and evaluate the AffinityNet on the Hybrid-ViT architecture.
-% %namely a desktop with Nvidia RTX 3060 with 12GB GPU memory and a laptop with Nvidia RTX 2070 with Max-Q design and 8GB GPU memory.
-
-% \subsection*{Results}
-% Overall, we reproduced the experiments related to the vision task as conducted at \cite{mainpaper}. Our results are up to first decimal place identical to those reported in \cite{mainpaper} thus supporting the authors' claim of having implemented a relatively sufficient ViT interpretability method. When it comes to the AffinityNet \cite{ahn2018learning}, the method has been adapted in the context of Hybrid-ViT architectures with our experiments indicating that the weakly-supervised semantic segmentation performance of Hybrid-ViT architectures are inferior to the CNN-based ones.
+\subsection{Results}
+Overall, we reproduced the experiments related to the vision task as conducted at \cite{mainpaper}. Our results are up to first decimal place identical to those reported in \cite{mainpaper} thus supporting the authors' claim of having implemented a relatively sufficient ViT interpretability method. When it comes to the AffinityNet \cite{ahn2018learning}, the method has been adapted in the context of Hybrid-ViT architectures with our experiments indicating that the weakly-supervised semantic segmentation performance of Hybrid-ViT architectures are inferior to the CNN-based ones.
 
 
-% \subsection*{What was easy}
-% We found particularly easy to run and understand the code provided by the original authors of both \cite{mainpaper} and \cite{ahn2018learning} papers. When it comes to replicating \cite{mainpaper}, the authors provided most of the information required to reproduce the vision-related experiments with the code compensating for what was missing.
+\subsection{What was easy}
+We found particularly easy to run and understand the code provided by the original authors of both \cite{mainpaper} and \cite{ahn2018learning} papers. When it comes to replicating \cite{mainpaper}, the authors provided most of the information required to reproduce the vision-related experiments with the code compensating for what was missing.
 
 
-% \subsection*{What was difficult}
-% The main difficulty of replicating the study presented in \cite{mainpaper} was that details on how to compute the AUC metric were not provided in the paper report. 
+\subsection{What was difficult}
+The main difficulty of replicating the study presented in \cite{mainpaper} was that details on how to compute the AUC metric were not provided in the paper report. 
 
-
-% % Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
-% % To begin with, some parts of the authors' code in \cite{mainpaper} have been challenging to debug, in detail parts where \texttt{einsum} function was used, forward and backwards hooks, while their safe division implementation also required time to understand. Furthermore, another idea that was hard to realize relates to normalizing the relevances and obtaining $\bar{R}_j^{u}^{(n)}$ and $\bar{R}_j^{v}^{(n)}$ to address the lack of conservation in the case of matrix multiplication, where we get two attribution maps for each of the matrices we multiply as described in section \ref{sub:3.2}. This is actually a special case, where to actually normalize the CAMs, all we need to do is divide each of them by $2$, which is what the normalization formulas presented in the paper would do since $R_j^{u}^{(n)}$ and $R_j^{v}^{(n)}$ have identical sums and we realized that after reading a discussion thread in the author's repository on GitHub\footnote{See also: \color{blue}{\href{https://github.com/hila-chefer/Transformer-Explainability/issues/10}{https://github.com/hila-chefer/Transformer-Explainability/issues/10}}.}.
-
-% \newpage
-
-% \begin{abstract}
-% % %  Give an overview of what you have done in the project with the key results and findings of your work. Should be no more than 300 words.
-
-% Transformers have been an object of extensive research among deep generative models during the last few years. Precisely, they became a state-of-the-art model for Natural Language Processing (NLP) tasks in 2017 and adopted the mechanism of attention, weighing the influence of different parts of the input data. In this project, we address the use of transformers in a different domain, computer vision, to perform weakly supervised semantic segmentation. Towards this goal, we combine classic back-propagation recipe through the chain rule with relevance propagation, another technique that is based on Deep Taylor Decomposition, to achieve significant performance, comparable to state-of-the-art CNN architectures, using transformers. Last but not least, we incorporate the concept of pixel affinities, which further improves performance in terms of Intersection over Union (IoU).
-
-% \end{abstract}
+\clearpage
 
 \section{Introduction}
 \label{section:intro}
 % Describe the problem, the approach of the paper, the experiments, and the results. At the high-level talk about what you worked on in your project and why it is important. Then give an overview of your results.
-One of the most exciting technological aspects nowadays is Machine Learning's promising capabilities in transforming the world we live in, mainly due to its exciting resurgence through Deep Learning. However, as machine learning models become more complex, there is a noticeable trade-off between accuracy and simplicity or interpretability \cite{explanations} and plenty of cutting-edge research papers have been published in top-tier conferences related to this tension. In this project, we primarily experimented with Layer-wise Relevance Propagation (LRP), a mechanism of explaining what pixels are relevant within a 2-dimensional image for reaching a classification decision \cite{renormalizationLRP} and applied it to a Vision Transformer [ViT] \cite{visiontransformer}, combined with gradient back-propagation to perform classification but also semantic segmentation on the respective data in ImageNet \cite{russakovsky2015ImageNet, imagenet-seg}, by reproducing the work of Chefer H. et al, in \cite{mainpaper}.
+One of the most exciting technological aspects nowadays is Machine Learning's mind-blowing potential in transforming the world we live in, mainly due to its exciting resurgence through Deep Learning. However, as machine learning models become more complex, there is a noticeable trade-off between accuracy and simplicity or interpretability \cite{explanations} and plenty of cutting-edge research papers have been published in top-tier conferences related to this tension. In this project, we primarily experimented with Layer-wise Relevance Propagation (LRP), a mechanism of explaining what pixels are relevant within a 2-dimensional image for reaching a classification decision \cite{renormalizationLRP} and applied it to a Vision Transformer [ViT] \cite{visiontransformer}, combined with gradient back-propagation to perform classification but also semantic segmentation on the respective data in ImageNet \cite{russakovsky2015ImageNet, imagenet-seg}, by reproducing the work of Chefer H. et al, in \cite{mainpaper}.
 
 Furthermore, the task of semantic segmentation refers to clustering the pixels of an input image that correspond to the same semantic category. There are various approaches dedicated to this task with the one proposed in \cite{panoptic} being the current state-of-the-art. However, they all rely on training given ground truth segmentation masks. Considering that annotating images in the form of segmentation masks is a rather expensive and tedious process, capitalizing on weak forms of segmentation would be highly beneficial. In order to address these issues, in this project, we investigated using ViT-based explainability as visual seeds to drive the generation of pseudo segmentation masks by computing pixel affinities, following the approach described in \cite{ahn2018learning}. In particular, we trained a Hybrid ViT-base, where the patches are extracted from a CNN feature map, through relevance propagation and used those as seeds to a network computing pixel affinities, in order to improve quality of the generated segmentation masks. 
 %An intuitive example of applying our Hybrid ViT-base and our AffinityNet implementations is illustrated in Fig. \ref{fig:fig1}.
@@ -51,18 +36,6 @@ Semantic segmentation has numerous applications, such as self-driving cars or me
 Regarding Deep Neural Networks (DNNs) interpretability, various approaches have been proposed in the literature. GradCAM \cite{selvaraju2017grad} is a popular interpretability method applied to various CNN architectures that weighs feature activations in different pixel regions within an image with the average gradient of the class scores. After these gradients are computed through global average pooling, they are passed to a ReLU\footnote{Rectified Linear Units activation function is: $\text{ReLU}(x) = \max\{x,0\}$.} activation function that intensifies pixels contributing towards increasing the target class activation scores. However GradCAM is restricted to CNN architectures. One more general approach is RISE \cite{rise} that measures pixels' importance by applying element-wise multiplications of the original input with a sampled random binary mask to reduce their intensities to zero and only preserve the most important among them. 
 
 Although CNN-based architectures have demonstrated competent performance in a number of vision-related tasks, they come with an increased inductive bias due to the 2D neighboring structure of the images. On the other hand, transformer-based architectures are able to learn spatial relationships detached from the explicit 2D nature of the images. Transformer architecture, since it was proposed in 2017 by Waswani A. et al., \cite{vaswani2017attention} has become very popular in various deep learning domains, and it is based solely on attention mechanisms, dispensing recurrence and convolutions entirely and weighing the influence of different parts of the input data. Following its recent success in NLP, it was recently adopted in computer vision tasks, and in this work, we focus on particularly re-implementing a Vision Transformer [ViT] \cite{visiontransformer} from scratch. Additionally, we employ the explainability cues derived from a image classification ViT to drive the construction of segmentation masks given solely image-level annotation as we explain hereunder.
-
-% Furthermore, the core idea behind interpretability is to specify how a particular model makes decisions, how certain it is about them, whether and to what extent people can trust it, or how users may correct it, especially in mission-critical applications. In this context, interpretability could be beneficial to particular applications of Deep Learning, for instance, in Diagnostic Captioning \cite{dc_pavlopoulos} models, where it is essential for an AI system to explain its generated captions, in the sense of reasoning its decisions to ensure trust with the medical community. The principal goals of interpretable AI boil down to identifying failure modes that enables developers to further improve their systems, establishing the appropriate trust and confidence to users, including the direction of fairness, which requires eliminating the biases to be incorporated in a model, as well as “machine teaching a human” on improving their own decisions \cite{selvaraju2017grad}.
-
-
-
-
-% - Image Classification / CNN, ViT
-% - Explainability for visual data (CAM, Grad-CAM, RISE)
-% - Explability targeted at ViT (attention mechanism etc.))
-
-% - Semantic Segmentation (Mask RCNN, U-NET)
-% - Weakly supervised semantic Segmentation
 
 \section{Methods}
 
@@ -268,24 +241,8 @@ Regarding the replication of paper \cite{mainpaper}, no training was required as
 
 
 \section{Conclusions}
-% Summarize your key results - what have you learned? What points do you think one should consider when using the approach of the paper you chose for your project? Suggest ideas for future extensions or new applications of your ideas.
-
-% In this project, we investigated how the ViT architecture can be used for weakly supervised semantic segmentation, combining ideas from previous works as \cite{mainpaper, ahn2018learning, visiontransformer}, to name a few. From our results, we undoubtedly realized the importance of pre-training and knowledge transfer, as we relied on pre-trained weights for all our models, ViT-base, Hybrid ViT-Base and AffinityNet, as well as the beneficial role of producing already high-quality CAMs through our Hybrid ViT-Base model, which were improved after discovering pixel affinities through our AffinityNet implementation, highlighting the success of a proposed model. With our best performing architecture, the Hybrid ViT-Base + Affinity model performs $\~6\%$  better than the baseline (Hybrid ViT-Base) model as trained on Pascal-VOC dataset, see Table \ref{tab:Affinity}. 
-
-
-% In this work, we conclude that the main results from \cite{mainpaper} for the computer vision part is qualitatively reproducible. We combined the approach with AffinityNet \cite{ahn2018learning} to improve the performance of weakly supervised semantic segmentation in terms of IoU. According to the table \ref{tab:Affinity}, we observe that the performance we achieved is lower compared to the one reported in \cite{ahn2018learning}. One reason for that could be the lower quality of ViT explainability seeds compared to the CNN-based ones. For future work, we would like to use the approach in other domains such as video, and reinforcement learning.
-
-
-%%%% 
 In the context of this study, we replicated the ViT explainability approach proposed in \cite{mainpaper}. Additionally, we capitalized on the explainability seeds derived from a Hybrid-ViT architecture to generate competent semantic segmentation labels for weak-supervision. More specifically, the AffinityNet \cite{ahn2018learning} was employed with the purpose of refining the initially incomplete explainability cues into segmentation masks of higher quality. The quantitative results provided in tables \ref{tab:perturbations} and table \ref{tab:segmentation} indicate that we have successfully implemented the explainability method described in \cite{mainpaper} since our results are identical to those originally reported in the latter for all the considered metrics. Regarding the AffinityNet, we evaluated the class-wise mIoU performance that we have achieved based on the explainability seeds as generated by the Hybrid-ViT architecture. 
 
 Furthermore, according to table \ref{tab:Affinity}, we observe that the performance we achieved is lower compared to the one reported in \cite{ahn2018learning}, however segmentation masks of improved quality were generated. One reason for that could be the lower quality of ViT explainability seeds compared to the CNN-based ones. Another potential reason for the lacking performance of the AffinityNet, when given explainability cues from ViT architecture, could be that the feature map $f^\text{aff}$ in our case, derives from low-level image representation where as in the original paper \cite{ahn2018learning} feature representation from multiple levels were aggregated. Such multi-level aggregation was not feasible in our scenario due to the nature of the transformer architecture. 
 
 Concluding, in this work we have demonstrated the feasibility of using ViT-derived explainability cues with the purpose of training the AffinityNet. Although, we were able to increase the quality of the ViT explainability cues by refining them with the AffinityNet, the CNN-based architectures perform better while using lighter models.
-
-\bibliography{references.bib}
-%\bibliographystyle{ieeetr}
-
-
-% \newpage
-
