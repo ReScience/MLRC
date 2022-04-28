@@ -50,6 +50,8 @@ An e-mail was sent to the original authors regarding the differences in results.
 
 \newpage
 % The following section formatting is optional you can also define sections as you deem fit. Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.
+
+
 \section{Introduction}
 Collaborative learning is becoming increasingly common. A deep learning model can be trained by multiple participants without the parties having to share their training set  \cite{yang2019federated, guo2020towards, melis2019exploiting}. Instead, they share gradients, given a public model. This allows private data to be used for training non-private networks. However, recent works discovered that the shared gradients may be used to recover sensitive training samples. This development poses a serious threat to collaborative learning. \citeauthor{gao2021privacy}\cite{gao2021privacy} proposes the ATSPrivacy-Framework as a solution for such reconstruction attacks.
 
@@ -58,6 +60,7 @@ The goal of the ATSPrivacy-Framework is to use simple data augmentations, such a
 As a response on \citeauthor{gao2021privacy}, \citeauthor{balunovic2021bayesian} \cite{balunovic2021bayesian} have shown that the proposed method is not secure during early stages of training. The goal of this research is to extend the research of \citeauthor{gao2021privacy}, and find out whether the method is also insecure in the final stages of training. This will be researched by incorporating knowledge of the policies being used as a defense into the attack model.
 
 % For this reason we test a modified attack model where the attacker learns a translation along with the reconstruction of an image and we evaluate whether the privacy improvements still hold under this model.
+
 
 \section{Scope of Reproducibility}
 \label{sec:claims}
@@ -97,6 +100,7 @@ In the original paper several attack methods have been tested, which all follow 
 
 %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
 
+
 \section{Methodology} \label{sec:method}
 % Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
 
@@ -114,8 +118,8 @@ Given a gradient $\nabla W(x,y)$ the attacker wants to find a sample and label p
 % The original attack model used in the paper tries to reconstruct private training samples using the gradients received in each iteration. Different optimization algorithms are used to extract information from the gradients. Given a gradient $\nabla W(x,y)$ the attacker wants to find a sample and label pair $(x',y')$, such that the matching gradient $\nabla W(x',y')$ approximates $\nabla W$. This can be expressed by minimizing the optimization problem shown in equation \ref{eq:1}. 
 
 \begin{equation}
-\label{eq:1}
-x^*,y^* = argmin_{x',y'} ||\nabla W(x,y) - \nabla W(x',y')||
+    \label{eq:1}
+    x^*,y^* = argmin_{x',y'} ||\nabla W(x,y) - \nabla W(x',y')||
 \end{equation}
 
 A reconstruction attack is considered successful when $x^*$ is very similar to $x$. The term $||\nabla W(x,y) - \nabla W(x',y')||$ is called the gradient loss. This term corresponds with the L1-norm, but it can also be replaced by the L2-norm or cosine distance.
@@ -126,14 +130,16 @@ In order to protect against reconstruction attacks the original dataset $D$ is t
 
 \textbf{Privacy Score} Due to the expensive computation time of the PSNR metric, it is not an efficient method to compare the privacy effect amongst candidate policies. A new privacy score is developed by the authors, which is intended to reflect the privacy leakage given a transformation policy and a model which is trained only for a few epochs. The privacy score is given by Equation \ref{eq:spri}. This equation is a numerical integration over $K$ steps which estimates the area under the curve of the gradient similarity during a reconstruction attack.
 
-\begin{equation}\label{eq:spri}
+\begin{equation}
+    \label{eq:spri}
     S_{pri} (T) \approx \frac{1}{|D| K} \sum_{x\in D}\sum_{j=0}^{K-1} \texttt{GradSim} (x'(\frac{i}K),T(x))
 \end{equation}
 
 
 Where $x'(i) = (1 - i) * x_0 + i * T(x)$ and \texttt{GradSim} measures the gradient similarity between two input samples $(x_1, x_2)$ with the same class $y$, as given by equation \ref{eq:gradsim}.
 
-\begin{equation}\label{eq:gradsim}
+\begin{equation}
+    \label{eq:gradsim}
     \texttt{GradSim}(x_1,x_2) = \frac{<\nabla W(x_1, y), \nabla (x_2, y)>}{|| \nabla W(x_1,y)|| \cdot ||\nabla W(x_2,y)||}
 \end{equation}
 
@@ -222,7 +228,6 @@ The parameters $t_x$ and $t_y$ from the translation module are constrained to a 
 
 % The second method is inspired by the observation that all of the successful augmentations selected by the paper make use of translations to protect the data. In particular, some of these apply a translation that either moves an image half a frame to the right, or half a frame to the left. See Figure \ref{}. This method then simply enforces that the solution is translated in the same way before it is given as input to the neural network.
 
-
 \subsection{Datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
 \citeauthor{gao2021privacy} used the CIFAR100 \cite{unknown-author-2009} and Fashion MNIST \cite{xiao2017fashionmnist} datasets during their research. The CIFAR100 dataset consists of 100 distinct classes, each containing 600 32x32 images. There are 500 training images and 100 testing images per class. The Fashion MNIST contains 70,000 fashion products which can be assigned to 10 distinct categories. Each of the 10 classes contains 7,000 images. There are 60,000 training images and 10,000 testing images.
@@ -253,7 +258,6 @@ The reconstruction algorithm reconstructs one image at a time in 4800 iterations
 
 
 % The parameters stated above are similar to the parameters used by \citeauthor{gao2021privacy} are correct and stable.
-
 
 \subsection{Experimental Setup and Code}\label{sect:experiments}
 % Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
@@ -297,7 +301,7 @@ Accuracy is used to measure model performance. Accuracy is defined as the ratio 
 % For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
 % (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
 We had access to a single GeForce 1080 Ti GPU from the Lisa Cluster
-\cite{lisac}, which has a Bronze 3104 (1.7GHz) processor with  12 CPU Cores and 256GM RAM of memory. % and 4x GeForce 1080Ti, 11 GB GDDR5x GPUs.
+\cite{lisac}, which has a Bronze 3104 (1.7GHz) processor with 12 CPU Cores and 256GM RAM of memory. % and 4x GeForce 1080Ti, 11 GB GDDR5x GPUs.
 
 For the Cifar100 dataset with the ResNet architecture, a complete trainingcycle took 2 hours and evaluating it under the reconstruction attack took 10 hours in order to reconstruct 100 images. The policy search took about 1 minute per policy.
 
@@ -336,68 +340,72 @@ The model's accuracies are comparable in most instances. But, the accuracy found
 % \end{tabular}
 % \caption{x}
 % \end{subtable}
-\\
+%\\
 % \caption{Accuracies for cifar100}
 % \end{table}
 
 
 \begin{table}[h]
 % 0.77007514 0.65832675 0.74841774 0.71064085
-\begin{subtable}{.50\linewidth}\centering
-{\begin{tabular}{|l|l l|}
-\hline
-      \textbf{Policy} &  \textbf{Theirs} & \textbf{Ours} \\\hline
-  None & 76.88 & 77.00     \\
-  3-1-7 &  \color{red} 70.56 & \color{red} 65.83    \\
-  43-18-18 &  77.27 & 74.84   \\
-  Hybrid & \color{red} 77.92 & \color{red} 71.06   \\
-  \hline
-\end{tabular}}
-\caption{Accuracy, Cifar100}\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.50\linewidth}\centering
-{\begin{tabular}{|l|l l |}
-\hline
-      \textbf{Policy} &  \textbf{Theirs} & \textbf{Ours} \\\hline
-  None & \color{red} 13.88 & \color{red} 9.94  $\pm 2.19$ \\
-  3-1-7 & 6.58 &  6.28 $\pm 1.02$ \\
-  43-18-18 & 8.56 & 8.71 $\pm 1.81 $\\
-  Hybrid & 7.64 & 7.48  $\pm 1.85$\\
-  \hline
-\end{tabular}}
-\caption{PSNR, Cifar100}\label{tab:prs}
-\end{subtable}%
-\hfill
-\begin{subtable}{.50\linewidth}\centering
-{\begin{tabular}{|l|l l |}
-\hline
-      \textbf{Policy} &  \textbf{Theirs} & \textbf{Ours} \\\hline
-  None &   95.03&    93.86 \\
-  19-15-45 &  91.33 &  94.08  \\
-  2-43-21  & 89.41 &  93.92 \\
-  Hybrid &  92.23 &   93.51\\
-  \hline
-\end{tabular}}
-\caption{Accuracy, F-Mnist}\label{tab:1b}
-\end{subtable}
-\hfill
-\begin{subtable}{.50\linewidth}\centering
-{\begin{tabular}{|l|l l|}
-\hline
-      \textbf{Policy} &  \textbf{Theirs} & \textbf{Ours} \\\hline
-  None &  10.04 &   9.71 $\pm 2.38$ \\
-  19-15-45 & \color{red} 7.01 & \color{red}  9.88  $\pm 1.80$ \\
-  2-43-21 & 7.75 &  7.94 $\pm  1.30$\\
-  Hybrid & \color{red} 7.60 &   \color{red} 8.94 $\pm 1.71$\\
-  \hline
-\end{tabular}}
-\caption{PSNR, F-Mnist}\label{tab:psnrs}
-\end{subtable}
+    \begin{subtable}{.50\linewidth}
+        \centering
+        {\begin{tabular}{|l|l l|}
+             \hline
+             \textbf{Policy} & \textbf{Theirs}   & \textbf{Ours}     \\\hline
+             None            & 76.88             & 77.00             \\
+             3-1-7           & \color{red} 70.56 & \color{red} 65.83 \\
+             43-18-18        & 77.27             & 74.84             \\
+             Hybrid          & \color{red} 77.92 & \color{red} 71.06 \\
+             \hline
+        \end{tabular}}
+        \caption{Accuracy, Cifar100}\label{tab:1a}
+    \end{subtable}%
+    \hfill
+    \begin{subtable}{.50\linewidth}
+        \centering
+        {\begin{tabular}{|l|l l |}
+             \hline
+             \textbf{Policy} & \textbf{Theirs}   & \textbf{Ours}              \\\hline
+             None            & \color{red} 13.88 & \color{red} 9.94  $\pm 2.19$ \\
+             3-1-7           & 6.58              & 6.28 $\pm 1.02$            \\
+             43-18-18        & 8.56              & 8.71 $\pm 1.81 $           \\
+             Hybrid          & 7.64              & 7.48  $\pm 1.85$             \\
+             \hline
+        \end{tabular}}
+        \caption{PSNR, Cifar100}\label{tab:prs}
+    \end{subtable}%
+    \hfill
+    \begin{subtable}{.50\linewidth}
+        \centering
+        {\begin{tabular}{|l|l l |}
+             \hline
+             \textbf{Policy} & \textbf{Theirs} & \textbf{Ours} \\\hline
+             None            & 95.03           & 93.86         \\
+             19-15-45        & 91.33           & 94.08         \\
+             2-43-21         & 89.41           & 93.92         \\
+             Hybrid          & 92.23           & 93.51         \\
+             \hline
+        \end{tabular}}
+        \caption{Accuracy, F-Mnist}\label{tab:1b}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{.50\linewidth}
+        \centering
+        {\begin{tabular}{|l|l l|}
+             \hline
+             \textbf{Policy} & \textbf{Theirs}  & \textbf{Ours}               \\\hline
+             None            & 10.04            & 9.71 $\pm 2.38$             \\
+             19-15-45        & \color{red} 7.01 & \color{red}  9.88  $\pm 1.80$   \\
+             2-43-21         & 7.75             & 7.94 $\pm  1.30$              \\
+             Hybrid          & \color{red} 7.60 & \color{red} 8.94 $\pm 1.71$ \\
+             \hline
+        \end{tabular}}
+        \caption{PSNR, F-Mnist}\label{tab:psnrs}
+    \end{subtable}
 
-\caption{Comparison between model accuracies, in percentages (a), (c). Comparison between reconstruction scores, in decibels (b), (d). Results that differ substantially are highlighted (accuracy $\Delta 4\%$, PSNR $\Delta 2$dB). The \textit{None} policy performs no augmentations at all, and the \textit{Hybrid} policy randomly choses one of the augmented policies at random, for each image. Standard deviations are given for our PSNR scores ($\pm \sigma$).
-}
-\label{tab:resls}
+    \caption{Comparison between model accuracies, in percentages (a), (c). Comparison between reconstruction scores, in decibels (b), (d). Results that differ substantially are highlighted (accuracy $\Delta 4\%$, PSNR $\Delta 2$dB). The \textit{None} policy performs no augmentations at all, and the \textit{Hybrid} policy randomly choses one of the augmented policies at random, for each image. Standard deviations are given for our PSNR scores ($\pm \sigma$).
+    }
+    \label{tab:resls}
 \end{table}
 
 Figure \ref{fig:imgs} shows a selection of image reconstructions performed by the attack model. Full sets of examples used to calculate the reconstructions scores can be found in Appendix \ref{apx:rdaa}.
@@ -405,50 +413,53 @@ Figure \ref{fig:imgs} shows a selection of image reconstructions performed by th
 \begingroup
 \setlength{\tabcolsep}{2pt}
 \begin{figure}[h]
-\captionsetup{justification=centering}
-\begin{subtable}{.25\linewidth}\centering
-{\begin{tabular}{ l l l l }
-  \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg}  & \includegraphics[width = 24pt]{repimages/ori_98_unaugmented.jpg} \\
-  \includegraphics[width = 24pt]{repimages/rec_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/rec_22_unaugmented.jpg}  &  \includegraphics[width = 24pt]{repimages/rec_98_unaugmented.jpg}  &   \\
-\end{tabular}}
-\caption{Unaugmented, \\ Cifar100}%\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.25\linewidth}\centering
-{\begin{tabular}{ l l l l }
-  \includegraphics[width = 24pt]{repimages/ori_21_hybrid.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages/ori_98_hybrid.jpg} \\
-  \includegraphics[width = 24pt]{repimages/rec_21_hybrid.jpg} &  \includegraphics[width = 24pt]{repimages/rec_22_hybrid.jpg}  &  \includegraphics[width = 24pt]{repimages/rec_98_hybrid.jpg}  &   \\
-\end{tabular}}
-\caption{Hybrid, \\ Cifar100}%\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.25\linewidth}\centering
-{\begin{tabular}{ l l l l }
-  \includegraphics[width = 24pt]{repimages_fmnist/ori_1_unaug.jpg} &  \includegraphics[width = 24pt]{repimages_fmnist/ori_2_unaug.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/ori_3_unaug.jpg} \\
-  \includegraphics[width = 24pt]{repimages_fmnist/rec_1_unaug.jpg} &  \includegraphics[width = 24pt]{repimages_fmnist/rec_2_unaug.jpg}  &  \includegraphics[width = 24pt]{repimages_fmnist/rec_3_unaug.jpg}  &   \\
-\end{tabular}}
-\caption{Unaugmented, \\ F-Mnist}%\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.25\linewidth}\centering
-{\begin{tabular}{ l l l l }
-  \includegraphics[width = 24pt]{repimages_fmnist/ori_1_hybrid.jpg} &  \includegraphics[width = 24pt]{repimages_fmnist/ori_2_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/ori_3_hybrid.jpg} \\
-  \includegraphics[width = 24pt]{repimages_fmnist/rec_1_hybrid.jpg} &  \includegraphics[width = 24pt]{repimages_fmnist/rec_2_hybrid.jpg}  &  \includegraphics[width = 24pt]{repimages_fmnist/rec_3_hybrid.jpg}  &   \\
-\end{tabular}}
-\caption{Hybrid, \\ F-Mnist}%\label{tab:1a}
-\end{subtable}%
-\caption{ Original, augmented and reconstructed images. The images in the first row are either the original images for the unaugmented policy, or the augmented images for the hybrid policy. The images on the second row are the respective reconstructions found by the attack model.}
+    \captionsetup{justification=centering}
+    \begin{subtable}{.25\linewidth}
+        \centering
+        {\begin{tabular}{ l l l l }
+             \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} & \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg}  & \includegraphics[width = 24pt]{repimages/ori_98_unaugmented.jpg} \\
+             \includegraphics[width = 24pt]{repimages/rec_21_unaugmented.jpg} & \includegraphics[width = 24pt]{repimages/rec_22_unaugmented.jpg}  & \includegraphics[width = 24pt]{repimages/rec_98_unaugmented.jpg}  &   \\
+        \end{tabular}}
+        \caption{Unaugmented, \\ Cifar100}%\label{tab:1a}
+    \end{subtable}%
+    \hfill
+    \begin{subtable}{.25\linewidth}
+        \centering
+        {\begin{tabular}{ l l l l }
+             \includegraphics[width = 24pt]{repimages/ori_21_hybrid.jpg} & \includegraphics[width = 24pt]{repimages/ori_22_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages/ori_98_hybrid.jpg} \\
+             \includegraphics[width = 24pt]{repimages/rec_21_hybrid.jpg} & \includegraphics[width = 24pt]{repimages/rec_22_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages/rec_98_hybrid.jpg}  &   \\
+        \end{tabular}}
+        \caption{Hybrid, \\ Cifar100}%\label{tab:1a}
+    \end{subtable}%
+    \hfill
+    \begin{subtable}{.25\linewidth}
+        \centering
+        {\begin{tabular}{ l l l l }
+             \includegraphics[width = 24pt]{repimages_fmnist/ori_1_unaug.jpg} & \includegraphics[width = 24pt]{repimages_fmnist/ori_2_unaug.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/ori_3_unaug.jpg} \\
+             \includegraphics[width = 24pt]{repimages_fmnist/rec_1_unaug.jpg} & \includegraphics[width = 24pt]{repimages_fmnist/rec_2_unaug.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/rec_3_unaug.jpg}  &   \\
+        \end{tabular}}
+        \caption{Unaugmented, \\ F-Mnist}%\label{tab:1a}
+    \end{subtable}%
+    \hfill
+    \begin{subtable}{.25\linewidth}
+        \centering
+        {\begin{tabular}{ l l l l }
+             \includegraphics[width = 24pt]{repimages_fmnist/ori_1_hybrid.jpg} & \includegraphics[width = 24pt]{repimages_fmnist/ori_2_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/ori_3_hybrid.jpg} \\
+             \includegraphics[width = 24pt]{repimages_fmnist/rec_1_hybrid.jpg} & \includegraphics[width = 24pt]{repimages_fmnist/rec_2_hybrid.jpg}  & \includegraphics[width = 24pt]{repimages_fmnist/rec_3_hybrid.jpg}  &   \\
+        \end{tabular}}
+        \caption{Hybrid, \\ F-Mnist}%\label{tab:1a}
+    \end{subtable}%
+    \caption{ Original, augmented and reconstructed images. The images in the first row are either the original images for the unaugmented policy, or the augmented images for the hybrid policy. The images on the second row are the respective reconstructions found by the attack model.}
     \label{fig:imgs}
 \end{figure}
 \endgroup
 
 % It can be seen from table \ref{tab:resls} that the obtained results form our reproductions differ from the results of the original paper. These are highlighted in the table with red colors to indicate substential differences. It can be seen that the accuracy of the hybrid augmentations from the reproduction are lower than the obtained accuracy from the orginal authors. The other differences are mainly in the PSNR score, where the fmnist dataset scores higher than the authors of the original paper claim, which indicate a smaller privacy score and thus results in the used data being easier to reproduce. 
 
-
 \subsection{Additional Insight}
 \textbf{Attacking with knowledge of policy.}
 %A comparison of between the reconstruction with and without knowledge about the best policy can be found in Figure \ref{fig:attack}. It can be seen that the policies no longer score better than no policy. Crazy, right? Yes.
-A comparison between the default attack algorithm used in the original paper and the enhanced attack algorithm, which takes knowledge of the policy into account, is shown in Figure \ref{fig:attack}. It can be seen that the enhanced algorithm performs considerably better for all tested policies, and it even surpasses the reconstruction score of the unaugmented policy for the \textit{43-18-18} policy. More reconstruction examples can be seen in Appendix \ref{apx:reaa}.
+Comparisons between the default attack algorithm used in the original paper and the enhanced attack algorithm, which takes knowledge of the policy into account, are shown in Table \ref{tab:psnrdefenh} and Figure \ref{fig:attack}. It can be seen that the enhanced algorithm performs considerably better for all tested policies, and it even surpasses the reconstruction score of the unaugmented policy for the \textit{43-18-18} policy. More reconstruction examples can be seen in Appendix \ref{apx:reaa}.
 
 % \begin{table}[htp]
 % \centering
@@ -465,67 +476,77 @@ A comparison between the default attack algorithm used in the original paper and
 % \label{tab:attack}
 % \end{table}
 
-\begin{figure}[h]
-
-\begin{subtable}{.30\linewidth}\centering
-\begin{tabular}{|l|ll|}
-\hline
+\begin{table}[h]
+%    \begin{subtable}{1.0\linewidth}
+        \centering
+        \begin{tabular}{|l|ll|}
+            \hline
 % Aligned is isolated_area
-\textbf{Policy} & \textbf{Default} & \textbf{Enhanced} \\ \hline
-None            &             9.94                   &  n/a                                    \\
-3-1-7           &             6.28                   &      9.43 $\pm 2.86$                               \\
-43-18-18  &       8.71                         &  10.34      $\pm 2.28$               \\
-Hybrid          &             7.48                   &         9.42   $\pm 2.85$                     \\ \hline
+            \textbf{Policy} & \textbf{Default} & \textbf{Enhanced} \\ \hline
+            None            & 9.94             & n/a               \\
+            3-1-7           & 6.28             & 9.43 $\pm 2.86$   \\
+            43-18-18        & 8.71             & 10.34      $\pm 2.28$   \\
+            Hybrid          & 7.48             & 9.42   $\pm 2.85$    \\ \hline
 
-\end{tabular}
-\caption{PSNR, Cifar100}\label{tab:erpsnr}
-\end{subtable}%
-\hfill
-\begingroup
-\setlength{\tabcolsep}{1.8pt}
-\begin{subtable}{.11\linewidth}\centering
-{\begin{tabular}{ l l l }
+        \end{tabular}\\
+        \vspace{7pt}
+        \footnotesize {PSNR, Cifar100}
+%    \end{subtable}%
+    \caption{ Comparison between reconstruction scores of the default and enhanced algorithms, in decibels. Standard deviations are given for the enhanced PSNR scores ($\pm \sigma$). }\label{tab:erpsnr}
+    \label{tab:psnrdefenh}
+\end{table}
+
+\begin{figure}[h]
+%    \hfill
+%    \\\\
+    \begingroup
+    \setlength{\tabcolsep}{1.8pt}
+    \begin{subtable}{.33\linewidth}
+        \centering
+        {\begin{tabular}{ l l l }
 %   \textbf{In} & \textbf{In*} & & \textbf{Out} & \textbf{Out*} & & \textbf{Paper} \\
-  \includegraphics[width = 20pt]{enhimages317/ori_77.jpg} &  \includegraphics[width = 20pt]{defimages317/rec_77.jpg} &
-   \includegraphics[width = 20pt]{enhimages317/rec_77.jpg} \\
-  \includegraphics[width = 20pt]{enhimages317/ori_91.jpg} &  \includegraphics[width = 20pt]{defimages317/rec_91.jpg} &
-   \includegraphics[width = 20pt]{enhimages317/rec_91.jpg} \\
-%   \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 20pt]{repimages/ori_22_unaugmented.jpg} & &
-%   \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 20pt]{repimages/ori_22_unaugmented.jpg} & &
-%     \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} \\
-\end{tabular}}
-\caption{3-1-7}%\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.11\linewidth}\centering
-{\begin{tabular}{ l l l }
+             \includegraphics[width = 24pt]{enhimages317/ori_77.jpg} & \includegraphics[width = 24pt]{defimages317/rec_77.jpg} &
+             \includegraphics[width = 24pt]{enhimages317/rec_77.jpg} \\
+             \includegraphics[width = 24pt]{enhimages317/ori_91.jpg} & \includegraphics[width = 24pt]{defimages317/rec_91.jpg} &
+             \includegraphics[width = 24pt]{enhimages317/rec_91.jpg} \\
+%   \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg} & &
+%   \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg} & &
+%     \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} \\
+        \end{tabular}}
+        \caption{3-1-7}%\label{tab:1a}
+    \end{subtable}%
+%    \hfill
+    \begin{subtable}{.33\linewidth}
+        \centering
+        {\begin{tabular}{ l l l }
 %   \textbf{In} & \textbf{In*} & & \textbf{Out} & \textbf{Out*} & & \textbf{Paper} \\
-  \includegraphics[width = 20pt]{enhimages431818/ori_77.jpg} &  \includegraphics[width = 20pt]{defimages431818/rec_77.jpg} &
-   \includegraphics[width = 20pt]{enhimages431818/rec_77.jpg} \\
-  \includegraphics[width = 20pt]{enhimages431818/ori_91.jpg} &  \includegraphics[width = 20pt]{defimages431818/rec_91.jpg} &
-   \includegraphics[width = 20pt]{enhimages431818/rec_91.jpg} \\
-%   \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 20pt]{repimages/ori_22_unaugmented.jpg} & &
-%   \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 20pt]{repimages/ori_22_unaugmented.jpg} & &
-%     \includegraphics[width = 20pt]{repimages/ori_21_unaugmented.jpg} \\
-\end{tabular}}
-\caption{43-18-18}%\label{tab:1a}
-\end{subtable}%
-\hfill
-\begin{subtable}{.11\linewidth}\centering
-{\begin{tabular}{ l l l }
+             \includegraphics[width = 24pt]{enhimages431818/ori_77.jpg} & \includegraphics[width = 24pt]{defimages431818/rec_77.jpg} &
+             \includegraphics[width = 24pt]{enhimages431818/rec_77.jpg} \\
+             \includegraphics[width = 24pt]{enhimages431818/ori_91.jpg} & \includegraphics[width = 24pt]{defimages431818/rec_91.jpg} &
+             \includegraphics[width = 24pt]{enhimages431818/rec_91.jpg} \\
+%   \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg} & &
+%   \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 24pt]{repimages/ori_22_unaugmented.jpg} & &
+%     \includegraphics[width = 24pt]{repimages/ori_21_unaugmented.jpg} \\
+        \end{tabular}}
+        \caption{43-18-18}%\label{tab:1a}
+    \end{subtable}%
+%    \hfill
+    \begin{subtable}{.33\linewidth}
+        \centering
+        {\begin{tabular}{ l l l }
 %   \textbf{In} & \textbf{In*} & & \textbf{Out} & \textbf{Out*} & & \textbf{Paper} \\
-  \includegraphics[width = 20pt]{enhimagesHybrid/ori_77.jpg} &  \includegraphics[width = 20pt]{defimagesHybrid/rec_77.jpg} &
-   \includegraphics[width = 20pt]{enhimagesHybrid/rec_77.jpg} \\
-  \includegraphics[width = 20pt]{enhimagesHybrid/ori_91.jpg} &  \includegraphics[width = 20pt]{defimagesHybrid/rec_91.jpg} &
-   \includegraphics[width = 20pt]{enhimagesHybrid/rec_91.jpg} \\
+             \includegraphics[width = 24pt]{enhimagesHybrid/ori_77.jpg} & \includegraphics[width = 24pt]{defimagesHybrid/rec_77.jpg} &
+             \includegraphics[width = 24pt]{enhimagesHybrid/rec_77.jpg} \\
+             \includegraphics[width = 24pt]{enhimagesHybrid/ori_91.jpg} & \includegraphics[width = 24pt]{defimagesHybrid/rec_91.jpg} &
+             \includegraphics[width = 24pt]{enhimagesHybrid/rec_91.jpg} \\
 %   \includegraphics[width = 25px]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 25px]{repimages/ori_22_unaugmented.jpg} & &
 %   \includegraphics[width = 25px]{repimages/ori_21_unaugmented.jpg} &  \includegraphics[width = 25px]{repimages/ori_22_unaugmented.jpg} & &
 %     \includegraphics[width = 25px]{repimages/ori_21_unaugmented.jpg} \\
-\end{tabular}}
-\caption{Hybrid}%\label{tab:1a}
-\end{subtable}%
-\endgroup
-\caption{Comparison between reconstruction scores, in decibels (a). Column 1 of (b, c, d) are images augmented by the policy. Column 2 of (b, c, d) are the reconstructions given by the default algorithm. Column 3 of (b, c, d) are the reconstructions from the enhanced algorithm. Standard deviations are given for the enhanced PSNR scores ($\pm \sigma$).}
+        \end{tabular}}
+        \caption{Hybrid}%\label{tab:1a}
+    \end{subtable}%
+    \endgroup
+    \caption{Comparison between reconstructions of the default and enhanced algorithms. Column 1 of (a, b, c) are images augmented by the policy. Column 2 of (a, b, c) are the reconstructions given by the default algorithm. Column 3 of (a, b, ckk) are the reconstructions from the enhanced algorithm. }
     \label{fig:attack}
 \end{figure}
 
@@ -544,11 +565,13 @@ In the paper the authors state that the best performing augmentations are often 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=12cm]{pics/policy_comparison.png}
-    \caption{Performance in the search algorithm benchmarks of 1500 random policies. Proposed Accuracy Score Threshold by original authors marked with dashed line. For the privacy score  Split based on if they contain at least 2 of the top 10 policies (the policies with indices: 3, 15, 1, 26, 12, 43, 25, 13, 4 and 39)}
+    \caption{Performance in the search algorithm benchmarks of 1500 random policies. Proposed Accuracy Score Threshold by original authors marked with dashed line. For the privacy score Split based on if they contain at least 2 of the top 10 policies (the policies with indices: 3, 15, 1, 26, 12, 43, 25, 13, 4 and 39)}
     \label{fig:bunch_a_policies}
 \end{figure}
 
 \newpage
+
+
 \section{Discussion}\label{sec:discuss}
 % Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
 
@@ -564,9 +587,6 @@ the algorithm only needs to learn $\frac12 N\times M \times 3$ pixel values and 
 
 The enhanced algorithm still cannot recover information from images that was deleted by the augmentations, such as the regions of the image that are cropped out, or the precise brightness, provided that the image is not augmented differently multiple times when used for collaborative training. This could prove useful in the future for protecting the privacy of participants in collaborative learning systems.
 % But some of these aspects may still be recoverable if the image is augmented multiple times differently during the training of a model, as is standard practice when training neural networks.
-
-
-
 
 \subsection{What Was Easy}
 %  your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
