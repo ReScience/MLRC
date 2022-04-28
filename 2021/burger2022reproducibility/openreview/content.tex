@@ -84,7 +84,7 @@ Such a fully connected classifier is replaced instead by an explainable xSlot mo
 \\
 In order to reproduce the experiments we will train a multitude of such SCOUTER models. All models use ResNeSt-26 \cite{resnest} as their backbone, since that was also used in the experiments we aim to reproduce. All models use the same SCOUTER loss as defined by the original authors. Since there are no pre-trained models made available we will train all models from scratch. For all models the amount of parameters is just above 15,000,000. The full table for parameter counts can be found in Table \ref{tab:num_param}.
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \begin{tabular}{l|c|c}
 \hline
@@ -118,14 +118,14 @@ The ImageNet Large Scale Visual Recognition Challenge (ILSVRC) dataset\footnote{
 %Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
 Many of the hyper-parameters were set in accordance with the original paper, as these were documented and reported. However, not all hyperparameter settings were documented. There is a specific lack of the "slots per class" hyperparameter. We tested both the positive and negative SCOUTER model with four different slots per class hyperparameter settings, namely: 1, 2, 3, and 5. We tested this with $\lambda$ values of both 1 and 10. We found there to be no significant difference in performance in classification accuracy or evaluation metrics between the different slots per class values. As such, all the models that we report on were trained with 1 slot per class since this value was set by the authors in the examples they provided with their code. The full hyperparameter settings can found in Table \ref{tab:hyperparams}.
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \begin{tabular}{lc|lc}
 \hline
 \multicolumn{1}{c}{\textbf{Hyperparameter}} & \textbf{Value}           & \textbf{Hyperparameter} & \multicolumn{1}{l}{\textbf{Value}} \\ \hline
 Epochs                                      & 20                       & Lambda Value            & \{1, 3, 10\}       \\
 Batch Size                                  & 70                       & Slots per Class         & 1                                  \\
-Number of Classes                           & min(N_{classes}, 100) & Power of Slot Loss      & 2                                  \\
+Number of Classes                           & min($N_{classes}$, 100) & Power of Slot Loss      & 2                                  \\
 Learning Rate                               & 0.0001                   & Image Size              & 260                                \\
 Learning Rate Drop                          & 70                       & Channel                 & 2048                               \\
 Hidden Dimensions                           & 64                       & Number of Freeze Layers & 0                                  \\
@@ -191,19 +191,19 @@ We chose to classify results that fall within $\pm$0.05 of the original results 
 \subsubsection{Result 1: reproducing evaluation metric scores}
 The results of our experiments regarding verifying claim 1 can be seen in Table \ref{tab:exp_eval}. From this we can see that the area size metric is largely reproducible, but the other metrics are not. Precision deviates not too much from the original scores, but IAUC, DAUC, infidelity and sensitivity differ a lot. Compared to the original scores obtained for the other explanation methods, SCOUTER does not outperform them with our acquired scores. Thus, we were not able to verify claim 1 with our implementation.
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{l|cc|cc|cc|cc|cc|cc}
 \hline
            & \multicolumn{2}{c|}{\textbf{Area Size}} & \multicolumn{2}{c|}{\textbf{Precision}} & \multicolumn{2}{c|}{\textbf{IAUC}} & \multicolumn{2}{c|}{\textbf{DAUC}} & \multicolumn{2}{c|}{\textbf{Infidelity}} & \multicolumn{2}{c}{\textbf{Sensitivity}} \\
 \textbf{Model}      & original      & reproduced     & original      & reproduced     & original   & reproduced   & original   & reproduced   & original      & reproduced      & original       & reproduced      \\ \hline
-Scouter_+ (\lambda = 1)  & 0.1561        & 0.1564           & 0.8493        & \textcolor{orange}{0.7898}           & 0.7512     & \textcolor{orange}{0.3377}         & 0.1753     & \textcolor{orange}{0.4013}         & 0.0799        & \textcolor{orange}{0.0006}            & 0.0796         & \textcolor{orange}{1.9167}            \\
-Scouter_+ (\lambda = 3)  & 0.0723        & \textcolor{orange}{0.1545}            & 0.8488        & \textcolor{orange}{0.7949}            & 0.7650     & \textcolor{orange}{0.3564}          & 0.1423     & \textcolor{orange}{0.4641}          & 0.0949        & \textcolor{orange}{0.0001}             & 0.0608         & \textcolor{orange}{1.5672}             \\
-Scouter_+ (\lambda = 10) & 0.0476        & \textcolor{orange}{0.1448}           & 0.9257        & \textcolor{orange}{0.7870}            & 0.7647     & \textcolor{orange}{0.3466}          & 0.2713     & \textcolor{orange}{0.4203}         & 0.0840        & 0.0601            & 0.1150         & \textcolor{orange}{2.2629}              \\ \hline
-Scouter_- (\lambda = 1)  & 0.0643        & 0.0946             & 0.8238        & 0.8481             & 0.7343     & \textcolor{orange}{0.2446}           & 0.1969     & \textcolor{orange}{0.4845}           & 0.0046        & 0.0012              & 0.0567         & \textcolor{orange}{2.2735}              \\
-Scouter_- (\lambda = 3)  & 0.0545        & 0.0804            & 0.8937         & \textcolor{orange}{0.6686}            & 0.6958     & \textcolor{orange}{0.3488}          & 0.4286     & \textcolor{orange}{0.3555}          & 0.0196        & \textcolor{orange}{0.0961}             & 0.1497         & \textcolor{orange}{2.9514}             \\
-Scouter_- (\lambda = 10) & 0.0217        & 0.0364           & 0.8101        & \textcolor{orange}{0.8968}           & 0.6730     & \textcolor{orange}{0.2148}         & 0.7333     & \textcolor{orange}{0.4783}         & 0.0014        & 0.0028            & 0.1895         & \textcolor{orange}{3.0524}           \\ \hline
+$\text{SCOUTER}_+$ ($\lambda$ = 1)  & 0.1561        & 0.1564           & 0.8493        & \textcolor{orange}{0.7898}           & 0.7512     & \textcolor{orange}{0.3377}         & 0.1753     & \textcolor{orange}{0.4013}         & 0.0799        & \textcolor{orange}{0.0006}            & 0.0796         & \textcolor{orange}{1.9167}            \\
+$\text{SCOUTER}_+$ ($\lambda$ = 3)  & 0.0723        & \textcolor{orange}{0.1545}            & 0.8488        & \textcolor{orange}{0.7949}            & 0.7650     & \textcolor{orange}{0.3564}          & 0.1423     & \textcolor{orange}{0.4641}          & 0.0949        & \textcolor{orange}{0.0001}             & 0.0608         & \textcolor{orange}{1.5672}             \\
+$\text{SCOUTER}_+$ ($\lambda$ = 10) & 0.0476        & \textcolor{orange}{0.1448}           & 0.9257        & \textcolor{orange}{0.7870}            & 0.7647     & \textcolor{orange}{0.3466}          & 0.2713     & \textcolor{orange}{0.4203}         & 0.0840        & 0.0601            & 0.1150         & \textcolor{orange}{2.2629}              \\ \hline
+$\text{SCOUTER}_-$ ($\lambda$ = 1)  & 0.0643        & 0.0946             & 0.8238        & 0.8481             & 0.7343     & \textcolor{orange}{0.2446}           & 0.1969     & \textcolor{orange}{0.4845}           & 0.0046        & 0.0012              & 0.0567         & \textcolor{orange}{2.2735}              \\
+$\text{SCOUTER}_-$ ($\lambda$ = 3)  & 0.0545        & 0.0804            & 0.8937         & \textcolor{orange}{0.6686}            & 0.6958     & \textcolor{orange}{0.3488}          & 0.4286     & \textcolor{orange}{0.3555}          & 0.0196        & \textcolor{orange}{0.0961}             & 0.1497         & \textcolor{orange}{2.9514}             \\
+$\text{SCOUTER}_-$ ($\lambda$ = 10) & 0.0217        & 0.0364           & 0.8101        & \textcolor{orange}{0.8968}           & 0.6730     & \textcolor{orange}{0.2148}         & 0.7333     & \textcolor{orange}{0.4783}         & 0.0014        & 0.0028            & 0.1895         & \textcolor{orange}{3.0524}           \\ \hline
 \end{tabular}}
 \vspace{3mm}
 \caption{Explanation evaluation metrics for all different SCOUTER models trained on ImageNet. The original scores are reported in Table 1 in \cite{scouter}. Scores that diverge more than 0.05 from the original value are highlighted in orange.}
@@ -213,16 +213,16 @@ Scouter_- (\lambda = 10) & 0.0217        & 0.0364           & 0.8101        & \t
 
 \subsubsection{Result 2: Reproducing Classification Accuracy}
 The results of our experiments regarding the verification of claim 2 can be seen in Table \ref{tab:classification_table}. As we can see, we were able to reproduce all scores for the models trained on ImageNet. We could also recreate the accuracy scores for the FC model on the other datasets. However, we did not obtain similar scores for any of the SCOUTER models on Con-text and CUB-200-2011. Our trained SCOUTER models perform significantly worse on these datasets compared to what the original paper reported and the scores we obtained for the FC models. Therefore, we did not find full support for claim 2, as we did not find SCOUTER to perform similar to the FC model on Con-text and CUB-200-2011. 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \resizebox{0.55\columnwidth}{!}{
 \begin{tabular}{c|cc|cc|cc}
 \hline
 \textbf{}      & \multicolumn{2}{c|}{\textbf{ImageNet}} & \multicolumn{2}{c|}{\textbf{Con-text}} & \multicolumn{2}{c}{\textbf{CUB-200-2011}} \\
 \textbf{Model} & original          & reproduced         & original          & reproduced         & original           & reproduced           \\ \hline
-FC             & 0.8080            & 0.8086               & 0.6732            & 0.6831 (\pm 0.0156)             & 0.7538             & 0.7824 (\pm 0.0274)                 \\
-Scouter_+       & 0.7991            & 0.7717             & 0.6870            & \textcolor{orange}{0.5492} (\pm 0.0182)             & 0.7362             & \textcolor{orange}{0.4718} (\pm 0.0212)               \\
-Scouter_-       & 0.7946            & 0.7952             & 0.6866            & \textcolor{orange}{0.6093} (\pm 0.0191)             & 0.7490             & \textcolor{orange}{0.4143} (\pm 0.0235)               \\ \hline
+FC             & 0.8080            & 0.8086               & 0.6732            & 0.6831 ($\pm$ 0.0156)             & 0.7538             & 0.7824 ($\pm$ 0.0274)                 \\
+$\text{SCOUTER}_+$       & 0.7991            & 0.7717             & 0.6870            & \textcolor{orange}{0.5492} ($\pm$ 0.0182)             & 0.7362             & \textcolor{orange}{0.4718} ($\pm$ 0.0212)               \\
+$\text{SCOUTER}_-$       & 0.7946            & 0.7952             & 0.6866            & \textcolor{orange}{0.6093} ($\pm$ 0.0191)             & 0.7490             & \textcolor{orange}{0.4143} ($\pm$ 0.0235)               \\ \hline
 \end{tabular}}
 \vspace{3mm}
 \caption{Classification accuracy on various datasets. The original scores are reported in Table 3 in \cite{scouter} with ResNeSt-26 as backbone. Scores that diverge more than 0.05 from the original value are highlighted in orange. Where applicable, standard deviation is reported in parentheses.}
@@ -232,16 +232,16 @@ Scouter_-       & 0.7946            & 0.7952             & 0.6866            & \
 \subsubsection{Result 3: reproducing ACRIMA confusion matrix evaluations}
 The results of our experiments regarding claim 3 can be seen in Table \ref{tab:acrima_table}. We were able to reproduce all results reported in the original paper. However, claim 3 states that SCOUTER achieves a higher score than the FC model in the reported confusion matrix metrics. This was not the case with the results we found. There is a very slight difference between the scores of SCOUTER and the FC model, where in some cases the FC model obtains a marginally higher score than (one of) the SCOUTER models. In the original paper, SCOUTER also only slightly outperformed the FC model. Thus, we have been able to reproduce the reported scores, but these results do not fully support claim 3. 
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{c|cc|cc|cc|cc|cc|cc}
 \hline
                & \multicolumn{2}{c|}{\textbf{AUC}} & \multicolumn{2}{c|}{\textbf{Accuracy}} & \multicolumn{2}{c|}{\textbf{Precision}} & \multicolumn{2}{c|}{\textbf{Recall}} & \multicolumn{2}{c|}{\textbf{F1-Score}} & \multicolumn{2}{c}{\textbf{Kappa}} \\
 \textbf{Model} & original       & reproduced       & original          & reproduced         & original          & reproduced          & original         & reproduced        & original          & reproduced         & original        & reproduced       \\ \hline
-FC             & 0.9997         & 0.9993 (\pm 0.0003)              & 0.9857            & 0.9843 (\pm 0.0141)                & 0.9915            & 0.9897 (\pm 0.0121)                 & 0.9831           & 0.9811 (\pm 0.0103)               & 0.9872            & 0.9836 (\pm 0.0092)                & 0.9710          & 0.9561 (\pm 0.0227)              \\ 
-Scouter_+       & 1.000          & 0.9953 (\pm 0.0034)           & 1.000             & 0.9831 (\pm 0.0129)             & 1.000             & 0.9718 (\pm 0.0212)             & 1.000            & 0.9919 (\pm 0.0096)            & 1.000             & 0.9854 (\pm 0.0103)             & 1.000           & 0.9566 (\pm 0.0329)           \\ 
-Scouter_-       & 0.9999         & 0.9989 (\pm 0.0004)           & 0.9952            & 0.9856 (\pm 0.0092)             & 1.0000            & 0.9896 (\pm 0.0082)              & 0.9915           & 0.9768 (\pm 0.0213)            & 0.9957            & 0.9876 (\pm 0.106)             & 0.9903          & 0.9757 (\pm 0.0208)           \\ \hline
+FC             & 0.9997         & 0.9993 ($\pm$ 0.0003)              & 0.9857            & 0.9843 ($\pm$ 0.0141)                & 0.9915            & 0.9897 ($\pm$ 0.0121)                 & 0.9831           & 0.9811 ($\pm$ 0.0103)               & 0.9872            & 0.9836 ($\pm$ 0.0092)                & 0.9710          & 0.9561 ($\pm$ 0.0227)              \\ 
+$\text{SCOUTER}_+$       & 1.000          & 0.9953 ($\pm$ 0.0034)           & 1.000             & 0.9831 ($\pm$ 0.0129)             & 1.000             & 0.9718 ($\pm$ 0.0212)             & 1.000            & 0.9919 ($\pm$ 0.0096)            & 1.000             & 0.9854 ($\pm$ 0.0103)             & 1.000           & 0.9566 ($\pm$ 0.0329)           \\ 
+$\text{SCOUTER}_-$       & 0.9999         & 0.9989 ($\pm$ 0.0004)           & 0.9952            & 0.9856 ($\pm$ 0.0092)             & 1.0000            & 0.9896 ($\pm$ 0.0082)              & 0.9915           & 0.9768 ($\pm$ 0.0213)            & 0.9957            & 0.9876 ($\pm$ 0.106)             & 0.9903          & 0.9757 ($\pm$ 0.0208)           \\ \hline
 \end{tabular}}
 \vspace{3mm}
 \caption{Confusion matrix metrics obtained by the models on the ACRIMA datasets. The original scores are reported in Table 4 in \cite{scouter}. Scores that diverge more than 0.05 from the original value are highlighted in orange. Where applicable, standard deviation is reported in parentheses.}
@@ -287,4 +287,4 @@ Lastly, there was no code provided for working with the ACRIMA dataset. We had t
 We sent an e-mail to the authors enquiring about the missing code. However, we did not receive a reply.
 
 %\bibliographystyle{plain}
-\bibliography{bibliography}
+%\bibliography{bibliography}
