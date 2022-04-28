@@ -1,4 +1,50 @@
 \newpage
 \section*{Appendix}
-\subsection{More details}
-This is an \textit{extended appendix}.
+\stepcounter{section}
+\subsection{List of inconsistencies, assumptions and corrections}
+\label{app:inconsistencies}
+After studying the original paper and the provided code, we spotted a few inconsistencies between the two. In order to deal with them, we had to make some assumptions that better aligned with the methods presented in the original paper.
+
+Regarding the influence attack on fairness, Koh et al.~\cite{koh2018} suggest that the train set during the attack is not $\mathcal{D}_c \cup \mathcal{D}_p$, but $B(\mathcal{D}_c \cup \mathcal{D}_p)$, i.e. the set that passes from the defense mechanism $B$. Hence, we assume that when the authors mention that they \textit{update the feasible set $\mathcal{F}_{\beta} \leftarrow B(\mathcal{D}_c \cup \mathcal{D}_p)$}, they mean that they update the parameters $\beta$ of the feasible set. Additionally, pre-computing $H^{-1}_{\hat{\theta}}$ is computationally expensive and is avoided in the authors' code. Instead the computational trick introduced in Koh et al.~\cite{koh2017} is used.
+
+Regarding the anchoring attack, we noticed two issues in the paper and the accompanied code. The anchoring attack with non-random sampling is deterministic and thus each iteration of attack will result in the same poisoned dataset $\mathcal{D}_p$ discarding the need to have multiple iterations. Moreover, the anchoring attack with random sampling is a stochastic method, yet in the existing implementation, the random number generator is seeded with the same number in every iteration, resulting in the same poisoned dataset $\mathcal{D}_p$. As a result, the attack's output will be deterministically generated as the method's stochasticity is discarded with the iterations being redundant.
+
+Regarding the helper functions for both attacks and defenses, it seems that the authors use the LP relaxation technique implemented in \cite{koh2018} by default in their experiments. However, we could not find an explicit mention of this in paper. Additionally, we did not find any suggestion for choosing the neighbor cutoff radius $\sigma$, which seems to be hard-coded for every dataset. Finally, the choice of radii for the L2 constraint and slab cutoff are not discussed in the paper, although the authors seem to use similar techniques to the ones discussed in \ref{sec:Defenses}.
+
+Regarding the pre-processing pipeline applied to the original data, we noticed it is neither mentioned in the paper nor provided in the GitHub repository of the authors. After contacting them, they pointed us to another repository that included a similar pre-processing pipeline to the one applied for the paper. Observing the code, we noticed two issues. Categorical data were converted to one-hot encoded and then standardized with the quantitative features, which is not the most efficient technique. Also, the test data were normalized along with the train data, allowing information from the test set to be utilized for training.
+
+Regarding the experimental setup, the reported results in the paper are the output of a single seed for the random generator. As a consequence, there was only a single split of the data between training and testing leading to results with high variance.
+
+\subsection{Finding the most popular point in a dataset}
+\label{app:nraa}
+Let $\mathbf{x}_1, \mathbf{x}_2, \dots, \mathbf{x}_n \in \mathbb{R}^m$ be points in a dataset $\mathcal{X}$. Our goal is to define the most popular point $\mathbf{x}_{\mathrm{pop}}$ in a meaningful way, such that it is dataset agnostic, i.e. it does not require manual input of parameters, such as a manually defined radius for each dataset. We mainly experimented with two methods.
+
+\begin{itemize}
+    \item \textbf{Method A: Percentile Radius}: We define the most popular point
+    \begin{equation}
+        \mathbf{x}_\mathrm{popA} \stackrel{\mathrm{def}}{=} \underset{\mathbf{x}\in\mathcal{X}}{\operatorname{argmax}}\operatorname{CountN}\left(\mathbf{x}, R\right)
+    \end{equation}where $\operatorname{CountN}(\mathbf{x}, R)$ is a function that returns the number of points $\mathbf{x}_i\in\mathcal{X}$ such that $d(\mathbf{x}, \mathbf{x}_i) \leq R, \;R\in\mathbb{R^+}\;\forall \mathbf{x}_i \in \mathcal{X}$ for some distance metric $d$. The problem of picking a fitting radius $R$ is not trivial as the radius has to be neither too small nor too big as either all or no points would be considered neighbors, respectively. The method we propose is to pick a radius $R$ such that at least $\alpha\%$ of $\mathbf{x}\in \mathcal{X}$ satisfy $||\mathbf{x} - \boldsymbol{\mu}|| \leq R$, where $\boldsymbol{\mu}$ the centroid of $\mathcal{X}$. In our experiments, $\alpha=15$ has proved to be decent for all three datasets.
+    \item \textbf{Method B: Exponentially decayed distances}:
+    We define the most popular point
+    \begin{equation}
+        \mathbf{x}_{\mathrm{popB}} \stackrel{\mathrm{def}}{=} \underset{\mathbf{x}\in\mathcal{X}}{\operatorname{argmax}} \displaystyle\sum_{\mathbf{x}'\in\mathcal{X}} \exp\left(-\frac{d(\mathbf{x}, \mathbf{x}')}{\sigma^2_{d(\mathcal{X})}}\right)
+    \end{equation}
+
+    where $d$ is a distance metric and $\sigma^2_{d(\mathcal{X})}$ denotes the variance of all the distances of the points in the dataset to each other under $d$. We define $\sigma_{d(\mathcal{X})}^2\stackrel{\mathrm{def}}{=}\operatorname{Var}\left(\operatorname{vec}(d(\mathcal{X})\right))$, where  $\left[d(\mathcal{X})\right]_{i j}:=d\left(\left[\mathcal{X}\right]_{i :}, \left[\mathcal{X}\right]_{j :}\right)$.
+\end{itemize}
+
+In Method A, we still define neighbors based on balls surrounding datapoints. Even though we still have to pick an $\alpha$, the choice is easier, as we don't have to manually check the distances in the dataset.
+
+In Method B, we discard the idea of neighbors based on radii around points and we turn our focus on finding a datapoint in a very dense area of the dataset. To ensure that the sum is higher for points with a lot of other points in their close vicinity, we exponentially decay the distances. This forces points close to our point in question to contribute more to the sum. We also need the method to be dataset agnostic, thus we need to scale the wideness of the exponential kernel. If the variance\footnotemark of the distances is high, we need to widen the kernel such that points further away still contribute to the sum. In contrast, if distances have low variance we need to sharpen the exponential kernel to make sure that only points close enough to the point in question contribute to the sum. We define the variance of the dataset $\mathcal{X}$ as $\sigma_{d(\mathcal{X})}^2=\operatorname{Var}\left(\operatorname{vec}(d(\mathcal{X})\right))$, where  $\left[d(\mathcal{X})\right]_{i j}:=d\left(\left[\mathcal{X}\right]_{i :}, \left[\mathcal{X}\right]_{j :}\right)$. We opted for this method since it requires the least amount of arbitrary assumptions about the dataset. Preliminary experiments hinted towards method B achieving slightly better results in our task, but this wasn't pursued further.
+
+In the Anchoring Attack, we need to sample a negative sample $x_{\mathrm{target-}}$ from the advantaged class $\mathcal{D}_{\mathrm{adv}}$ and a positive sample $x_{\mathrm{target+}}$ from the disadvantaged class $\mathcal{D}_{\mathrm{disadv}}$. In the non-random sampling setting (NRAA), we simply calculate the most popular point in the negative but advantaged class $\mathcal{D}_{\mathrm{adv}}\cap\mathcal{D}^-\subset \mathcal{D}$ and the most popular point in the positive but disadvantaged class $\mathcal{D}_{\mathrm{disadv}}\cap\mathcal{D}^+\subset \mathcal{D}$.
+
+\footnotetext{The mean of the dataset or some other statistic could also be used, which intuitively makes more sense. Basic experiments hinted that dividing by the variance performed better, but the mean method can not be completely discarded as we didn't conduct thorough experiments due to time constraints.}
+
+\subsection{Data Augmentation}
+\label{appendix:data_augmetation}
+As it has been demonstrated through experimental evaluation, the IAF can deteriorate a model's fairness. However, we argue that the same approach can be applied for data augmentation to increase a model's fairness resulting in an unbiased classifier.
+
+The use of the fairness metrics with absolute values, as described in Section~\ref{sec:metrics}, fails to highlight the bias direction. However, by using the actual differences of the metrics, we can utilize this information. Therefore, knowing the initial bias of the data by inspecting the sign of $P(y_{\mathrm{label}} \mid \mathbf{x} \in \mathcal{D}_{\mathrm{adv}}) - P(y_{\mathrm{label}} \mid \mathbf{x} \in \mathcal{D}_{\mathrm{disadv}})$, we can assume that the model's bias will be in the same direction, i.e., the SPD and EOD will have the same sign. To this end, to direct a model's bias towards zero, we have to use the opposite sign of the aforementioned quantity for the values of $\lambda$.
+
+Moreover, as the altered method is used for augmentation, the test dataset $\mathcal{D}_{\mathrm{test}}$ should not be utilized, in contrast with the IAF. Finally, we could use a validation set to halt the data augmentation process in order to find the optimal value of $\lambda$ where the SPD and EOD would be close to zero.

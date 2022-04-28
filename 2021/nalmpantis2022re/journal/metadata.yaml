@@ -6,56 +6,63 @@
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
 # Change the default title
-title: "[Re] A report in MLRC 2021"
+title: "[Re] Exacerbating Algorithmic Bias through Fairness Attacks"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: John Doe
+  - name: Angelos Nalmpantis
     orcid: 0000-0000-000-000
-    email: johndoe@gmail.com
-    affiliations: 1,*
+    email: angelos.nalampantis@student.uva.nl
+    affiliations: 1,2,*
 
-  - name: Foo Bar
-    orcid: 0000-0000-000-001
-    email: foobar@gmail.com
-    affiliations: 1      # * is for contact author
+  - name: Apostolos Panagiotopoulos
+    orcid: 0000-0003-3785-0642
+    email: apostolos.panagiotopoulos@student.uva.nl
+    affiliations: 1,2
+
+  - name: John Gkountouras
+    orcid: 0000-0001-6085-2983
+    email: john.gkountouras@student.uva.nl
+    affiliations: 1,2
+
+  - name: Konstantinos Papakostas
+    orcid: 0000-0002-2096-2931
+    email: konstantinos.papakostas@student.uva.nl
+    affiliations: 1,2
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Hogwarts University
-    address: Hogsmeade, UK
+    name:    University of Amsterdam
+    address: Amsterdam, NL
+  - code:    2
+    name:    Equal contributions
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords:  rescience c, machine learning, deep learning, python, pytorch
+keywords:  rescience c, machine learning, python, pytorch, fairness, adversarial attacks
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/
+  - url: https://github.com/toliz/fairness-attacks
   - doi: 00.0000/zenodo.0000000
-  - swh: swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
-# Data URL and DOI (optional if no data)
-data:
-  - url:
-  - doi:
+  - swh: swh:1:dir:224b71f5d3c02f260427e2f7c492b6db98c65638
 
 # Information about the original article that has been replicated
 replication:
- - cite: "Yoshua Bengio, Yann Lecun, Geoffrey Hinton. All you need is AGI (ICML 2042)."
- - bib:  bengio2042
- - url:  https://arxiv.org/pdf/xxxx.pdf
- - doi:  # Regular digital object identifier
+ - cite: "Ninareh Mehrabi, Muhammad Naveed, Fred Morstatter, Aram Galstyan. Exacerbating Algorithmic Bias through Fairness Attacks (AAAI 2021)."
+ - bib:  mehrabi2021exacerbating
+ - url:  https://arxiv.org/pdf/2012.08723.pdf
+ - doi:  10.48550/arXiv.2012.08723
 
 # Don't forget to surround abstract with double quotes
-abstract: "AGI is not all you need."
+abstract: "We conducted a reproducibility study of the paper 'Exacerbating Algorithmic Bias through Fairness Attacks'. According to the paper, current research on adversarial attacks is primarily focused on targeting model performance, which motivates the need for adversarial attacks on fairness. To that end, the authors propose two novel data poisoning adversarial attacks, the influence attack on fairness and the anchoring attack. We aim to verify the main claims of the paper, namely that: a) the proposed methods indeed affect a model's fairness and outperform existing attacks, b) the anchoring attack hardly affects performance, while impacting fairness, and c) the influence attack on fairness provides a controllable trade-off between performance and fairness degradation."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -80,7 +87,7 @@ language: Python
 
 # For example, the URL of the GitHub issue where review actually occured
 review:
-  - url: https://openreview.net/forum?id=forum_id
+  - url: https://openreview.net/forum?id=rYLMJ6zX3RF
 
 contributors:
   - name: Koustuv Sinha
