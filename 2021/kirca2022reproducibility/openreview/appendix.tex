@@ -1,0 +1,126 @@
+\newpage
+\section*{Appendix}
+\subsection*{More details}
+% This is an \textit{extended appendix}.
+
+\textbf{List of used dependencies}
+\begin{itemize}
+    \item Python 3.6
+    \item PIP 20.3.1
+    \item setuptools 19.2 (in most of the cases you have to downgrade)
+    \item Tensorflow 1.12.3
+    \item scikit-learn 0.23.1
+    \item tensorboard 1.12.2
+    \item cvxpy 0.4.11 [cvxpy 1.0+ is not backwards compatible, therefore the downgrade of setuptools]
+    \item CVXcanon 0.1.1
+    \item scs 2.1.2
+    \item scipy 1.1.0
+    \item numpy 1.16.2
+    \item pandas 1.1.4
+    \item Matplotlib 3.3.3
+    \item tabulate 0.8.9
+    \item seaborn 0.11.0
+    \item tqdm 4.62.3
+    \item IPython 7.16.1
+    \item pillow 8.0.1
+\end{itemize}
+
+\textbf{List of Assumptions Made}
+\begin{itemize}
+    \item The seed used by the authors is the default seed observed in the code.
+    \item Data was shuffled before use
+    \item Categorical features were one-hot encoded except the sensitive feature.
+    \item Female is represented with the value 1 and male with the value 0.
+    \item Data was standardized with a mean of 0 and a standard deviation of 1
+    \item Results were based on the test error, SPD and EOD of the last iteration.
+    \item The feasible set is assumed to be decided by simply projecting the data to a sphere or slab within the vicinity of the target
+\end{itemize}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Abbreviation & Meaning & Page \\
+        \hline
+        ML & Machine learning & \pageref{intro} \\
+        SPD & Statistical parity difference & \pageref{sec:claims} \\
+        EOD & Equality of oppurtunity difference & \pageref{sec:claims} \\
+        IAF & Influence attack on fairness & \pageref{intro} \\
+        DPA & Data poisoning attack & \pageref{model description} \\
+        RAA & Random anchoring attack & \pageref{model description} \\
+        NRAA & Non-random anchoring attack & \pageref{model description} \\
+        \hline
+    \end{tabular}
+    \vspace{0.3cm}
+    \caption{Summary of Abbreviations}
+    \label{tab:abbreviations}
+\end{table}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/papers_results.png}
+\centering
+\caption{Results obtained for different attacks (\cite{mehrabi2020exacerbating}})
+\label{papers_results}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/metrics_plot.png}
+\centering
+\caption{Results obtained for different attacks with different metrics: mean, max and last.}
+\label{metrics_plot}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/authors_data_seed_1.png}
+\centering
+\caption{Results obtained for different attacks using seed 1 and data sets provided by \cite{mehrabi2020exacerbating}}
+\label{authors_seed1}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/authors_data_seed_2.png}
+\centering
+\caption{Results obtained for different attacks using seed 2 and data sets provided by \cite{mehrabi2020exacerbating}}
+\label{authors_seed2}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/recreated_data_seed_1.png}
+\centering
+\caption{Results obtained for the novel fairness attacks using seed 1 and the recreated data sets}
+\label{recreated_seed1}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/recreated_data_seed_2.png}
+\centering
+\caption{Results obtained for the novel fairness attacks using seed 2 and the recreated data sets}
+\label{recreated_seed2}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.45\textwidth]{../openreview/images/alg1.png}
+\includegraphics[width=0.45\textwidth]{../openreview/images/alg2.png}
+\centering
+\caption{Left: IAF algorithm. Right: Anchoring attack algorithm, as described in \cite{mehrabi2020exacerbating}}
+\label{alg}
+\label{alg2}
+\end{figure}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{l r r r r r r}
+    % \toprule\\
+    &\multicolumn{2}{l}{IAF} & \multicolumn{2}{l}{RAA} & \multicolumn{2}{l}{NRAA} \\ \hline 
+    & Time (s) & \# iters & Time (s) & \# iters & Time (s) & \# iters \\
+    \hline\\
+    COMPAS  &     88.0 &    77.0 &     33.0 &    28.0 &   5411.0 &    28.0 \\
+    Drug consumption &     50.0 &    67.0 &     20.0 &    28.0 &    170.0 &    28.0 \\
+    German           &    203.0 &   143.0 &     30.0 &    28.0 &     67.0 &    28.0 \\
+    \bottomrule\\
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Summary of time and iterations needed to run each data set}
+    \label{table:time_iter}
+\end{table}
+

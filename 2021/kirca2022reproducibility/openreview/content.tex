@@ -1,0 +1,348 @@
+\section{Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+The goal of this paper is to assess the reproducibility of experiments and results in the paper 'Exacerbating Algorithmic Bias through Fairness Attacks' by \cite{mehrabi2020exacerbating}, from which the following claims are evaluated:
+\begin{itemize}
+    \item[$-$] Claim 1: The anchoring attacks reduce the fairness of an ML model trained on the three data sets German Credit, COMPAS and Drug consumption.
+    \item[$-$] Claim 2: The influence attack reduces the fairness of an ML model trained on the three data sets German Credit, COMPAS and Drug consumption.
+\end{itemize}
+
+\subsection*{Methodology}
+
+We used the code the authors published alongside their paper as a resource to understand the methodology of their experiments, which was only briefly touched upon in the original paper. Our contribution is to extrapolate the original method using the provided code and to use this to recreate the experiments, successfully obtaining similar results as the paper and supporting their claims.
+
+\subsection*{Results}
+Our results followed similar patterns as those of the authors, which backs up their claims regarding the attacks. However, our results did slightly deviate from their results, meaning the original paper has some reproducibility issues in the context of our experimental setup.
+
+\subsection*{What was easy and what was difficult}
+
+It was difficult to understand the experiments from the paper. In our specific setting it was not possible to obtain similar results following only the methodology of their paper. Recreating the data sets required several assumptions. Reorganizing the code was a challenge in and of itself, owing to a lack of documentation within the original code.
+
+\subsection*{Communication with original authors}
+We had no direct contact with the authors. However, other research teams working on reproducing the same work provided us with a digital environment file supplied to them by the authors.
+
+% \subsection{Submission Checklist}
+
+% Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+
+% \begin{itemize}
+% \item Title should start with "\texttt{[Re]}"
+% \item Author information, along with ORCID id
+% \item Author affiliations
+% \item Code URL, Software Heritage Foundation link
+% \item Abstract
+% \item Review URL (the OpenReview URL of your report)
+% \end{itemize}
+
+% \subsection{Continuous Integration}
+
+% We use Github Actions CI to check your submission and compile the pdf file subsequently.
+% You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+
+\clearpage
+
+% \section{Content}
+
+\section{Introduction}
+\label{intro}
+
+Recent years have seen a rising interest in algorithmic fairness, which has led to different measures and definitions for characterizing fairness (\cite{dwork2012fairness, hardt2016equality, kusner2017counterfactual, verma2018, mehrabi2019survey}). Areas in which algorithmic fairness has become prevalent include predicting whether prisoners are likely to re-offend upon release (\cite{duwe2017}) or whether an individual is likely to default on a loan payment (\cite{ereiz2019}).
+
+In 'Exacerbating Algorithmic Bias through Fairness Attacks' by \cite{mehrabi2020exacerbating} it is claimed that machine learning (ML) models are not only susceptible to various malicious adversarial attacks targeting their accuracy, but also to those targeting the fairness of ML models.
+Mehrabi argues that a model's fairness is as important as its accuracy and research into adversarial attacks specifically designed to attack fairness is therefore warranted. To test the robustness of fairness methods intended to increase the fairness of an ML model, the researchers propose two novel data poising attacks on fairness, those being the anchoring attack and the influence attack.
+
+The anchoring attack has two variations; random and non-random. The core concept is to place poisoned points near real data points of a data set, to skew the decision boundary of an ML model. These poisoned points are identical to the point they are placed close to, but with the opposite target label. 
+The influence attack on fairness (IAF) aims to lower the fairness of an ML model by introducing fairness loss to the loss function. Maximizing for this loss function maximizes the covariance between the distance to the decision boundary and the sensitive features.
+
+This paper investigates the reproducibility of the research of \cite{mehrabi2020exacerbating}. Additionally, their claims regarding the two proposed fairness attacks the fairness of a targeted ML model will be tested, analyzed, and evaluated.
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+The main contribution of \cite{mehrabi2020exacerbating} is presenting two novel fairness attacks, called (random and non-random) anchoring attacks and influence attacks, and showing that these attacks more negatively impact the fairness scores of ML models than adversarial attacks on accuracy. 
+To reproduce to work of the the original paper, the code and altered versions of three data sets, German Credit, Drug Consumption and COMPAS data sets accompanying the paper, which is publicly available on GitHub\footnote{\href{https://github.com/Ninarehm/attack}{https://github.com/Ninarehm/attack}}, are utilized.
+Fairness is quantified using the metrics statistical parity difference (SPD) (\cite{dwork2012fairness}) and equality of opportunity difference (EOD) (\cite{hardt2016equality}), following the approach of \cite{mehrabi2020exacerbating}.
+
+
+The following are the main claims made within the original paper by \cite{mehrabi2020exacerbating}:
+\begin{itemize}
+    \item[$-$] Claim 1: The anchoring attacks reduce the fairness of an ML model trained on the three data sets German Credit, COMPAS and Drug consumption.
+    \item[$-$] Claim 2: The influence attack reduces the fairness of an ML model trained on the three data sets German Credit, COMPAS and Drug consumption.
+    \item[$-$] Claim 3: Poisoning attacks designed to attack the accuracy of an ML model are not suitable as a fairness attack.
+\end{itemize}
+
+
+Claim 3 will not be considered in this paper, as the original authors mention it only briefly. They only evaluated whether influence attacks on accuracy had any effect on a model's fairness, without evaluating any other form of accuracy attack.
+In order to obtain results that can reject or support this claim, one would have to consider other adversarial attacks on accuracy, which is beyond the scope of this paper.
+
+To demonstrate the effectiveness of their fairness attacks, the authors compare it to a fairness attack inspired by \cite{DBLP:journals/corr/abs-2004-07401}.
+However, to thoroughly evaluate the effectiveness of the novel attacks, one would have to compare against multiple other concurrent works on adversarial attacks on fairness. Since we were only allocated four weeks for this project, this is also beyond the scope of this paper. 
+
+The focus of this paper will thus solely be on reproducing the novel attacks introduced by \cite{mehrabi2020exacerbating} and evaluating claims 1 and 2.
+
+\section{Methodology}
+\label{method}
+The authors' code, provided alongside the paper, includes a clear entry point as well as the data sets used for the discussed experiments. However, there were several issues with reproducing the experiments, such as a reliance on outdated Python libraries of which the new versions are not backwards-compatible.
+This is likely a result of the code being a combination of the code of previous papers that \cite{mehrabi2020exacerbating} based their research on, which resulted in a lack of documentation.
+Furthermore, information about data pre-processing is missing from the original paper, causing reproducibility issues. Only the attributes and the classification goal for each data set were clearly reported. Additionally, the number of features we discovered in the data sets provided by the authors did not match the number of features described in their paper. These issues required us to make multiple assumptions as we aimed to recreate these modified data sets from the original raw versions. The exact nature of these assumptions is further detailed in section \ref{sec:data sets}. A list of all made assumptions is found in the Appendix.
+As a result of this obscurity regarding both the original method and the number of assumptions necessary to reconstruct the method, we decided not to re-implement the code in its entirety, instead making adjustments and additions to the original code to reproduce the original implementation. This is discussed in the next section. 
+
+To increase the scalability and maintainability of the code base, the intent was to employ the PyTorch framework instead of the TensorFlow framework used by the original authors.
+However, there were no straighforward substitutions for some TensorFlow functions, such as tf.truncated\_normal\_initializer and tf.variable. 
+This would necessitate a change to some of the code's fundamental structures. As our approach is centered around utilizing the code provided by the authors, which, due to its complexity, required a significant amount of time to understand, there was a limited amount of time available for making such substantial modifications to the code. 
+
+
+\subsection{Model descriptions}
+\label{model description}
+
+The model that the authors used to minimize the classification loss was not specified in the original paper. 
+The authors' code, however, revealed that SciPy's fmin optimizer\footnote{\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html}{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html}} was utilized as a minimizer for the experiments, which minimizes the loss by applying the Nelder-Mead algorithm (\cite{neldermead}). 
+
+A \textbf{data poisoning attack} (DPA) has the goal of creating poisoned data set $D_p$ using the original clean data set $D_c$, such that the defender’s test loss function $L(\hat{\theta}; D_{test})$ is maximized. 
+To do so, iterative gradient steps are taken on each of the features of the poisoned data points $D_p$.
+The poisoned points are then projected to the feasible set $\mathcal F_\beta$ to avoid being detected by the defender's anomaly detector.
+According to the paper, as well as the algorithms in Figure \ref{alg}, the feasible set is obtained by applying anomaly detector B; $F_b \leftarrow B(D_c \cup D_p)$. However, the anomaly detector B is not described in detail.
+Observing the code led to the assumption that the feasible set is determined by simply projecting the data onto a slab in close proximity to the target, shielding the attacker from anomaly detection. 
+
+This is not the first time that such gradient-oriented poisoning of data was implemented, as it was first explored using SVMs (\cite{biggio2013SVM}), and in the following years extended to linear and logistic regression (\cite{Mei2015b}), topic modeling (\cite{meizhure2015a}), collaborative filtering (\cite{li2016data}), and neural networks (\cite{koh2017understanding, munozgonzalez2017poisoning, yang2017generative}).
+\cite{koh2017understanding} called this the projected gradient ascent method since it calculates the gradient during training, but instead of changing the model parameters to decrease the loss, it poisons the data to increase the loss. This attack on accuracy can be defined as the following optimization problem, where $\epsilon$ is a hyperparameter discussed in section \ref{sec:experimental setup}.
+
+\begin{equation}
+\begin{aligned}
+&\max _{\mathcal{D}_{p}} L_{a d v}\left(\hat{\theta} ; \mathcal{D}_{\text {test }}\right) 
+\;\;\;\;\;\;\;\; \text { s.t. }\left|\mathcal{D}_{p}\right|=\epsilon\left|\mathcal{D}_{c}\right| \;\;\;\;\;\;\;\; \text { with } \quad \mathcal{D}_{p} \subseteq \mathcal{F}_{\beta}  \\
+&\text { where } \hat{\theta}=\arg \min \mathcal{L}\left(\theta ; \mathcal{D}_{c} \cup \mathcal{D}_{p}\right).
+\end{aligned}
+\end{equation}
+
+
+\textbf{Influence Attack on Fairness} (IAF)
+is a DPA inspired by the influence attack on accuracy (\cite{koh2017understanding}) and the work of \cite{zafar2015learning}, which introduced a loss function for fair classification involving a fairness constraint, called decision boundary covariance.
+Decision boundary covariance is the covariance between the sensitive feature $z$, which is gender in this case, and the signed distance from the feature vector to the decision boundary $d_{\theta}(x)$).
+% \footnote{It is important to note that the distance to the margin, $d_{\theta}$(x), only depends on the non-sensitive features x.}.
+
+\begin{equation}
+    Cov(z, d_{\theta}(x)) \approx \frac{1}{N}\sum^N_{i=1}(z_i -z)d_{\theta}(x_i)
+\end{equation}
+
+
+% Moreover, a smaller covariance threshold leads to a more fair solution, although, it comes at a larger cost in accuracy.
+If class labels in the training set are correlated with one or more sensitive attributes ${z_i}^N_{i=1}$ (e.g. gender, race), the percentage of samples with a certain sensitive attribute having $d_{\theta}(x_i)$ $\geq$ 0 may differ drastically from the percentage of users without this sensitive attribute value having $d_{\theta}(x_i)$ $\geq$ 0.
+% Note that this may happen even if sensitive attributes are not used to construct the decision boundary but are correlated with one or more of the other features.
+The intuition behind decision boundary covariance is that the sensitive attributes should not determine which side of the decision boundary a point is on, and thus which label it receives. 
+The left side of Figure \ref{influence_visual} shows an instance where the sensitive attribute (shape) and assigned label (color) have zero covariance, indicating that the sensitive attribute has no influence on classification. On the right, the covariance is either extremely positive or extremely negative, indicating that the sensitive attribute does correlate with the classification result.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{../openreview/images/cov.png}
+\caption{The shape of the data points represents the sensitive attribute, and the color their labels. The decision boundary is represented by the black line.}
+\label{influence_visual}
+\end{figure}
+
+The goal of the adversary is to maximize the covariance between $z$ and $d_{\theta} (x_i)$, which will decrease the fairness of the classification.
+% will be referred to as the fairness loss $\ell_{fairness}$.
+It is worth noting that this covariance can happen even if sensitive attributes aren't utilized to construct the decision boundary, because sensitive attributes can be correlated with one or more of the other features.
+
+IAF is a variant of the influence attack by \cite{koh2018stronger} and \cite{koh2017understanding} that includes demographic information.
+This demographic information, specifically gender, is used to decide which group is advantaged and disadvantaged, called $D_a$ and $D_d$ respectively, during sampling.
+Similar to the convention in \cite{koh2018stronger}, one positive and one negative instance are sampled uniformly at random, after which $|D_c|$ instances are created to act as poisoned points $D_p$.
+The poisoned data points are inversely proportional to the class balance, such that $(|D^+_c|)$ positive poisoned data points are sampled from $D_a$ and  $(|D^+_c|)$ negative poisoned data points are sampled from $D_d$, in which $|D^+_c|$ and $|D^-_c|$ represent the number of positive and negative points in the clean data respectively. 
+
+The loss function of IAF, combines $\ell_{fairness}$ with the loss function of the influence attack, $\ell_{acc}$ as defined in Equation \ref{equation:inffairnessattack}, with hyperparameter $\lambda$ controlling the impact of the fairness loss on the adversarial loss. 
+
+\begin{equation}
+    % \begin{split}
+        L_{adv}(\theta ; D_{test}) = \ell_{acc} + \lambda \ell_{fairness} \;\;\;\;\;\;\;\;\;\;\; 
+        \mbox{where  } \;\;\;\; l_{fairness} = \frac{1}{N}\sum^N_{i=1}(z_i -z)d_{\theta}(x_i)
+    % \end{split}
+    \label{equation:inffairnessattack}
+\end{equation}
+
+
+Algorithm 1, as shown in Figure \ref{alg}, details the implementation of this poisoning attack, using the aforementioned parameters. 
+
+\textbf{Anchoring Attack}
+is another DPA and its objective is to target some points and cloud their labels with poisoned points with opposing labels, resulting in a skewed decision boundary.
+In contrast to IAF, the loss of the model is not used, meaning this attack can be used in combination with any model and loss function. 
+
+A target point $x_{target}$ is sampled in one of two ways, as demonstrated in Figure \ref{alg}. In the random anchoring attack (RAA), these anchor points are chosen uniformly at random for each demographic group, while in the non-random instance (NRAA) they are picked based on their popularity, which is defined as the amount of similar data points in their vicinity.
+Next, poisoned points are created and are placed in close vicinity of $x_{target}$, resulting in them having the same demographic as $x_{target}$, but the opposite label.
+This will skew the decision boundary, causing more advantaged points to have a predictive outcome of +1 and more disadvantaged points to have a predictive outcome of -1, as depicted in Figure \ref{anchoring_visual}.
+
+\begin{figure}
+\includegraphics[width=0.6\textwidth]{../openreview/images/anchoring-visual.png}
+\centering
+\caption{The left figure show a data set before attack and the right figure is an anchoring attack representation displaying how poisoned points are placed in close vicinity (depicted by the large solid circle) to the target points (\cite{mehrabi2020exacerbating}).}
+\label{anchoring_visual}
+\end{figure}
+
+% As demonstrated in Algorithm \ref{alg}, a target point $x_{target}$ is sampled. A poisoned data point x is created in close vicinity of  xtarget, so to have the same demographic but the opposite label.
+% A poisoned data point, $\tilde{x}$ is then generated in the vicinity of $x_{target}$ and given an opposite label. This ensures that the poisoned point and the clean point have the same demographic information, but the opposite label, which skews the decision boundary as shown in Figure \ref{anchoring_visual}.
+
+
+\subsection{Data sets}
+\label{sec:data sets}
+% For each data set include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any pre-processing done, and 4) a link to download the data (if available).
+
+
+The data sets listed below were used in both the original paper's experiment and our own.
+The data is split 80-20 between the training and test set and and gender has been chosen as the sensitive attribute for each data set. 
+
+\textbf{German Credit data set}\footnote{\href {https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data) }{https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data) }}
+This data set is from the UCI ML repository (\cite{Dua:2019}). It contains credit profiles with 20 attributes for 1000 individuals. The classification goal is to predict whether an individual has a good or bad credit score.
+The pre-processed German data provided with the paper has the same number of samples, but 58 attributes instead of 20. Based on data exploration we made the assumption that this is the result of one-hot-encoding of categorical features. 
+
+
+\textbf{COMPAS data set}\footnote{\href{https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis }{https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis }}
+This data set is provided by ProPublica (\cite{larson2016COMPAS}). It consists of profiles with 52 attributes such as criminal history, jail time and demographics about 7214 defendants from Broward County. In this case the classification goal is to predict whether an individual will re-offend within two years after being released\footnote{Therefore, COMPAS-scores-two-years.csv is the relevant data set}.
+The original paper only looked at the eight attributes specified in Table \ref{table:datasets}.
+The pre-processed COMPAS data provided with the paper has the same number of samples as the original but 16 attributes, again due to one-hot-encoding. 
+
+
+\textbf{Drug Consumption data set}\footnote{\href{https://archive.ics.uci.edu/ml/datasets/Drug+consumption+\%28quantified\%29}{https://archive.ics.uci.edu/ml/datasets/Drug+consumption+\%28quantified\%29}} 
+This data set is also from the UCI ML repository (\cite{Dua:2019}). It contains profiles of 1885 individuals, consisting of 32 attributes. The classification goal is to predict whether or not an individual has consumed cocaine at some point in their lifetime. Only the 13 attributes specified in Table \ref{table:datasets} are used in the original experiments and our own. 
+The pre-processed drug data provided with the code had 1885 samples and 13 attributes, like the original. 
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{ c c | c c c c }
+ \hline
+ COMPAS & & Drug\\
+ \hline
+ sex & age\_cat & ID & Age & Gender & SS\\
+ juv\_fel\_count & juv\_misd\_count & Education & Country & Ethnicity\\
+ priors\_count & c\_charge\_degree & Nscore & Escore & Oscore\\
+ race & juv\_other\_count  & Ascore & Cscore & Impulsive
+\end{tabular}
+\vspace{.3cm}
+\caption{The features used for the COMPAS  and Drug data set}
+\label{table:datasets}
+\end{table}
+
+
+The authors provide pre-processed versions of the aforementioned data sets without a description of the pre-processing methodology.
+As such, we made the decision to pre-process the raw data we obtained from the original sources and will further refer to these as the recreated data sets.
+
+Our pre-processing procedure is based on data exploration of the data sets provided by the authors. To run the code, the sensitive feature index must be specified. Data exploration revealed that the sensitive feature indexes are 36, 4 and 12 respectively for German, COMPAS and Drug. For the sake of simplicity, the sensitive feature is always moved to index 0 in the recreated data sets.
+Furthermore, males were represented with 0 and females with 1, as this is how they were labeled in the code. After finding out that the number of attributes in the recreated data set did not match the number of attributes of the authors' data, it was discovered that one-hot encoding was used for categorical features, which could explain the reason these data sets contained more attributes than indicated in their paper. Thereafter the data was standardized, with a mean of 0 and a standard deviation of 1. To see whether the attribute values matched the attribute values of the authors' data, all the attributes were compared and popped once they matched. This procedure revealed the index of the sensitive features as well. Finally, the data was shuffled as this is common practice.
+
+
+% \subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+
+\subsection{Extension}
+\label{extension}
+% the code is self-contained, handling things such as loading the data set, loading the correct model and setting the hyperparameters.
+
+Our contribution to the existing work is making the original paper more reproducible, by documenting how we reproduced the findings for their novel fairness attacks.
+This is done by providing the pre-processing procedure of the data\footnote{\href{https://github.com/DCHamerslag/FACT}{https://github.com/DCHamerslag/FACT}}, which was discussed in section \ref{sec:data sets}.
+Furthermore, we organized the code by removing unnecessary code and adding some documentation.
+This paper also covers all the assumptions made and information obtained from the code that was used to reproduce the results, shown in section \ref{sec:results}. This is accumulated into a more comprehensive model description in section \ref{model description} and experimental setup in section \ref{sec:experimental setup}.
+
+
+% \textbf{Why are the results not reproducible?} due to lack of comprehensive documentation. However, the claims might be of suitable character, this will become apparent when to evaluate the results on the authors data compared to those on the pre-processed original data.
+
+
+
+
+\subsection{Experimental setup and Computational requirements}
+\label{sec:experimental setup}
+
+\textbf{The hyperparameters} for this experiment are $\epsilon$ and $\lambda$. $\epsilon$ determines the size of the poisoned data set as a fraction of the clean data and $\lambda$ controls the trade-off between accuracy loss and fairness loss, in the loss function of IAF; $L_{adv} = \ell_{acc} + \lambda \ell_{fairness}$.
+
+\textbf{Statistical Parity Difference}
+captures the difference in predictive outcome between different (advantaged and disadvantaged) demographic groups. It is defined as:
+\begin{equation}
+    SPD = |p(\hat{Y}=+1|x\in D_a)-p(\hat{Y}=+1|x\in D_d)|
+\end{equation}
+
+\textbf{Equality of Opportunity Difference} captures the difference in the true positive rate between different (advantaged and disadvantaged) demographic groups. It is defined as:
+\begin{equation}
+    EOD = |p(\hat{Y}=+1|x\in D_a, Y=+1)-p(\hat{Y}=+1|x\in D_d, Y=+1)|
+\end{equation}
+
+As in the original paper, we evaluate the attacks by plotting accuracy and the aforementioned SPD and EOD fairness criteria. The model becomes more unfair as SPD and EOD get closer to 1.
+Despite the fact that the authors do not indicate the seed used in their experiment or if they averaged numerous seeds, the code revealed a default seed for each attack setup. 
+In our experiment, three runs were executed for each type of fairness attack and data set. The used seeds for each attack and data set combination were the default seed, the default seed plus 1 and the default seed plus 2. Each run examined $\epsilon$ values ranging from 0.0 to 1.0, with 0.1 increments. $\lambda$ was set to 1.0 for all runs with IAF, like in the original work.
+Because the original results are only presented as graphs, instead of numbers, we examine the difference between the original and reproduced plots to assess if the reproduced results are similar to the results in the original paper.
+
+It was not specified whether the average accuracy, max accuracy or the last iteration's accuracy was taken over multiple runs. We plotted the results for each instance - an example is given in Figure \ref{metrics_plot} in the Appendix - and observed that the last of the metrics, accuracy, SPD and EOD is most similar to the results in the original paper. Therefore, metrics of the last iteration are used in Section \ref{sec:results}.
+
+Furthermore, the code is not optimised to utilize a GPU, so the experiments are executed on a MacBook Pro (2017) with a 3.3 GHz Dual-Core Intel Core i5 processor and 16 GB memory. The training time was about five minutes for IFA with 30 to 200 iterations, less than one minute for RAA with 29 iterations and less than two minutes for NRAA with 29 iterations. However, the training time for NRAA on the COMPAS data set was about 90 minutes. See Table \ref{table:time_iter} in the Appendix for further specifics regarding run times.
+
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/authors_data_seed_0.png}
+\centering
+\caption{Results obtained for the novel fairness attacks using the default seed and data sets provided by \cite{mehrabi2020exacerbating}}
+\label{authors_seed0}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=0.8\textwidth]{../openreview/images/recreated_data_seed_0.png}
+\centering
+\caption{Results obtained for the novel fairness attacks using the default seed and the recreated data sets}
+\label{recreated_seed0}
+\end{figure}
+
+\subsection{Results reproducing the original paper}
+\label{results og}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper.  For example, an experiment training and evaluating a model on a data set may support a claim that that model outperforms some baseline. Logically group related results into sections. 
+The results in Figure \ref{authors_seed0}  display the last iteration's accuracy, SPD and EOD, obtained using the data provided with the default seed. 
+The influence attack and both anchoring attacks are presented in the same plot. The reproduced results are similar to those presented by the authors, see Figure \ref{papers_results} in the Appendix.
+Because the SPD and EOD scores are relatively high for IAF, RAA and NRAA, the results support both claims 1 and 2 from Section \ref{sec:claims}.
+
+
+\subsection{Results beyond original paper}
+\label{results ext}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+The results in Figure \ref{recreated_seed0} display the last iteration's accuracy, SPD and EOD of the recreated data sets, with the default seed. 
+Although the results differ from the results obtained when using the data provided by the authors, the SPD and EOD scores are relatively high for IAF, RAA and NRAA and therefore, these results also support claim 1 and 2 in section \ref{sec:claims}. Furthermore, the results for the last iteration's accuracy, SPD and EOD with different seeds for both the authors' data as well as the recreated data are shown in figures \ref{authors_seed1}, \ref{authors_seed2}, \ref{recreated_seed1} and \ref{recreated_seed2}.
+
+
+\section{Discussion}
+\label{discussion}
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+Upon visual inspection, the results obtained using the authors' data sets, seen in Figure \ref{authors_seed0}, are similar to those presented in their paper, with the graphs following similar patterns as those in the original paper. Small differences may be caused by our assumption that the default seed was used and not an average over various seeds.
+The results obtained from the recreated data sets, seen in Figure \ref{recreated_seed0}, do not appear very similar to those in the original paper. This could be the result of any of the assumptions that needed to be made to recreate the authors' altered data sets, such as the assumption that the data had been shuffled. If any of our assumptions are incorrect, this could well explain the differences. They do, however, follow a similar pattern. It can thus be stated that claims 1 and 2 of the authors are supported by our experimental results.
+
+\textbf{Future work} could be to test the robustness of fairness methods using the novel fairness attacks. This was beyond the scope of the work done in \cite{mehrabi2020exacerbating}, but would be a sensible next step to take, as they were designed for this purpose.
+Another way in which this work can be expanded upon is by thoroughly comparing these results to those of attacks on accuracy to test claim 3 as listed in Section \ref{sec:claims}. Also, these results can be compared with the results of other fairness attacks to better contextualize the performances of the novel attacks.
+Additionally, it can be of interest to test the fairness performance of the novel attacks on different data sets with sensitive attributes other than gender to see how well the attacks generalize.
+
+\subsection{What was easy and what was difficult}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+% \subsection{What was difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow".
+
+%-------------------------------------
+Once the digital environment was received from the authors, we were able to run the code with the provided data sets and obtain results similar to those given in the original paper, see Figure \ref{results og}. 
+
+
+However, the lack of documentation in the method regarding the type of model used, the data pre-processing procedure, a lack of details regarding SVM and hinge loss make the original paper unnecessarily time-consuming to reproduce. A significant amount of the information about the implementation, needed to reproduce the experiments from scratch, was provided by the code they released and their reference materials, such as \cite{koh2018stronger} and \cite{zafar2015learning}.
+
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+There was no direct communication between us and the original authors. However, we communicated with other research teams working on reproducing the same work and they provided us with a digital environment file supplied by the authors that is not publicly available. Its content is listed in the Appendix.
+ 
+\section{Conclusion}
+It can be concluded that the main claims of \cite{mehrabi2020exacerbating} regarding the effectiveness of their fairness attacks are correct. However, fully reproducing their results proved too difficult with our setup. The main obstacles we encountered were a lack of documentation regarding their data pre-processing and their used model. Future work would do well to focus on several areas, such as comparisons with other attacks or experimentation with different data sets.
+
+\newpage
+\bibliographystyle{apalike}
+\bibliography{ref.bib}
+\newpage
+\appendix
+
+% This is an example citation \cite{Sinha:2021}.
