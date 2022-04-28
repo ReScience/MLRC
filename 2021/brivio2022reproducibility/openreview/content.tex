@@ -1,0 +1,404 @@
+% SUMMARY
+\section{Reproducibility Summary}
+
+\textit{This report summarises our efforts to reproduce the results presented in the ACL2021 paper \href{https://aclanthology.org/2021.acl-long.556/}{Hate Speech Detection based on Sentiment Knowledge Sharing} by \cite{original_zhou}, as part of the ML Reproducibility Challenge 2021.}
+
+
+\subsection{Scope of Reproducibility}
+
+The main goal of this reproducibility attempt is to confirm the effectiveness of the hate speech detection framework proposed by \cite{original_zhou}. In particular, our efforts are directed at validating their main claim that sentiment knowledge sharing in a multi-task learning setup improves the performance of the model in predicting hate speech. Besides reproducing their main results, we perform repeated experiments to assess the variability of the scores and carry out a hyperparameter search.
+
+
+\subsection{Methodology}
+
+The authors provide a code-base which is available at \url{https://github.com/1783696285/SKS}. We reuse the available code, modifying it where necessary and integrating it with a few additional scripts for statistics computation and data preparation. Our code, data and results are available at 
+\url{https://github.com/matteobrv/repro-SKS}.
+% \url{https://anonymous.4open.science/r/repro-SKS-A}.
+
+
+\subsection{Results}
+
+Our findings diverge substantially from the results reported in the original paper. In particular, in our reproduction experiments, including sentiment features appears to hurt the performance of the model in the hate speech detection task (approximately $0.5$ to $2.0$ F1-score).
+
+
+\subsection{What was easy}
+
+The paper provides some broad indications with respect to the training details and the code-base is publicly available. Similarly, the data-sets are also freely available and the authors provide links to them in their repository.
+
+
+\subsection{What was difficult}
+
+The code-base is rather convoluted. Following the instructions included in the authors' repository resulted in a number of exceptions caused by formatting issues, missing code snippets and hard-coded values. The lack of a clear and comprehensive documentation also contributed to an arduous code review and reproducibility effort.
+
+
+\subsection{Communication with original authors}
+
+We managed to reach one of the authors and exchange a few messages over GitHub. However, despite multiple attempts, we did not manage to communicate with the authors per email and get an answer to our questions concerning some aspects of the implementation and the paper itself.
+
+\newpage
+
+
+
+% INTRODUCTION
+% ------------------------------------------------------------------------------------------------------
+\section{Introduction}
+
+Being able to quickly and reliably detect hate speech in an automatic manner is an important task.
+Due to the growing number of regulations concerning the use of hate speech and other forms of offensive language online this topic has gained increasing interest, both in academia and industry \cite{davidson_2017, Schmidt_2017, basile_semeval, yin_arkaitz}.
+
+As in any supervised learning task, the availability and the size of labelled data-sets pose significant challenges. The task is made even more arduous by its multilingual and multi-domain nature. One way to alleviate such problems is to make use of additional data-sets from potentially related tasks.
+
+The study by \cite{original_zhou} that we attempt to reproduce describes a multi-task learning framework for online hate speech detection that relies on the purportedly strong negative sentiment characterising this threatening form of communication. The model presented in the original paper, Sentiment Knowledge Sharing (\texttt{SKS}), is a multi-head attention network that predicts whether the input text contains hate speech or not. The main claim of the paper revolves around the fact that the model is (optionally) trained in a multi-task setting for sentiment analysis, and it can incorporate information from a dictionary of derogatory words through `category embeddings' (see Section \ref{sec:model-description} for further details).
+
+Based on experiments carried out on two benchmark data-sets, \cite{original_zhou} claim that training a model relying both on sentiment information and category embeddings allows to boost its performance in the task of hate speech detection. The results of our experiments, however, seem to suggest otherwise. For both data-sets the \texttt{SKS} model metrics diverge from the original ones. Moreover, its performance turns out to be lower or only marginally better than that of other models where the sentiment component was ablated.
+
+
+
+% SCOPE OF REPRODUCIBILITY
+% ------------------------------------------------------------------------------------------------------
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+The work of \cite{original_zhou} is based on the intuition that hate speech detection and sentiment analysis are two highly correlated tasks and that hate speech is likely to arise from derogatory words. Our reproducibility attempt tries to verify the following claims:
+
+\begin{itemize}
+    \item A model relying both on Sentiment Knowledge Sharing (\texttt{SKS}) and a dictionary of derogatory words scores better than several strong baselines where sentiment features are not considered.
+    \item Ablating the sentiment knowledge component (\texttt{-s}) results in a poorer performance, as the model relies solely on derogatory words features which, despite being likely indicators of hate speech, can make the model too sensitive too false positives (e.g. \textit{I’m so fucking ready!}).
+    \item A model where both sentiment knowledge and derogatory word features are ablated (\texttt{-sc}) scores the worst performance.
+\end{itemize}
+
+Besides trying to reproduce the original results (see Table~3 in \cite{original_zhou}), we carry out a hyperparameter search to validate the values reported by the authors. Every experiment we carry out is ran multiple times to check whether any observed differences stand when score variability is taken into consideration.
+
+
+% METHODOLOGY
+% ------------------------------------------------------------------------------------------------------
+\section{Methodology}
+
+\subsection{Model description}\label{sec:model-description}
+    The \texttt{SKS} model relies heavily both on the Mixture-of-Experts (MoE) approach as introduced by \cite{shazeer_2017} and the Multi-gate Mixture-of-Experts (MMoE) one presented by \cite{ma_2018}. Its overall architecture consists mainly of three macro-components: an input layer, a sentiment knowledge sharing layer and a gated attention layer.
+
+
+\subsubsection{The input layer}
+    In the input layer, word embeddings are used to encode words of each target sentence. Specifically, every token $w_i$ of a given sentence $S = \{w_1, w_2, ..., w_i, ..., w_N\}$ is transformed into a real-valued vector $x_i \in \mathbb{R}^d$. Additionally, given that derogatory words represent a helpful marker of hate speech, each vector $x_i$ is concatenated with a category embedding vector $c_i \in \mathbb{R}^{d^i}$, such that $x_i^{'} = x_i \oplus c_i$.
+    
+    Category embeddings are created on the basis of a dictionary of derogatory words which allows to classify sentences into two categories, either containing derogatory words or not. The result of the classification is encoded as a vector $c_i$ and appended to each word embedding $x_i$, such that the encoded sentence is $S^{'} = \{x_1^{'}, x_2^{'}, ..., x_i^{'}, ..., x_N^{'}\}$.
+
+
+\subsubsection{The sentiment knowledge sharing layer}
+    The sentiment knowledge sharing component relies on a multi-task learning strategy which, according to the authors, would allow to take advantage of the high correlation between the two tasks of sentiment analysis and hate speech detection. In the proposed implementation, the two tasks share a bottom hidden layer based on the Mixture-of-Experts (MoE) approach. This layer is made up of multiple identical feature extraction units (Experts) each of which, in turn, is composed of a multi-head attention layer using $4$ heads and two feed forward neural networks.
+    
+    Each unit relies on the idea of multi-head attention introduced by \cite{vaswani_attention}, where the input matrix $\mathrm{X}$ is mapped to query $\mathrm{Q} \in \mathbb{R}^{(n_1 \times d_1)}$, key $\mathrm{K} \in \mathbb{R}^{(n_1 \times d_1)}$, and value $\mathrm{V} \in \mathbb{R}^{(n_1 \times d_1)}$ using linear transformations. Given these three matrices the attention parameters are computed as follows:
+    
+    \begin{equation}
+        \mathrm{Attention(Q,K,V)} = \mathrm{softmax}\left( \frac{\mathrm{QK}^\top}{d_1} \right)\mathrm{V}.
+    \end{equation}
+    
+    In the implementation proposed by \cite{original_zhou} $\mathrm{K = V}$ and $d_1$ corresponds to the number of hidden layer units. The $ith$ output of the multi-head attention mechanism is: 
+    
+    \begin{equation}
+        \mathrm{M}_i = \mathrm{Attention}(\mathrm{QW}^{Q}_{i},\mathrm{KW}^{K}_i,\mathrm{VW}^{V}_i),
+    \end{equation}
+    
+    where the parameter matrices are $\mathrm{W}^{Q}_{i} \in \mathbb{R}^{n_1 \times \frac{d_1}{l}}$, $\mathrm{W}^{K}_{i} \in \mathbb{R}^{n_1 \times \frac{d_1}{l}}$ and $\mathrm{W}^{V}_{i} \in \mathbb{R}^{n_1 \times \frac{d_1}{l}}$. All outputs are then concatenated and multiplied by $\mathrm{W}^{O}$ to get the final feature representation $\mathrm{H}^s = \mathrm{concat}(\mathrm{M}_1, \mathrm{M}_2, ..., \mathrm{M}_i, ..., \mathrm{M}_l)\mathrm{W}^O$.
+    
+    Finally, the authors decide to use both maximum and average pooling \cite{shen_2018} to fuse the feature representations, concatenating the two results:
+    
+    \begin{equation}
+        \mathrm{P}_m = \mathrm{Pooling\_max}(\mathrm{H}^s),
+    \end{equation}
+    
+    \begin{equation}
+        \mathrm{P}_a = \mathrm{Pooling\_average}(\mathrm{H}^s),
+    \end{equation}
+    
+    \begin{equation}
+        \mathrm{P}_s = \mathrm{concat}(\mathrm{P}_m, \mathrm{P}_a).
+    \end{equation}
+
+
+\subsubsection{The gated attention layer}
+    The third macro-component is a gated attention mechanism which allows to select a subset of the feature extraction units from the previous layer. The output $g^k(x)$ of a specific gate $k$ corresponds to the probability of selecting a specific unit. The subset of units selected through this process are then weighted and summed to get the final representation $f^k(x)$ for a given sentence, which is then passed to a feed-forward neural network to detect hate speech:
+    
+    \begin{equation}
+        g^k(x) = \mathrm{softmax}(\mathrm{W}_{gn} * \mathrm{gate}(x)),
+    \end{equation}
+    
+    \begin{equation}
+        f^k(x) = \sum_{i=1}^{n} g^k(x)_i f_i(x),
+    \end{equation}
+    
+    \begin{equation}
+        y_k = h^k f^k(x).
+    \end{equation}
+
+
+\subsection{Datasets}
+Following in the footsteps of \cite{original_zhou}, we test the model and report results on two public hate speech data-sets:
+SemEval2019 Task-5 (SE) \cite{basile_semeval}%
+\footnote{\url{http://hatespeech.di.unito.it/hateval.html}}
+and Davidson (DV) \cite{davidson_2017}%
+\footnote{\url{https://github.com/t-davidson/hate-speech-and-offensive-language/tree/master/data}}. The former is freely available upon request, while the latter is openly distributed under an MIT License.
+
+The SE data-set contains a total of $13,000$ tweets and is divided into training-, validation- and test-set, consisting of $9,000$, $1,000$ and $3,000$ samples, respectively. The training-set contains $3,783$ instances of hate speech and $5,217$ instances that are not. In the validation-set $427$ samples are classified as hate speech and $573$ as non-hate speech. The test-set is split into $1,260$ hate speech samples and $1,740$ non-hate speech ones.
+
+The DV data-set contains a total of $24,783$ manually labelled tweets. Each tweet is assigned to either one of three classes: hate speech ($1,430$), offensive language ($19,190$) or neither ($4,163$). \cite{original_zhou} merge the last two classes together and obtain $1,430$ tweets classified as hate speech and $23,353$ classified as non-hate speech.
+
+Finally, the model relies also on a sentiment data-set freely available on Kaggle%
+\footnote{\url{https://www.kaggle.com/dv1453/twitter-sentiment-analysis-analytics-vidya}} under no specific license. The original authors only use the training-set which contains $31,962$ tweets, $2,242$ of which are classified as having a negative sentiment, while the remaining $29,720$ a positive one.
+
+
+\subsection{Hyperparameters}
+We begin our reproducibility attempt, relying solely on the hyperparameters reported in the original paper. Our results are summarised in Table \ref{table:comparison_original_repro_results}.
+
+In the input layer, all word vectors are initialised using Glove Common Crawl Embeddings ($840$B Token) with a dimension of $300$, while category embeddings are randomly initialised and have a dimension of $100$.
+
+In the sentiment knowledge sharing layer, the multi-head attention mechanism is implemented using $4$ heads. The two feed-forward networks in each expert unit have one layer with $400$ units and two layers with $150$ units, respectively. However, contrary to what we see in the implementation, it is worth noting that the original paper reports $200$ units for the second network. After each layer a dropout rate of $0.1$ is used.
+
+The model is trained by mini-batches of $512$ instances for $15$ epochs, using the \texttt{RMSprop} optimiser and a learning rate of $0.001$. The original authors report using learning rate decay and early stopping to avoid overfitting.
+
+
+\subsubsection{Hyperparameters tuning}
+The original work does not provide any details regarding hyperparameters tuning and upon contacting the authors to inquire about it we received no answer. We tune learning rate ($10^{-6}$ to $10^{-1}$, on a log scale), batch size (from $32$ to $1024$, on a log$_2$ scale) and dropout rate ($0.0$ to $0.4$ with increments of $0.1$) on the SE data-set using grid-search with $60$ epochs and find that the respective optimal values are $0.001$, $256$ and $0.0$.
+
+%However, the values indicated in the original paper performs similarly. Considering the model variation (see Table~\ref{tbl:data} and Figure~\ref{fig:data}), the differences can be easily attributed to the model variance, due to random initialisation.
+Despite discrepancies with the original values the model's performance remains similar. In this respect, considering the model variation (see Table~\ref{tbl:data} and Figure~\ref{fig:data}), any differences are likely due to random initialisation.
+
+
+\subsection{Experimental setup and code}
+We try to reproduce the results presented in Table $3$ of the original paper \cite{original_zhou}. For both data-sets the authors train three models: \texttt{SKS}, which relies both on sentiment knowledge sharing and category embeddings; \texttt{-s}, a model where the sentiment knowledge sharing component is ablated; \texttt{-sc}, a model that does without both sentiment knowledge sharing and category embeddings. We rely largely on the TensorFlow implementation \cite{tensorflow2015} made available by the authors, modifying it where necessary and integrating it with a few additional scripts for statistics computation and data preparation.
+
+For each result reported in the original paper we repeat the corresponding experiment $10$ times. Specifically, for each repetition the model is reinitialised and trained over $15$ epochs. We keep the results from the best epoch of each repetition and then compute the average and the standard deviation for the originally employed measures i.e. accuracy and macro-F1 score for the SE data-set and accuracy and weighted-F1 score for the DV data-set.
+
+Given that the DV data-set is highly unbalanced, the authors use a $5$-fold cross-validation approach to measure the performance of each model. We follow in their footsteps and adopt the $10$ times repetition strategy for each fold.
+
+Our code, data as well as the final and intermediate per-iteration results are available at 
+\url{https://github.com/matteobrv/repro-SKS}.
+% \url{https://anonymous.4open.science/r/repro-SKS-A}.
+
+
+\subsection{Computational requirements}
+To run our experiments we use an NVIDIA TITAN Xp with a $12$ GB memory. Training the models on the SE data-set took approximately $24$ minutes for the \texttt{SKS} model and $7$ minutes both for the \texttt{-sc} and \texttt{-s} model.
+On the DV data-set the training took approximately $3$ hours for the \texttt{SKS} model and $2$ hours both for the \texttt{-sc} and \texttt{-s} model. The hyperparameters tuning step on the SE data-set took approximately $33$ hours.
+ 
+
+
+% RESULTS
+% ------------------------------------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+
+In Table \ref{table:comparison_original_repro_results} we summarise the original results along the ones we obtained using the specified hyperparameters. Comparing our findings with those reported by the original authors we observe a discrepancy in all three measures, Accuracy, macro-F1 and weighted-F1 score, for both data-sets. In the SE data-set, the most notable differences concern the results of the \texttt{SKS} and \texttt{-s} models. In the DV data-set, there are some noteworthy discrepancies only with respect to the \texttt{SKS} model.
+
+Looking at the mean scores we obtain on the SE data-set, the \texttt{SKS} model does not outperform both ablated versions \texttt{-s} and \texttt{-sc}, thus contradicting the first and second claim in Section \ref{sec:claims}. In fact, while \texttt{SKS} obtains an Accuracy of $61.04$ and a macro-F1 score of $60.88$, the \texttt{-s} model outperforms it, reaching an Accuracy and a macro-F1 score of $64.17$ and $63.05$, respectively. On the other hand, the third claim appears to hold. With an Accuracy of $60.52$ and a macro-F1 score of $60.47$ the \texttt{-sc} model is the one registering the worst performance.
+
+Turning to the DV data-set, none of the claims appear to be substantiated by our findings. The \texttt{SKS} models scores the lowest with an Accuracy of $93.63$ and a weighted-F1 score of $93.62$, while the ablated versions \texttt{-s} and \texttt{-sc} register similar values for both metrics, with an Accuracy of $93.99$ and $93.98$ and a weighted-F1 score of $94.11$ and $94.12$, respectively.
+
+\begin{table*}[h]
+\centering
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{4}{c}{DV}                                                                                & \multicolumn{4}{c}{SE}                                                                               \\
+  \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+\multirow{2}{*}{Model}        & \multicolumn{2}{c}{Acc}                           & \multicolumn{2}{c}{F1 (weighted)}                 & \multicolumn{2}{c}{Acc}                          & \multicolumn{2}{c}{F1 (macro)}                    
+                       \\ 
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\cmidrule(lr){6-7} \cmidrule(lr){8-9}
+  & Orig. & Repro. &
+  Orig. & Repro. &
+  Orig. & Repro. &
+  Orig. & Repro.  \\
+  \cmidrule{2-9}
+\texttt{-sc}                    & \multicolumn{1}{c}{94.0} & 93.98 ($\pm$1.61) & \multicolumn{1}{c}{94.0} & 94.12 ($\pm$1.73) & \multicolumn{1}{c}{59.6} & 60.52 ($\pm$1.44)   & \multicolumn{1}{c}{59.3} & 60.47 ($\pm$1.40)  \\
+\texttt{-s}                     & \multicolumn{1}{c}{94.5} & 93.99 ($\pm$1.49) & \multicolumn{1}{c}{94.3} & 94.11 ($\pm$1.58) & \multicolumn{1}{c}{61.3} & 64.17 ($\pm$0.99)      & \multicolumn{1}{c}{61.3} & 63.05 ($\pm$0.63) \\
+\texttt{SKS}                    & \multicolumn{1}{c}{95.1} & 93.63 ($\pm$2.09) & \multicolumn{1}{c}{96.3} & 93.62 ($\pm$2.37) & \multicolumn{1}{c}{65.9} & 61.04 ($\pm$1.81) & \multicolumn{1}{c}{65.2} & 60.88 ($\pm$1.64)\\
+
+\bottomrule
+\end{tabular}
+  \caption{\label{tbl:data} For each data-set and performance measure we report each model's original (Orig.) results on the left and the reproduced (Repro.) ones on the right, including the standard deviation of the reproduced score.}
+\label{table:comparison_original_repro_results}
+\end{table*}
+
+For a visual inspection of the results presented in Table~\ref{tbl:data} we also plot box plots of the scores obtained in multiple reproduction attempts in Figure~\ref{fig:data}.
+Despite some overlap in the range of the obtained scores, the median scores of the \texttt{SKS} model is lower than those of the ablated versions. The figure also shows that the scores reported in the original paper fall within the range $\pm 1.5$ standard deviation from the mean of the scores of the multiple reproduction experiments.
+However, for both data-sets, the original scores of \texttt{SKS} is substantially above this range.
+
+\subsection{Alternative metrics}
+
+The original paper reports macro- or weighted-averaged F1 scores, with the motivation of comparability to earlier research on these data-sets. However, the task at hand is a binary classification task with a clear positive class.
+Incorporating the negative class score through averaging does not allow to assess the success of the classifier on the task. Furthermore, relying on weighted averaging without having a justified set of weights, but using weights proportional to the support of each class, rewards classifiers with majority bias even further.
+
+\begin{figure}
+  \pgfplotstableread[col sep=tab]{results.txt}\rtable
+  \begin{tikzpicture}%
+  \begin{axis}[%
+      boxplot,
+      boxplot/draw direction=y,
+      boxplot/whisker range=10,
+      xtick={1,2,3},
+      xticklabels={-sc,-s,SKS},
+      title={(a) F1-weighted on DV data-set},
+      grid,
+  ]
+    \addplot table[y=DVscF1w] {\rtable};
+    \addplot table[y=DVsF1w] {\rtable};
+    \addplot table[y=DVsksF1w] {\rtable};
+    \addplot[only marks,mark=o] coordinates{
+      (1, .940)
+      (2, .943)
+      (3, .963)
+    };
+  \end{axis}%
+  \end{tikzpicture}\hfill
+  \begin{tikzpicture}
+  \begin{axis}[%
+      boxplot,
+      boxplot/draw direction=y,
+      boxplot/whisker range=10,
+      xtick={1,2,3},
+      xticklabels={-sc,-s,SKS},
+      title={(b) F1-macro on SE data-set},
+      yticklabel pos=right,
+      grid,
+  ]
+    \addplot table[y=SEscF1m] {\rtable};
+    \addplot table[y=SEsF1m] {\rtable};
+    \addplot table[y=SEsksF1m] {\rtable};
+    \addplot[only marks,mark=o] coordinates{
+      (1, .593)
+      (2, .613)
+      (3, .652)
+    };
+  \end{axis}
+  \end{tikzpicture}%
+  \caption{\label{fig:data}Box plots of (a) F1-weighted on the DV data-set and (b) F1-macro on the SE data-set, from repeated experiments with different initialisations. Circles represent the scores reported in the original article. The red square in (b) indicates the single outlier for the \texttt{-s} option on this data-set. The rest of the scores are equal to the median. Note that the y-axes do not have the same scale.
+  }
+\end{figure}
+
+To present a more interpretable impression of the success of each model and provide further insight into the differences based on model ablation and alternations, Figure~\ref{fig:pr} depicts the distribution of precision, recall and F1-scores for the different reproduction experiments carried out on the two data-sets.
+
+\begin{figure}
+  \pgfplotstableread[col sep=tab]{results.txt}\rtable
+  \begin{tikzpicture}%
+  \begin{axis}[%
+      boxplot,
+      boxplot/draw direction=y,
+      boxplot/whisker range=10,
+      xtick={1,...,9},
+      xticklabels={prec-sc, rec-sc, F1-sc , prec-s, rec-s, F1-s , prec SKS, rec SKS, F1 SKS},
+      x tick label style={rotate=90},
+      title={(a) Metrics distribution on DV data-set},
+      grid,
+  ]
+    \addplot[fill=blue,   fill opacity=0.2] table[y=DVscPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=DVscRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=DVscF1bin] {\rtable};
+    \addplot[fill=blue,   fill opacity=0.2] table[y=DVsPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=DVsRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=DVscF1bin] {\rtable};
+    \addplot[fill=blue, fill opacity=0.2] table[y=DVsksPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=DVsksRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=DVsksF1bin] {\rtable};
+  \end{axis}%
+  \end{tikzpicture}\hfill
+  \begin{tikzpicture}
+  \begin{axis}[%
+      boxplot,
+      boxplot/draw direction=y,
+      boxplot/whisker range=10,
+      xtick={1,...,9},
+      xticklabels={prec-sc, rec-sc, F1-sc , prec-s, rec-s, F1-s , prec SKS, rec SKS, F1 SKS},
+      x tick label style={rotate=90},
+      title={(b) Metrics distribution on SE data-set},
+      yticklabel pos=right,
+      grid,
+  ]
+    \addplot[fill=blue,   fill opacity=0.2] table[y=SEscPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=SEscRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=SEscF1bin] {\rtable};
+    \addplot[fill=blue,   fill opacity=0.2] table[y=SEsPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=SEsRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=SEsF1bin] {\rtable};
+    \addplot[fill=blue, fill opacity=0.2] table[y=SEsksPrecision] {\rtable};
+    \addplot[fill=orange, fill opacity=0.2] table[y=SEsksRecall] {\rtable};
+    \addplot[fill=gray, fill opacity=0.2] table[y=SEsksF1bin] {\rtable};
+  \end{axis}
+  \end{tikzpicture}%
+  \caption{\label{fig:pr}Box plots of binary
+    precision (blue), recall (orange), and F1-scores (grey) on (a) the DV data-set and
+    (b) the SE data-set, from repeated experiments
+    with different initialisations.
+    Note that the y-axes do not have the same scale.
+  }
+\end{figure}
+
+The plots indicate that, despite a large overlap, jointly learning sentiment analysis (\texttt{SKS}) improves
+the precision of the hate speech detection on the DV data-set. Despite having a negative impact on the recall,
+this also yields a slightly better median F1 score. However, the effect of the sentiment task appears to be mostly negative on the SE data-set.
+
+
+% DISCUSSION
+% ------------------------------------------------------------------------------------------------------
+\section{Discussion}
+
+The reproducibility results from Section~\ref{sec:results} do not fully support the claims outlined in Section \ref{sec:claims} for either data-sets. In particular, our findings seem to suggest that the multi-task learning approach implemented by the authors to allow the \texttt{SKS} model to extract sentiment features and apply them to hate speech detection does not yield the expected results. However, considering the lack of a comprehensive documentation, the convoluted structure of the code-base and the insufficient communication with the original authors it is hard to draw definitive conclusions. In fact, there are a number of plausible explanations as to why our findings diverge from those reported in the original paper.
+
+For instance, considering the slight difference between the optimal hyperparameters we found and those reported by \cite{original_zhou}, as well as the large variation in the model's scores, one could speculate that, at least for part of the experiments, the authors employed some parameters which have not been reported. This would also explain the difference between some of the values indicated in the paper and those used in the provided implementation.
+
+Another explanation could lie in the fact that we inadvertently deviated from the original implementation while trying to fix some of the issues we faced in running the code-base. Whenever information was missing or not completely clear assumptions had to be made, and we tried to approximate the original results by trial and error. This was the case for the \texttt{-sc} model where the procedure to ablate the category embeddings component was not given and the answer we received from the authors did not help us to overcome the problem.
+
+Yet another explanation revolves around the data. The main intuition behind the original study is the fact that hate speech typically carries a negative sentiment. Hence, the relation between this two tasks would help the model to better identify hate speech (arguably by increasing recall). However, a manual inspection of the data-sets suggests that their content may actually be surprising for a classifier informed by sentiment analysis.
+Both data-sets are collected using keywords that are likely to contain hate speech, and the negative class (i.e. non-hate speech one) contains posts that are either offensive (but not hate speech), or content generated by people counteracting earlier offensive content.
+That being the case, the sentiment of this class is not necessarily positive and helpful for discriminating hate speech \emph{in these data-sets}. However, in a more realistic environment, the authors' proposal may be correct. Given more `normal' negative class instances, learning sentiment analysis jointly is likely to inform the hate speech detection.
+% \footnote{We leave testing this assumption to future work,
+% possibly the final version of this paper if it is accepted for publication.}
+The binary evaluation metrics presented in Figure~\ref{fig:pr} indicate that at least on the DV data-set, the addition of sentiment may have some positive effects. Understanding the reasons for these differences, and improving the joint learning model is a possible direction  for the future research.
+
+\subsection{What was easy}
+
+The paper provides some broad indications with respect to the training details and both the data-sets and the code-base are open-sourced.
+
+
+\subsection{What was difficult}
+
+The lack of a comprehensive documentation, the convoluted structure of the code-base and the insufficient
+communication with the original authors contributed to an arduous code review and reproducibility effort.
+
+
+\subsection{Communication with original authors}
+
+We first tried to review and run the provided code-base by ourselves. However, after encountering some issues related to how the data-sets were being processed and how to run the \texttt{-sc} model ablating category embeddings, we decided to reach out to the authors through GitHub. One of the corresponding authors provided some indications which, unfortunately, did not help us overcome the problems at hand.
+
+We also tried to contact the authors per email twice, inquiring about some aspects of the model implementation as well as the procedure they followed to tune the hyperparameters. However, we never received an answer.
+
+
+%% %\section*{References}
+%% \bibliographystyle{chicago}
+%% \bibliography{references}
+
+%% Add your summary here. No need to worry about fitting it in a single page now.
+%% 
+%% \subsection{Submission Checklist}
+%% 
+%% Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+%% 
+%% \begin{itemize}
+%% \item Title should start with "\texttt{[Re]}"
+%% \item Author information, along with ORCID id
+%% \item Author affiliations
+%% \item Code URL, Software Heritage Foundation link
+%% \item Abstract
+%% \item Review URL (the OpenReview URL of your report)
+%% \end{itemize}
+%% 
+%% \subsection{Continuous Integration}
+%% 
+%% We use Github Actions CI to check your submission and compile the pdf file subsequently.
+%% You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+%% 
+%% \clearpage
+%% 
+%% \section{Content}
+%% Copy your Openreview content here.
+%% 
+%% This is an example citation \cite{Sinha:2021}.
+
