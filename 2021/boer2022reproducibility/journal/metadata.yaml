@@ -1,0 +1,152 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Data-Driven Methods for Balancing Fairness and Efficiency in Ride-Pooling"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Sarah de Boer
+    orcid: 0000-0001-5184-4340
+    email: sarah.de.boer@student.uva.nl
+    affiliations: 1,2,*
+
+  - name: Radu Alexandru Cosma
+    orcid: 0000-0002-7568-2857
+    email: radu.cosma@student.uva.nl
+    affiliations: 1,2,*      # * is for contact author
+    
+  - name: Lukas Knobel
+    orcid: 0000-0003-3014-5262
+    email: lukas.knobel@student.uva.nl
+    affiliations: 1,2,*      # * is for contact author
+    
+  - name: Yeskendir Koishekenov
+    orcid: 0000-0001-5566-6465
+    email: yeskendir.koishekenov@student.uva.nl
+    affiliations: 1,2,*      # * is for contact author
+    
+  - name: Benjamin Shaffrey
+    orcid: 0000-0001-6450-2251
+    email: benjamin.shaffrey@student.uva.nl
+    affiliations: 1,2,*      # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: 1012 WX Amsterdam
+  - code:    2
+    name:    All authors have contributed equally
+    address: ""
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, ride-pooling, fairness, LSTM, ILP, resource allocation, matching algorithms, reinforcement learning, machine learning, deep learning, python, pytorch
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/reproducibilityaccount/reproducing-ridesharing
+  - doi: 10.5281/zenodo.6501845
+  - swh:
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Naveen Raman, Sanket Shah, John Dickerson. Data-Driven Methods for Balancing Fairness and Efficiency in Ride-Pooling (IJCAI 2021)."
+ - bib:  ijcai2021-51
+ - url:  https://www.ijcai.org/proceedings/2021/0051.pdf
+ - doi:  10.24963/ijcai.2021/51 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Reproducibility Summary
+
+Scope of reproducibility
+Our work attempts to verify two methods to mitigate forms of inequality in ride-pooling platforms proposed in the paper Data-Driven Methods for Balancing Fairness and Efficiency in Ride-Pooling: (1) integrating fairness constraints into the objective functions and (2) redistributing income of drivers. We extend this paper by testing for robustness to a change in the neighbourhood selection process by using actual Manhattan neighbourhoods and we use corresponding demographic data to examine differences in service based on ethnicity.
+
+Methodology
+The authors of the paper provide preprocessed data and code implemented in TensorFlow, which we transform into PyTorch. Experiments in this reproducibility study can be divided into 3 parts: (1-2) we reproduce the results regarding objective functions and income redistribution using data and settings provided in the paper and code; (3) we apply this approach to the same data grouped into Manhattan neighbourhoods. Further, we examine discrepancies between service rates of different ethnicities using neighbourhood-specific demographic data as a proxy for this protected information.
+
+Results
+The results in the original paper regarding different objective functions were reproduced within a margin of error. Also, income redistribution is able to reduce wage inequality, albeit to a lesser degree. The objective functions appear to be sensitive to the neighbourhood selection mechanism. While the results of the rider-fairness objective functions are maintained, performance of the driver-fairness objective functions declines. There appear to be only small differences in service rates between ethnicities, while rider-side fairness seems to mitigate inequalities the most. However, this is only achieved by worsening the service for well-served neighbourhoods instead of improving it for underserved ones.
+
+What was easy
+The simulation logic as well as the training and testing procedures in the provided code were straightforward to execute. 
+
+What was difficult
+To be able to run the authors' code we needed to make several changes to it. Moreover, specific parts of the original research were not explicitly mentioned in the paper. Another point of difficulty was the absence of preprocessing code which was not detailed properly and could not be fully reproduced. The reproducibility of the paper relied on the provided code, communication with the authors as well as previous works.
+
+Communication with original authors
+We contacted the authors about the preprocessed data that was not hosted online due to licensing issues. They supplied it as well as responded very quickly and provided clarifications on the parameters and their values in the code."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=BE3Ms3GXhCF
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1

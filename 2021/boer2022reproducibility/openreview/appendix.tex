@@ -1,0 +1,211 @@
+\newpage 
+
+\appendix
+
+\section*{Appendix}
+
+\section{Neural network details} \label{appendix:network}
+The inputs to the neural network model are the current location of the vehicle, the information about the remaining delay, and locations for the current requests that have been accepted. First, authors order them according to their trajectory and feed them as inputs to an LSTM \cite{lstm} after an embedding layer. The embeddings for the locations are calculated separately and are the byproduct of a two-layer neural network that attempts to estimate the travel times between two locations (see Appendix \ref{sec:Embeddings_training}).
+
+Additional inputs to the neural network are the information about the current decision epoch, the number of vehicles in the vicinity of the vehicle of interest and the total number of requests that arrived in the epoch. This information is used to stabilise learning because the value of being in a given state is dependent on the competition it faces from other drivers when it is in that state. These inputs are concatenated with the output of the LSTM from the previous paragraph and, after 2 dense layers, used to predict the value. An overview of the details of the neural network can be seen in Table \ref{tab:nn}.
+
+\begin{table}[!htbp]
+    \small
+    \centering
+    \begin{tabular} { | c | c | c |c | c | }
+    \hline
+     locations of vehicle and& \multirow{3}{*}{delay} & decision time & number of & total number \\ 
+
+     its accepted requests & & $\downarrow$ & \multirow{4}{*}{vehicles in vicinity} & \multirow{4}{*}{of requests} \\ 
+    $\downarrow$ & & & & \\
+    \textbf{Embedding (100)} & & \textbf{Linear Layer (100)} & & \\ 
+    $\downarrow$ & & $\downarrow$ & & \\ 
+    locations embedding &  & time embedding & &  \\ 
+    \cline{1-2} 
+    \multicolumn{2}{|c|}{$\downarrow$} & & & \\ 
+    
+    \multicolumn{2}{|c|}{\textbf{LSTM}} & & & \\ 
+    
+    \multicolumn{2}{|c|}{$\downarrow$} & & & \\
+    \multicolumn{2}{|c|}{path embedding} & & &  \\ 
+    \hline
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    
+    \multicolumn{5}{|c|}{\textbf{Linear Layer (300)}} \\
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    \multicolumn{5}{|c|}{\textbf{ELU}} \\
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    
+    \multicolumn{5}{|c|}{\textbf{Linear Layer (300)}} \\
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    
+    \multicolumn{5}{|c|}{\textbf{ELU}} \\
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    
+    \multicolumn{5}{|c|}{\textbf{Linear Layer (1)}} \\
+    \multicolumn{5}{|c|}{$\downarrow$} \\
+    
+    \multicolumn{5}{|c|}{value} \\
+    \hline
+
+\end{tabular}
+
+\caption{Overview of the value approximation neural network. The model layers (with output dimensions in brackets) are presented in \textbf{bold}. }
+\label{tab:nn}
+
+\end{table}
+
+\newpage
+\subsection{Embeddings training} \label{sec:Embeddings_training}
+In accordance with \citet{shah20}, the embedding model, shown in Table \ref{tab:emb}, was trained for 1000 epochs with batch size 1024 and Adam optimiser with default settings. The training also utilises early stopping with patience 15.
+
+\begin{table}[!htbp]
+    \centering
+    \begin{tabular} { |c | c | }
+    \hline
+    origin location & destination location \\
+    $\downarrow$ &  $\downarrow$ \\
+    \textbf{Embedding} & \textbf{Embedding} \\
+    $\downarrow$ &  $\downarrow$  \\
+    origin embedding & destination embedding \\
+    \hline
+    \multicolumn{2}{|c|}{\textbf{Concat}(origin embedding, destination embedding)}  \\
+    \multicolumn{2}{|c|}{$\downarrow$}  \\
+    \multicolumn{2}{|c|}{\textbf{Linear Layer (100)}} \\
+    \multicolumn{2}{|c|}{$\downarrow$}  \\
+    \multicolumn{2}{|c|}{\textbf{ELU}} \\
+    \multicolumn{2}{|c|}{$\downarrow$} \\
+    \multicolumn{2}{|c|}{\textbf{Linear Layer (1)}} \\
+    \multicolumn{2}{|c|}{$\downarrow$} \\
+    \multicolumn{2}{|c|}{travel time estimate} \\
+    
+    \hline
+    
+\end{tabular}
+
+\caption{Embedding Model. The model layers (with output dimensions in brackets) are presented in \textbf{bold}. }
+\label{tab:emb}
+
+\end{table}
+
+\section{Seeds}\label{sec:Seeds}
+The settings selected for seeded runs, have to meet several conditions. First of all, we wanted to rerun at least one setting for all four objective functions. Next to that, for the rider-fairness, we rerun all lambda values because this objective function differed the most between our results and the original paper's. For the driver-fairness, we only chose a lambda value of 4/6, since all lambda values yield similar results and only this one is used to examine both, driver- and rider-side fairness metrics.
+
+By default, the seed 874 is used. If further seeds are used for experiments, the following four are utilised: 688701, 490013, 423376, 191758.
+
+% !htbp
+
+
+\section{Hyperparameters}
+\label{appendix:hyperparameters}
+
+\begin{table}[!htbp]
+    \centering
+    \begin{tabular}{| c | c |}
+    \hline 
+        \textbf{Hyperparameter names} & \textbf{Values} \\
+        \hline 
+        %\hline
+        number of locations: $|L|$ & 4461  \\
+        %\hline 
+        number of neighbourhoods: $H$& 10\\ 
+        %\hline 
+        max. capacity of driver: $m$ & 4 \\
+        %\hline 
+        ride-pooling pricing: $\delta$ & 5  \\
+        %\hline 
+        pick up delay & 300   \\
+        %\hline 
+        drop off delay & 600  \\
+        %\hline 
+        min. replay buffer size & $5*10^{5}$ / (number of riders)  \\
+        %\hline 
+        number of samples & 3  \\
+        %\hline 
+        gamma: $\gamma$ & 0.9  \\
+        \hline 
+    \end{tabular}
+    \caption{Hyperparameter values.}
+    \label{tabl:dataset_params}
+\end{table}
+
+
+
+
+
+\newpage
+\section{Hardware configurations}
+
+\begin{table}[!htbp]
+\begin{minipage}{\textwidth}
+\centering
+
+    \centering
+    \begin{tabular}{| c | c | c | c |}
+    \hline 
+        \textbf{Name} & \textbf{CPU} & \textbf{GPU} & \textbf{RAM} \\
+        \hline 
+        %\hline
+        Setup 1 & i5-8600k & GTX1080 & 16 GB \\
+        %\hline 
+        Setup 2 & i7-1165G7 & - & 32 GB \\ 
+        %\hline 
+        Setup 3 & Apple-M1 & - & 16 GB \\
+         %\hline 
+        LISA cluster\footnote{One Nvidia GTX1080Ti GPU with 3 CPUs provided by SURFsara’s LISA cluster. For more info see: \url{ https://userinfo.surfsara.nl/systems/lisa/description} }  & Intel Xeon Silver 4110 & GTX1080 Ti & 32 GB\\
+        \hline 
+    \end{tabular}
+    \caption{Hardware configurations used.}
+    \label{tabl:hw_conf}
+
+\end{minipage}
+
+\end{table}
+
+
+\section{Results of the original paper}\label{sec:Results of the original paper}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{../openreview/plots/figure_1_paper.png}
+    \caption{Figure of the original paper, \citet{raman21}, comparing objective functions for different number of drivers.}
+    \label{fig:drivernrcomp_orig}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../openreview/plots/figure_2_paper.png}
+    \caption{Figure of the original paper, \citet{raman21}, comparing the distribution of incomes for different objective functions  ($\lambda=\frac{4}{6}$ for driver-side fairness and $\lambda=10^9$ for rider-side fairness.)}
+    \label{fig:incomedistrcomp-orig}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{../openreview/plots/figure_3_paper.png}
+    \caption{Figure of the original paper, \citet{raman21}, comparing the gain metric to the standard deviation of the redistributed income to Shapley value ratio for different values of r.}
+    \label{fig:redist-orig}
+\end{figure}
+
+\section{Results for different seeds}
+
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{../openreview/plots/fig1_seeds_final.pdf}
+    \caption{Comparison of objective functions for 200 drivers with five different seeds. Each configuration is modelled as a bivariate Gaussian distribution. The $\lambda$ values for the rider-fairness are (from left to right): $10^{10}, 10^9, 10^8$, for the driver-fairness: $\lambda=\frac{4}{6}$.}
+    \label{fig:drivernrcomp_seeds}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{../openreview/plots/fig2_requests_final.pdf}
+    \includegraphics[width=0.7\linewidth]{../openreview/plots/fig2_income_final.pdf}
+    \includegraphics[width=0.7\linewidth]{../openreview/plots/fig2_rider_fairness_final.pdf}
+    \includegraphics[width=0.7\linewidth]{../openreview/plots/fig2_driver_fairness_final.pdf}
+    \caption{Comparing the distribution of incomes for different objective functions with five different seeds ($\lambda=\frac{4}{6}$ for driver-side fairness and $\lambda=10^9$ for rider-side fairness.)}
+    \label{fig:incomedistrcomp_seeds}
+\end{figure}
+
+
+
