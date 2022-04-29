@@ -1,73 +1,38 @@
 \section*{\centering Reproducibility Summary}
-
-% \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
-% }
-
 \subsection*{Scope of Reproducibility}
-
-% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
-% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
-
-\cite{gan2shape} propose an unsupervised method named GAN2Shape that purportedly is able to recover 3D information stored in the weights of a pre-trained StyleGAN2 model, to produce 3D shapes from 2D images. We aim to reproduce the 3D shape recovery and identify its strengths and weaknesses.
+\textcite{gan2shape} propose an unsupervised method named GAN2Shape that purportedly is able to recover 3D information stored in the weights of a pre-trained StyleGAN2 model, to produce 3D shapes from 2D images. We aim to reproduce the 3D shape recovery and identify its strengths and weaknesses.
 
 \subsection*{Methodology}
-
-% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
-
-We re-implement the method proposed by \cite{gan2shape} with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques\footnote{Our code is available at \url{https://github.com/alessioGalatolo/GAN-2D-to-3D}.} While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported\footnote{All depencies are declared in \autoref{sec:methodology}}. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
+We re-implement the method proposed by \textcite{gan2shape} with regards to 3D shape reconstruction, and extend their work. Our extensions include novel prior shapes and two new training techniques. While the code-base relating to GAN2Shape was largely rewritten, many external dependencies, which the original authors relied on, had to be imported% \footnote{All depencies are declared in \autoref{sec:methodology}}
+. The project used 189 GPU hours in total, mostly using a single Nvidia K80, T4 or P100 GPU, and a negligible number of runs on a Nvidia V100 GPU.
 
 \subsection*{Results}
-
-% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
-We replicate the results of \cite{gan2shape} on a subset of the LSUN Cat, LSUN Car and CelebA datasets and observe varying degrees of success. We perform several experiments and illustrate the successes and shortcomings of the method. Our novel shape priors improve the 3D shape recovery in certain cases where the original shape prior was unsuitable. Our generalized training approach shows initial promise, but has to be confirmed with increased computational resources.
+We replicate the results of \textcite{gan2shape} on a subset of the LSUN Cat, LSUN Car and CelebA datasets and observe varying degrees of success. We perform several experiments and illustrate the successes and shortcomings of the method. Our novel shape priors improve the 3D shape recovery in certain cases where the original shape prior was unsuitable. Our generalized training approach shows initial promise, but has to be confirmed with increased computational resources.
 
 \subsection*{What was easy}
-% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
 The original code is easily runnable on the correct machine type (Linux operating system and CUDA 9.2 compatible GPU) for the specific datasets used by the authors.
 
 \subsection*{What was difficult}
-% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
 Porting the model to a new dataset, problem setting or a different machine type is far from trivial. The poor cohesion of the original code makes interpretation very difficult, and that is why we took care to re-implement many parts of the code using the decoupling principle. The code depends on many external implementations which had to be made runnable, which caused a significant development bottleneck as we developed on Windows machines (contrary to the authors). The exact loss functions and the number of training steps were not properly reported in the original paper, which meant it had to be deduced from their code. Certain calculations required advanced knowledge of light-transport theory, which had no familiarity to us, and had to be mimicked and could not be verified.
-
 
 \subsection*{Communication with original authors}
 We did not communicate with the original authors.
 \newpage
-% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
-% \\
-% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+
 \section{Introduction}
-% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
-Image generation has been a hot topic within generative models as they represent an intuitive problem whose results are easily accessible by the public. One of the models that has received a lot of public attention is StyleGAN~(\cite{stylegan}). 
-% This method is based on Generative Adversarial Networks, GANs (\cite{gan}), a method that pairs two networks, one that acts as a Generator (or decoder) and the other as a Discriminator (or encoder) of the results of the generator. 
-The network's architecture has been refined through multiple iterations in StyleGAN2~(\cite{stylegan2}), StyleGAN2-ADA~(\cite{stylegan2-ada}) and StyleGAN3~(\cite{stylegan3}). StyleGAN2 improves on the first version by, among other things, adding a projection method onto the latent space, which allows the inversion an image into its latent representation. 
+Image generation has been a hot topic within generative models as they represent an intuitive problem whose results are easily accessible by the public. One of the models that has received a lot of public attention is StyleGAN~(\textcite{stylegan}). 
+% This method is based on Generative Adversarial Networks, GANs (\textcite{gan}), a method that pairs two networks, one that acts as a Generator (or decoder) and the other as a Discriminator (or encoder) of the results of the generator. 
+The network's architecture has been refined through multiple iterations in StyleGAN2~\cite{stylegan2}, StyleGAN2-ADA~\cite{stylegan2-ada} and StyleGAN3~\cite{stylegan3}. StyleGAN2 improves on the first version by, among other things, adding a projection method onto the latent space, which allows the inversion an image into its latent representation. 
 
 % Since the Generator acts as a decoder, it needs to add information when moving from the latent space to the output. 
-Methods like GAN2Shape~(\cite{gan2shape}) aim at exploiting the information that is already stored in the generator of a pre-trained StyleGAN2 model to go beyond generating synthetic 2D images. In particular, this method aims to extract the 3D shape of the preeminent object in any image. This is intuitively possible due to the size of the training dataset of the StyleGAN2 model,  and its ability to generate images of an object from multiple views and lighting directions by varying $\textbf{w}$. The authors of GAN2Shape use StyleGAN2 networks pre-trained on different dataset categories and five different feature extraction models to derive the shape information for images belonging to the same dataset categories. This method, compared to many others~(\cite{lunz2020inverse, henzler2019escaping, wu20153d, wang2019deep}), has the advantage of being completely unsupervised, and not requiring a change in the training process of the classical 2D GAN. 
+Methods like GAN2Shape~\cite{gan2shape} aim at exploiting the information that is already stored in the generator of a pre-trained StyleGAN2 model to go beyond generating synthetic 2D images. In particular, this method aims to extract the 3D shape of the preeminent object in any image. This is intuitively possible due to the size of the training dataset of the StyleGAN2 model, and its ability to generate images of an object from multiple views and lighting directions by varying $\textbf{w}$. The authors of GAN2Shape use StyleGAN2 networks pre-trained on different dataset categories and five different feature extraction models to derive the shape information for images belonging to the same dataset categories. This method, compared to many others~\cite{lunz2020inverse, henzler2019escaping, wu20153d, wang2019deep}, has the advantage of being completely unsupervised, and not requiring a change in the training process of the classical 2D GAN. 
 % It furthermore removes the requirements of a dataset that has 3D shapes as labels, and eases the memory consumption and the training difficulty brought by the rendering process.
 
-In this article, we describe our replication of GAN2Shape~(\cite{gan2shape}) and report mixed results. 
+In this article, we describe our replication of GAN2Shape~\cite{gan2shape} and report mixed results. 
 We perform several experiments and we illustrate the successes and shortcomings of the method. Further, we extend the method improving the original results in several cases.
 
 \section{Scope of reproducibility}
 \label{sec:claims}
-% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
-
-% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
-% This is concise, and is something that can be supported by experiments.
-% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
-
-% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
-% \begin{itemize}
-%     \item Claim 1
-%     \item Claim 2
-%     \item Claim 3
-% \end{itemize}
-
-% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
-
-%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
-
 The authors of GAN2Shape make the following claims:
 \begin{enumerate}
     \item Their framework does not require any kind of annotation, keypoints or assumption about the images
@@ -85,16 +50,16 @@ The resources we used were mainly the authors' code, the code and documentation 
 
 \subsection{Model descriptions}
 % Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
-To extract the implicit 3D knowledge of pre-trained StyleGAN network, \cite{gan2shape} propose an elaborate scheme involving five different neural networks. Each network models a particular quantity corresponding to the view and lighting directions, the depth of the image, and the albedo. The \textbf{View} and \textbf{Light} ($V$ and $L$, resp.) networks operate in a \textit{encoder} type manner, trying to obtain a low-dimensional vector representation of the camera view direction $\textbf{v}$ and the direction of light $\textbf{l}$ illuminating the object in the picture. 
+To extract the implicit 3D knowledge of pre-trained StyleGAN network, \textcite{gan2shape} propose an elaborate scheme involving five different neural networks. Each network models a particular quantity corresponding to the view and lighting directions, the depth of the image, and the albedo. The \textbf{View} and \textbf{Light} ($V$ and $L$, resp.) networks operate in a \textit{encoder} type manner, trying to obtain a low-dimensional vector representation of the camera view direction $\textbf{v}$ and the direction of light $\textbf{l}$ illuminating the object in the picture. 
 The \textbf{Depth} and \textbf{Albedo} ($D$ and $A$, resp.) networks utilize \textit{auto-encoder} architectures\footnote{We refer to tables 5-7 of the original paper (\cite{gan2shape}) for the exact architectures.} to obtain image-resolution depth maps $\textbf{d}$ and diffuse reflections (albedo) $\textbf{a}$ off the object's presumed surface.
 
 The real GAN knowledge extraction happens in the final network, the \textbf{Offset} encoder $E$, combined with the pre-trained StyleGAN2 generator, $G$. The offset encoder aims to learn a latent representation $\textbf{w}$ of images with randomly sampled view and light directions, \textit{pseudo-samples}.
 % Because $\textbf{w}$ of the original image is already known, the offset encoder only needs to learn to predict the offset $\Delta \textbf{w}$ such that $\textbf{w}^{'}_{i} = \textbf{w} + \Delta \textbf{w}_i$.
-Paired with $G$, this allows the creation of new realistic samples $\Tilde{\textbf{I}_i} = G(\textbf{w}^{'}_{i})$ with new view and lighting directions, denoted \textit{projected samples}.
+Paired with $G$, this allows the creation of new realistic samples $\Tilde{\textbf{I}}_i = G(\textbf{w}^{'}_{i})$ with new view and lighting directions, denoted \textit{projected samples}.
 % This process is only possible due to the implicit 3D knowledge of the StyleGAN network. 
 The projected samples then serve as extended training data, providing multiple view-light direction variations of the original image.
 
-To use the components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and  $\textbf{a}$ to obtain a reconstructed image, the authors utilize a pretrained neural renderer developed by \cite{neural-renderer}, which we denote by $\Phi$.
+To use the components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and $\textbf{a}$ to obtain a reconstructed image, the authors utilize a pretrained neural renderer developed by \textcite{neural-renderer}, which we denote by $\Phi$.
 % %TODO: ^could be better
 % This allows the rendering of images given the components while retaining the ability to back-propagate through it.
 % The neural renderer is pre-trained and is not in itself optimized during our training.
@@ -105,12 +70,12 @@ The training process of this method can be divided into 3 different steps, where
 
 \textbf{Prior pretraining.} Before attempting to learn the true shape of an object, the depth network is initialized by pretraining it on a fixed prior shape. 
 % It means we provide a fixed shape as a target depth map and optimize the network to predict this shape for the given input image. 
-For this purpose \cite{gan2shape} propose to use an \textit{ellipsoid} shape as the shape prior. 
-% The origin and size of the ellipsoid are controlled by an external parsing model developed by \cite{zhao2017pyramid}. This parsing model detects and labels (with a score) each pixel in the image as an object. Using the parsing model it is possible to extract the object we are considering from the background. \cite{gan2shape} use the mask returned by the parsing model to determine the location and size of the ellipsoid and align it with the object depicted in the image\footnote{See the original paper/source code by \cite{gan2shape} for further details}. This initialization is thought to bring the network ``closer" to the true shape, reducing the number of iterations required for convergence. Seeing as the number of possible depth configurations that could yield a particular image when projected onto two dimensions is infinite, we speculate it may also be \textit{required} to obtain reasonable depth map reconstructions (supported by our experiments, see \ref{sec:results_priors}), acting as a strong prior that guides the reconstruction toward a shape we would expect. 
-We utilized this ellipsoid prior to reproduce the results of \cite{gan2shape}, and we extended their work by also evaluating two new different priors. 
+For this purpose \textcite{gan2shape} propose to use an \textit{ellipsoid} shape as the shape prior. 
+% The origin and size of the ellipsoid are controlled by an external parsing model developed by \textcite{zhao2017pyramid}. This parsing model detects and labels (with a score) each pixel in the image as an object. Using the parsing model it is possible to extract the object we are considering from the background. \textcite{gan2shape} use the mask returned by the parsing model to determine the location and size of the ellipsoid and align it with the object depicted in the image\footnote{See the original paper/source code by \textcite{gan2shape} for further details}. This initialization is thought to bring the network ``closer" to the true shape, reducing the number of iterations required for convergence. Seeing as the number of possible depth configurations that could yield a particular image when projected onto two dimensions is infinite, we speculate it may also be \textit{required} to obtain reasonable depth map reconstructions (supported by our experiments, see \ref{sec:results_priors}), acting as a strong prior that guides the reconstruction toward a shape we would expect. 
+We utilized this ellipsoid prior to reproduce the results of \textcite{gan2shape}, and we extended their work by also evaluating two new different priors. 
 
-\textbf{Step 1} optimizes only the $A$ network according to \autoref{eq:step1_loss}. Given an input $\text{I}$, the first four networks predict their components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$, $\textbf{a}$, and we obtain a reconstructed image $\hat{\textbf{I}} = \Phi (\textbf{v}, \textbf{l}, \textbf{d}, \textbf{a})$\footnote{$\mathcal{L}_{p}$ is a neural network trained to predict similarities between images (\cite{perceptual}) and $\mathcal{L}_s$ is a term that encourages smoothness of the resulting depth maps (as described in \cite{smooth-loss}). We refer to our code for the weights $\lambda_i$.}.
-% The reconstruction loss is a weighted sum of the L1 norm and the \textbf{perceptual} loss function, $\mathcal{L}_{p}$. $\mathcal{L}_{p}$ is a neural network trained to predict similarities between images (\cite{perceptual}) and $\mathcal{L}_s$ is a term that encourages smoothness of the resulting depth maps (as described in \cite{smooth-loss}).
+\textbf{Step 1} optimizes only the $A$ network according to \autoref{eq:step1_loss}. Given an input $\text{I}$, the first four networks predict their components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$, $\textbf{a}$, and we obtain a reconstructed image $\hat{\textbf{I}} = \Phi (\textbf{v}, \textbf{l}, \textbf{d}, \textbf{a})$\footnote{$\mathcal{L}_{p}$ is a neural network trained to predict similarities between images~\cite{perceptual} and $\mathcal{L}_s$ is a term that encourages smoothness of the resulting depth maps (as described in \cite{smooth-loss}). We refer to our code for the weights $\lambda_i$.}.
+% The reconstruction loss is a weighted sum of the L1 norm and the \textbf{perceptual} loss function, $\mathcal{L}_{p}$. $\mathcal{L}_{p}$ is a neural network trained to predict similarities between images (\textcite{perceptual}) and $\mathcal{L}_s$ is a term that encourages smoothness of the resulting depth maps (as described in \textcite{smooth-loss}).
 \begin{equation}
     \mathcal{L}_{\text{step1}}(\textbf{I}, \hat{\textbf{I}}) = 
     \norm{\textbf{I} - \hat{\textbf{I}}}_1
@@ -120,8 +85,8 @@ We utilized this ellipsoid prior to reproduce the results of \cite{gan2shape}, a
 %TODO: find weight coeffs  of the weighted sum
 % The gradients can be taken with respect to the Albedo network's parameters and the network is updated. This is done iteratively (see \autoref{tab:stages} for the number of iterations) before moving on to step 2.
 
-\textbf{Step 2}  optimizes the $E$ network according to \autoref{eq:step2_loss}. Using the $\textbf{d}$ and  $\textbf{a}$ components given in the last step 1 iteration, and random directions $\textbf{v}_{i}^{'}$, $\textbf{l}_{i}^{'}$, we generate $N_p$ new pseudo-images $\textbf{I}_{i}^{'}$.
-For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}^{'})$, which serves as input to the StyleGAN generator network $G$ and obtain the projected images $\Tilde{\textbf{I}_i}$. 
+\textbf{Step 2}  optimizes the $E$ network according to \autoref{eq:step2_loss}. Using the $\textbf{d}$ and $\textbf{a}$ components given in the last step 1 iteration, and random directions $\textbf{v}_{i}^{'}$, $\textbf{l}_{i}^{'}$, we generate $N_p$ new pseudo-images $\textbf{I}_{i}^{'}$.
+For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}^{'})$, which serves as input to the StyleGAN generator network $G$ and obtain the projected images $\Tilde{\textbf{I}}_i$. 
 
 \begin{equation}
     \mathcal{L}_{\text{step2}}(\textbf{I}) = \frac{1}{N_p}
@@ -133,10 +98,10 @@ For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}
 
 % Where the last term is the L2 regularization term and $\lambda_1 = 5\cdot10^{-4}$. No other network is updated during this step.
 
-\textbf{Step 3} optimizes the $L$, $V$, $D$ and $A$ networks according to \autoref{eq:step3_loss}. It consists in part of $\mathcal{L}_{\text{step1}}$. The second part utilizes the projected samples from the last iteration of step 2. For each projected sample $\Tilde{\textbf{v}_i}=V(\Tilde{\textbf{I}_i})$, $\Tilde{\textbf{l}_i}=L(\Tilde{\textbf{I}_i})$ is calculated. Combined with $\textbf{d}$ and  $\textbf{a}$ from the original image, they can be used to reconstruct each projected sample from the components  $\bar{I} = \Phi(\Tilde{textbf{v}_i}, \Tilde{\textbf{l}_i},  \textbf{d}, \textbf{a}))$.
+\textbf{Step 3} optimizes the $L$, $V$, $D$ and $A$ networks according to \autoref{eq:step3_loss}. It consists in part of $\mathcal{L}_{\text{step1}}$. The second part utilizes the projected samples from the last iteration of step 2. For each projected sample $\Tilde{\textbf{v}}_i=V(\Tilde{\textbf{I}}_i)$, $\Tilde{\textbf{l}}_i=L(\Tilde{\textbf{I}}_i)$ is calculated. Combined with $\textbf{d}$ and  $\textbf{a}$ from the original image, they can be used to reconstruct each projected sample from the components  $\bar{\textbf{I}} = \Phi(\Tilde{\textbf{v}}_i, \Tilde{\textbf{l}}_i, \textbf{d}, \textbf{a}))$.
 \begin{equation}
     \mathcal{L}_{\text{step3}}(\textbf{I}, \bar{\textbf{I}})
-    = \frac{1}{N_p} \sum_{i=1}^{N_p} [\mathcal{L}_p (\textbf{I}, \bar{\textbf{I}_i} ) + ||\textbf{I} - \bar{\textbf{I}_i} ||_1]  + \mathcal{L}_\text{step1}(\textbf{I}, \hat{\textbf{I}}) + \lambda_2 \mathcal{L}_{s}(\textbf{D}(\textbf{I}))
+    = \frac{1}{N_p} \sum_{i=1}^{N_p} [\mathcal{L}_p (\textbf{I}, \bar{\textbf{I}}_i ) + ||\textbf{I} - \bar{\textbf{I}}_i ||_1] + \mathcal{L}_\text{step1}(\textbf{I}, \hat{\textbf{I}}) + \lambda_2 \mathcal{L}_{s}(\textbf{D}(\textbf{I}))
     \label{eq:step3_loss}
 \end{equation}
 
@@ -161,11 +126,11 @@ For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}
     \node[block, below of=step2, anchor=north] (step3) {Step 3};
     
     \node[transpblock, inner xsep=30pt, inner ysep=20pt,
-    fit=(step1) (step2)  (step3)] (imblock) {};
+    fit=(step1) (step2) (step3)] (imblock) {};
     
     \node[modelblock, right of=imblock, xshift=2cm, anchor=west](model){Single image model};
     
-    \node[predblock, text width=3cm, below of=model, anchor=north](pred){Predict depth map for  \textit{one} image.};
+    \node[predblock, text width=3cm, below of=model, anchor=north](pred){Predict depth map for \textit{one} image.};
     
     
     \draw[arrow] (traindata) -- (pretrain);
@@ -187,7 +152,7 @@ For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}
     \label{fig:oldtrainerFlowchart}
 \end{figure}
 \subsubsection{Novel Shape Priors}
-The first novel prior we consider is a masked box. Using the mask returned by the parsing model developed by \cite{zhao2017pyramid} we extrude the relevant object from the background, in a step-like manner. Improving on this idea, we also smooth the transition from the object to the background. This is done by using three 2D convolutions, where we convolve the masked box shape with a $11 \times 11$ filter of ones. Renormalizing the convolved shape, we obtain \autoref{subfig:c} denoted as `smoothed box'. 
+The first novel prior we consider is a masked box. Using the mask returned by the parsing model developed by \textcite{zhao2017pyramid} we extrude the relevant object from the background, in a step-like manner. Improving on this idea, we also smooth the transition from the object to the background. This is done by using three 2D convolutions, where we convolve the masked box shape with a $11 \times 11$ filter of ones. Renormalizing the convolved shape, we obtain \autoref{subfig:c} denoted as `smoothed box'. 
 
 The last prior we tested is obtained by normalizing the score (or "confidence") that the parsing model gives to each pixel. We use this confidence to project the object, i.e. a pixel that is within the category with more confidence will be farther projected. This prior is similarly smoothed by convolutions and is denoted as `confidence based'. 
 
@@ -204,7 +169,7 @@ The last prior we tested is obtained by normalizing the score (or "confidence") 
     \end{subfigure}
     \begin{subfigure}[t]{0.20\textwidth}
         \includegraphics[width=\textwidth]{../openreview/images/priors/prior_smoothed_box.png}
-        \caption{Masked and  smoothed box
+        \caption{Masked and smoothed box
         }
         \label{subfig:c}
     \end{subfigure}
@@ -264,7 +229,7 @@ To facilitate understanding of our modifications to the training procedure, we p
     fit=(batch_pretrain) (pretrain)] (pretrainblock) {};
     
     \node[transpblock, inner xsep=30pt, inner ysep=20pt,
-    fit=(extrim) (step2)  (step3)] (imblock) {};
+    fit=(extrim) (step2) (step3)] (imblock) {};
     
     \node[transpblock, inner xsep=40pt, inner ysep=35pt, 
     fit=(extrbatch) (imblock)] (batchblock) {};
@@ -302,21 +267,21 @@ To facilitate understanding of our modifications to the training procedure, we p
 
 \subsection{Datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
-We aimed to reproduce the authors' results on the LSUN Car, LSUN Cat (\cite{yu2015lsun}) and Celeba (\cite{celeba}). From these datasets, the authors selected a subset consisting of 10 images of cars, 216 images of cat faces, and 399 celebrity faces. Like the authors, we used RGB images of three color channels, resized to $128 \times 128$ pixel resolution. No further preprocessing was applied.
+We aimed to reproduce the authors' results on the LSUN Car, LSUN Cat~\cite{yu2015lsun} and Celeba~\cite{celeba}. From these datasets, the authors selected a subset consisting of 10 images of cars, 216 images of cat faces, and 399 celebrity faces. Like the authors, we used RGB images of three color channels, resized to $128 \times 128$ pixel resolution. No further preprocessing was applied.
 \subsection{Hyperparameters}
 \label{sec:hyperparams}
 % Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
-For replication purposes, the original hyperparameters by \cite{gan2shape} were used, but we also tried tuning some parameters that we believe are key to the method: the number of projected samples, $N_p$, for each image and the number of epochs for pre-training the depth network. $N_p$ was varied within $\{2, 4, 8, 16, 32\}$. In our tests we found the values 4, 8 and 8, respectively for the LSUN Car, LSUN Cat and Celeba dataset, to be the threshold after which the improvements in image quality start greatly decreasing (see \autoref{sec:appendix-hyperparams-tuning} in Appendix for more details).
+For replication purposes, the original hyperparameters by \textcite{gan2shape} were used, but we also tried tuning some parameters that we believe are key to the method: the number of projected samples, $N_p$, for each image and the number of epochs for pre-training the depth network. $N_p$ was varied within $\{2, 4, 8, 16, 32\}$. In our tests we found the values 4, 8 and 8, respectively for the LSUN Car, LSUN Cat and Celeba dataset, to be the threshold after which the improvements in image quality start greatly decreasing (see \autoref{sec:appendix-hyperparams-tuning} in Appendix for more details).
 % but we believe a good compromise is to perform a few initialization iterations as described in \autoref{sec:init_iter} with a large $N_p$ (i.e. 128) and then continue training with a lower number (i.e. 16).
 
-The number of epochs for the depth network pretraining was varied within $\{100, 500, 1000, 2000\}$. This pretraining affects how irregular the depth map predictions are. We believe that using a threshold for the loss to check the convergence would be preferable as the number of epochs selected by the authors (1000) is enough in most cases but not in all. We attribute irregularity in some of our results to this issue. 
+The number of epochs for the depth network pretraining was varied within $\{100,\allowbreak 500,\allowbreak 1000,\allowbreak 2000\}$. This pretraining affects how irregular the depth map predictions are. We believe that using a threshold for the loss to check the convergence would be preferable as the number of epochs selected by the authors (1000) is enough in most cases but not in all. We attribute irregularity in some of our results to this issue. 
 
 % Finally, the mean and standard deviation of the normal distribution that we used for sampling different view-light directions, was varied. We did not find any meaningful changes in the results, and thus the centering of the random view-light directions does not seem important.
 \subsection{Experimental setup and code}
 % Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
 % Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
 % Provide a link to your code.
-For each dataset we run our implementation of the framework from \cite{gan2shape} on the images that were selected by the authors, the procedure saves a checkpoint for each network. These checkpoints are later fed the original image to get the generated result. The evaluation of the results was only qualitative as all the datasets we explored do not have a ground truth for comparison. We instead relied on a manual evaluation.
+For each dataset we run our implementation of the framework from \textcite{gan2shape} on the images that were selected by the authors, the procedure saves a checkpoint for each network. These checkpoints are later fed the original image to get the generated result. The evaluation of the results was only qualitative as all the datasets we explored do not have a ground truth for comparison. We instead relied on a manual evaluation.
 
 Our code is available at \url{https://github.com/alessioGalatolo/GAN-2D-to-3D}. Our results are available interactively under the \lstinline{docs} folder and at \href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{alessiogalatolo.github.io/GAN-2D-to-3D/}.
 \subsection{Computational requirements}
@@ -324,7 +289,7 @@ Our code is available at \url{https://github.com/alessioGalatolo/GAN-2D-to-3D}. 
 % For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
 % For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
 % (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
-Most of the experiments we ran were on a Intel(R) Xeon(R) CPU @ 2.20GHz with 2 cores available and a Nvidia Tesla P100-PCIE-16GB. Since the framework described by \cite{gan2shape} is instance-specific, we report the average time for completing the projection of a single image: 96m and 28s for an image in the Celeba dataset, 95m and 43s for a LSUN Cat image and 74m and 32s for a LSUN Car image.
+Most of the experiments we ran were on a Intel(R) Xeon(R) CPU @ 2.20GHz with 2 cores available and a Nvidia Tesla P100-PCIE-16GB. Since the framework described by \textcite{gan2shape} is instance-specific, we report the average time for completing the projection of a single image: 96m and 28s for an image in the Celeba dataset, 95m and 43s for a LSUN Cat image and 74m and 32s for a LSUN Car image.
 \section{Results}
 \label{sec:results}
 % Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
@@ -552,19 +517,19 @@ The authors provide a clear specification of the Python package dependencies, as
 % List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
 
 % Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
-The paper by \cite{gan2shape} did not contain enough information for a successful reimplementation. Many details had to be discerned or guessed from their code. Furthermore, the quality of said code does not allow for a quick interpretation. For example, deducing the training loop and the number of iterations for each step was further complicated by the poor cohesion of the original code: the trainer script was heavily mingled with model class, using class members of the model object to increment training steps and nested function calls back and forth between the trainer and model classes. 
+The paper by \textcite{gan2shape} did not contain enough information for a successful reimplementation. Many details had to be discerned or guessed from their code. Furthermore, the quality of said code does not allow for a quick interpretation. For example, deducing the training loop and the number of iterations for each step was further complicated by the poor cohesion of the original code: the trainer script was heavily mingled with model class, using class members of the model object to increment training steps and nested function calls back and forth between the trainer and model classes. 
 % This made the code very hard to read. In our implementation we completely redesigned the trainer class, taking care to separate it from the model.
 
 % In particular, the description of the functions of the different training steps was not detailed enough. 
-The components  $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and  $\textbf{a}$ were not enough to pass in to the neural renderer to reconstruct an image. In reality, several calculations of quantities such as diffuse shading and texture were needed to be fed into the neural renderer, using concepts from light transport theory that were not mentioned in the paper.
+The components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and $\textbf{a}$ were not enough to pass in to the neural renderer to reconstruct an image. In reality, several calculations of quantities such as diffuse shading and texture were needed to be fed into the neural renderer, using concepts from light transport theory that were not mentioned in the paper.
 
-% The exact training loop  were also hard to deduce from the report along with how the ellipsoid prior shape worked exactly. 
-% The fact that we had to pre-train the depth network with the ellipsoid shape as the target had to be discovered in the code. The different training \textit{stages}, i.e. the different number of iterations/step each epoch, had to be deduced from Table 10 in the appendix of \cite{gan2shape}. Before closely reading the appendix and then exam.
+% The exact training loop were also hard to deduce from the report along with how the ellipsoid prior shape worked exactly. 
+% The fact that we had to pre-train the depth network with the ellipsoid shape as the target had to be discovered in the code. The different training \textit{stages}, i.e. the different number of iterations/step each epoch, had to be deduced from Table 10 in the appendix of \textcite{gan2shape}. Before closely reading the appendix and then exam.
 
 Another difficulty was the heavy reliance on external pre-trained neural networks. 
-% Beyond the StyleGAN2 network, the neural renderer \cite{neural-renderer}, the perceptual loss \cite{perceptual}, and the masking networks \cite{zhao2017pyramid, bisenet, bisenet2}, all had to be installed and made runnable.
-The neural renderer \cite{neural-renderer}, in particular, posed several problems. The major one was incompatibility with Windows machines. To be able to develop on our personal machines, we had to make manual edits of the neural renderer script and different CUDA files.
-% To successfully compile the neural renderer, we used an older version of the MSVC (2015) \lstinline{C++} compiler \cite{msvc}. Additionally, the neural renderer was built with CUDA 9.2 support, which later posed a problem when we wanted to employ Nvidia T4 and V100 GPUs which are only compatible with CUDA 10+. Through online searching, reading the Nvidia documentation and trial-and-error, we found we were able to run it with CUDA version 10.2.89.
+% Beyond the StyleGAN2 network, the neural renderer \textcite{neural-renderer}, the perceptual loss \textcite{perceptual}, and the masking networks \textcite{zhao2017pyramid, bisenet, bisenet2}, all had to be installed and made runnable.
+The neural renderer~\cite{neural-renderer}, in particular, posed several problems. The major one was incompatibility with Windows machines. To be able to develop on our personal machines, we had to make manual edits of the neural renderer script and different CUDA files.
+% To successfully compile the neural renderer, we used an older version of the MSVC (2015) \lstinline{C++} compiler \textcite{msvc}. Additionally, the neural renderer was built with CUDA 9.2 support, which later posed a problem when we wanted to employ Nvidia T4 and V100 GPUs which are only compatible with CUDA 10+. Through online searching, reading the Nvidia documentation and trial-and-error, we found we were able to run it with CUDA version 10.2.89.
 %FIXME: probably useful to include the cuda version used
 
 Another challenge with this method is the lack of objective quantitative metrics to evaluate the success of the models. One instead has to rely almost entirely on qualitatively gauging the shape reconstructions by eye.
@@ -573,7 +538,7 @@ Another challenge with this method is the lack of objective quantitative metrics
 
 \subsubsection{Variability of the results}
 \label{sec:variability}
-We observed that the method is very sensitive to various random factors and identical runs may yield different results, see \autoref{fig:variability}. One factor may be the random initialization of the networks, but we do not believe it is the dominating factor, since the depth network is pre-trained on a fixed prior shape each run. Rather, as mentioned by the authors \cite{gan2shape}, the quality of the projected samples varies. 
+We observed that the method is very sensitive to various random factors and identical runs may yield different results, see \autoref{fig:variability}. One factor may be the random initialization of the networks, but we do not believe it is the dominating factor, since the depth network is pre-trained on a fixed prior shape each run. Rather, as mentioned by the authors~\cite{gan2shape}, the quality of the projected samples varies. 
 Additionally, we only sample $8-16$ different view-light directions in each step 2 iteration, which may be too few projected samples for a robust model. Since this sampling is random, increasing the number of samples should assure the inclusion of meaningful view and light projections (experimental backing in the \autoref{appendix}).
 % We speculate that with increased resources, the number of projected samples could be upped by orders of magnitude to increase robustness.
 
@@ -582,9 +547,9 @@ Additionally, we only sample $8-16$ different view-light directions in each step
 We have observed that the instance-specific model forgets the previous training images (see Appendix \ref{sec:forget-appendix}, \autoref{fig:forget_cat}), and thus has no generalization capability. This is not necessarily a problem if one has time and computational resources. It can also be argued that this is exactly what is intended with this model, and that generalization is up to the training dataset of the StyleGAN model. It does, however, limit the usefulness of the model. As an example, the training time for one $128 \times 128$ pixel RGB image using a Tesla K80 GPU was about 2.5 hours, which seems exceedingly costly for just one low-resolution depth map. We argue that a \textit{general} model would have more use. The ideal scenario would be a model $D^*$ trained on $\mathcal{D}$ that is able to accurately predict $\textbf{d}_i = D^*(\textbf{I}_i)$ $\forall$ $ \textbf{I}_i \in \mathcal{D}$, and even extend to unseen testing data belonging to the same distribution as $\mathcal{D}$. This discussion is what urged us to explore the altered training procedure of sections \ref{sec:method-general} and \ref{sec:general}.
 
 \subsubsection{Final conclusions}
-We were able to replicate some of the results of \cite{gan2shape} on the datasets LSUN Car, LSUN Cat and Celeba. We identified several failure modes and limitations of the model, and back it up with experimental evidence. Examples are the variability and sensitivity to the projected samples, the heavy dependence on shape priors and the computational costliness of the single-use model - all of which were not adequately accounted for in the original paper.
+We were able to replicate some of the results of \textcite{gan2shape} on the datasets LSUN Car, LSUN Cat and Celeba. We identified several failure modes and limitations of the model, and back it up with experimental evidence. Examples are the variability and sensitivity to the projected samples, the heavy dependence on shape priors and the computational costliness of the single-use model - all of which were not adequately accounted for in the original paper.
 
-We propose a new prior shape, the smoothed box prior, that has shown very promising results especially for fine details and complex object structures. We propose a second prior shape, confidence-based, that has shown best results in the face dataset. We finally suggest two new training procedures that produce better results and are better at generalizing than the original model by \cite{gan2shape}.
+We propose a new prior shape, the smoothed box prior, that has shown very promising results especially for fine details and complex object structures. We propose a second prior shape, confidence-based, that has shown best results in the face dataset. We finally suggest two new training procedures that produce better results and are better at generalizing than the original model by \textcite{gan2shape}.
 
 We recognize the limitations of this work as we were only able (due to the restricted computational power) to test the method on part of the dataset. For example, the Cat's dataset used by the authors contains more than 200 images but we were able to only test few of them. We speculate that some images in the dataset could yield better results than those reported here. However, we believe that few bad projected images should be enough to claim the uneffectiveness of the method at least in some particular cases.
 
@@ -593,7 +558,7 @@ Another limitation of our work is the lack of quantitative evaluation methods. T
 % % Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published.
 % We did not communicate with the original authors.
 \subsection{Future work}
-We speculate that it would be interesting to adapt the same method to StyleGAN3 (\cite{stylegan3}) where the network has been modified to support training with fewer samples, leaving the question if the network still retains enough information that is needed for GAN2Shape to work. Future work could also explore the use of our priors on datasets where the original method failed (e.g. the LSUN Horse dataset). We speculate that, since our prior captures the boundaries of the object very well (compared to the ellipsoid where the boundaries are only used to position the origin), it could achieve better results in complex 3D objects where the shape cannot be simplified into an ellipse. A limitation of this method is that it does not use voxels, but learns a height map. This disallows realistic shape reconstructions and more complex geometries with multiple x and y values for each z value etc. Future work should investigate whether this model could be extended to predict voxels instead of height maps. Given our promising results with the generalizing trainer, which was obtained through only a few epochs of training, we believe that it should be further explored with increased epochs and training set size.
+We speculate that it would be interesting to adapt the same method to StyleGAN3 \cite{stylegan3} where the network has been modified to support training with fewer samples, leaving the question if the network still retains enough information that is needed for GAN2Shape to work. Future work could also explore the use of our priors on datasets where the original method failed (e.g. the LSUN Horse dataset). We speculate that, since our prior captures the boundaries of the object very well (compared to the ellipsoid where the boundaries are only used to position the origin), it could achieve better results in complex 3D objects where the shape cannot be simplified into an ellipse. A limitation of this method is that it does not use voxels, but learns a height map. This disallows realistic shape reconstructions and more complex geometries with multiple x and y values for each z value etc. Future work should investigate whether this model could be extended to predict voxels instead of height maps. Given our promising results with the generalizing trainer, which was obtained through only a few epochs of training, we believe that it should be further explored with increased epochs and training set size.
 % It is also possible that larger architectures are required to generalize well, hence that should be explored in future work.
 % \bibliographystyle{plainnat}
 % \bibliography{references}
