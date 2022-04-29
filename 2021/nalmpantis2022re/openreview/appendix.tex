@@ -1,7 +1,7 @@
 \newpage
 \section*{Appendix}
-\stepcounter{section}
-\subsection{List of inconsistencies, assumptions and corrections}
+\appendix
+\section{List of inconsistencies, assumptions and corrections}
 \label{app:inconsistencies}
 After studying the original paper and the provided code, we spotted a few inconsistencies between the two. In order to deal with them, we had to make some assumptions that better aligned with the methods presented in the original paper.
 
@@ -15,7 +15,7 @@ Regarding the pre-processing pipeline applied to the original data, we noticed i
 
 Regarding the experimental setup, the reported results in the paper are the output of a single seed for the random generator. As a consequence, there was only a single split of the data between training and testing leading to results with high variance.
 
-\subsection{Finding the most popular point in a dataset}
+\section{Finding the most popular point in a dataset}
 \label{app:nraa}
 Let $\mathbf{x}_1, \mathbf{x}_2, \dots, \mathbf{x}_n \in \mathbb{R}^m$ be points in a dataset $\mathcal{X}$. Our goal is to define the most popular point $\mathbf{x}_{\mathrm{pop}}$ in a meaningful way, such that it is dataset agnostic, i.e. it does not require manual input of parameters, such as a manually defined radius for each dataset. We mainly experimented with two methods.
 
@@ -41,7 +41,7 @@ In the Anchoring Attack, we need to sample a negative sample $x_{\mathrm{target-
 
 \footnotetext{The mean of the dataset or some other statistic could also be used, which intuitively makes more sense. Basic experiments hinted that dividing by the variance performed better, but the mean method can not be completely discarded as we didn't conduct thorough experiments due to time constraints.}
 
-\subsection{Data Augmentation}
+\section{Data Augmentation}
 \label{appendix:data_augmetation}
 As it has been demonstrated through experimental evaluation, the IAF can deteriorate a model's fairness. However, we argue that the same approach can be applied for data augmentation to increase a model's fairness resulting in an unbiased classifier.
 
