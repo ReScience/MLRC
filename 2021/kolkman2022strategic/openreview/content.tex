@@ -1,6 +1,18 @@
 \section{Reproducibility Summary}
 
-Add your summary here. No need to worry about fitting it in a single page now.
+In this work, the paper Strategic Classification Made Practical is evaluated through a reproduction study. We successfully reproduced the original results using the same dataset and hyperparameters. In addition, we conducted an additional experiment that tests the framework's performance on a dataset containing both strategic and non-strategic users. The results show significant decrease in accuracy of linear models proportional to the number of non-strategic users. The non-linear RNN model achieves good performance regardless of the proportion of strategic users. The results provide insight into the limitations of the claims that the original approach is flexible and practical.
+
+\clearpage
+\section{Content}
+\section{Reproducibility Summary}
+
+In this work, the paper Strategic Classification Made Practical\cite{levanon2021strategic} is evaluated through a reproduction study. The results from the reproduction examines if the claims made in the paper are valid. We could find two main claims that were made by the authors that we will attempt to reproduce. Those are as follows:
+
+% The claims made in the paper that will be reproduced are as follows:
+\begin{enumerate}
+    \item "We propose a novel learning framework for strategic classification that is practical, effective, and flexible. This allows for differentiation through strategic user responses, which supports end-to-end training."
+    \item "We propose several forms of regularization that encourage learned models to promote favorable social outcomes."
+\end{enumerate}
 
 \subsection{Submission Checklist}
 
@@ -23,6 +35,384 @@ You can also run the tests locally by running \texttt{python check\_yaml.py}, an
 \clearpage
 
 \section{Content}
-Copy your Openreview content here.
+\newif{\ifhidecomments}
 
-This is an example citation \cite{Sinha:2021}.
+
+\title{Strategic classification made practical: reproduction}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  David S.~Hippocampus\thanks{Use footnote for providing further information
+    about author (webpage, alternative address)---\emph{not} for acknowledging
+    funding agencies.} \\
+  Department of Computer Science\\
+  Cranberry-Lemon University\\
+  Pittsburgh, PA 15213 \\
+  \texttt{hippo@cs.cranberry-lemon.edu} \\
+
+}
+
+\begin{document}
+
+\maketitle
+
+\section*{\centering Reproducibility Summary}
+
+
+\subsection*{Scope of Reproducibility}
+
+In this work, the paper Strategic Classification Made Practical\cite{levanon2021strategic} is evaluated through a reproduction study. The results from the reproduction examines if the claims made in the paper are valid. We could find two main claims that were made by the authors that we will attempt to reproduce. Those are as follows:
+
+% The claims made in the paper that will be reproduced are as follows:
+\begin{enumerate}
+    \item "We propose a novel learning framework for strategic classification that is practical, effective, and flexible. This allows for differentiation through strategic user responses, which supports end-to-end training."
+    \item "We propose several forms of regularization that encourage learned models to promote favorable social outcomes."
+\end{enumerate}
+
+We interpret \textit{practical, effective and flexible} as such that the model should work better on a variety of real life problems than their non-strategic counterpart.
+
+\subsection*{Methodology}
+
+In this paper, the same code, datasets and hyperparameters were used as the original paper to reproduce the results.
+To further validate the claims from the original paper, we extended the original implementation to include an experiment that tests performance on a dataset containing both strategic (also referred to as gaming) and non-strategic users.
+
+\subsection*{Results}
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+The reproduction of the original paper as well as the extended implementation were successful. We were able to reproduce the original results and examine the performance of the proposed model in an environment where strategic and non-strategic users both present. Linear models seem to struggle with different proportions of strategic users, while the non-linear model (RNN) achieves good performance regardless of the proportion of strategic users.
+\subsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The codebase for the paper was available on GitHub which meant that we didn't have to start from scratch. They also provided us with the original data. The codebase also came with the original results from the authors which meant that comparing the results was easy.
+
+% The codebase that was used for the original paper was written and organized well enough, thus verifying that the results from the original paper were valid results was not a problem.
+
+%The codebase of the authors when we were able to run it was easily done, because all of the code was in notebooks. We could run the notebooks and it would produce the results. 
+
+\subsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+%% No need for details on env files i think
+Although the code was available, documentation of the code was quite sparse. Therefore, it was hard to figure out what each part of the code did and made it difficult to interpret what the results actually meant at certain stages. % Another problem with the code was the environment file that was supposed to be used to run the notebooks. This file gave errors when creating an environment and we needed to manually install the packages. The paper itself did have all the formula's for the math. However, the variables in the formulas were not clearly explained in the text. Lastly, we would have liked if there was a final table which summarised all the accuracy's for the different methods used.
+
+\subsection*{Communication with original authors}
+The University of Amsterdam communicated before the course with the authors about the datasets. While working on the reproduction we sent one email about clarification of their method and to request a missing dataset.
+% Briefly describe how much contact you had with the original authors (if any).
+\newpage
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+\section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+As consequential decisions such as loan approval and fraud detection are increasingly made by predictive machine learning systems, it is important to consider the weaknesses and vulnerabilities of these systems. Users may gain knowledge of the model and use this knowledge to modify their features to improve their outcomes. Therefore, a model must be resilient against strategic modification of features to classify these users properly.\\\\
+This problem of classification while users strategically modify their features is referred to as strategic classification, and it is the main subject of the paper Strategic Classification  Made Practical\cite{levanon2021strategic}. In this paper, a novel framework is proposed that claims to be more practical and flexible than previous methods, along with novel methods to improve social outcomes in automated decision-making. This work will examine the results demonstrated in this paper through reproduction of their experiments.
+
+\section{Scope of reproducibility} \label{sec:scope}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+% Consistently use moving points/editing features to avoid confusion
+This paper describes our efforts to reproduce the work from the paper Strategic Classification Made Practical\cite{levanon2021strategic}, which addresses the problem of strategic classification in a manner that is more practical than previous approaches, more flexible than previous approaches and takes social good into account.\\
+The original paper describes strategic classification as a classification task on a set of points $x \in \mathbb{R}^D$. A classifier $h(x)$ is tasked to classify $x$ to into classes $y = \{-1,1\}$, which is determined by a score function $f$ via the decision rule $h(x) = \sign(f(x))$. In strategic classification, the assumption is made that points can move according to a cost function $c(x,x')$. Therefore, users can modify their original features $x$ to their repsonse $x'$ to improve their outcome using the best move for $x$; $\Delta_h(x)$. Where this best move $\Delta_h(x)$ can be described as follows: 
+\begin{equation} \label{eq:resp_map}
+  \Delta_h(x) = \argmax_{x' \in \chi} h(x') - c(x,x') 
+\end{equation}\\
+To accurately classify points that are able to to modify their features, the error function has to take this into account. This results in an empirical loss function of: 
+\begin{equation} \label{eq:SERM}
+ \min_{f \in F} \sum^m_{i=1} \mathds{I}\{y \neq h(\Delta_f(x))\} + \lambda R(f)
+\end{equation}
+Which translates to choosing a score function $f$ such that misclassification of manipulated datapoints is minimized according to regularization method $R$ and $\lambda$ that determines the regularization strength. Optimizing equation \ref{eq:SERM} is referred to as strategic empirical risk minimization (SERM) in the original paper, which functions as the main loss function of the framework.
+\\\\
+The claims that the paper made are as follows:
+\begin{enumerate}
+    \item Flexible, practical and effective modeling: By using SERM, the claim is made that the framework can extend beyond the original formulation of strategic classification, i.e. outperform the original paper by Hardt et al.\cite{hardt2016strategic} and demonstrate good performance in new and realistic environments.
+    \item Socially-aware learning: By regularizing based on social objectives such as expected utility, social burden and recourse, the claim is made that the model can promote socially favourable outcomes, i.e. increase positive user outcomes as regularization increases.
+\end{enumerate}
+
+In addition to reproducing the results presented in the paper, we perform novel experiments that test the claimed practicality, effectiveness and flexibility of the approach. In the experiments, we lift the assumption that all the users of the system are modifying their features to game the classifier. We make the case that this assumption cannot be applied to many real life settings. The experimental results show that in some settings the proposed method leads to decreased performance.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+% Model description and datasets could be merged since the models change per dataset
+\subsection{Model descriptions} \label{sec:model_desc}
+
+
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained).
+The focus of the original paper is on proposing a new framework, rather than a new model. Therefore, the models that were used in the original paper were relatively simple, consisting of linear classifiers and a basic RNN. All models were optimized using Adam.\\ 
+The claims made in the paper were proven independently of each other in different experiments using different datasets, \textit{spam, credit, fraud} and \textit{financial distress} (datasets will be elaborated upon in section \ref{sec:datasets}). This was done to demonstrate the flexibility of the framework as well as to demonstrate the generalizability of the framework on different datasets.\\\\ To verify said generalizability and flexibility, we repeated these experiments using the code provided by the authors. Similar to the original paper, results were compared to two "simpler", non-strategic models to verify performance. By non-strategic, we mean a standard classifier which assumes that the datapoints cannot move in any way. These models are referred to as \textbf{benchmark}, which is a non-strategic classifier trained and evaluated on non-strategic data, and \textbf{blind}, which is a non-strategic classifier evaluated on strategic data. To clarify: performing strategic classification is the act of training a model on a dataset and consequently performing a classification task where strategic movement of points according to a cost function is taken into account.
+
+In the original paper, the model calculates the cost depending on the scale. Therefore, we will also be using scale to calculate the cost. Similar to the original paper, the influence of scale on model performance will be examined, where scale will take on the following values: $[0.5, 1, 2]$. These values were chosen such that the results can be compared to the original paper. This means that for each run of the model the cost is increased or decreased depending on the scale. The cost function used is:
+\begin{equation}\label{eq:r_util}
+     Cost = scale * squared\_error
+\end{equation}
+
+\subsubsection{Experimental setup claim 1}
+The claim of model flexibility is tested by performing strategic classification on the \textit{spam} dataset, which is the same dataset used by Hardt et al\cite{hardt2016strategic} in their original definition of strategic classification. The model used for this experiment is a linear classifier with a SERM loss function. Average accuracy was monitored and compared to a blind model and a benchmark model. To further validate the performance of the framework, strategic classification was also performed on the remaining datasets.
+
+\subsubsection{Experimental setup claim 2} 
+The claim of socially-aware learning was verified by performing strategic classification on the \textit{credit} dataset. To account for social good, several regularization techniques are used. Specifically expected utility, social burden and recourse are considered in the loss function:\\
+
+Expected utility: summed utility that the users gain from classification results, minus the total cost of gaming
+\begin{equation}\label{eq:r_util}
+     R_{utility} = -\sum^m_{i=1} h(\Delta(x)) - c(x,\Delta(x))
+\end{equation}\\
+Social burden: minimal cost value from among users classified as positive.
+\begin{equation}\label{eq:r_burden}
+    R_{burden} = \sum \min c(x,\Delta(x)) %maybe put $\Delta(x)$ here to be consistent
+\end{equation}
+\\
+Recourse: the capacity of a user who classified negative to restore approval through reasonable action
+\begin{equation}\label{eq:r_recourse}
+    R_{recourse} = \sum^m_{i=1}\sigma(-f(x)) * \sigma(-f(\Delta_f(x)))
+\end{equation}
+Where $\Delta(x)$ is the best response for $x$, $\Delta_f(x)$ is the best response for $x$ with regard to $f$, $x'$ is the strategically modified datapoint (as described in section \ref{sec:scope}), and $\sigma(x)$ is the sigmoid function of $x$.  Similar to the first experiment, this experiment uses a linear classifier with a SERM loss function. For every regularisation method, differing ranges of regularisation were analysed and compared to a benchmark model. The experiment on utility used a log range for $\lambda \in [-0.4,-0.2]$ of 10 steps, the experiment on social burden used a log range for $\lambda \in [-2,1]$ of 30 steps, and the experiment on recourse used a log range for $\lambda \in [0,0.3]$ of 15 steps.
+
+\subsubsection{Additional experiments} 
+The authors make an assumption that all the users of the system will game according to their cost function. However, in many real life situations this assumption may not hold. For instance, in an email spam classification setting, people who write regular non-spam emails will most likely not think about gaming the spam classifier system. Assuming that every user is gaming might lead to a situation where a non-gaming email is falsely classified as spam due to the classifier being too strict. The case in which the strategic model is evaluated on a dataset consisting of non-gaming users is not taken into account in the paper. \\ \\
+We performed an additional experiment to investigate that case, with the hypothesis that the strategic model would perform worse on non-strategic data and would result in more false negative errors. In addition, we investigated a mixed data situation, in which gaming users make up some proportion of the data, defined by an additional parameter. After being trained on the original dataset, the classifiers were evaluated on $n$ datapoints, out of which $\beta * n$  points chosen at random were strategically modified. $\beta$ is the share of  gaming users in the data, ranging from $[0, 1]$ in steps of 0.1.  In this experiment, we tracked the classification accuracy and error types, false negatives and false positives, of the strategic and non-strategic model. The accuracy benchmark used with this model is the performance of the non-strategic model on non-strategic data ($\beta = 0$), which is the same as in the original paper. The experiment was performed on the four datasets from the paper in a new Jupyter notebook. We used the cost scale of 0.5 in the experiments.
+ 
+\subsection{Datasets} \label{sec:datasets}
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+The datasets that were used in the original paper were also used in this work. All datasets and their details are shown in figure \ref{tab:datasets}. 
+\textit{Spam}, as used by Hardt et al\cite{hardt2016strategic} contains features of users and spammers from a Brazilian social network. The features consists of numerical values about the user and their activity, such as amount of followers or number of words in a post. The dataset can be obtained from Costa et al.\cite{spam_data}.
+\textit{Financial Distress}, created for a Kaggle challenge \cite{financial_distress} contains time-series data describing the measure of financial distress for 422 companies. Each company has a maxium of 14 time steps after which the company has or has not gone bankrupt.
+\textit{Fraud}, which was also created for a Kaggle challenge\cite{credit_fraud}, contains 284000 credit card transactions that are either real or fraudulent. Features include numerical features related to the transaction, such as time of transaction and amount of money in the transaction.
+\textit{Credit}, created by Ustun et al\cite{ustun2019actionable}, contains credit card spending patterns as well as labels that define if the pattern is regular or not. There are 30000 data points, each with 11 features that include features such as age, payment history and education level.
+\begin{figure}[h]
+\begin{tabular}{l|l|l|l|l|l}
+\cline{2-5}
+                                         & Dataset size & Features & Format      & Description                                     &  \\ \cline{1-5}
+\multicolumn{1}{|l|}{Spam}               & 7,076             & 15         & .csv        & Collection of social network users and posts          &  \\ \cline{1-5}
+\multicolumn{1}{|l|}{Credit}             & 30,000             & 11         & .csv        & Collection of credit card spending patterns     &  \\ \cline{1-5}
+\multicolumn{1}{|l|}{Fraud}              & 284k             & 29         & .csv        & Collection of credit card transaction           &  \\ \cline{1-5}
+\multicolumn{1}{|l|}{Financial distress} &  422            &  83        & time series & Collection of financial situations of companies &  \\ \cline{1-5}
+\end{tabular}
+    \caption{Description of the datasets that were used in this project. All of these datasets have previously been used in the context of strategic classification, which makes them suitable to use when comparing models. Each dataset was gathered from the respective paper that they were first mentioned in.}
+    \label{tab:datasets}
+\end{figure}
+\subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+As described in section \ref{sec:model_desc}, a seperate model was trained for every experiment. In turn, every model had seperate hyperparameters as well. As such, hyperparameters were chosen based on their performance in the original paper. Figure \ref{tab:hyperparams_vanilla} and figure \ref{tab:hyperparams_reg} (see Appendix B) show the hyperparameters that were used per experiment.
+\begin{figure}[H]
+    \centering
+\begin{tabular}{l|llll|}
+\cline{2-5}
+                                    & \multicolumn{4}{c|}{Vanilla}                                                                   \\ \cline{2-5} 
+                                    & \multicolumn{1}{l|}{Spam} & \multicolumn{1}{l|}{Credit} & \multicolumn{1}{l|}{Fraud} & Distress \\ \hline
+\multicolumn{1}{|l|}{Epochs}        & \multicolumn{1}{l|}{16}     & \multicolumn{1}{l|}{16}       & \multicolumn{1}{l|}{16}    & 16   \\ \hline
+\multicolumn{1}{|l|}{Learning rate} & \multicolumn{1}{l|}{0.5}    & \multicolumn{1}{l|}{0.5}      & \multicolumn{1}{l|}{0.5}   & 0.5  \\ \hline
+\multicolumn{1}{|l|}{Batch size}    & \multicolumn{1}{l|}{128}     & \multicolumn{1}{l|}{64}       & \multicolumn{1}{l|}{24}    & 24  \\ \hline
+\multicolumn{1}{|l|}{Train slope}   & \multicolumn{1}{l|}{1}      & \multicolumn{1}{l|}{1}        & \multicolumn{1}{l|}{1}     & 1    \\ \hline
+\multicolumn{1}{|l|}{Eval slope}    & \multicolumn{1}{l|}{5}      & \multicolumn{1}{l|}{5}        & \multicolumn{1}{l|}{3}     & 5    \\ \hline
+\end{tabular}
+    \caption{Hyperparameter details for strategic classification without extensions (referred to as vanilla) on all datasets. Hyperparameters were chosen based on their performance in the original paper.}
+    \label{tab:hyperparams_vanilla}
+\end{figure}
+
+\subsection{Experimental setup and code}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+The reproduction of the results was done with jupyter notebooks, this is the same as the original authors. Each notebook specialises in one part of the methods used in the original paper. The results of these different notebooks are then summarised in a plotting notebook called "reproduction plots.ipynb". Each notebook trains the respective model and saves the results to a .csv file. The measure used to evaluate the experiments is the accuracy of the model with the different datasets. The code can be found at this \href{https://anonymous.4open.science/r/Strategic_classification_made_practical_reproduce_91BD/README.md}{\textbf{github}}.
+
+% Using the Jupyter notebook code provided by the original authors, reproducing the experiments was simply a matter of installing the correct libraries and running the notebooks. (Something about bad environment file?)\\
+% In the additional experiment, we evaluated the performance of the model in a situation where the amount of users that strategically modify their features was varied. After being trained on the original dataset, the classifiers were evaluated on $n$ datapoints, out of which only $\beta * n$  points chosen at random were strategically modified. In this experiment, we tracked the classification accuracy and error types, false negatives and false positives, of the strategic and non-strategic model, while $\beta$ ranged from $[0,1]$ in steps of 0.1. The accuracy benchmark used is the performance of the non-strategic model on non-strategic data ($\beta = 0$), which is the same as in the original paper. The experiment was performed on the four datasets from the paper in a new Jupyter notebook.
+
+\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+Experiments were able to be reproduced on laptops without a dedicated graphics card. Times per experiment differed, but individual experiments generally took 60 minutes. The exception to this rule was calculating the performance of the model for social burden, which took around 9 hours to run on a laptop with a GTX 1050.
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+The reproduction study reveals minimal differences between the reported and reproduced accuracies. The first claim for a novel learning framework for strategic classification is supported by our reproduced results. The framework performs better than the Hardt et al.\cite{hardt2016strategic} strategic classification baseline. Thus, it also supports the second claim of the original paper.
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections.\\ 
+\begin{figure}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+ 
+    Dataset & \multicolumn{7}{|c|}{Accuracy} \\\hline
+    Cost scale & \multicolumn{3}{|c|}{0.5} & \multicolumn{2}{|c|}{1}& \multicolumn{2}{|c|}{2}\\\hline
+    & Method & Original & Rerun & Original & Rerun & Original & Rerun\\\hline
+    \multirow{3}{4em}{Credit}   & Benchmark     & 0.738 & 0.738 & 0.736 & 0.738 & 0.736 & 0.738\\
+                                & SERM          & 0.72 & 0.738 & 0.736 & 0.732 & 0.735& 0.733 \\
+                                & Blind         & 0.57 & 0.55 &0.625 & 0.587 & 0.665 & 0.647\\\hline
+    \multirow{3}{4em}{Distress} & Benchmark     & 0.928 & 0.917 & 0.928 & 0.917 & 0.94 & 0.917\\
+                                & SERM          & 0.916 & 0.917 & 0.916 & 0.917 & 0.928 & 0.905\\
+                                & Blind         & 0.63 & 0.631 & 0.642 & 0.631 & 0.666 & 0.643\\\hline
+    \multirow{3}{4em}{Fraud}    & Benchmark     & 0.949 & 0.959 & 0.954 & 0.959 & 0.964 & \textbf{0.959} \\
+                                & SERM          & \textbf{0.76} & \textcolor{red}{0.908}& 0.954 & 0.908 & 0.939 & \textbf{0.719}\\
+                                & Blind         & 0.653 & 0.668 & 0.668 & 0.724 & 0.760 & 0.765\\\hline
+    \multirow{3}{4em}{Spam}     & Benchmark     & 0.814 & 0.813 & 0.815 & 0.813 & 0.819 & 0.813\\
+                                & SERM          & 0.719 & 0.797 & 0.787 & 0.804 & 0.779 & 0.794\\
+                                & Blind         & 0.653 & 0.668 & 0.588 & 0.581 & 0.617 & 0.601\\\hline
+\end{tabular}
+    \caption{Accuracy table for the basic framework experiments that were reproduced, for all original datasets. Various scales (amount of gaming per user) were examined and results are generally very similar.}
+    \label{tab:accuracies}
+\end{figure}
+
+\subsubsection{Result 1}
+As mentioned in section 3.1, the claim of flexible modeling was reproduced and evaluated by running the code that was provided by the original authors and comparing the outcome to the results produced by Hardt et al.\cite{hardt2016strategic}, as visible in figure \ref{tab:accuracies} and appendix A. Similar to the results proposed in the original paper, our reproduced results outperform the algorithm proposed by Hardt et al. \cite{hardt2016strategic}.\\
+To further evaluate the claim of flexibility, the original paper examines performance in environments other than the one proposed in Hardt et al.\cite{hardt2016strategic}. The new environments are the datasets credit, financial distress and spam. These datasets give an accuracy of more than 0.7 for all except for the blind testing. This is true in both the original results and our reproduction. The lower accuracy in the blind testing can be explained by making the assumption that nobody is gaming when everyone is gaming in the dataset. This causes the agents who are gaming to cross the decision boundary by gaming the system. However, as visible in figure \ref{tab:accuracies}, the results of our reproduction of strategic classification on the \textit{fraud} dataset using the SERM method has a significantly higher accuracy than the original paper. The other noticeable result in the accuracy is again in the fraud dataset. However, it is between the benchmark and the SERM method which in all other cases had a difference of less than 0.1. 
+
+\subsubsection{Result 2}
+To prove the second claim about social impact, the authors made plots similar to figure \ref{fig:extention_results}. In figure \ref{fig:extention_results} we see that there is an initial range where the accuracy doesn't drop significantly with increase in regularisation, similarly to the plots of the original authors. This means that the model can be fitted to accomplish lower social burden without having a detrimental effect to the accuracy. To test the true social impact it would be good to also test these regularized models on mixed data, since we saw a large amount of false negatives in the previous section. However we did not have time for that in this paper and these results show that the model can be regularized succesfully which was the main focus of the claim made by the original authors.
+
+\begin{figure}
+    \centering
+    \hspace*{-.5in}
+    \includegraphics[scale=0.5]{plots/Extentions.png}
+    \caption{Graphs showing the relationship between the social welfare metrics and model accuracy (left: recourse, center: social burden, right: utility). Points correspond 
+    to different degrees of regularization $\lambda$. }
+    \label{fig:extention_results}
+\end{figure}
+
+
+% \begin{figure}[H]
+% \centering
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.4]{plots/burden.jpg}
+%     \caption{A graph showing model performance as the amount of social burden increases.}
+%     \label{fig:burden_result}
+%     \end{subfigure}
+%     %
+%     \hfill
+%     %
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.4]{plots/recourse.png}
+%     \caption{A graph showing model performance as the amount of recourse increases.}
+%     \label{fig:recourse_result}
+%     \end{subfigure}
+%     %
+%     % \hfill
+%     %
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.45]{plots/utility.jpg}
+%     \caption{A graph showing model performance as the amount of utility increases.}
+%     \label{fig:utility_result}
+%     \end{subfigure}
+    
+%     \caption{Results of social regularization experiments. While the model was being regularized base on utility, social burden and recourse, accuracy was monitored.}
+% \end{figure}
+\subsection{Results beyond original paper}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+
+The results in terms of accuracy, presented in Figure \ref{fig:semi-strat}, show that for 3 out of 4 datasets, there is a clear linear relationship between the amount of gaming users and both models' performance, with roughly the same slope and opposite direction. For fraud and spam data, the point of equal performance is around 0.6, which suggests that the non-strategic model is better, assuming uniform probability distribution of $\beta$. The plots of false positive and negative errors (Fig \ref{fig:confusion}) show, in line with our initial hypothesis, that the drop in performance of the strategic model is caused by more false negative errors, and by false positive in case of the non-strategic model.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{plots/semi-strategic.png}
+    \caption{A comparison of non-strategic and strategic model accuracy as the proportion of gaming  users changes, evaluated on four datasets used in the original paper. }
+    \label{fig:semi-strat}
+\end{figure}
+
+The distress data is an outlier, in which the strategic model is at the benchmark level for all levels of $\beta$ and the non-strategic model's accuracy significantly decreases with $\beta$. This might be due to the fact that the distress classifier is a RNN network, while the other ones are linear models. The RNN can learn a more complex representation, which enables the strategic model to adjust in a more refined way, not just by moving the linear boundary. 
+
+The experimental results show a practical limitation in the presented method, which comes from the assumption that all users game in the same way and according to the same cost function. However, the distress model shows that decreased performance for non-strategic users is not always the case. Looking into this relationship is a potential direction of new research, which might result in improvements to the proposed framework.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{plots/mistake_rates.png}
+    \caption{Fractions of different datasets classified as false negative and false positive by the non-strategic (top row) and strategic (bottom row) models. Evaluated on four datasets used in the original paper. }
+    \label{fig:confusion}
+\end{figure}
+
+\section{Discussion}
+After comparing the results, we conclude that the experimental results support the first claim to a large extent. The model is flexible since it performs well on multiple problems and it is effective since it performs significantly better on strategic data than the non-strategic model. On the practical part there are still some unanswered questions. As mentioned we thought that the original test environment with the assumption that all users are gaming might not be very representative for certain problems, like the spam dataset. We think most people don't adjust their emails to account for spam filters. We see this in the amount of false negatives from the strategic model on mixed data. For other problems like the distress dataset the strategic model performs really well on our mixed data, showing great potential for real-life problems. Follow-up research might involve investigating how different types of non-linear classifiers (e.g. decision trees, different neural network architectures) deal with the problem of mixed data.\\
+\\
+The second claim is also supported by the results, they show that the model can be regularized without completely compromising the accuracy. This is an interesting result and it shows that their technique does work in practice. However since the strategic models show more false negatives for a mixed data set than non-strategic ones, it might have a more severe social burden than initially thought. An interesting followup experiment could be to check a regularized model on mixed data to see what the impact actually is.
+
+% After looking at our results, we can somewhat safely conclude that our experimental results supports the first claim. The second claim we did not have enough time to conclusively say if the claim was supported or not. The model is flexible and can be modified to take strategic classification into account. This can be seen in the results beyond the original paper section where we used a combined dataset of users who are gaming the system and not gaming the system.\\\\
+% However, a problem that was faced repeatedly while reproducing the original paper was the fact that the experiments that were done exist in such a controlled environment that it is difficult to say whether these experiments even prove the claims that are being made. A collection of assumptions are made: datapoints move according to a cost function, all users are strategically modifying their features, ..., such that results from this situation cannot be interpreted as real-life situations, simply a very specific simulation in a very controlled environment. Questions also arose about the definition of social good and the ability of this paper to meaningfully quantify social good in the context of real-life applications. The statement is made that the outcome of these models are "socially profitable", which is consequently tested on a dataset that has very little to do with social good.
+% % Nothing is a bit too harsh, simply not practical/applicable
+% Ultimately, the biggest critique was the fact that their proposed flexible, socially-aware framework was nothing more than a linear classifier that could move their decision boundary based on data it had seen before. Although the simplicity of the model is not a problem, the fact that it is being handled like something more, is a problem. We make the argument that due to the controlled environment and considerable amount of assumption, that with the exception of new techniques to tackle the problem, nothing new has been demonstrated. The paper feels hastily written at times and badly thought through. 
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{What was easy}
+Since we had not worked on the problem of strategic classification before, it would have been very difficult to implement it in the limited timeframe that was available. Luckily, the authors of the paper had created a codebase containing all experiments and results. Along with the code, the dataset sources were also mentioned in the original paper. Therefore, we were able to verify that the results from the original paper were valid as soon as we got the code working. 
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\subsection{What was difficult}
+Although the code was available, documentation of the code was quite sparse and unclear, and getting every part of the code to run took some trial and error due to the lack of comments. There were some short comments in the vanilla notebook, which we could consequently use to try to understand what was happening in the code. As well as a lack of documentation in the code, the counterpart of equations \ref{eq:resp_map} and \ref{eq:SERM} written in the original paper lacked sufficient explanation about what the variables/functions meant and what their purpose was in the equation. When taking all these factors into account, understanding the code was quite a challenge. 
+
+Another problem was the fact that the results from the original paper were not summarised in a table, which meant we had to manually keep track of the accuracies for every experiment. Another problem was the fact that hyperparameter selection also was not elaborated upon. Although these are minor issues, they still took time to look into and were part of what was difficult about this project.
+
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\subsection{Communication with original authors}
+The communication with the authors was minimal. We asked about a clarification point about their method that had to do with them not using a combined dataset where users where partially gaming the system.
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+
+%\section*{References}
+
+\bibliographystyle{abbrv}
+\bibliography{references.bib}
+
+\appendix
+\section{Reproduced plots}\label{app:plots}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/vanilla_ii.png}
+    \caption{Graph detailing performance of the proposed method (SERM) on the different datasets for different amount of gaming compared to an SVM classifier.}
+    \label{fig:vanilla_II}
+\end{figure}
+\section{Additional information}
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{l|lll|}
+    \cline{2-4}
+                                        & \multicolumn{3}{c|}{Social Regularization on \textit{credit}}                            \\ \cline{2-4} 
+                                        & \multicolumn{1}{l|}{Utility}  & \multicolumn{1}{l|}{Recourse} & Social burden \\ \hline
+    \multicolumn{1}{|l|}{Epochs}        & \multicolumn{1}{l|}{10}       & \multicolumn{1}{l|}{10}       & 10            \\ \hline
+    \multicolumn{1}{|l|}{Learning rate} & \multicolumn{1}{l|}{0.05}     & \multicolumn{1}{l|}{0.05}     & 0.05          \\ \hline
+    \multicolumn{1}{|l|}{Batch size}    & \multicolumn{1}{l|}{64}       & \multicolumn{1}{l|}{64}       & 64            \\ \hline
+    \multicolumn{1}{|l|}{Cost scale}         & \multicolumn{1}{l|}{1/x\_dim} & \multicolumn{1}{l|}{1/x\_dim} & 1/x\_dim      \\ \hline
+\end{tabular}
+    \caption{Hyperparameter details for strategic classification with social regularization on the \textit{spam} dataset.}
+    \label{tab:hyperparams_reg}
+\end{figure}
+
+
+
+\end{document}
+
