@@ -166,31 +166,31 @@ The final loss is calculated using Eq. (\ref{eq:12}), where $\lambda$ is a weigh
 \subsection{Datasets}
 The primary dataset used in our experimentation is the PASCAL VOC 2012 containing 1464, 1449, and 1456 images in the train, val, and test split, respectively, of 21 object classes is used as the primary dataset to benchmark the proposed methods. An augmented dataset containing 10582 images was prepared using the technique described in \cite{hariharan2011semantic} and used to train the classification and segmentation models. For a cross-dataset evaluation of the pseudo label generator, the train set of the MS COCO 2017 dataset \cite{coco} containing 117040 images (excluding grayscale images) of 81 classes are used.
 
-% %Mention about BgMask from boxes under dataset setup%
-
 % %-----------------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Hyperparameters}
-% Default hyper-parameters proposed in the paper were used for all the stages and are listed in Table \ref{tab:hyperparameter}. A hyper-parameter search was performed for the values of grid size, lambda, and damp parameters, results of which we report in Section \ref{sec:grid} and Section \ref{sec:lamda_damp} respectively. 
+Default hyper-parameters proposed in the paper were used for all the stages and are listed in Table \ref{tab:hyperparameter}. A hyper-parameter search was performed for the values of grid size, lambda, and damp parameters, results of which we report in Section \ref{sec:grid} and Section \ref{sec:lamda_damp} respectively. 
 
-% \begin{table}[h]
-%     \begin{tabular}{ccccc}
-%     \cline{1-2}\cline{4-5}
-%     \multicolumn{2}{c}{Stage 1}             &  & \multicolumn{2}{c}{Stage 3}                                      \\
-%     Hyper-parameter      & Value            &  & Hyper-parameter           & Values (VGG \cite{vgg16} / ResNet \cite{resnet})                \\ 
-%     Grid Size            & 4                &  & Dense CRF                 & (4, 121, 5, 3, 3) / (4, 67, 3, 3, 1) \\
-%     ROI Size             & (2, 2)           &  & CS Classifier Temperature & 20                                   \\
-%     \multicolumn{2}{c}{Stage 2}             &  & Learning Rate             & 1e-3                                 \\ 
-%     Background Threshold & 0.99             &  & Gamma                     & 0.9                                  \\
-%     Crop Size            & (321, 321)       &  & Step Size                 & 10                                   \\
-%     DCRF                 & (4, 55, 3, 3, 3) &  & Lambda Weight             & 0.1                                  \\
-%     Grid Size            & 1                &  & Damping Coefficient       & 7                                    \\
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Hyperparameters used all over the experiments.}
-%     \label{tab:hyperparameter}
-%     \end{table}
+\begin{table}[ht!]
+\begin{center}
+\begin{tabular}{ccccc}
+\cmidrule[1pt]{1-2}\cmidrule[1pt]{4-5}
+\multicolumn{2}{c}{Stage 1}             &  & \multicolumn{2}{c}{Stage 3}                                      \\ \cmidrule[1pt]{1-2}\cmidrule[1pt]{4-5}
+Hyper-parameter      & Value            &  & Hyper-parameter           & Values (VGG \cite{vgg16} / ResNet \cite{resnet})                \\ \cmidrule{1-2}\cmidrule{4-5}
+Grid Size            & 4                &  & Dense CRF                 & (4, 121, 5, 3, 3) / (4, 67, 3, 3, 1) \\
+ROI Size             & (2, 2)           &  & CS Classifier Temperature & 20                                   \\ \cmidrule{1-2}
+\multicolumn{2}{c}{Stage 2}             &  & Learning Rate             & 1e-3                                 \\ \cmidrule{1-2}
+Background Threshold & 0.99             &  & Gamma                     & 0.9                                  \\
+Crop Size            & (321, 321)       &  & Step Size                 & 10                                   \\
+DCRF                 & (4, 55, 3, 3, 3) &  & Lambda Weight             & 0.1                                  \\
+Grid Size            & 1                &  & Damping Coefficient       & 7                                    \\ \cmidrule[0.6pt]{1-2}\cmidrule[0.6pt]{4-5}
+\end{tabular}
+\vspace{1mm}
+\caption{Hyperparameters used all over the experiments.}
+\label{tab:hyperparameter}
+\end{center}
+\end{table}
 
-% \begin{table}[h]
+% \begin{table}[ht!]
 %     \begin{tabular}{ccccc}
 %     \cline{1-2}\cline{4-5}
 %     \multicolumn{2}{c}{Stage 1}             &  & \multicolumn{2}{c}{Stage 3}                                      \\ \cline{1-2}\cline{4-5}
@@ -228,9 +228,6 @@ The primary dataset used in our experimentation is the PASCAL VOC 2012 containin
 % \end{table}
 % %----------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
 \subsection{Code details}
 
 The complete code containing the proposed NAL and all ablation studies both using PyTorch \cite{pytorch} and PyTorch Lightning along with WandB \cite{wandb} integration is available at these links: (\href{https://anonymous.4open.science/r/BANA-60CA}{PyTorch}, \href{https://anonymous.4open.science/r/BANA-PL-60CA}{PyTorch Lightning}). Links to all obtained pseudo labels and pre-trained models are also provided in README. Detailed discussion about the implementation is provided in the following sections. 
@@ -247,7 +244,7 @@ The original authors' code implementation contained Stage 1 and Stage 2, but the
 \subsection{Computational requirements}
 The experiments have been performed on Google Colaboratory with NVIDIA Tesla K80 (NVIDIA-SMI 495.46, Driver Version: 418.67, CUDA Version: 11.2) and Kaggle cloud service platform with NVIDIA Tesla P100-PCIE-16GB (NVIDIA-SMI 495.46, Driver Version: 418.67, CUDA Version: 11.0). The time required for various experiments is mentioned in Table \ref{tab:time}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{ccc} \toprule\toprule
 Experiment performed              & Backbone of the network     &Time (in hours)\\ \midrule
@@ -266,8 +263,6 @@ Stage-3 training with NAL             &ResNet-101               &12  \\ \bottomr
 \end{table}
 
 
-
-
 % % -----------------------------------------------------------------------------
 
 \section{Results}
@@ -276,61 +271,27 @@ Stage-3 training with NAL             &ResNet-101               &12  \\ \bottomr
 We experimented and verified all the central claims made by the paper about BAP methodology and NAL on PASCAL VOC 2012 dataset. Following are the detailed description of the results obtained.
 
 % % -----------------------------------------------------------------------------
-% \subsection{Results reproducing original paper}
+\subsection{Results reproducing original paper}
 
-% \subsubsection{Experiments with Background Aware Pooling}
+\subsubsection{Experiments with Background Aware Pooling}
 
-% We successfully replicated the results reported in Table \ref{tab:Table 3} from the original paper, and it supports claim 1 of BAP being a superior method to GAP presented in Section \ref{sec:claims} .
+We successfully replicated the results reported in Table \ref{tab:Table3} from the original paper, and it supports claim 1 of BAP being a superior method to GAP presented in Section \ref{sec:claims} .
 
-% \begin{table}[h!]
-%     \begin{center}
-%     \begin{tabular}{ccccc} \toprule\toprule
-%     Experiment performed              & Backbone of the network     &Time (in hours)\\ \midrule
-%     Stage-1 training                &VGG-16                         &2.5 \\ 
-%     Stage-2 pseudo label generation                &VGG-16          &0.5 \\ 
-%     Stage-2 VOC to COCO conversion    &VGG-16                       &54\\  
-%     Stage-3 training with CRF or RET         &VGG-16                &7 \\ 
-%     Stage-3 training with CRF or RET         &ResNet-101            &7.5 \\ 
-%     Stage-3 training with NAL             &VGG-16                   &10.5  \\ 
-%     Stage-3 training with NAL             &ResNet-101               &12  \\ \bottomrule
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Approximate time required for each experiment.}
-%     \label{tab:time2}
-%     \end{center}
-%     \end{table}
-
-% \begin{table}[h!]
-%     \begin{center}
-%     \begin{tabular}{ccc}
-%         Method          & Authors' Results & Our Results \\ 
-%     GAP                      & 76.1                      & 75.5                 \\ 
-%     BAP $Y_{crf}$ \hspace{1mm} w/o \hspace{1mm} u_0     & 77.8                      & 77                   \\ 
-%     BAP $Y_{crf}$            & 79.2                      & 78.8                 \\ 
-%     BAP $Y_{ret}$             & 69.9                      & 69.9                 \\ 
-%     BAP $Y_{crf}$ \hspace{1mm} \& \hspace{1mm} Y_{ret}  & 68.2                      & 72.7                 \\
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Comparison of pseudo labels on the PASCAL VOC validation sets in terms of mIoU.}
-%     \label{tab:Table3}
-%     \end{center}
-%     \end{table}
-
-% \begin{table}[h!]
-% \begin{center}
-% \begin{tabular}{ccccc}\toprule\toprule
-% \text{Method}            & \text{Authors' Results} & \text{Our Results} \\ \midrule
-% GAP                      & 76.1                      & 75.5                 \\ 
-% BAP $Y_{crf}$ \hspace{1mm} w/o \hspace{1mm} u_0     & 77.8                      & 77                   \\ 
-% BAP $Y_{crf}$            & 79.2                      & 78.8                 \\ 
-% BAP $Y_{ret}$             & 69.9                      & 69.9                 \\ 
-% BAP $Y_{crf}$ \hspace{1mm} \& \hspace{1mm} Y_{ret}  & 68.2                      & 72.7                 \\ \bottomrule
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Comparison of pseudo labels on the PASCAL VOC validation sets in terms of mIoU.}
-% \label{tab:Table3}
-% \end{center}
-% \end{table}
+\begin{table}[ht!]
+\begin{center}
+\begin{tabular}{ccccc}\toprule\toprule
+\text{Method}            & \text{Authors' Results} & \text{Our Results} \\ \midrule
+GAP                      & 76.1                      & 75.5                 \\ 
+BAP $Y_{crf}$ \hspace{1mm} w/o \hspace{1mm} $u_0$    & 77.8                      & 77                   \\ 
+BAP $Y_{crf}$            & 79.2                      & 78.8                 \\ 
+BAP $Y_{ret}$             & 69.9                      & 69.9                 \\ 
+BAP $Y_{crf}$ \hspace{1mm} \& \hspace{1mm} $Y_{ret}$  & 68.2                      & 72.7                 \\ \bottomrule
+\end{tabular}
+\vspace{1mm}
+\caption{Comparison of pseudo labels on the PASCAL VOC validation sets in terms of mIoU.}
+\label{tab:Table3}
+\end{center}
+\end{table}
 
 \begin{figure}[h!]
 \begin{center}
@@ -339,113 +300,94 @@ We experimented and verified all the central claims made by the paper about BAP 
 \end{center}
 \end{figure}
 
-% As discussed in section \ref{section3.1.2}, we verified the authors' claims that the classifier model is generic and can be used for the detection of classes unseen during training. We trained the classifier model over the Pascal VOC dataset and generated pseudo labels over the MS-COCO dataset. We use the COCO-API evaluator of \href{https://github.com/cocodataset/cocoapi}{pycocotools} to evaluate our results on the COCO benchmark. The comparison of our results with the authors' results is given in Table. \ref{tab:voc-coco}.
+As discussed in section \ref{section3.1.2}, we verified the authors' claims that the classifier model is generic and can be used for the detection of classes unseen during training. We trained the classifier model over the Pascal VOC dataset and generated pseudo labels over the MS-COCO dataset. We use the COCO-API evaluator of \href{https://github.com/cocodataset/cocoapi}{pycocotools} to evaluate our results on the COCO benchmark. The comparison of our results with the authors' results is given in Table. \ref{tab:voc-coco}.
 
-% \begin{table}[h!]
-% \begin{center}
-% \begin{tabular}{ccccccc}
-% \toprule\toprule
-% Method / Results    & AP   & AP_{50} & AP_{75} & AP_S & AP_M  & AP_L  \\ \midrule
-% BAP: Y_{crf} \hspace{1mm} (Authors) & 11.7 & 28.7 & 8.0  & 3.0 & 15.0 & 27.1 \\ 
-% BAP: Y_{crf} \hspace{1mm} (Ours)    & 8.6  & 20.1 & 6.5  & 1.9 & 8.8  & 15.9 \\ 
-% BAP: Y_{ret} \hspace{1mm} (Authors) & 9.0  & 30.1 & 2.8  & 4.4 & 10.2 & 16.2 \\ 
-% BAP: Y_{ret} \hspace{1mm} (Ours)    & 6.6  & 20.2 & 2.5  & 3.3 & 5.7  & 10.6 \\ \bottomrule
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Quantitative comparison of pseudo labels on the MS-COCO train set for model trained on Pascal VOC.}
-% \label{tab:voc-coco}
-% \end{center}
-% \end{table}
+\begin{table}[ht!]
+\begin{center}
+\begin{tabular}{ccccccc}
+\toprule\toprule
+Method / Results    & $AP$   & $AP_{50}$ & $AP_{75}$ & $AP_S$ & $AP_M$  & $AP_L$  \\ \midrule
+BAP: $Y_{crf}$ \hspace{1mm} (Authors) & 11.7 & 28.7 & 8.0  & 3.0 & 15.0 & 27.1 \\ 
+BAP: $Y_{crf}$ \hspace{1mm} (Ours)    & 8.6  & 20.1 & 6.5  & 1.9 & 8.8  & 15.9 \\ 
+BAP: $Y_{ret}$ \hspace{1mm}(Authors) & 9.0  & 30.1 & 2.8  & 4.4 & 10.2 & 16.2 \\ 
+BAP: $Y_{ret}$ \hspace{1mm} (Ours)    & 6.6  & 20.2 & 2.5  & 3.3 & 5.7  & 10.6 \\ \bottomrule
+\end{tabular}
+\vspace{1mm}
+\caption{Quantitative comparison of pseudo labels on the MS-COCO train set for model trained on Pascal VOC.}
+\label{tab:voc-coco}
+\end{center}
+\end{table}
+
 % % -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 % % -------------------------------------------------------------------------------------------------------------------------------------------------------------
-% \subsubsection{Experiments with Noise Aware Loss}
+\subsubsection{Experiments with Noise Aware Loss}
 
-% Comparison between our and the authors' results regarding NAL is provided in Table \ref{tab:Table 5}, which shows that NAL outperforms the cross-entropy loss computed on $Y_{crf}$ and $Y_{ret}$, thus supporting the claim 2 presented in section \ref{sec:claims}.
+Comparison between our and the authors' results regarding NAL is provided in Table \ref{tab:Table 5}, which shows that NAL outperforms the cross-entropy loss computed on $Y_{crf}$ and $Y_{ret}$, thus supporting the claim 2 presented in section \ref{sec:claims}.
 
-% \begin{table}[h!]
-% \begin{center}
-% \begin{tabular}{ccccc}
-% \toprule\toprule
-% \multirow{2}{*}{Method} & \multicolumn{2}{c}{DeepLab v1} & \multicolumn{2}{c}{DeepLab v2} \\ \cmidrule{2-5}
-%                         & Author's Results & Our Results & Author's Results & Our Results \\ \midrule
-% w / Y_{crf} \hspace{1mm} (val)                 & 67.8             & 64.7        & 74.0             & 67.0        \\ 
-% w / Y_{ret} \hspace{1mm} (val)                  & 66.1             & 62.8        & 72.4             & 70.2        \\ 
-% w / NAL $(val)$                  & 68.1             & 64.8        & 74.6             & 70.8        \\
-% w / NAL $(test)$                  & 69.4             & 65.6        & 76.1             & 71.7        \\ \bottomrule
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Comparison of mIoU scores using DeepLab-V1 and DeepLab-V2 on the PASCAL VOC 2012.}
-% \label{tab:Table 5}
-% \end{center}
-% \end{table}
+\begin{table}[ht!]
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule\toprule
+\multirow{2}{*}{Method} & \multicolumn{2}{c}{DeepLab v1} & \multicolumn{2}{c}{DeepLab v2} \\ %\cmidrule{2-5}
+                        & Author's Results & Our Results & Author's Results & Our Results \\ \midrule
+$w / Y_{crf}$ \hspace{1mm} (val)                 & 67.8             & 64.7        & 74.0             & 67.0        \\ 
+$w / Y_{ret}$ \hspace{1mm} (val)                  & 66.1             & 62.8        & 72.4             & 70.2        \\ 
+$w /$NAL \hspace{1mm}(val)                  & 68.1             & 64.8        & 74.6             & 70.8        \\
+$w /$NAL \hspace{1mm}(test)                  & 69.4             & 65.6        & 76.1             & 71.7        \\ \bottomrule
+\end{tabular}
+\vspace{1mm}
+\caption{Comparison of mIoU scores using DeepLab-V1 and DeepLab-V2 on the PASCAL VOC 2012.}
+\label{tab:Table 5}
+\end{center}
+\end{table}
 
-% \subsection{Results beyond original paper}
+\subsection{Results beyond original paper}
 
 \subsubsection{Experiments with grid size}
 \label{sec:grid}
 
 We performed a hyperparameter search for the grid size (N) and observed that lower values of N for generating pseudo labels provide the best results. In contrast, the opposite was true for training the classification network. 
 
-% \begin{table}
-% \begin{tabular}{ccccc} 
-% \multicolumn{2}{c}{\multirow{2}{*}{Grid Size (N)}} & \multicolumn{3}{c}{For Generating}  \\ 
-% \multicolumn{2}{c}{}                           & 1 & 2 & 3                            \\ 
-
-% \multirow{5}{*}{{For Training}}         & 1      &75.82   &75.77   &75.65                              \\ 
-%                                         & 2      &76.11   &76.10   &75.15                              \\ 
-%                                         & 3      &75.87   &75.78   &75.81                              \\ 
-%                                         & 4      &78.83   &78.72   &78.82                              \\ 
-%                                         & 5      &74.16   &74.07   &74.02                              \\
-
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Comparison of our pseudo labels $Y_{crf}$ using different grid sizes on the PASCAL VOC val set.}
-% \label{tab:grid}
-% \end{table}
-
-
-% \begin{table}[h!]
-% \centering
-% \begin{tabular}{ccccc} 
-% \toprule\toprule
-% \multicolumn{2}{c}{\multirow{2}{*}{Grid Size (N)}} & \multicolumn{3}{c}{For Generating}  \\ 
-% \multicolumn{2}{c}{}                           & 1 & 2 & 3                            \\ 
-% \midrule
-% \multirow{5}{*}{{For Training}}         & 1      &75.82   &75.77   &75.65                              \\ 
-%                                         & 2      &76.11   &76.10   &75.15                              \\ 
-%                                         & 3      &75.87   &75.78   &75.81                              \\ 
-%                                         & 4      &\textbf{78.83}   &78.72   &78.82                              \\ 
-%                                         & 5      &74.16   &74.07   &74.02                              \\
-% \bottomrule
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Comparison of our pseudo labels $Y_{crf}$ using different grid sizes on the PASCAL VOC val set.}
-% \label{tab:grid}
-% \end{table}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ccccc} 
+\toprule\toprule
+\multicolumn{2}{c}{\multirow{2}{*}{Grid Size (N)}} & \multicolumn{3}{c}{For Generating}  \\ 
+\multicolumn{2}{c}{}                           & 1 & 2 & 3                            \\ 
+\midrule
+\multirow{5}{*}{{For Training}}         & 1      &75.82   &75.77   &75.65                              \\ 
+                                        & 2      &76.11   &76.10   &75.15                              \\ 
+                                        & 3      &75.87   &75.78   &75.81                              \\ 
+                                        & 4      &\textbf{78.83}   &78.72   &78.82                              \\ 
+                                        & 5      &74.16   &74.07   &74.02                              \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+\caption{Comparison of our pseudo labels $Y_{crf}$ using different grid sizes on the PASCAL VOC val set.}
+\label{tab:grid}
+\end{table}
 
 \subsubsection{Experiments with NAL and it's counterpart losses}
 \label{sec:bootstraping}
 
-% Besides NAL, various other losses have been defined in the paper to deal with unreliable regions such as entropy regularisation and bootstrapping. The comparison between our results and the authors' results is given in Table \ref{Table 5}, with both before and after applying Dense-CRF.
+Besides NAL, various other losses have been defined in the paper to deal with unreliable regions such as entropy regularisation and bootstrapping. The comparison between our results and the authors' results is given in Table \ref{Table 5}, with both before and after applying Dense-CRF.
 
-% \begin{table}[h!]
-%     \begin{center}
-%     \begin{tabular}{
-%     >{\columncolor[HTML]{FFFFFF}}c 
-%     >{\columncolor[HTML]{FFFFFF}}c 
-%     >{\columncolor[HTML]{FFFFFF}}c }
-%     {\color[HTML]{0D1117} \text{Method}}                    & {\color[HTML]{0D1117} \text{Authors' Results}} & {\color[HTML]{0D1117} \text{Our Results}} \\ 
-%     {\color[HTML]{0D1117} \text{Baseline}}                  & {\color[HTML]{0D1117} 61.8 / 67.5}                        & {\color[HTML]{0D1117} 60.9 / 64.5}          \\ 
-%     {\color[HTML]{0D1117} \text{w / Entropy Regularization \cite{grandvalet2004semi}}} & {\color[HTML]{0D1117} 61.4 / 67.3}                        & {\color[HTML]{0D1117} 60.8 / 64.1}          \\ 
-%     {\color[HTML]{0D1117} \text{w / Bootstrapping \cite{reed2014training}}}          & {\color[HTML]{0D1117} 61.9 / 67.6}                        & {\color[HTML]{0D1117} 60.9 / 64.6}          \\ 
-%     {\color[HTML]{0D1117} \text{w / $\mathcal{L}_{wce}$}}      & {\color[HTML]{0D1117} 62.4 / 68.1}                        & {\color[HTML]{0D1117} 61.4 / 64.8}          \\ 
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Comparison of mIoU scores using different losses on the PASCAL VOC 2012 validation set.}
-%     \label{Table 5}
-%     \end{center}
-%     \end{table}
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ccc}
+    \toprule\toprule
+    {\color[HTML]{0D1117} \text{Method}}                    & {\color[HTML]{0D1117} \text{Authors' Results}} & {\color[HTML]{0D1117} \text{Our Results}} \\ \midrule
+    {\color[HTML]{0D1117} \text{Baseline}}                  & {\color[HTML]{0D1117} 61.8 / 67.5}                        & {\color[HTML]{0D1117} 60.9 / 64.5}          \\ 
+    {\color[HTML]{0D1117} \text{w / Entropy Regularization \cite{grandvalet2004semi}}} & {\color[HTML]{0D1117} 61.4 / 67.3}                        & {\color[HTML]{0D1117} 60.8 / 64.1}          \\ 
+    {\color[HTML]{0D1117} \text{w / Bootstrapping \cite{reed2014training}}}          & {\color[HTML]{0D1117} 61.9 / 67.6}                        & {\color[HTML]{0D1117} 60.9 / 64.6}          \\ 
+    {\color[HTML]{0D1117} \text{w / $\mathcal{L}_{wce}$}}      & {\color[HTML]{0D1117} 62.4 / 68.1}                        & {\color[HTML]{0D1117} 61.4 / 64.8}          \\ \bottomrule
+    \end{tabular}
+    \vspace{1mm}
+    \caption{Comparison of mIoU scores using different losses on the PASCAL VOC 2012 validation set.}
+    \label{Table 5}
+    \end{center}
+    \end{table}
 
 
 % \begin{table}[h!]
@@ -486,43 +428,41 @@ We performed a hyperparameter search for the grid size (N) and observed that low
 % \end{center}
 % \end{table}
 
-% \subsubsection{Experiments with different values of lambda and damp parameters.}
-% \label{sec:lamda_damp}
+\subsubsection{Experiments with different values of lambda and damp parameters.}
+\label{sec:lamda_damp}
 
-% \begin{wrapfigure}[4]{}{0.3\textwidth}
-% \centering
-% \vspace{-15mm}
-% \includegraphics[width=0.25\textwidth]{../openreview/images/heatmap.png}
-% \caption{\label{fig:heatmap}mIoU scores obtained on the PASCAL VOC validation set.}
-% \label{fig:heatmap1}
-% \end{wrapfigure}
+\begin{wrapfigure}[4]{}{0.3\textwidth}
+\centering
+\vspace{-15mm}
+\includegraphics[width=0.25\textwidth]{../openreview/images/heatmap.png}
+\caption{\label{fig:heatmap}mIoU scores obtained on the PASCAL VOC validation set.}
+\label{fig:heatmap1}
+\end{wrapfigure}
 
-% To justify the selection of the values of lambda and damp parameters, comparison studies were performed by choosing different values of lambda and damp parameters. We train the DeepLabV1 (LargeFOV) model for a range of lambda and damp parameters and report the results as a heat-map representation in Fig. \ref{fig:heatmap1}.
+To justify the selection of the values of lambda and damp parameters, comparison studies were performed by choosing different values of lambda and damp parameters. We train the DeepLabV1 (LargeFOV) model for a range of lambda and damp parameters and report the results as a heat-map representation in Fig. \ref{fig:heatmap1}.
 
 % % -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
 % % ------------------------------------------------------------------------------------------------------------
-% \vspace{5mm}
-% \section{Discussion}
-% Through our experiments, we reproduce and verify the central claims of the original paper about the two newly introduced techniques - BAP and NAL. We additionally perform ablation studies on different model hyper-parameters and various losses to gain insights into the original author's choice of the same.
+\vspace{5mm}
+\section{Discussion}
+Through our experiments, we reproduce and verify the central claims of the original paper about the two newly introduced techniques - BAP and NAL. We additionally perform ablation studies on different model hyper-parameters and various losses to gain insights into the original author's choice of the same.
 
-% We obtained very similar results in the reproducibility of BAP. The above claim that BAP is a superior method to GAP is well verified by the increased results obtained using BAP compared to GAP on PASCAL VOC, as reported in Table \ref{tab:Table 3}. We further analyze that using $u_0$ (corresponding to background attention map) yields better results than using $u_b$ (corresponding to background class activation map) for generation of the pseudo labels, suggesting superior discrimination of background regions in this method.
+We obtained very similar results in the reproducibility of BAP. The above claim that BAP is a superior method to GAP is well verified by the increased results obtained using BAP compared to GAP on PASCAL VOC, as reported in Table \ref{tab:Table3}. We further analyze that using $u_0$ (corresponding to background attention map) yields better results than using $u_b$ (corresponding to background class activation map) for generation of the pseudo labels, suggesting superior discrimination of background regions in this method.
 
-% In implementing the authors' cross-dataset evaluation results on the COCO dataset, we obtain considerably lower results despite following the protocols mentioned in the paper. However, our results support the claim that BAP serves as a promising technique in implementing a class-agnostic pseudo label generator.
+In implementing the authors' cross-dataset evaluation results on the COCO dataset, we obtain considerably lower results despite following the protocols mentioned in the paper. However, our results support the claim that BAP serves as a promising technique in implementing a class-agnostic pseudo label generator.
 
-% %and achieved comparable results from the authors. 
+We implemented NAL from scratch and performed all the weakly-supervised training experiments with the obtained pseudo labels $Y_{crf}$ and $Y_{ret}$.
+We report slightly lower results compared to authors, which we attribute to the minor implementational differences and a possible tuning of the parameters in DenseCRF. This can be shown by Table \ref{Table 5} in which all the results before DenseCRF match the author's results, but there are some differences after using DenseCRF. However, a relative gain in performance for both DeepLab v1 and v2 is clearly observed from Table \ref{tab:Table 5} when unreliable regions are exploited with the help of NAL. Furthermore, our experiments using different losses for regions with different predicted labels in $Y_{crf}$ and $Y_{ret}$, as listed in Table \ref{Table 5}, provide supporting evidence that NAL outperforms the contemporary losses and suggests it is a robust technique for weakly-supervised training when there are regions with less confidence.
 
-% We implemented NAL from scratch and performed all the weakly-supervised training experiments with the obtained pseudo labels $Y_{crf}$ and $Y_{ret}$.
-% We report slightly lower results compared to authors, which we attribute to the minor implementational differences and a possible tuning of the parameters in DenseCRF. This can be shown by Table \ref{Table 5} in which all the results before DenseCRF match the author's results, but there are some differences after using DenseCRF. However, a relative gain in performance for both DeepLab v1 and v2 is clearly observed from Table \ref{tab:Table 5} when unreliable regions are exploited with the help of NAL. Furthermore, our experiments using different losses for regions with different predicted labels in $Y_{crf}$ and $Y_{ret}$, as listed in Table \ref{Table 5}, provide supporting evidence that NAL outperforms the contemporary losses and suggests it is a robust technique for weakly-supervised training when there are regions with less confidence.
+For Stage 1 and Stage 2, we perform experiments with different choices of grid size in BAP, and for Stage 3, we analyze model performance for different values of damping parameter $\gamma$ and weighting parameter $\lambda$. From Table \ref{tab:grid}, we infer that the best result is obtained for grid size 4 for training and 1 for label generation, which is in coherence with the values used in the original paper. 
+For Stage 3, Fig. \ref{fig:heatmap1} supports the authors' choice of values assigned to $\gamma$ and $\lambda$. Using a higher damping coefficient value ($\gamma$) makes the model biased towards most confident labels. On the other hand, using a higher value of $\lambda$ gives more weight to $wce$ loss, increasing the reliance on regions with low confidence. All the ablation experiments with the selected hyper-parameters yielded validation IoU lower than that obtained in Table \ref{tab:Table 5}.
 
-% For Stage 1 and Stage 2, we perform experiments with different choices of grid size in BAP, and for Stage 3, we analyze model performance for different values of damping parameter $\gamma$ and weighting parameter $\lambda$. From Table \ref{tab:grid}, we infer that the best result is obtained for grid size 4 for training and 1 for label generation, which is in coherence with the values used in the original paper. 
-% For Stage 3, Fig. \ref{fig:heatmap1} supports the authors' choice of values assigned to $\gamma$ and $\lambda$. Using a higher damping coefficient value ($\gamma$) makes the model biased towards most confident labels. On the other hand, using a higher value of $\lambda$ gives more weight to $wce$ loss, increasing the reliance on regions with low confidence. All the ablation experiments with the selected hyper-parameters yielded validation IoU lower than that obtained in Table \ref{tab:Table 5}.
+In our qualitative analysis of the generated pseudo labels (refer Fig. (\ref{fig:bap_exp})) $Y_{crf}$ and $Y_{ret}$ we infer that $Y_{crf}$ particularly performs well in capturing low level image features. In Fig. \ref{fig:bap_exp}, it is seen to discriminate the background region between the wheel's spokes correctly. $Y_{ret}$, on the other hand, captures high-level features in the same image although mildly exaggerated. Thus, the two labels complement each other, and together is a good indication of unreliable regions identified and suppressed by NAL.
 
-% In our qualitative analysis of the generated pseudo labels (refer Fig. (\ref{fig:bap_exp})) $Y_{crf}$ and $Y_{ret}$ we infer that $Y_{crf}$ particularly performs well in capturing low level image features. In Fig. \ref{fig:bap_exp}, it is seen to discriminate the background region between the wheel's spokes correctly. $Y_{ret}$, on the other hand, captures high-level features in the same image although mildly exaggerated. Thus, the two labels complement each other, and together is a good indication of unreliable regions identified and suppressed by NAL.
-
-% After porting the code base into PyTorch Lightning, we also concluded the implementations and experiments that ensured the correctness of various bits of training and evaluation process such as data loading, loss calculation, model weights optimization, and checkpoint re-loading for further reproducibility experiments in the future.
+After porting the code base into PyTorch Lightning, we also concluded the implementations and experiments that ensured the correctness of various bits of training and evaluation process such as data loading, loss calculation, model weights optimization, and checkpoint re-loading for further reproducibility experiments in the future.
 % % -----------------------------------------------------------------------------------------------------------
 
 \section{Conclusion}
