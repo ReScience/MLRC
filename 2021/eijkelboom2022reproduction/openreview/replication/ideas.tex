@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\begin{document}
+
+{\Large \textbf{Ideas for replication}}
+
+\bigskip
+
+\textbf{Main goals with replication}
+
+\begin{itemize}
+    \item Evaluate if the proposed method still holds under other conditions:
+    \begin{itemize}
+        \item Other datasets
+        \item Other $J$ values
+        \item Limited population information
+        \item Other clustering algorithms
+        \item Other fairness metrics
+        \item Other number of clusters
+    \end{itemize}
+    \item Evaluate if the proposed method is sound:
+    \begin{itemize}
+        \item Is the way in which fairness is implemented correct?
+        \item How does bias in $U$ influence the results?
+        \item Which assumptions are made (e.g. $J$, $U$, $K$)
+    \end{itemize}
+    \item Evaluate if the proposed method works:
+    \begin{itemize}
+        \item Does it actually improve fairness?
+        \item How much does it do so?
+    \end{itemize}
+\end{itemize}
+
+\textbf{Different experiments}
+
+\begin{itemize}
+    \item Anna's idee: Try out the Bank dataset but with J = 2 (instead of J=3 martial status) as used in Bera et al. 2019 and Backurs et al. 2019 and see if Variational Fair clustering still performs better. Because then you can compare 1 on 1.
+    \item Verschillende clustering technieken proberen (K-means, K-median, PAM, CLARA(NS)) op de genoemde data sets en zelfde condities. \textbf{Note by Anna} they did K-means and K-medians. They did \textit{not} try K-center :) 
+    \item Het kiezen van K is nogal arbitrair voor mijn gevoel, wellicht kunnen we Silhouette/Shadowing gebruiken (dit kan je gebruiken om de distance van punten binnen een cluster tot een ander cluster te bekijken).
+    \item Misschien heel debiel, maar voor m'n gevoel kunnen we hier ook wat mee. Idk wat nog though :)
+    
+    Interestingly, at each iteration, it performs an independent update for each assignment variable. Therefore, it can be easily distributed for large-scale datasets. This scalability is important as it enables to explore different trade-off levels between the fairness and clustering objectives.
+    
+    Ja zeker! Bijv. door te kijken naar Anna's ding, maar dan voor een arbitraire $J$ en $K$ (wat gebeurt er met runtime als die omhoog gaan). 
+    
+    \item Andere divergence functions?
+
+\end{itemize}
+
+\textbf{Different data sets}
+
+\begin{itemize}
+    \item Overzicht met allerlei kenmerken van verschillende fairness datasets (November 2021). Globaal overview op pagina 6, daarna per dataset uitgebreidere uitleg (\url{https://arxiv.org/abs/2110.00530}).
+\end{itemize}
+
+
+\textbf{Comments from paper}
+
+\url{https://arxiv.org/pdf/2106.07239.pdf} on the paper we are reproducing/replicating
+\begin{itemize}
+    \item Fairness objective is penalized for proportions that are not precisely equal to the population level 
+    \item cost/fairness tradeoff is a non-monotone function of a parameter which the user must adjust (Not entirely sure what parameter they are referring to but I thought $\lambda$) 
+\end{itemize}
+
+\end{document}
