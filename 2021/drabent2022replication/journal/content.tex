@@ -10,7 +10,7 @@ Overall we find the same results as the authors: searched transformation policie
 
 \subsection{What was easy}
 
-Paper was clearly written and the general idea was easy to follow. There was a codebase available in PyTorch and part of the experiments were reproducible using this code.
+Paper was clearly written and the general idea was easy to follow. There was a codebase available in PyTorch and some of the reported experiments were reproducible using this code.
 
 \subsection{What was difficult}
 
@@ -129,18 +129,18 @@ We ran our experiments using Nvidia GeForce GTX 1080 GPU. The policy search took
 
 \subsection{Results reproducing original paper}
 
-\paragraph{Experiment 1} A reconstruction attack on $100$ images from the CIFAR-100 validation set is performed with and without a searched transformation policy applied. We document the optimization process of the attack in terms of GradSim. The model used is ResNet20  trained on the tiny dataset for $50$ epochs. The results of this experiment are shown in Figure \ref{fig:1}, which shows a very similar result to the original paper. In addition to the original figure, we show the standard deviation over the $100$ images, since GradSim can differ significantly from image to image. When taking the average of multiple runs, it can be seen that the privacy-aware transform does indeed make the GradSim convergence more difficult.
+\paragraph{Experiment 1} A reconstruction attack on $100$ images from the CIFAR-100 validation set is performed with and without a searched transformation policy applied. We document the optimization process of the attack in terms of GradSim. The model used is ResNet20, trained on the tiny dataset for $50$ epochs. The results of this experiment are shown in Figure \ref{fig:1re}, which shows a very similar result to the original paper shown in \ref{fig:1og}. In addition to the original figure, we show the standard deviation over the $100$ images, since GradSim can differ significantly from image to image. When taking the average of multiple runs, it can be seen that the privacy-aware transform does indeed make the GradSim convergence more difficult.
 
 \begin{figure}[h]
     \begin{minipage}{.5\textwidth}
         \centering
         \subfloat[Reproduced result]{
             \includegraphics[width=0.47\textwidth]{images/fig1.png}
-            \label{fig:1}
+            \label{fig:1re}
         }
         \subfloat[Result from original paper]{
             \includegraphics[width=0.47\textwidth]{images/fig1OG.png}
-            \label{fig:1OG}
+            \label{fig:1og}
         }
         \captionof{figure}{Optimization process of reconstruction attack with and without searched policy}
         \label{fig:1}
