@@ -1,9 +1,5 @@
 \section*{Reproducibility Summary}
 
-% \textit
-% {The following paper is a reproducibility report for \textbf{Background-Aware Pooling and Noise-Aware Loss for Weakly-Supervised Semantic Segmentation} \cite{oh2021background} published in CVPR 2021 as part of the ML Reproducibility Challenge 2021. The repository is available at this \href{https://anonymous.4open.science/r/BANA-60CA}{link} with the PyTorch Lightning \cite{lightning} Extension available at this \href{https://anonymous.4open.science/r/BANA-PL-60CA}{link}.
-% }
-
 % %----------------------------------------------------------------------------------%----------------------------------------------------------------------------------
 \subsection*{Scope of Reproducibility}
 
@@ -89,8 +85,6 @@ For a given bounding box $B_i$, foreground features $r_i$ are aggregated using t
 \begin{equation} \label{eq:3}
 r_{i}=\frac{\sum_{\mathbf{p} \in B_{i}}(1-A(\mathbf{p})) f(\mathbf{p})}{\sum_{\mathbf{p} \in B_{i}}(1-A(\mathbf{p}))}
 \end{equation}
-
-% While traditional weakly-supervised segmentation techniques employ Global Average Pooling (GAP), the process of using the attention map $A$ to extract foreground features through BAP, is key to the improved pixel-wise segmentation in the pseudo labels.
 
 \subsubsection{Generation of Pseudo Labels}
 \label{section3.1.2}
@@ -190,47 +184,11 @@ Grid Size            & 1                &  & Damping Coefficient       & 7      
 \end{center}
 \end{table}
 
-% \begin{table}[ht!]
-%     \begin{tabular}{ccccc}
-%     \cline{1-2}\cline{4-5}
-%     \multicolumn{2}{c}{Stage 1}             &  & \multicolumn{2}{c}{Stage 3}                                      \\ \cline{1-2}\cline{4-5}
-%     Hyper-parameter      & Value            &  & Hyper-parameter           & Values (VGG \cite{vgg16} / ResNet \cite{resnet})                \\ \cline{1-2}\cline{4-5}
-%     Grid Size            & 4                &  & Dense CRF                 & (4, 121, 5, 3, 3) / (4, 67, 3, 3, 1) \\
-%     ROI Size             & (2, 2)           &  & CS Classifier Temperature & 20                                   \\ \cline{1-2}
-%     \multicolumn{2}{c}{Stage 2}             &  & Learning Rate             & 1e-3                                 \\ \cline{1-2}
-%     Background Threshold & 0.99             &  & Gamma                     & 0.9                                  \\
-%     Crop Size            & (321, 321)       &  & Step Size                 & 10                                   \\
-%     DCRF                 & (4, 55, 3, 3, 3) &  & Lambda Weight             & 0.1                                  \\
-%     Grid Size            & 1                &  & Damping Coefficient       & 7                                    \\ \cline{1-2}\cline{4-5}
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Hyperparameters used all over the experiments.}
-%     \label{tab:hyperparameter}
-%     \end{table}
-
-
-% \begin{table}[h]
-% \begin{tabular}{ccccc}
-% \cmidrule[1]{1-2}\cmidrule[1]{4-5}
-% \multicolumn{2}{c}{Stage 1}             &  & \multicolumn{2}{c}{Stage 3}                                      \\ \cmidrule{1-2}\cmidrule{4-5}
-% Hyper-parameter      & Value            &  & Hyper-parameter           & Values (VGG \cite{vgg16} / ResNet \cite{resnet})                \\ \cmidrule{1-2}\cmidrule{4-5}
-% Grid Size            & 4                &  & Dense CRF                 & (4, 121, 5, 3, 3) / (4, 67, 3, 3, 1) \\
-% ROI Size             & (2, 2)           &  & CS Classifier Temperature & 20                                   \\ \cmidrule{1-2}
-% \multicolumn{2}{c}{Stage 2}             &  & Learning Rate             & 1e-3                                 \\ \cmidrule{1-2}
-% Background Threshold & 0.99             &  & Gamma                     & 0.9                                  \\
-% Crop Size            & (321, 321)       &  & Step Size                 & 10                                   \\
-% DCRF                 & (4, 55, 3, 3, 3) &  & Lambda Weight             & 0.1                                  \\
-% Grid Size            & 1                &  & Damping Coefficient       & 7                                    \\ \cmidrule[0.6]{1-2}\cmidrule[0.6]{4-5}
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Hyperparameters used all over the experiments.}
-% \label{tab:hyperparameter}
-% \end{table}
 % %----------------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Code details}
 
-The complete code containing the proposed NAL and all ablation studies both using PyTorch \cite{pytorch} and PyTorch Lightning along with WandB \cite{wandb} integration is available at these links: (\href{https://anonymous.4open.science/r/BANA-60CA}{PyTorch}, \href{https://anonymous.4open.science/r/BANA-PL-60CA}{PyTorch Lightning}). Links to all obtained pseudo labels and pre-trained models are also provided in README. Detailed discussion about the implementation is provided in the following sections. 
+The complete code containing the proposed NAL and all ablation studies both using PyTorch \cite{pytorch} and PyTorch Lightning along with WandB \cite{wandb} integration is available at these links: (\href{https://github.com/karan-uppal3/BANA}{PyTorch}, \href{https://github.com/karan-uppal3/BANA/tree/Pytorch-Lightning}{PyTorch Lightning}). Links to all obtained pseudo labels and pre-trained models are also provided in README. Detailed discussion about the implementation is provided in the following sections. 
 
 \subsubsection{Pseudo label generation from VOC to COCO}
 
@@ -261,7 +219,6 @@ Stage-3 training with NAL             &ResNet-101               &12  \\ \bottomr
 \label{tab:time}
 \end{center}
 \end{table}
-
 
 % % -----------------------------------------------------------------------------
 
@@ -389,45 +346,6 @@ Besides NAL, various other losses have been defined in the paper to deal with un
     \end{center}
     \end{table}
 
-
-% \begin{table}[h!]
-%     \begin{center}
-%     \begin{tabular}{
-%     >{\columncolor[HTML]{FFFFFF}}c 
-%     >{\columncolor[HTML]{FFFFFF}}c 
-%     >{\columncolor[HTML]{FFFFFF}}c }
-%     \cline\cline
-%     {\color[HTML]{0D1117} \text{Method}}                    & {\color[HTML]{0D1117} \text{Authors' Results}} & {\color[HTML]{0D1117} \text{Our Results}} \\ \toprule
-%     {\color[HTML]{0D1117} \text{Baseline}}                  & {\color[HTML]{0D1117} 61.8 / 67.5}                        & {\color[HTML]{0D1117} 60.9 / 64.5}          \\ 
-%     {\color[HTML]{0D1117} \text{w / Entropy Regularization \cite{grandvalet2004semi}}} & {\color[HTML]{0D1117} 61.4 / 67.3}                        & {\color[HTML]{0D1117} 60.8 / 64.1}          \\ 
-%     {\color[HTML]{0D1117} \text{w / Bootstrapping \cite{reed2014training}}}          & {\color[HTML]{0D1117} 61.9 / 67.6}                        & {\color[HTML]{0D1117} 60.9 / 64.6}          \\ 
-%     {\color[HTML]{0D1117} \text{w / $\mathcal{L}_{wce}$}}      & {\color[HTML]{0D1117} 62.4 / 68.1}                        & {\color[HTML]{0D1117} 61.4 / 64.8}          \\ \bottomrule
-%     \end{tabular}
-%     \vspace{1mm}
-%     \caption{Comparison of mIoU scores using different losses on the PASCAL VOC 2012 validation set.}
-%     \label{Table 5}
-%     \end{center}
-%     \end{table}
-
-% \begin{table}[h!]
-% \begin{center}
-% \begin{tabular}{
-% >{\columncolor[HTML]{FFFFFF}}c 
-% >{\columncolor[HTML]{FFFFFF}}c 
-% >{\columncolor[HTML]{FFFFFF}}c }
-% \cline\cline
-% {\color[HTML]{0D1117} \text{Method}}                    & {\color[HTML]{0D1117} \text{Authors' Results}} & {\color[HTML]{0D1117} \text{Our Results}} \\ \cline
-% {\color[HTML]{0D1117} \text{Baseline}}                  & {\color[HTML]{0D1117} 61.8 / 67.5}                        & {\color[HTML]{0D1117} 60.9 / 64.5}          \\ 
-% {\color[HTML]{0D1117} \text{w / Entropy Regularization \cite{grandvalet2004semi}}} & {\color[HTML]{0D1117} 61.4 / 67.3}                        & {\color[HTML]{0D1117} 60.8 / 64.1}          \\ 
-% {\color[HTML]{0D1117} \text{w / Bootstrapping \cite{reed2014training}}}          & {\color[HTML]{0D1117} 61.9 / 67.6}                        & {\color[HTML]{0D1117} 60.9 / 64.6}          \\ 
-% {\color[HTML]{0D1117} \text{w / $\mathcal{L}_{wce}$}}      & {\color[HTML]{0D1117} 62.4 / 68.1}                        & {\color[HTML]{0D1117} 61.4 / 64.8}          \\ \cline
-% \end{tabular}
-% \vspace{1mm}
-% \caption{Comparison of mIoU scores using different losses on the PASCAL VOC 2012 validation set.}
-% \label{Table 5}
-% \end{center}
-% \end{table}
-
 \subsubsection{Experiments with different values of lambda and damp parameters.}
 \label{sec:lamda_damp}
 
@@ -442,8 +360,6 @@ Besides NAL, various other losses have been defined in the paper to deal with un
 To justify the selection of the values of lambda and damp parameters, comparison studies were performed by choosing different values of lambda and damp parameters. We train the DeepLabV1 (LargeFOV) model for a range of lambda and damp parameters and report the results as a heat-map representation in Fig. \ref{fig:heatmap1}.
 
 % % -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 % % ------------------------------------------------------------------------------------------------------------
 \vspace{5mm}
