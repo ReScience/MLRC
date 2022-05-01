@@ -12,7 +12,7 @@ The proposed optimizer: AdaBelief, claims to achieve three goals: fast convergen
 \subsection*{Methodology}
 
 % Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
-To validate these claims, we reproduce experiments on \textbf{Image Classification} with CIFAR-10, CIFAR-100 and ImageNet datasets, \textbf{Language Modeling} with Penn Treebank, \textbf{Generative Modeling} with WGAN, WGAN-GP and SN-GAN architectures. We use the code provided by the author\footnote{\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}. All experiments were performed on 8 NVIDIA V100 GPUs and took about 1096 GPU hours in total.
+To validate these claims, we reproduce experiments on \textbf{Image Classification} with CIFAR-10, CIFAR-100 and ImageNet datasets, on \textbf{Language Modeling} with Penn Treebank, and on \textbf{Generative Modeling} with WGAN, WGAN-GP and SN-GAN architectures. We use the code provided by the author\footnote{\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}. All experiments were performed on 8 NVIDIA V100 GPUs and took about 1096 GPU hours in total.
 
 
 \subsection*{Results}
@@ -24,7 +24,7 @@ To validate these claims, we reproduce experiments on \textbf{Image Classificati
 % cifar10	cifar100	imagenet	PTB	   WGAN	 WGAN-GP	SNGAN	
 % 0.295	0.18	    0.25	   0.228 	2.2	   1.8  	0.33	
 							
-The image classification experiments on CIFAR-10, CIFAR-100 and ImageNet are reproduced to within 0.29\%, 0.18\% and 0.25\% of reported values respectively. The language modeling experiments produce an average deviation of 0.22\%, while the generative modeling experiments on WGAN, WGAN-GP and SN-GAN are replicated to within 2.2\%, 1.8\% and 0.33\% of reported value.
+The image classification experiments on CIFAR-10, CIFAR-100 and ImageNet are reproduced to within 0.29\%, 0.18\% and 0.25\% of reported values respectively. The language modeling experiments produce an average deviation of 0.22\%, while the generative modeling experiments on WGAN, WGAN-GP and SN-GAN are replicated to within 2.2\%, 1.8\% and 0.33\% of value reported in the original paper.
 \par
 We perform ablation studies for change of dataset in language modeling and for effect of weight decay on ImageNet. We also perform analysis of generalization ability of optimizers and of training stability of GANs. All of the results largely support the claims made in the paper \cite{zhuang_adabelief_2020}.
 
@@ -46,7 +46,7 @@ The challenging aspects in our study were: (1) Grid search for optimal hyperpara
 % + Clarification on range of hyperparameters in SN-GAN experiments, optimizer specific parameters for certain experiments like Fromage \\
 % + Blacklisting in ImageNet dataset
 % +
-We communicated the original author Juntang Zhuang on multiple occasions for doubts related to hyperparameters and code, to which he promptly replied and helped us.
+We communicated with the author of the original paper, Juntang Zhuang, on multiple occasions for doubts related to hyperparameters and code, to which he promptly replied and helped us.
 
 
 \newpage
@@ -56,7 +56,7 @@ We communicated the original author Juntang Zhuang on multiple occasions for dou
 \section{Introduction}
 \label{intro}
 Optimization is at the heart of machine learning. Training of neural networks aims to find the optimal solution (deepest valley on the loss surface) using gradient descent. The variation in method to traverse the loss landscape gives rise to different optimizers. Discovering different optimizers is an active area of research in machine learning.
-In this report, we reproduce and add on to the experimental analysis of a recent optimizer, AdaBelief \cite{zhuang_adabelief_2020}, introduced in 2020 at NeurIPS conference.
+In this report, we reproduce and add on to the experimental analysis of an optimizer, AdaBelief \cite{zhuang_adabelief_2020}, introduced in 2020 at NeurIPS conference.
 
 \par
 The proposed optimizer, AdaBelief, claims to outperform its counterparts on various real world deep learning tasks. As a part of the ML Reproducibility Challenge, we replicate all the experiments mentioned in the AdaBelief paper \cite{zhuang_adabelief_2020}, comparing it with other optimizers, and also perform additional experiments to investigate the efficacy of AdaBelief.
@@ -90,10 +90,10 @@ SGD \cite{SGD} family uses the same learning rate for all parameters, whereas, a
 AdaBelief \cite{zhuang_adabelief_2020} claims to performs better than existing optimizers. To evaluate the  validity of its claims, we investigate the following target questions:
 
 \begin{itemize}
-    \item Does AdaBelief produce better scores in comparison to other optimizers on real world tasks of image classification, language modeling, generative modeling and reinforcement learning?
-    \item Does AdaBelief convergence fast like adaptive methods, e.g. Adam?
+    \item Does AdaBelief perform better in comparison to other optimizers on real world tasks of image classification, language modeling, generative modeling and reinforcement learning?
+    \item Does AdaBelief show fast convergence like adaptive methods, e.g. Adam?
     \item Does AdaBelief generalize well like the accelerated gradient methods, e.g. SGD?
-    \item Adaptive methods like Adam are stable in complex settings like training of Generative Adversarial Networks (GANs) \cite{GAN}. How does AdaBelief compare to them?
+    \item Adaptive methods like Adam are stable in complex settings like training of Generative Adversarial Networks (GANs) \cite{GAN}. How does AdaBelief compare with them?
 \end{itemize}
 
 % Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
@@ -106,7 +106,7 @@ AdaBelief \cite{zhuang_adabelief_2020} claims to performs better than existing o
 % + one section per experiment (paper and beyond paper both) \\ \\
 % \lipsum[4]\footnote{Foo}\par
 \subsection{Experimental setup and model description}
-We perform experiments on many real world tasks: \textbf{(a) Image Classification}: CIFAR-10, CIFAR-100 \& ImageNet datasets are used. On  CIFAR-10 \& CIFAR-100, we train using VGG11 \cite{VGG}, ResNet34 \cite{Resnet} and DenseNet121 \cite{Densenet} . In the case of ImageNet we use a ResNet18 architecture.  \textbf{(b) Language Modeling}: Penn Treebank \cite{PTB} and WikiText-2 \cite{WikiText_2} datasets are used. Both are used to train 1, 2, 3-layer LSTM \cite{LSTM}. The HP of the LSTM model were taken from here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}. \textbf{(c) Generative Modeling}: CIFAR-10 dataset is used with Wasserstein-GAN (WGAN) \cite{WGAN}, with the improved gradient penalty version WGAN-GP \cite{WGAN-GP} \& with spectral normalization GAN (SN-GAN) \cite{SN-GAN} architectures, where generator and discriminator use same HP. WGAN is a smaller model with a vanilla CNN generator, whereas the SN-GAN is a bigger model with spectral normalization in the discriminator. For SN-GAN we make use of this repository\footnote{\href{https://github.com/juntang-zhuang/SNGAN-AdaBelief}{https://github.com/juntang-zhuang/SNGAN-AdaBelief}} \textbf{(d) Reinforcement Learning}: An agent is trained by Adam and AdaBelief optimizers to play Space Invaders (Atari Game) using Deep Q-Network (DQN) \cite{DQN_RL} architecture. Implementation was taken from here\footnote{\label{fnote:juntang_RL_repo}\href{https://github.com/juntang-zhuang/rainbow-adabelief}{https://github.com/juntang-zhuang/rainbow-adabelief}}. The code for experiments on image classification, language modeling, WGAN, WGAN-GP was taken from here\footnote{\label{fnote:juntang_repo}\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}.
+We perform experiments on many real world tasks: \textbf{(a) Image Classification}: CIFAR-10, CIFAR-100 \& ImageNet datasets are used. On  CIFAR-10 \& CIFAR-100, we train using VGG11 \cite{VGG}, ResNet34 \cite{Resnet} and DenseNet121 \cite{Densenet}. In the case of ImageNet we use a ResNet18 \cite{Resnet} architecture.  \textbf{(b) Language Modeling}: Penn Treebank \cite{PTB} and WikiText-2 \cite{WikiText_2} datasets are used. Both are used to train 1, 2, 3-layer LSTM \cite{LSTM}. The HP of the LSTM model were taken from here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}. \textbf{(c) Generative Modeling}: CIFAR-10 dataset is used with Wasserstein-GAN (WGAN) \cite{WGAN}, with the improved gradient penalty version WGAN-GP \cite{WGAN-GP} \& with spectral normalization GAN (SN-GAN) \cite{SN-GAN} architectures, where generator and discriminator use same HP. WGAN is a smaller model with a vanilla CNN generator, whereas the SN-GAN is a bigger model with spectral normalization in the discriminator. For SN-GAN we make use of this repository\footnote{\href{https://github.com/juntang-zhuang/SNGAN-AdaBelief}{https://github.com/juntang-zhuang/SNGAN-AdaBelief}} \textbf{(d) Reinforcement Learning}: An agent is trained by Adam and AdaBelief optimizers to play Space Invaders (Atari Game) using Deep Q-Network (DQN) \cite{DQN_RL} architecture. Implementation was taken from here\footnote{\label{fnote:juntang_RL_repo}\href{https://github.com/juntang-zhuang/rainbow-adabelief}{https://github.com/juntang-zhuang/rainbow-adabelief}}. The code for experiments on image classification, language modeling, WGAN, WGAN-GP was taken from here\footnote{\label{fnote:juntang_repo}\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}.
 	
 % 	\item Spk Dzn
     
@@ -146,13 +146,13 @@ We perform experiments on many real world tasks: \textbf{(a) Image Classificatio
 		6. \rule{0pt}{9pt} & &   & LSTM (3 layer) & \textcolor{green}{\checkmark} & AdamW \& RAdam LRS; WT2 & 11 & 3.75 & 41.25 \\
 
 		\hline
-		7. & \multirow{3}{0.12\linewidth}{Generative Modeling} & \multirow{3}{0.08\linewidth}{CIFAR-10} \rule{0pt}{9pt} & WGAN \cite{WGAN} & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 0.89 & 53.55 \\
+		7. & \multirow{3}{0.12\linewidth}{Generative Modeling} & \multirow{3}{0.08\linewidth}{CIFAR-10} \rule{0pt}{9pt} & WGAN & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 0.89 & 53.55 \\
 
 		\cline{4-9}
-		8. \rule{0pt}{9pt} & &   & WGAN-GP \cite{WGAN-GP} & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 1 & 66.5 \\
+		8. \rule{0pt}{9pt} & &   & WGAN-GP & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 1 & 66.5 \\
 
 		\cline{4-9}
-		9. \rule{0pt}{9pt} & &   & SN-GAN \cite{SN-GAN} & \textcolor{green}{\checkmark} & HP search; training stablity anal. & 45 & 15 & 675 \\
+		9. \rule{0pt}{9pt} & &   & SN-GAN & \textcolor{green}{\checkmark} & HP search; training stablity anal. & 45 & 15 & 675 \\
 
 		\hline
 		10. & Reinforcement Learning & N/A & Space Invaders (Atari) & \textcolor{green}{\checkmark} & Beyond AdaBelief paper \cite{zhuang_adabelief_2020} & 2 & 1 & 2 \\
@@ -294,7 +294,7 @@ We run experiments on a Portable Batch System (PBS) managed cluster. We used 8 N
 
 \subsection{Experiments reproducing original paper}
 \label{lab:Results}
-To evaluate the performance of AdaBelief and to validate the aforesaid claims, we perform experiments on various tasks like Image Classification, Language Modeling, Generative Modeling, Reinforcement Learning and compare our results with those stated in the paper \cite{zhuang_adabelief_2020}. HP details can be found in Table \ref{table:hyperparam}
+To evaluate the performance of AdaBelief and to validate the aforesaid claims, we perform experiments on various tasks like Image Classification, Language Modeling, Generative Modeling, Reinforcement Learning and compare our results with those stated in the paper \cite{zhuang_adabelief_2020}. HP details can be found in Table \ref{table:hyperparam}.
 % \begin{itemize}
 
 % refer same footnote multiple times on a page
@@ -344,7 +344,7 @@ Other optimizers from literature use weight decay of ~$10^{-4}$ while the author
 
 \subsubsection{Language Modeling}
 \label{lab:Language_modling}
-We ran experiments on Penn Treebank (PTB) dataset \cite{PTB} using 1,2,3-layer LSTM models. We report test perplexities (ppl) (Fig. \ref{table:LSTM_test}) for 3 independent runs on 9 optimizers\footnoteref{fnote:optim_list}. Plots for train ppl are reported in Fig. \ref{table:LSTM_train}. For Fromage, the author does not provide HP, hence we grid search and find the optimal $LR=10^{-2}$. In case of 2 layer LSTM using AdamW \& RAdam, we find that an $LR=10^{-3}$ gives a ppl of 73.78 \& 74.05, while $LR=10^{-2}$ gives a ppl of 93.61 \& 90.49 respectively. The author reports a ppl $\sim 73$, $\sim 73.5$ at $LR=10^{-2}$. Similarly, in 3-layer LSTM, $LR=10^{-3}$ for AdamW and RAdam works better than $LR=10^{-2}$. PTB is a small dataset, so, we additionally experiment on WikiText-2 (section \ref{lab:WT2_LSTM}) for Adam and AdaBelief (top performers in case of PTB) on the setting reported here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}.
+We ran experiments on Penn Treebank (PTB) dataset \cite{PTB} using 1,2,3-layer LSTM models. We report test perplexities (ppl) (Fig. \ref{table:LSTM_test}) for 3 independent runs on 9 optimizers\footnoteref{fnote:optim_list}. Plots for train ppl are reported in Fig. \ref{table:LSTM_train}. For Fromage, the author does not provide HP, hence we use grid search to find the optimal $LR=10^{-2}$. In case of 2 layer LSTM using AdamW \& RAdam, we find that an $LR=10^{-3}$ gives a ppl of 73.78 \& 74.05, while $LR=10^{-2}$ gives a ppl of 93.61 \& 90.49 respectively. The author reports a ppl $\sim 73$, $\sim 73.5$ at $LR=10^{-2}$. Similarly, in 3-layer LSTM, $LR=10^{-3}$ for AdamW and RAdam works better than $LR=10^{-2}$. PTB is a small dataset, so, we additionally experiment on WikiText-2 (section \ref{lab:WT2_LSTM}) for Adam and AdaBelief (top performers in case of PTB) on the setting reported here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}.
 
 \begin{table}[t]
     \begin{center}
@@ -468,7 +468,7 @@ with different y-axis ranges.}
 To investigate the efficacy of AdaBelief in use cases beyond text and images we train an agent to  play Space Invaders (Atari Game). We report $Q$ value and reward function for Adam and AdaBelief in Fig. \ref{table:Q_value}, \ref{table:Reward_value}. We compare our results with author's results from here\footnote{\href{https://github.com/juntang-zhuang/rainbow-adabelief}{https://github.com/juntang-zhuang/rainbow-adabelief}} and find that both results agree.
 
 \subsubsection{Image Classification on CIFAR-10 and CIFAR-100 using Apollo}
-Apollo \cite{Apollo} is another optimizer that claims to achieve better convergence speed and generalization than SGD and variants of Adam. To investigate this, we experiment with Apollo on CIFAR-10 and CIFAR-100. Fig. \ref{table:CIFAR10_100_train}, \ref{table:CIFAR10_100_test} show the train, test accuracies on VGG11, ResNet34 and DenseNet121 for the 3 independent runs. AdaBelief outperforms Apollo in all settings except DenseNet121 on CIFAR-100 . It can also be seen that as we move from a simpler (VGG11) to a complex architecture (DenseNet121) the gap between Apollo and AdaBelief closes out. We made use of official implementation of Apollo in our experiments\footnote{\href{https://github.com/XuezheMax/apollo}{https://github.com/XuezheMax/apollo}}.
+Apollo \cite{Apollo} is another optimizer that claims to achieve better convergence speed and generalization than SGD and variants of Adam. To investigate this, we experiment with Apollo on CIFAR-10 and CIFAR-100. Fig. \ref{table:CIFAR10_100_train}, \ref{table:CIFAR10_100_test} show the train, test accuracies on VGG11, ResNet34 and DenseNet121 for the 3 independent runs. AdaBelief outperforms Apollo in all settings except DenseNet121 on CIFAR-100. It can also be seen that as we move from a simpler (VGG11) to a complex architecture (DenseNet121) the gap between Apollo and AdaBelief reduces. We made use of official implementation of Apollo in our experiments\footnote{\href{https://github.com/XuezheMax/apollo}{https://github.com/XuezheMax/apollo}}.
 
 
 
