@@ -130,86 +130,84 @@ We ran our experiments using Nvidia GeForce GTX 1080 GPU. The policy search took
 \subsection{Results reproducing original paper}
 
 \paragraph{Experiment 1} A reconstruction attack on $100$ images from the CIFAR-100 validation set is performed with and without a searched transformation policy applied. We document the optimization process of the attack in terms of GradSim. The model used is ResNet20, trained on the tiny dataset for $50$ epochs. The results of this experiment are shown in Figure \ref{fig:1re}, which shows a very similar result to the original paper shown in \ref{fig:1og}. In addition to the original figure, we show the standard deviation over the $100$ images, since GradSim can differ significantly from image to image. When taking the average of multiple runs, it can be seen that the privacy-aware transform does indeed make the GradSim convergence more difficult.
-
+\setcounter{figure}{-1}    
 \begin{figure}[h]
-    \begin{minipage}{.5\textwidth}
         \centering
         \subfloat[Reproduced result]{
-            \includegraphics[width=0.47\textwidth]{images/fig1.png}
+            \includegraphics[width=0.4\textwidth]{images/fig1.png}
             \label{fig:1re}
         }
-        \subfloat[Result from original paper]{
-            \includegraphics[width=0.47\textwidth]{images/fig1OG.png}
+        \subfloat[Original result]{
+            \includegraphics[width=0.4\textwidth]{images/fig1OG.png}
             \label{fig:1og}
         }
         \captionof{figure}{Optimization process of reconstruction attack with and without searched policy}
         \label{fig:1}
-    \end{minipage}
-    \begin{minipage}{.5\textwidth}
+\end{figure}
+\setcounter{figure}{0} 
+\begin{figure}[h]
         \centering
-        \subfloat[Reproduced results]{
+        \subfloat[Reproduced result]{
             \includegraphics[width=0.4\textwidth]{images/fig2.png}
             \label{fig:2re}
         }
         \hspace{5mm}
-        \subfloat[Original results]{
+        \subfloat[Original result]{
             \includegraphics[width=0.4\textwidth]{images/fig2og.png}
             \label{fig:2og}
         }
         \captionof{figure}{Correlation between $S_{pri}$ and PSNR}
         \label{fig:2}
-    \end{minipage}
     \vspace{-5mm}
 \end{figure}
 
 \paragraph{Experiment 2} A visual comparison between reconstructed images with and without a searched transformation policy applied is performed for both ResNet20 and ConvNet on images from CIFAR-100 and Fashion-MNIST. The optimizer used in the attack is Adam+Cosine. The images, the resulting reconstructions, and their PSNR values are shown in the left half of Figure \ref{fig:4}. The results from the original paper are shown at the right side of Figure \ref{fig:4}. As can be seen, the images used and PSNR values reported are different. This is due to the fact that it was too expensive to identify the exact same images and PSNR values differ quite severely depending on the image used. However, for all $12$ images, we observe a less pronounced visual effect of the transformation policy as well as a smaller gap in PSNR values between the reconstructions with and without the policies applied. This implicates that the effect shown in the original paper is not as severe for all images, although the images we selected may be particularly easy to reconstruct.
 
 \begin{figure}[h]
+\centering
     \subfloat[CIFAR-100 with ResNet20]{
-        \includegraphics[width=0.11\textwidth]{images/fig4a.png}
+        \includegraphics[width=0.24\textwidth]{images/fig4a.png}
         \label{fig:4a}
     }
     \subfloat[CIFAR-100 with ConvNet]{
-        \includegraphics[width=0.11\textwidth]{images/fig4b.png}
+        \includegraphics[width=0.24\textwidth]{images/fig4b.png}
         \label{fig:4b}
     }
     \subfloat[FMNIST with ResNet20]{
-        \includegraphics[width=0.11\textwidth]{images/fig4c.png}
+        \includegraphics[width=0.23\textwidth]{images/fig4c.png}
         \label{fig:4c}
     }
     \subfloat[FMNIST with ConvNet]{
-        \includegraphics[width=0.11\textwidth]{images/fig4d.png}
+        \includegraphics[width=0.23\textwidth]{images/fig4d.png}
         \label{fig:4d}
     }
+    
     \subfloat[CIFAR-100 with ResNet20]{
-        \includegraphics[width=0.11\textwidth]{images/fig4aog.PNG}
+        \includegraphics[width=0.24\textwidth]{images/fig4aog.PNG}
         \label{fig:4aog}
     }
     \subfloat[CIFAR-100 with ConvNet]{
-        \includegraphics[width=0.11\textwidth]{images/fig4bog.PNG}
+        \includegraphics[width=0.24\textwidth]{images/fig4bog.PNG}
         \label{fig:4bog}
     }
     \subfloat[FMNIST with ResNet20]{
-        \includegraphics[width=0.11\textwidth]{images/fig4cog.PNG}
+        \includegraphics[width=0.23\textwidth]{images/fig4cog.PNG}
         \label{fig:4cog}
     }
     \subfloat[FMNIST with ConvNet]{
-        \includegraphics[width=0.11\textwidth]{images/fig4dog.PNG}
+        \includegraphics[width=0.23\textwidth]{images/fig4dog.PNG}
         \label{fig:4dog}
     }
     \caption{Visualization results for reconstruction attacks on different datasets and models with associated PSNR values. Our results above and original results below.}
-    \vspace{-5mm}
     \label{fig:4}
 \end{figure}
 
 \paragraph{Experiment 3}
 
 To gain further insight into the effectiveness of the different policies, we report the qualitative and quantitative results of Adam+Cosine attacks and model accuracy for the datasets and models in Figure \ref{fig:4}. The results are calculated over $6$ images as performing the experiment is very expensive and number wasn't stated in the paper. The policies considered and the results are listed in Table \ref{tab:1}.
-
+\begin{center}
 \begin{table}[h]
-    \centering
-    \begin{subtable}[h]{0.21\textwidth}
-    % \centering
+    \begin{subtable}[h]{0.25\textwidth}
       \begin{tabular}{lrrr}
             \hline
              Policy   &   PSNR &   PSNR (std) &   Acc \\
@@ -223,9 +221,8 @@ To gain further insight into the effectiveness of the different policies, we rep
         \end{tabular}
         \caption{CIFAR-100 + ResNet20}
     \end{subtable}
-    \hspace{55mm}% \hfill
-    \begin{subtable}[h]{0.21\textwidth}
-        \centering
+    \hspace{40mm}% \hfill
+    \begin{subtable}[h]{0.25\textwidth}
         \begin{tabular}{lrrr}
             \hline
              Policy   &   PSNR &   PSNR (std) &   Acc \\
@@ -240,8 +237,8 @@ To gain further insight into the effectiveness of the different policies, we rep
         \caption{CIFAR-100 + ConvNet}
     \end{subtable}
     \vfill
-    \begin{subtable}[h]{0.21\textwidth}
-        \centering
+    \vspace{0mm}
+    \begin{subtable}[h]{0.25\textwidth}
         \begin{tabular}{lrrr}
             \hline
              Policy   &   PSNR &   PSNR (std) &   Acc \\
@@ -255,9 +252,8 @@ To gain further insight into the effectiveness of the different policies, we rep
         \end{tabular}
         \caption{FMINST + ResNet20}
     \end{subtable}
-    \hspace{55mm}% \hfill
-    \begin{subtable}[h]{0.21\textwidth}
-        \centering
+    \hspace{40mm}% \hfill
+    \begin{subtable}[h]{0.25\textwidth}
         \begin{tabular}{lrrr}
             \hline
              Policy   &   PSNR &   PSNR (std) &   Acc \\
@@ -274,6 +270,7 @@ To gain further insight into the effectiveness of the different policies, we rep
     \caption{PSNR (db) (including mean and standard deviation over $6$ images) and model accuracy (\%) of different transformation configurations for each model and dataset. $19-1-18$ is the random policy.}
     \label{tab:1}
 \end{table}
+\end{center}
 Table \ref{tab:1} shows similar patterns to the original paper, where the searched policies have low PSNR values compared to not using transformations. We do observe that PSNR values have a relatively high standard deviation, and during our experiments, we found that the policies do not form a good defense for some images. This problem will be further discussed in Section \ref{sec:discussion}.
 
 \paragraph{Experiment 4} The defensive qualities of the searched transformation policies are benchmarked against existing defenses from the literature \cite{zhu2019} \cite{wei2020} under the Adam+Cosine attack. The results are shown in Table \ref{tab:3}. Although the exact values differ slightly, the overall results are similar to the original paper, where all the existing defenses perform worse than the hybrid strategy.
@@ -281,7 +278,6 @@ Table \ref{tab:1} shows similar patterns to the original paper, where the search
 \paragraph{Experiment 5} This experiment concerns \textbf{Claim 2}. Because policies should be general, they are tested against various attack configurations. For this, we again use $6$ images from the test set and perform the different attacks on the images without the transformation policies applied and with the hybrid strategy transformation policies applied. The results are shown in Table \ref{tab:2}. As can be seen from the table, the hybrid strategy works well against all configurations of the reconstruction attack. This is in line with the results from the original paper.
 
 \begin{table}[htb!]
-    \begin{minipage}{.6\linewidth}
     \centering
     \begin{tabular}{lrrrr}
         \hline
@@ -297,9 +293,8 @@ Table \ref{tab:1} shows similar patterns to the original paper, where the search
         \end{tabular}
     \caption{PSNR values (db) (including mean and standard deviation over $6$ images) of reconstructed images with and without transformations applied for different attack configurations}
     \label{tab:2}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{.35\linewidth}
+\end{table}
+\begin{table}[htb!]
     \centering
         \begin{tabular}{lrr}
             \hline
@@ -313,8 +308,6 @@ Table \ref{tab:1} shows similar patterns to the original paper, where the search
         \end{tabular}
     \caption{CIFAR100 with ResNet20}
     \label{tab:my_label}
-    \end{minipage}
-    \vspace{-8mm}
 \end{table}
 
 \paragraph{Experiment 6} This experiment concerns the transferability of \textbf{Claim 3}. To test this, the policies searched on CIFAR-100 are applied to Fashion-MNIST using both ResNet20 and ConvNet. Reconstruction attacks are performed with the Adam+Cosine attack. The resulting PSNR values and accuracies are listed in Table \ref{tab:4}. The results differ from the original. It can be seen that the transformation policies are not effective here.
@@ -352,7 +345,6 @@ Table \ref{tab:1} shows similar patterns to the original paper, where the search
     \end{subtable}
     \caption{Resulting PSNR (dB) and accuracy (\%) values for applying policies searched on CIFAR-100 to Fashion-MINST}
     \label{tab:4}
-    \vspace{-10mm}
 \end{table}
 
 \paragraph{Experiment 7}
@@ -361,17 +353,17 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
 
 \begin{figure}[h]
     \centering
-    \subfloat[Reproduced results]{
-        \includegraphics[width=0.4\textwidth]{images/fig3.png}
+    \subfloat[Reproduced result]{
+        \includegraphics[width=0.5\textwidth]{images/fig3.png}
         \label{fig:3a}
     }
-    \subfloat[Original results]{
-        \includegraphics[width=0.4\textwidth]{images/fig3og.png}
+    
+    \subfloat[Original result]{
+        \includegraphics[width=0.5\textwidth]{images/fig3og.png}
         \label{fig:3b}
     }
     \caption{Convergence speed with and without transformations applied}
     \label{fig:3}
-    \vspace{-6mm}
 \end{figure}
 \paragraph{Experiment 8}
 
@@ -380,15 +372,16 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
 \begin{figure}[htb]
     \centering
     \subfloat[Shallow layers]{
-        \includegraphics[width=0.4\textwidth]{images/fig6shallow.png}
+        \includegraphics[width=0.5\textwidth]{images/fig6shallow.png}
         \label{fig:6a}
     }
+    
     \hspace{5mm}
     \subfloat[Deep layers]{
-        \includegraphics[width=0.4\textwidth]{images/fig6deep.png}
+        \includegraphics[width=0.5\textwidth]{images/fig6deep.png}
         \label{fig:6b}
     }
-    \caption{Reproduced results of gradient similarity during the reconstruction optimization, for CIFAR100 with ResNet20}
+    \caption{Reproduced result of gradient similarity during the reconstruction optimization, for CIFAR100 with ResNet20}
     \label{fig:6}
     \vspace{-5mm}
 \end{figure}
@@ -397,7 +390,7 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
 
 \begin{figure}[h]
     \centering
-    \subfloat[Reproduced results]{
+    \subfloat[Reproduced result]{
         \includegraphics[width=0.3\textwidth]{images/fig5.png}
         \label{fig:5re}
     }
@@ -412,7 +405,6 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
     }
     \caption{Privacy scores of the 50 transformation functions in the augmentation library, best transformations are red.}
     \label{fig:5}
-    \vspace{-5mm}
 \end{figure}
 
 \paragraph{Experiment 10}
@@ -426,7 +418,6 @@ The final experiment reproducing the results from the original paper is aimed at
 \paragraph{Extension 2} We additionally extend the evaluation of the transferability of the searched policies by testing which transformations work best on a different dataset. Since good policies share the same general qualities, as stated in Claim 5, the five best transformations from Claim 6 can be expected to be the same when using a different dataset. For this experiment, we use the Rescaled ImageNet dataset. The resulting transformations are shown in Figure \ref{fig:ext1}. Out of the $5$ best transformations on the Rescaled ImageNet $3$ were also found on CIFAR-100 in both our results and the results from the original paper. This shows that, indeed, these transformations contain the desired qualities from Claim 6.
 
 \begin{table}[htb]
-    \begin{minipage}{.4\linewidth}
     \centering
     \begin{tabular}{lrrr}
         \hline
@@ -438,9 +429,8 @@ The final experiment reproducing the results from the original paper is aimed at
     \end{tabular}
     \caption{PSNR values (dB) and accuracies of policies searched on CIFAR-100 applied to Rescaled ImageNet}
     \label{tab:ext1}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{.6\linewidth}
+\end{table}
+\begin{table}[htb]
     \centering
         \begin{tabular}{lrrr}
         \hline
@@ -457,7 +447,6 @@ The final experiment reproducing the results from the original paper is aimed at
     \end{tabular}
     \caption{Comparisons with existing defense methods under the Adam+Cosine attack}
     \label{tab:3}
-    \end{minipage}
     \vspace{-8mm}
 \end{table}
 
