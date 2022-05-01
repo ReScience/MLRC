@@ -21,7 +21,7 @@ We did not communicate with the original authors.
 \section{Introduction}
 Image generation has been a hot topic within generative models as they represent an intuitive problem whose results are easily accessible by the public. One of the models that has received a lot of public attention is StyleGAN~(\textcite{stylegan}). 
 % This method is based on Generative Adversarial Networks, GANs (\textcite{gan}), a method that pairs two networks, one that acts as a Generator (or decoder) and the other as a Discriminator (or encoder) of the results of the generator. 
-The network's architecture has been refined through multiple iterations in StyleGAN2~\cite{stylegan2}, StyleGAN2-ADA~\cite{stylegan2-ada} and StyleGAN3~\cite{stylegan3}. StyleGAN2 improves on the first version by, among other things, adding a projection method onto the latent space, which allows the inversion an image into its latent representation. 
+The network's architecture has been refined through multiple iterations in StyleGAN2~\cite{stylegan2}, StyleGAN2-ADA~\cite{stylegan2-ada} and StyleGAN3~\cite{stylegan3}. StyleGAN2 improves on the first version by, among other things, adding a projection method onto the latent space, which allows the inversion of an image into its latent representation. 
 
 % Since the Generator acts as a decoder, it needs to add information when moving from the latent space to the output. 
 Methods like GAN2Shape~\cite{gan2shape} aim at exploiting the information that is already stored in the generator of a pre-trained StyleGAN2 model to go beyond generating synthetic 2D images. In particular, this method aims to extract the 3D shape of the preeminent object in any image. This is intuitively possible due to the size of the training dataset of the StyleGAN2 model, and its ability to generate images of an object from multiple views and lighting directions by varying $\textbf{w}$. The authors of GAN2Shape use StyleGAN2 networks pre-trained on different dataset categories and five different feature extraction models to derive the shape information for images belonging to the same dataset categories. This method, compared to many others~\cite{lunz2020inverse, henzler2019escaping, wu20153d, wang2019deep}, has the advantage of being completely unsupervised, and not requiring a change in the training process of the classical 2D GAN. 
@@ -272,11 +272,11 @@ The model correctly learned the shape and the texture of many images, although s
 In the following sections we show the reconstructed depth map and 3D projection of some images chosen as representative of the dataset. All of the images that follow have the background cut from the actual object, this was only done for ease of illustration and was not done for the actual training process since the original authors do not mask the background in all cases. It is also difficult to illustrate the results fairly in 2D images, so we invite the reader to visit \href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{our website} 
 with \textit{interactive} 3D plots\footnote{\href{https://alessiogalatolo.github.io/GAN-2D-to-3D/}{alessiogalatolo.github.io/GAN-2D-to-3D/}}.
 
-\subsection{Results reproducing original paper}
+\subsection{Results reproducing the original paper}
 \label{sec:replication}
 
 \subsubsection{LSUN Car}
-We present the results on LSUN Car dataset in \autoref{fig:result-car-cat}. Most features are projected in the right direction and show details that are correctly outward projected from the main object. This result supports all the claims made in \autoref{sec:claims} as we did not use any annotation or assumption for the images, many details were retrieved with high precision using the StyleGAN knowledge and we were able to easily make a rotation of the image (see interactive web-page).
+We present the results on LSUN Car dataset in \autoref{fig:result-car-cat}. Most features are projected in the correct direction and show details that are correctly outward projected from the main object. This result supports all the claims made in \autoref{sec:claims} as we did not use any annotation or assumption for the images, many details were retrieved with high precision using the StyleGAN knowledge and we were able to easily make a rotation of the image (see interactive web-page).
 \begin{figure}[h]
     \centering
     \begin{subfigure}{0.80\textwidth}
@@ -341,9 +341,10 @@ We present the results on LSUN Car dataset in \autoref{fig:result-car-cat}. Most
     \label{fig:result-car-cat}
 \end{figure}
 \subsubsection{LSUN Cat}
-The second experiment was executed on the LSUN Cat dataset. The results are a slightly poorer compared to the the LSUN Car dataset. The face of the cats gets properly recognized, but some details like the nose are not protruded from the rest of the face and are generally on the same plane, see \autoref{fig:result-car-cat}. Some images present some irregularities in the form of spikes and hills (d). The rotation (f) does not result in a completely natural image as part of the face of the cat appears on the same plane. This experiment does not support claims 2 and 4 in some cases (e.g. figures \ref{fig:result-car-cat} (d) and (f) negate claims 2 and 4 respectively) while it does for claims 1 and 3 (\autoref{sec:claims}).
+The second experiment was conducted on the LSUN Cat dataset. The results were slightly poorer compared to the LSUN Car dataset. The face of the cats gets properly recognized, but some details like the nose are not protruded from the rest of the face and are generally on the same plane, see \autoref{fig:result-car-cat}. Some images present some irregularities in the form of spikes and hills (d). The rotation (f) does not result in a completely natural image as part of the face of the cat appears on the same plane. This experiment does not support claims 2 and 4 in some cases (e.g. figures \ref{fig:result-car-cat} (d) and (f) negate claims 2 and 4 respectively) while it does for claims 1 and 3 (\autoref{sec:claims}).
 \subsubsection{CelebA}
-The third experiment conducted on the CelebA dataset shows that most of the face are correctly portrayed with the only exception of the border of the face e.g. chin and forehead that sometimes is not included in the projection (see \autoref{fig:result-celeba} (b)). Also we found out that the method does not behave well with faces that are viewed from the side (see \autoref{fig:result-celeba} (c)) where the face still gets a projection as it was viewed from the front. As a consequence of this, the rotation of side faces does not result in a good image. This experiment supports claims 1-4 (\autoref{sec:claims}) only for some faces and claims 1 and 3 for those viewed from the side.
+
+The third experiment conducted on the CelebA dataset shows that most of the face are correctly portrayed with the only exception of the border of the face e.g. chin and forehead that sometimes is not included in the projection, see \autoref{fig:result-celeba} (b). Also we found out that the method does not behave well with faces that are viewed from the side, see \autoref{fig:result-celeba} (c), where the face still gets a projection as it was viewed from the front. As a consequence of this, the rotation of side faces does not result in a good image. This experiment supports claims 1-4 (\autoref{sec:claims}) only for some faces and claims 1 and 3 for those viewed from the side.
 \begin{figure}[h]
     \begin{subfigure}{0.33\textwidth}
         \centering
@@ -379,6 +380,7 @@ The third experiment conducted on the CelebA dataset shows that most of the face
 \subsubsection{The effects of shape priors}
 \label{sec:results_priors}
 The original paper did not specify the exact reasons for choosing an ellipsoid prior for the pretraining of the depth net, therefore we decided to experiment with multiple prior shapes as well as no prior shape.
+
 \textbf{No prior.} With the goal of assessing the results of this method when no prior shape is given, we ran a test on one image from the LSUN Car dataset without any prior pre-training, and with random initialization. The reconstruction objective is still satisfied very well, but it has converged to an extremely noisy depth map (see \autoref{fig:no_prior} in \autoref{app:priors} in the appendix). This briefly shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
 % This is intuitively expected, because the network has to choose from infinite depth configurations that could lead to the image when projected onto 2D, and it shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
 
