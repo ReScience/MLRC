@@ -54,7 +54,7 @@
 \section{Hyperparameters} \label{app:hyperparameters}
 \begin{table}[H]
 \centering
-\begin{tabular}{c|c|c}
+\begin{tabular}{l|c|c}
 \hline
                                                                                                        & Our StylEx  & Lang et al's StylEx   \\ \hline \hline
 Step Size                                                                                              & 1e-3        & 2e-4                  \\ 
@@ -73,35 +73,6 @@ Optimizer                                                                       
 \end{table}
 \normalsize
 
-\section{Verbal Description Study} \label{app:classificationstudy}
-\begin{table}[H]
-\begin{minipage}{.5\linewidth}
-{\begin{tabular}{m{1.1cm}|m{1.1cm}|m{1.1cm}|m{1.1cm}|m{1.1cm}}
-\hline
-\multicolumn{5}{c}{Cats/Dogs}                                                                                                   \\ \hline \hline
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-11-31.png} & {\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-11-16.png}} & {eye: \hspace{0.8cm} 0.73}   & {pupil: 0.16} & shape: 0.1   \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-11-49.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-12-07.png} & {mouth: 0.73} & {open: \hspace{0.8cm} 0.3}   & tongue: 0.16 \\
-{\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-12-23.png}} & {\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 21-12-34.png}} & {ear: \hspace{0.8cm} 0.90}     & {right: 0.06}    & become: 0.06   
-\end{tabular}}
-\caption*{(a)}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-{\begin{tabular}{m{1.1cm}|m{1.1cm}|m{1.1cm}|m{1.1cm}|m{1.1cm}}
-\hline
-\multicolumn{5}{c}{Face}                                                                                                        \\ \hline \hline
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-41-05.png} & {\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-41-19.png}} & {eyebrow: 0.90} & {thick: 0.17} & brow: 0.07 \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-41-35.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-41-47.png} & {tooth: 0.30} & {lip: \hspace{0.8cm} 0.10} & disappear: 0.07 \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-42-03.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-42-15.png} & {glass: 0.90} & {size: 0.13} & bigger: 0.10    \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-42-29.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-42-42.png} & {mouth: 0.70} & {open: 0.40} & lip: \hspace{0.8cm} 0.10       \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-42-54.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-43-04.png} & {bright: 0.37} & {skin: 0.30} & light: 0.27     \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-43-13.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-43-30.png} & {mustache: 0.93} & {facial: 0.07} & hair: 0.07      \\
-\includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-43-44.png} & \includegraphics[width=1.1cm]{images/Screenshot from 2022-02-02 22-43-55.png} & {eye: \hspace{0.8cm} 0.77} & {color: 0.47} & eyelash: 0.13  
-\end{tabular}}
-\caption*{(b)}
-\end{minipage}
-\caption{\textbf{Verbal description study results.} The 3 most common words used in user descriptions for the Cat/Dogs (a) and Face (age/gender) (b) classifiers. This user study proves the distinctness of each attribute since the most common word used to describe each attribute change is different per classifier.}
-\label{tab:top3}
-\end{table}
 \section{MNIST Reconstruction}
 \label{app:MNIST_Reconstruct}
 \begin{figure}[H]
@@ -121,3 +92,34 @@ Optimizer                                                                       
     \caption{An example of image reconstruction on the MNIST dataset. The StylEx had converged however, it was trained conditioned on a classifier that always predicted 8, thus was effectively trained without a classifier. It's loss curves can be found { \href{https://app.labml.ai/run/841a8fde81b511eca9da0242ac1c0002}{here}}.}
     \label{fig:MNIST_Reconstruct}
 \end{figure}
+
+\section{Verbal Description Study} \label{app:classificationstudy}
+\begin{table}[H]
+\begin{minipage}{.8\linewidth}
+{\begin{tabular}{m{1.5cm}|m{1.5cm}|m{2.4cm}|m{2.4cm}|m{2.4cm}}
+\hline
+\multicolumn{5}{c}{Cats/Dogs Classifier}                                                                                                   \\ \hline \hline
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-11-31.png} & {\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-11-16.png}} & {eye:  0.73}   & {pupil: 0.16} & shape: 0.1   \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-11-49.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-12-07.png} & {mouth: 0.73} & {open: 0.3}   & tongue: 0.16 \\
+{\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-12-23.png}} & {\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 21-12-34.png}} & {ear:  0.90}     & {right: 0.06}    & become: 0.06   
+\end{tabular}}
+\caption*{(a)}
+\end{minipage}
+\begin{minipage}{.8\linewidth}
+{\begin{tabular}{m{1.5cm}|m{1.5cm}|m{2.4cm}|m{2.4cm}|m{2.4cm}}
+\hline
+\multicolumn{5}{c}{Face (age/gender) Classifier}                                                                                                        \\ \hline \hline
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-41-05.png} & {\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-41-19.png}} & {eyebrow: 0.90} & {thick: 0.17} & brow: 0.07 \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-41-35.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-41-47.png} & {tooth: 0.30} & {lip:  0.10} & disappear: 0.07 \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-42-03.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-42-15.png} & {glass: 0.90} & {size: 0.13} & bigger: 0.10    \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-42-29.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-42-42.png} & {mouth: 0.70} & {open: 0.40} & lip:  0.10       \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-42-54.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-43-04.png} & {bright: 0.37} & {skin: 0.30} & light: 0.27     \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-43-13.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-43-30.png} & {mustache: 0.93} & {facial: 0.07} & hair: 0.07      \\
+\includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-43-44.png} & \includegraphics[width=1.5cm]{images/Screenshot from 2022-02-02 22-43-55.png} & {eye:  0.77} & {color: 0.47} & eyelash: 0.13  
+\end{tabular}}
+\caption*{(b)}
+\end{minipage}
+\caption{\textbf{Verbal description study results.} The 3 most common words used in user descriptions for the Cat/Dogs (a) and Face (age/gender) (b) classifiers. This user study proves the distinctness of each attribute since the most common word used to describe each attribute change is different per classifier.}
+\label{tab:top3}
+\end{table}
+
