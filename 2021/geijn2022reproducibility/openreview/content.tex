@@ -1,28 +1,280 @@
-\section{Reproducibility Summary}
+\section*{\centering Reproducibility Summary}
 
-Add your summary here. No need to worry about fitting it in a single page now.
+\subsection*{Scope of Reproducibility}
 
-\subsection{Submission Checklist}
+This work aims to reproduce Lang et al.'s StylEx \cite{Lang2021ExplainingIS} which proposes a novel approach to explain how a classifier makes its decision. They claim that StylEx creates a post-hoc counterfactual explanation whose principal attributes correspond to properties that are intuitive to humans. The paper boasts a large range of real-world practicality. However, StylEx proves difficult to reproduce due to its time complexity and holes in the information provided. This paper tries to fill in these holes by: i) re-implementation of StylEx in a different framework, ii) creating a low resource training benchmark.
 
-Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+\subsection*{Methodology}
 
+We use their provided python notebook to confirm their \textit{AttFind} algorithm. However, to test the authors' claims, we reverse engineer their architecture and completely re-implement their train algorithm. Due to the computational cost of training, we use their pre-trained weights to test our reconstruction. To expedite training, a smaller resolution dataset is used. The training took 9 hours for 50,000 iterations on a Google Colab Nvidia K80 GPU. The hyperparameters are listed in the proceedings.
+
+\subsection*{Results}
+
+We reproduce the StylEx model in a different framework and test the \textit{AttFind} algorithm, verifying the original paper's results for the perceived age classifier. However, we could not reproduce the results for the other classifiers used, due to time limitations in training and the absence of their pre-trained models. In addition, we verify the paper's claim of providing human-interpretable explanations, by reproducing the two user studies outlined in the original paper.
+
+\subsection*{What was easy}
+
+The notebook supplied by the authors loads their pre-trained models and reproduces part of the results in the paper. Furthermore, their algorithm for discovering classifier-related attributes, \textit{AttFind}, is well outlined in their paper making the notebook easy to follow. Lastly, the authors were responsive to our inquiries.
+
+\subsection*{What was difficult}
+
+A major difficulty was that the authors provide only a single pre-trained model, which makes most of the main claims require training code to verify. Moreover, the paper leaves out information about their design choices and experimental setup. In addition, the authors do not provide an implementation of the models' architecture or training. Finally, the practical audience is limited by the resource requirements.
+
+\subsection*{Communication with original authors}
+
+We had modest communication with the original author, Oran Lang. Our discussion was limited to inquiries about design choices not mentioned in the paper. They were able to clarify the encoder architecture and some of their experimental setup. However, their training code could not be made available due to internal dependencies.
+
+\newpage
+% \setstretch{.2}
+% \titlespacing*{\section}
+% {0pt}{5pt}{5pt}
+% \titlespacing*{\subsection}
+% {0pt}{5pt}{5pt}
+
+\section{Introduction}
+
+As the field of machine learning (ML) develops and its algorithms become more prevalent in society, concerns on the explainability of black-box models become pivotal. For problems that have a high societal impact, there is understandable apprehension towards trusting models that do not provide justification. For applications such as medical imaging and autonomous driving, there is a need for some level of human supervision. Even if a model has high performance, such as neural networks, without the ability for human interpretation, its use will be limited.
+
+In order to gain trust in systems powered by ML models, the models need to be interpretable and explainable. The two concepts are regularly used interchangeably, yet have subtle differences. Interpretability is the degree to which humans can understand the cause of a decision \cite{MILLER20191}. Deep neural networks, such as classifiers are often perceived as “black boxes”
+whose decisions are opaque and hard for humans to understand. Explaining the decision of classifiers can reveal model biases\cite{17kim2018interpretability} and also provide support to downstream human decision-makers. On the other hand, explainability is linked to the internal logic of a model. It focuses on explaining the data representation within that network. Explainability implies interpretability, however, the implication is not bidirectional.
+
+In recent years, there has been increasing attention to the field of explainability of deep network classifiers. Among the various ways of explanations, counterfactual explanations are gaining increasing attention \cite{19mothilal2020explaining,11goyal2019counterfactual,33goyal2019counterfactual}. 
+To discover and visualize, the attributes used to generate counterfactual explanations, a natural candidate is generative models. 
+In \cite{35wu2021stylespace} they observed that StyleGAN2 \cite{Karras2020AnalyzingAI}, tends to contain a disentangled latent space (i.e., the “StyleSpace”) which can be used to extract individual attributes.  
+The authors based their proposed methodology \cite{Lang2021ExplainingIS} on this observation. Though \cite{schutte2021using} propose a similar architecture, Lang et al. assert that by integrating the classifier into the training of StylEx they can obtain principal attributes that are specific for the classification task. Additionally, they suggest that StylEx can be applied to a large variety of complex, real-world tasks, which makes its replicability especially intriguing.
+
+Our work aims to reproduce the claims made by Lang et al. and confirm their results. Their paper reports in detail many experiments to justify their claims, but does not dive into their experimental setups for architecture and training. Since not all the information needed is available without contacting the authors, we argue that this paper cannot be considered \textit{fully} reproducible.
+
+To remedy the holes in reproducibility and aid future work that builds on or applies StylEx, we build their proposed architecture and training algorithm, after correspondence with the authors.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+To determine the scope of reproduction, we quote Lang et al.'s main claims:
+\begin{enumerate}[label=\textbf{Claim \arabic*}]
+    \item \label{itm:claim1} [They] propose the StylEx model for classifier-based training of a StyleGAN2, thus driving its StyleSpace to capture classifier-specific attributes
+    \item \label{itm:claim2} A method to discover classifier-related attributes in StyleSpace coordinates, and use these for counterfactual explanations.
+    \item \label{itm:claim3} StylEx is applicable for explaining a large variety of classifiers and real-world complex domains. [They] show it provides explanations understood by human users.
+\end{enumerate}
+To reproduce Claim 2, a trained model and the \textit{AttFind} algorithm are sufficient; both of which are contained in the authors' notebook. Claim 1 requires a network trained conditioned on a classifier and a network trained without, while Claim 3 requires multiple networks trained on multiple domains. However, to train these models, the architecture and training code is necessary; which, as stated previously, are not open source or thoroughly documented. In addition, the computational cost to train the models is expensive. Thus, to verify these claims our goals will be to:
 \begin{itemize}
-\item Title should start with "\texttt{[Re]}"
-\item Author information, along with ORCID id
-\item Author affiliations
-\item Code URL, Software Heritage Foundation link
-\item Abstract
-\item Review URL (the OpenReview URL of your report)
+    \item Reconstruct their architecture and port the pre-trained weights in PyTorch
+    \item Evaluate whether the principal attributes we obtain correspond to the same features using their pre-trained weights
+    \item Retrain on datasets of smaller images and analyze the scalability of their method using fewer training steps and smaller architecture
+    \item Conduct two user studies on visual coherence and distinctness to prove that attributes extracted are interpretable by humans
 \end{itemize}
 
-\subsection{Continuous Integration}
+To ease reproduction for future work, we built the StylEx architecture into a different framework, to get a deeper understanding of the model, and become more equipped to tackle training. As an addition, this contribution allows StylEx to be more accessible for classifiers trained in PyTorch.
 
-We use Github Actions CI to check your submission and compile the pdf file subsequently.
-You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+\section{Background}
+There have been many attempts to extract explanations from classifiers most of which utilize heatmaps of important features. However, heatmaps struggle to visualize features that are not spatially localized such as color or shape. Rather than identifying areas of interest, one can provide an explanation through a "what-if" example where the features are slightly altered. These forms of justification have been found to be more interpretable for non-localized features, and are known as \textit{counterfactual} examples. However, it often requires domain knowledge and handcrafting examples to be appropriate. Lang et al. automate this and utilize machine learning to generate realistic counterfactual examples. This section will outline how they claim to achieve this with their two major contributions, StylEx and AttFind.
 
-\clearpage
+\subsection{StylEx}
 
-\section{Content}
-Copy your Openreview content here.
+The way Lang et al. generate examples is through a neural generative model they dubbed StylEx. StylEx expands on the popular generative adversarial network StyleGAN v2, which generates realistic images by creating competition between two networks. 
 
-This is an example citation \cite{Sinha:2021}.
+One of these two networks, referred to as the Generator, $G$, attempts to generate a realistic image. To this end, the generator samples from a latent space, $z\in R^n$, with a simple probability distribution such as $z_i\sim \mathcal{N}(0,1)$. The sampled vector is pushed through a series of linear layers called \textit{mapping network} to create a new latent vector, $w$, with a more complex probability distribution. This vector is used as input to a number of \textit{StyleBlocks} based on the logarithmic resolution of the image. StyleBlocks consist of an affine transform and an upsampling layer. The affine transform, $A_r$, maps $w$ to yet another vector $s_r$, where $r$ denotes the block number or resolution of the block. This concatenation of all $s_r$ is known as the style, or \textit{attribute}, vector, and the space that it spans is known as the StyleSpace. The attribute space is emphasized due to recent observations that it is less entangled than the latent space. The second network is the discriminator, $D$. This network is trained to differentiate between fake and real images. This forces the generator to slowly improve its creation of fake images. In this way, the discriminator can be seen as an adaptive loss function.
+
+The flaw with the direct application of StyleGAN is that it generates from a random latent space. To explain a classification, we would like to condition it on a particular image of interest, but StyleGAN has no mechanism for extracting the attributes of an image. To fix this, Lang et al. added a third, encoding network to StylEx, $E$. Rather than using a randomly sampled $z$ and the mapping network to obtain $w$, StylEx uses the output of the encoder, $z = E(x)$, where $x$ is an input image. StylEx adds an extra loss condition that the reconstructed image, $x' = G(E(x))$, should be approximately $x$. Thus, the encoder combined with the affine transformations allows us to extract the attributes of an input image.
+
+StylEx is not unique in adding an encoder to the StyleGAN to explain a classifier. However, other methods do not include the classifier in the training of the network. StyleGAN incorporates the classifier into training by appending its output to the encoded $z$ vector. This results in another loss condition $C(x) \approx C(x')$.
+
+\subsection{AttFind}
+
+Once the attributes of an image have been extracted, a counterfactual explanation can be achieved from the attributes with the most affect on a classifier's decision. Lang et al. propose attribute find (AttFind) to discover the most influential attributes. The algorithm adjusts all the attributes one at a time by a fixed amount $d$ and observes their effect on the classification $\Delta c_s$. The $k$ attributes with the highest $\Delta c$ create a \textit{local} explanation for an image's classification. To approximate a \textit{global} explanation, the principal attributes are determined by the mean $\Delta c$ across images in a set. 
+
+\section{Reproduction approach}
+
+Reimplementing StylEx has been split into two main tasks to ease resource requirements. The first task consists of rebuilding StylEx in a different framework; the second is training the model from scratch. In this section, we discuss how we rebuilt the model architecture and training process. Additionally, we include details obtained through correspondence missing from the original paper.
+
+\subsection{Model descriptions}
+
+To test \ref{itm:claim1} and \ref{itm:claim3}, at least two models are necessary. Because only one pre-trained model is available, a new model needs to be trained. However, this is computationally expensive as it builds on StyleGAN \footnote{StyleGAN can take on the order of 40 days on one GPU for high resolutions \cite{karras2019stylebased}}. This led us to evaluate reproducibility in two ways. Firstly, we recreate their architecture in PyTorch, using their pre-trained weights to bypass the training limitation. Secondly, we attempt to train a model from scratch using less complex datasets with smaller resolutions to verify claims requiring multiple models. In the following sections, we explain how we reconstruct the StylEx architecture and training process.
+\subsubsection{Rebuilding StylEx}
+ \label{First Approach}
+ 
+The author's notebook includes a TensorFlow StylEx pre-trained on the FFHQ\cite{karras2019stylebased} dataset to find the attributes most influential in age classification. 
+
+Taking advantage of the pre-trained model's raw parameters, we reverse engineer the architecture of each component of StylEx and implement it in PyTorch. Subsequently, the pre-trained weights are transferred into the reconstructed StylEx to confirm the correct implementation of the structure. Transferring the pre-trained parameters from a TensorFlow model to a PyTorch model turned out to be challenging and non-trivial. 
+
+We start by building the architecture of the MobileNetV1 \cite{howard2017mobilenets} classifier, as described in the summary of their model, in both TensorFlow and PyTorch. We follow this approach so that we can compare how the results of each layer differ, depending on the framework. 
+We notice that for the 2D convolutional layers PyTorch and TensorFlow pad the images differently, leading to different results. To address this, we add a \href{https://pytorch.org/docs/stable/generated/torch.nn.ConstantPad2d.html}{ConstantPad2D} layer in our PyTorch architecture before each convolution with a stride of 2. In addition, we change the default hyperparameters of PyTorch's \href{https://pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html}{BatchNorm2D} to match the corresponding TensorFlow defaults.
+
+The next step is to follow the same procedure for the encoder and the StyleGAN components. We use the official StyleGAN2 implementation in PyTorch by NVlabs\cite{Karras2020AnalyzingAI} and modify the initial architecture to align with the StylEx model. In particular, instead of only using the encoding of an image $X$ as input to the generator, we also concatenate the classifier's output logits. Additionally, their generator returns the StyleSpace which contains classifier-specific attributes. For the encoder, we use the same architecture as StyleGAN2's discriminator. Finally, we transfer the pre-trained weights, to our components.
+
+The last step is to load the rebuilt StylEx model in the provided notebook to confirm that the conversion of the models is successful and reproduce the results provided in the notebook. 
+
+\subsubsection{Training the model}
+
+Lang et al. asserted that StylEx works for a wide range of classifiers and datasets. The results they show in their paper are all with high-resolution images. The high resolution comes with a high computational cost as StylEx is built on top of a StyleGAN. High-resolution StyleGANs can take over a month to train on a single GPU system. To tackle this, we train our model on a low-resolution MNIST dataset. In this way, we investigate whether their model works well on low-resolution datasets and relieve computational requirements.
+
+The training is as outlined in their paper. The loss function for the StylEx model is broken into seven parts: $\mathcal{L}_x$, $\mathcal{L}_w$, $\mathcal{L}_{LPIPS}$, $\mathcal{L}_{adv}$, $\mathcal{L}_{PLR}$, $\mathcal{L}_{KL}$, and the $\mathcal{L}_{GP}$. $\mathcal{L}_x$ is the L1 loss between the real image, $x$, and the reconstruction of that image, $G(E(x))$. $\mathcal{L}_{LPIPS}$ is the Learned Perceptual Image Patch Similarity (LPIPS) of the two images. This loss is a metric other than raw pixel value error for the similarity between two images. $\mathcal{L}_w$ is the L1 loss between the encoding of the original image, $w = E(x)$, and the encoding of the reconstructed image $w' = E(G(E(x)))$. Collectively, these three losses make up the reconstruction loss, $\mathcal{L}_{rec}$, ie, $$\mathcal{L}_{rec} = \mathcal{L}_w +\mathcal{L}_x + \mathcal{L}_{LPIPS}.$$
+In the implementation, each loss term in $L_{rec}$ had a weighting coefficient to even out the magnitude of their contributions. The weights are detailed further in Section \ref{sec:hyperparameters}.
+
+$\mathcal{L}_{KL}$ is the KL divergence loss between the classification probabilities of the original image and its reconstructed classification probabilities. $\mathcal{L}_{GP}$ and $\mathcal{L}_{PLR}$ are the \textit{gradient penalty} and \textit{path length regularization} losses described in the WGAN-GP\cite{NIPS2017_892c3b1c} and StyleGAN2 paper\cite{Karras2020AnalyzingAI} respectively. $\mathcal{L}_{adv}$ is the Wasserstein adversarial generator loss of $x'$. Finally, the discriminator's loss is the Wasserstein adversarial discriminator loss.
+
+\section{Experimental setup}
+
+\subsection{Datasets}
+   
+The pre-trained models the authors offer are trained on the Flickr-Faces-HQ Dataset \cite{karras2019stylebased} \footnote{https://github.com/NVlabs/ffhq-dataset}. The dataset contains 70,000 high-quality PNG images at 1024×1024 resolution with large variations in terms of age, ethnicity, and image background. They use it to find the top attributes which contribute to perceiving a person's age (young or old) or gender (male or female). They also preprocess the images by lowering the resolution to 256x256. The official dataset is unlabeled. It is not clear whether the authors' dataset is an internal, labeled Google version or an unofficially labeled dataset.
+
+For training, the MNIST \cite{deng2012mnist} dataset is used due to its simplicity. Only the examples with labels 8 or 9 are kept and the resolution is increased to 32x32. MNIST was chosen because images compressed to 16x16 or even 8x8 tend to be recognizable for humans. Unfortunately, LPIPS relies on neural networks that have a fixed number of pooling layers. Without editing reimplementation of LPIPS, the lowest resolution possible is 32.
+
+\subsection{Hyperparameters} \label{sec:hyperparameters}
+%Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+A complete list of hyperparameters can be found in Table \ref{tab:hyperparameters} (see Appendix \ref{app:hyperparameters}).
+A hyperparameter search was not performed for two reasons. First, the training time is long -- even for very low resolutions, this is constraining. Second, the criteria for evaluating success is based on a human user, making automated hyperparameter tuning unintuitive.
+
+
+% As mentioned, the batch normalization layers use different default hyperparameter values between the two frameworks. In particular, we notice and change the following when transferring the MobileNetV1 classifier:
+% \begin{itemize}
+%     \item \textbf{momentum}: The value of momentum in TensorFlow is equivalent to a value of [1-momentum] in Pytorch.
+%     \item \textbf{epsilon}: A value added to the denominator for numerical stability, from 1e-05 to 1e-03.
+% \end{itemize}
+
+
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+\subsection{Computational requirements}
+
+Most of our experiments were conducted on Google Colab along with our systems. For training our models we use Colab's NVIDIA Tesla K80 GPU. Our code is provided in the following GitHub repository: \href{ https://anonymous.4open.science/r/MLRC_2021_FALL-E358/README.md}{MLRC\_2021\_FALL-E358}.
+
+The basic architecture of the StyleGAN2 was adapted from \href{https://github.com/NVlabs/stylegan2-ada-pytorch} {NVlabs' GitHub repository}. As previously mentioned, we modify the basic architecture, to align with StylEx's generator and load Lang et al.'s pre-trained weights. The training code was adapted from \href{https://nn.labml.ai/gan/stylegan/index.html} {labml.ai Annotated Paper Implementations'} StyleGAN implementation.
+
+Training the model on MNIST for 50,000 iterations takes on the order of nine hours to train on Colab. The time required for AttFind is dependent on the resolution, latent dimension, and the number of images in the dataset. Finding the attribute of a single image took approximately one minute for an image with resolution 32 and a latent space of 514.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Rebuilding StylEx results}
+
+To support \ref{itm:claim1}, we recreate their pre-trained models to PyTorch and test if our results agree. In Figure \ref{fig:PyTorch vs TensorFlow classifier} (see Appendix \ref{app:A}), we compare the results from our PyTorch StylEx to their TensorFlow implementation. There are minor differences in the probabilities from the PyTorch classifier which are likely caused by differences in default values or module implementations in the two frameworks.
+
+\subsection{AttFind results}
+
+We are now equipped to test our PyTorch models on the AttFind method and inspect the principal attributes of the age classifier; meaning the attributes with the highest contribution to young or old classification. To this end, we compute the AttFind algorithm -- with our classifier and generator as inputs -- using the 250 latent variables of the FFHQ dataset. As can be seen in Figures \ref{fig:top 4 attrs ours} and \ref{fig:top 4 attrs theirs} (see Appendix \ref{app:B}), our model obtains the same attributes as in the original paper.
+
+In addition, we implement the \textbf{Independent} selection strategy, to generate image-specific explanations as described in the original paper. This method is a \textit{local} explanation that returns the top-k attributes affecting a classifier's decision for a single image rather than the entire dataset. The results are shown in Figure \ref{fig:independent method}.
+
+These results support the author's \ref{itm:claim2}, that AttFind discovers significant attributes for a classifier's decision. Notably, in \ref{fig:att3} the reported probability of the top left image is $17\%$ in the paper, while the probability we find with our and their notebook classifier is $39\%$.
+
+\begin{figure}[H]
+\centering
+\subfloat[][\centering \small \textbf{Attribute 1}  "Skin Pigmentation"]{       \includegraphics[width=0.23\textwidth]{images/1_skin_pigmentation_ours.png} \label{fig:att1}}
+    \hspace{0.2em}
+    \subfloat[][\centering \small \textbf{Attribute 2}  "Eyebrow Thickness"]{
+        \includegraphics[width=0.23\textwidth]{images/2_eyebrow_thickness_ours.png} \label{fig:att2}}
+    \hspace{0.2em}
+    % \hfill
+    \subfloat[][\centering \small \textbf{Attribute 3}  "Add/Remove Glasses"]{
+        \includegraphics[width=0.23\textwidth]{images/3_glasses_ours.png} \label{fig:att3}}
+    \hspace{0.2em}
+    \subfloat[][\centering \small \textbf{Attribute 4}  "Dark/White Hair"]{
+        \includegraphics[width=0.23\textwidth]{images/4_hair_ours.png} \label{fig:att4}}
+    \caption {\textbf{Top 4 attributes for the perceived age classifier detected by our model.} These images show how the probability of classifying a person as young or old changes based on each attribute. On the first column of each image we display the probability of the person being classified as old and on the second column the probability of them being classified as young.} 
+    \label{fig:top 4 attrs ours}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \subfloat[\centering \textbf{Source}]{
+         \includegraphics[width=0.15\linewidth]{images/original_independent.png}
+         \label{fig:source}}
+    \subfloat[\centering \textbf{Attribute \#1} "Add Glasses"]{
+         \includegraphics[width=0.15\linewidth]{images/1_independent.png}
+         \label{fig:att1_ind}}
+    \subfloat[\centering \textbf{Attribute \#2} "White Hair"]{
+         \includegraphics[width=0.15\linewidth]{images/2_independent.png}
+         \label{fig:att2_ind}}
+    \subfloat[\centering \textbf{Attribute \#3} "Neck Coverage"]{
+         \includegraphics[width=0.15\linewidth]{images/3_independent.png}
+         \label{fig:att3_ind}}
+    \subfloat[\centering \textbf{Attribute \#4} "Receding Hairline"]{
+         \includegraphics[width=0.15\linewidth]{images/4_independent.png}
+         \label{fig:att4_ind}}
+    \subfloat[\centering \textbf{Attribute \#5} "Shiny White Hair"]{
+         \includegraphics[width=0.15\linewidth]{images/5_independent.png}
+         \label{fig:att5}}
+ \caption{\textbf{Independent selection strategy.} Top-5 detected attributes for explaining a perceived-age classifier for a \textit{specific} image. The attributes obtained are different from those presented in Figure \ref{fig:top 4 attrs ours} which are computed based on the largest average effect over $250$ images. The probabilities displayed correspond to the person being classifier as old.}
+  \label{fig:independent method}
+\end{figure}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lll}
+    \toprule 
+        & \textbf{Theirs} & \textbf{Ours} \\ \hline
+    \midrule
+        Perceived Gender & ${0.96 (\pm 0.047)}$ & ${0.94  (\pm 0.031)}$\\
+        Perceived Age & ${0.983  (\pm 0.037)}$ & ${0.978  (\pm 0.025)}$\\
+    \bottomrule\\
+    \end{tabular}
+    \caption{\textbf{Classification study results.} Correct identification of the top-6 attributes.}
+    \label{tab:user study table}
+\end{table}
+\subsection{Quantitative evaluation results}
+
+To validate the authors' \ref{itm:claim3} that attributes obtained are identifiable by humans, we conduct the two user studies explained in the paper. Both studies (\href{https://docs.google.com/forms/d/e/1FAIpQLSd6gU662t3YoGQI_ks49Qd1AlRU_DrshvjXzuCSQ7Rzy2Alng/viewform?fbzx=2962293837802464858}{Classification} and \href{https://docs.google.com/forms/d/e/1FAIpQLSeW8f7eaCzof2MfGsITEpsnZ2srI4r3GDTrBrYX3BDim4T38A/viewform
+}{Verbal description}) aim to prove that the top extracted attributes are distinct, visually coherent, and can be used as counterfactual explanations. 
+
+The material used for the classification study was obtained by our PyTorch StylEx model on the perceived gender classifier (top 6 attributes), and by the authors' \href{https://explaining-in-style.github.io/supmat.html}{supplementary material}  for the perceived age classifier (top 4 attributes). The verbal description study combines a mixture of attributes from our and the authors' models, explaining Face and Cats/Dogs classifiers. Results for both studies were provided by 30 users (different per study).
+
+Table \ref{tab:user study table} shows that the results we obtain are within a standard deviation of their results; verifying their contribution that StylEx provides attributes that are easily distinguishable by humans. 
+
+Table \ref{tab:top3} depicts the three most common words used, to describe the most prominent attribute that changes in the images (see Appendix \ref{app:classificationstudy}). By inspecting the results, we draw two main conclusions. First, for all coordinates except skin color (i.e. 5\textsuperscript{th} row in Face(age/gender) classifiers), the majority of the users use the same word in their descriptions. Second, the most common word used is different per attribute, proving that each attribute is unique. Our results agree with the results provided in the original paper.
+
+% {\color{red}Often papers do not include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.}
+ 
+\subsection{Reconstruction Generalization}
+
+To further investigate the proposed model, we create new latent variables using images from the FFHQ dataset on our architectures with their pre-trained weights. Then, we use the obtained latent variables to reconstruct the images using our pre-trained generator. Finally, we follow the same process using their architecture and compare the resulting images. Our StylEx reconstructs a clearer image, compared to their model which is more blurred. This may occur because of some differences in the formatting between the frameworks.
+
+\subsection{Training}
+The training proved quite volatile. The $\mathcal{L}_{rec}$ would get stuck in local minima during training. Examples of the images reconstructed by the fully trained model (see Appendix \ref{app:MNIST_Reconstruct}).
+
+Lang et al. experimented with two training regimens. The first regimen was trained using only $E(x)$ as $w$, the inputs to the generator, and the above loss. The second regimen alternated between using $E(x)$ and a randomly generated encoding, $\bar w$. This $\bar w$ is created by applying a mapping network to $z$, where $z \sim \mathcal{N}(0^n,1^n)$ and $n$ is the dimensionality of $w$. For this randomly generated $\bar x' = G(\bar w)$, only the adversarial loss is calculated. Training using $\bar w$ can be viewed as the same as training a vanilla StyleGAN. Because we are unsure which method was used for the results in their paper and notebook, we experimented with both. However, the first regimen was the only one that converged.
+
+Though we were able to train a model, due to time constraints, we were unable to fully investigate \ref{itm:claim1}.
+
+Again due to time constraints, we were unable to run AttFind on the trained model to fully test \ref{itm:claim3}.
+
+\section{Discussion}
+Using the definition of reproducibility\footnote{“reproducibility refers to the ability of a researcher to duplicate the results of a prior study using the same materials as were used by the original investigator”} by the U.S. National Science Foundation (NSF) subcommittee on replicability in science, it is difficult to determine Lang et al.'s reproducibility. All details regarding the experimental setup, such as the hyperparameters, the hours of training, the number of steps, the labels of the datasets, etc. are omitted, thus recreating the exact materials of the original investigators is difficult. Since our definition is an implication and we cannot satisfy the first condition, we cannot determine the reproducibility.
+
+Instead, we will use a looser definition of reproducibility. We will refer to reproducibility as the ability for another researcher to test their claims. We found that, given enough time, the StylEx is seemingly reproducible. However, given a limited time budget such as our own, the paper is not fully reproducible. We, therefore, can only provide unit tests of their claims. The following sections will discuss information from the results section \ref{sec:results} and to what degree they confirm reproducibility claim by claim.
+
+\subsection{Claim 1}
+
+The most difficult claim to investigate, given a limited time budget, is the effect of classifier-based training on the StyleSpace. The original paper trains three models, the StylEx with and without integration of the classifier in training and the StyleGAN v2. We found, once the training algorithm is implemented correctly, just training all three models will take at least 24 hours for 50,000 epochs on one GPU even for the simple MNIST dataset. The authors stated that it took approximately a week to train StylEx with 8GPUs. Over two weeks of training time is beyond our time constraints.
+
+In addition, we observed that training is volatile.\footnote{An example of successful training can be found \href{https://app.labml.ai/run/841a8fde81b511eca9da0242ac1c0002}{here} and one where the model failed to converge {\href{https://app.labml.ai/run/0a2a0af682cd11ec8a010242ac1c0002}{here}}} The reconstruction error stagnates in a local minimum before suddenly dipping. However, the model was not always able to escape the local minima within 50,000 iterations. This suggests that, though their results are likely replicable, their replicability may be stochastic. This again hinders reproducibility when time is limited.
+
+\subsection{Claim 2}
+
+The claim that the authors document the most was \ref{itm:claim2}, their AttFind method. Because the method was implemented in the notebook provided, testing reproducibility was easy. 
+
+We were able to verify that for the perceived age classifier, our model obtains the same top attributes. We conclude that their method can discover the most influential classifier-related attributes.
+
+In addition to their notebook, we modified the AttFind method to find the principal attributes of a single image as shown in Figure \ref{fig:independent method}. This validated the sub-claim of AttFind that StylEx can provide image-specific explanations. Rather than finding the \textit{globally} important attributes, the model can find the \textit{locally} important attributes for a particular image.
+
+\subsection{Claim 3}
+
+The authors claim that StylEx is \textit{applicable} to a variety of real-world problems. Applicability can be interpreted in two different ways. One can interpret it as being \textit{possible} to apply StylEx to a variety of domains, or as \textit{practical} to apply StylEx to a variety of domains. From what we have seen in Figures \ref{fig:top 4 attrs ours}, \ref{fig:independent method}, it is possible to use StylEx for explaining an age classifier, thus it can explain a real-world problem. From Figure \ref{fig:MNIST_Reconstruct} (see Appendix \ref{app:MNIST_Reconstruct}), we found that the StylEx can be trained to, at minimum, reconstruct MNIST data, thus multiple domains.
+
+Though we have found that it is \textit{possible}, we have also found that it is seemingly impractical. Every domain requires the model to be retrained, meaning every domain requires days or weeks of training.
+
+\subsection{What was easy}
+The open-source notebook is very well structured, which combined with the pseudo-code outlined in Algorithm 1 of their paper, made the AttFind method easy to replicate. In addition, the provided pre-trained models helped to derive some of the vague components of StylEx model.
+
+\subsection{What was difficult}
+As we already emphasized, there are many difficulties in reproducing this paper. StylEx is built on top of several previous papers making the knowledge needed for implementation substantial. Lang et al. proposed a model without providing code, that is computationally expensive, and with volatile training behavior. In addition, that is sensitive to hyperparameters, which in our case were unknown.  Even when scaling down the complexity of the model using smaller resolutions, the time cost of training exceeds what was feasible with our time constraints.
+
+Taking shortcuts to subvert these difficulties had a multitude of challenges. We found loading weights from TensorFlow to PyTorch deceptively complex and far from trivial due to differences between the frameworks. Even evaluating their notebook came with difficulties as the dataset they trained on FFHQ does not officially have labels, so the details of their dataset were unknown.
+
+
+\subsection{Future Work}
+
+The primary goal of this paper was to reproduce the work of Lang et al., however, through reimplementing their code, we found two open avenues for future research. Firstly, the paper focused on general image explanations but did not show examples of misclassified data. It would be interesting to see what insights can be obtained through StylEx. Secondly, the paper compared StylEx only with StyleGAN v2 models. AttFind seems applicable to general autoencoders, and not specific to GANs. Viewing StylEx as an autoencoder, rather than a GAN seems like a promising angle for scalability to a similar counterfactual generator. 
