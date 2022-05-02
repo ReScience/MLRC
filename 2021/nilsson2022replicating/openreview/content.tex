@@ -54,7 +54,7 @@ The real GAN knowledge extraction happens in the final network, the \textbf{Offs
 Paired with $G$, this allows the creation of new realistic samples $\Tilde{\textbf{I}}_i = G(\textbf{w}^{'}_{i})$ with new view and lighting directions, denoted \textit{projected samples}.
 The projected samples then serve as extended training data, providing multiple view-light direction variations of the original image.
 
-To use the components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and $\textbf{a}$ to obtain a reconstructed image, the authors utilize a pretrained neural renderer developed by \textcite{neural-renderer}, which we denote by $\Phi$.
+To use the components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and $\textbf{a}$ to obtain a reconstructed image, the authors utilize a pre-trained neural renderer developed by \textcite{neural-renderer}, which we denote by $\Phi$.
 % This allows the rendering of images given the components while retaining the ability to back-propagate through it.
 % The neural renderer is pre-trained and is not in itself optimized during our training.
 
@@ -62,7 +62,7 @@ To use the components $\textbf{v}$, $\textbf{l}$, $\textbf{d}$ and $\textbf{a}$ 
 \label{sec:train}
 The training process of this method can be divided into 3 different steps, where the different networks involved are trained separately. In the original paper, these steps are done sequentially and for one image at a time, as shown in \autoref{fig:oldtrainerFlowchart}, and each step is repeated multiple times before moving into the following one. The result is a model that can predict the depth map for only one image. All of the networks are trained using the Adam optimization algorithm.
 
-\textbf{Prior pretraining.} Before attempting to learn the true shape of an object, the depth network is initialized by pretraining it on a fixed prior shape. 
+\textbf{Prior pre-training.} Before attempting to learn the true shape of an object, the depth network is initialized by pre-training it on a fixed prior shape. 
 % It means we provide a fixed shape as a target depth map and optimize the network to predict this shape for the given input image. 
 For this purpose \textcite{gan2shape} propose to use an \textit{ellipsoid} shape as the shape prior. 
 % The origin and size of the ellipsoid are controlled by an external parsing model developed by \textcite{zhao2017pyramid}. This parsing model detects and labels (with a score) each pixel in the image as an object. Using the parsing model it is possible to extract the object we are considering from the background. \textcite{gan2shape} use the mask returned by the parsing model to determine the location and size of the ellipsoid and align it with the object depicted in the image\footnote{See the original paper/source code by \textcite{gan2shape} for further details}. This initialization is thought to bring the network ``closer" to the true shape, reducing the number of iterations required for convergence. Seeing as the number of possible depth configurations that could yield a particular image when projected onto two dimensions is infinite, we speculate it may also be \textit{required} to obtain reasonable depth map reconstructions (supported by our experiments, see \ref{sec:results_priors}), acting as a strong prior that guides the reconstruction toward a shape we would expect. 
@@ -113,8 +113,8 @@ For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}
     \tikzstyle{predblock}=[block, fill=red!30]
     \tikzstyle{arrow}=[thick,->,>=stealth]
     \node[datablock] (traindata) {Single image};
-    \node[block, right of=traindata, anchor=west, xshift=1cm] (pretrain) {Prior pretraining};
-    \node[block, right of=pretrain, anchor=west, xshift=1cm] (step1) {Step 1};
+    \node[block, right of=traindata, anchor=west, xshift=1cm] (pre-train) {Prior pre-training};
+    \node[block, right of=pre-train, anchor=west, xshift=1cm] (step1) {Step 1};
     \node[block, below of=step1, anchor=north] (step2) {Step 2};
     \node[block, below of=step2, anchor=north] (step3) {Step 3};
     
@@ -126,8 +126,8 @@ For each $\textbf{I}_{i}^{'}$ we predict $\Delta \textbf{w}_i = E(\textbf{I}_{i}
     \node[predblock, text width=3cm, below of=model, anchor=north](pred){Predict depth map for \textit{one} image.};
     
     
-    \draw[arrow] (traindata) -- (pretrain);
-    \draw[arrow] (pretrain) -- (step1);
+    \draw[arrow] (traindata) -- (pre-train);
+    \draw[arrow] (pre-train) -- (step1);
     \draw[arrow] (step1) -- (step2);
     \draw[arrow] (step2) -- (step3);
     \draw [arrow] (step1.east)arc(160:-160:0.2);
@@ -176,12 +176,12 @@ The last prior we tested is obtained by normalizing the score (or ``confidence")
 
 \subsection{Generalized Training Procedure}
 \label{sec:method-general}
-Given the single-use nature of the model obtainable with the original training procedure, we decided to develop an alternative training procedure to favor a general model $M^*$ usable for all images belonging to the same distribution as the training dataset $\mathcal{D}$. We propose to pretrain the depth net $D$ on all images first, instead of repeating the process for each image. We also modify Step 1, 2 and 3 by greatly lessening the number of iterations given to a single image and breaking up the sequential training of the original method into a few iterations per example, and instead introducing $N_e$ \textit{epochs} and batch training to compensate, increasing resource utilization and training speed. %
+Given the single-use nature of the model obtainable with the original training procedure, we decided to develop an alternative training procedure to favor a general model $M^*$ usable for all images belonging to the same distribution as the training dataset $\mathcal{D}$. We propose to pre-train the depth net $D$ on all images first, instead of repeating the process for each image. We also modify Step 1, 2 and 3 by greatly lessening the number of iterations given to a single image and breaking up the sequential training of the original method into a few iterations per example, and instead introducing $N_e$ \textit{epochs} and batch training to compensate, increasing resource utilization and training speed. %
 %
-% \textbf{Prior pretraining.} In the original training procedure (see \autoref{fig:oldtrainerFlowchart}), the depth net $D$ is repeatedly pretrained on the prior shape each time we process a new image. 
-% We believe that this is partly at fault for the poor predictions $D_{t \neq i}(\textbf{I_i})$ because it acts as a "soft reset" of the depth network. Even though it performs the pretraining for a new image example, 
+% \textbf{Prior pre-training.} In the original training procedure (see \autoref{fig:oldtrainerFlowchart}), the depth net $D$ is repeatedly pre-trained on the prior shape each time we process a new image. 
+% We believe that this is partly at fault for the poor predictions $D_{t \neq i}(\textbf{I_i})$ because it acts as a "soft reset" of the depth network. Even though it performs the pre-training for a new image example, 
 % Our experiments indicate this procedure destroys some of the knowledge obtained while training on the previous images and moves the depth predictions back closer to the prior shape.
-% We instead propose to perform the prior pretraining one-time only on \textit{all} images before proceeding to the other training steps. This has the added benefit of allowing mini-batch training which improves training speed.
+% We instead propose to perform the prior pre-training one-time only on \textit{all} images before proceeding to the other training steps. This has the added benefit of allowing mini-batch training which improves training speed.
 % \textbf{Steps 1, 2 and 3.} We modify the steps primarily
 %
 % We argue that sequentially training the model like the original training loop, image by image, will most likely lead it to first learn a local minimum only tenable to the first image (overfit). We believe this both makes for an unfavorable initialization when proceeding to the next image, and also that it is partly at fault for forgetting the previous images, as the last e.g. $5300$ iterations are spent on only one example $\textbf{I}_{i=t}$ with no revisiting of the previous images $\textbf{I}_{i<t}$. 
@@ -203,16 +203,16 @@ To facilitate understanding of our modifications to the training procedure, we p
     \tikzstyle{predblock}=[block, fill=red!30]
     \tikzstyle{arrow}=[thick,->,>=stealth]
     \node[datablock] (traindata) {Training dataset};
-    \node[block, right of=traindata, anchor=west, xshift=1cm] (batch_pretrain) {Extract batch};
-    \node[block, right of=batch_pretrain, anchor=west, xshift=1cm] (pretrain) {Prior pretraining};
-    \node[block, right of=pretrain, anchor=west, xshift=1cm] (extrbatch) {Extract batch};
+    \node[block, right of=traindata, anchor=west, xshift=1cm] (batch_pre-train) {Extract batch};
+    \node[block, right of=batch_pre-train, anchor=west, xshift=1cm] (pre-train) {Prior pre-training};
+    \node[block, right of=pre-train, anchor=west, xshift=1cm] (extrbatch) {Extract batch};
     \node[block, right of=extrbatch, anchor=west, xshift=1cm] (step1) {Step 1};
     \node[block, right of=step1, anchor=west, xshift=1cm] (extrim) {Extract image};
     \node[block, below of=extrim, anchor=north] (step2) {Step 2};
     \node[block, below of=step2, anchor=north] (step3) {Step 3};
     
     \node[transpblock, inner xsep=30pt, inner ysep=20pt,
-    fit=(batch_pretrain) (pretrain)] (pretrainblock) {};
+    fit=(batch_pre-train) (pre-train)] (pre-trainblock) {};
     
     \node[transpblock, inner xsep=30pt, inner ysep=20pt,
     fit=(extrim) (step2) (step3)] (imblock) {};
@@ -227,9 +227,9 @@ To facilitate understanding of our modifications to the training procedure, we p
     
     \node[predblock, text width=3cm, below of=model, anchor=north](pred){Predict depth map $\forall$ images in the category.};
     
-    \draw[arrow] (traindata) -- (batch_pretrain);
-    \draw[arrow] (batch_pretrain) -- (pretrain);
-    \draw[arrow] (pretrain) -- (extrbatch);
+    \draw[arrow] (traindata) -- (batch_pre-train);
+    \draw[arrow] (batch_pre-train) -- (pre-train);
+    \draw[arrow] (pre-train) -- (extrbatch);
     \draw[arrow] (extrbatch) -- (step1);
     \draw[arrow] (step1) -- (extrim);
     \draw[arrow] (extrim) -- (step2);
@@ -241,7 +241,7 @@ To facilitate understanding of our modifications to the training procedure, we p
     \draw[arrow] (epochblock) -- (model);
     \draw[arrow] (model) -- (pred);
     
-    \node[label, anchor = south west] at (pretrainblock.north west) {$\times N_{\mathcal{B}}$ };
+    \node[label, anchor = south west] at (pre-trainblock.north west) {$\times N_{\mathcal{B}}$ };
     \node[label, anchor = south west] at (imblock.north west) {$\times$ batch size};
     \node[label, anchor = south west] at (batchblock.north west) {$\times N_{\mathcal{B}}$ };
     \node[label, anchor = south west] at (epochblock.north west) {$\times N_{e}$};
@@ -257,7 +257,7 @@ We aimed to reproduce the authors' results on the LSUN Car, LSUN Cat~\cite{yu201
 \label{sec:hyperparams}
 For replication purposes, the original hyperparameters by \textcite{gan2shape} were used, but we also tried tuning some parameters that we believe are key to the method: the number of projected samples, $N_p$, for each image and the number of epochs for pre-training the depth network. $N_p$ was varied within $\{2, 4, 8, 16, 32\}$. In our tests we found the values 4, 8 and 8, respectively for the LSUN Car, LSUN Cat and CelebA dataset, to be the threshold after which the improvements in image quality start greatly decreasing (see \autoref{app:hyperparams-tuning} in Appendix for more details).
 
-The number of epochs for the depth network pretraining was varied within $\{100,\allowbreak 500,\allowbreak 1000,\allowbreak 2000\}$. This pretraining affects how irregular the depth map predictions are. We believe that using a threshold for the loss to check the convergence would be preferable as the number of epochs selected by the authors (1000) is enough in most cases but not in all. We attribute irregularity in some of our results to this issue.
+The number of epochs for the depth network pre-training was varied within $\{100,\allowbreak 500,\allowbreak 1000,\allowbreak 2000\}$. This pre-training affects how irregular the depth map predictions are. We believe that using a threshold for the loss to check the convergence would be preferable as the number of epochs selected by the authors (1000) is enough in most cases but not in all. We attribute irregularity in some of our results to this issue.
 \subsection{Experimental setup and code}
 For each dataset we run our implementation of the framework from \textcite{gan2shape} on the images that were selected by the authors, the procedure saves a checkpoint for each network. These checkpoints are later fed the original image to get the generated result. The evaluation of the results was only qualitative as all the datasets we explored do not have a ground truth for comparison. We instead relied on a manual evaluation.
 
@@ -379,7 +379,7 @@ The third experiment conducted on the CelebA dataset shows that most of the face
 \subsection{Results beyond the original paper}
 \subsubsection{The effects of shape priors}
 \label{sec:results_priors}
-The original paper did not specify the exact reasons for choosing an ellipsoid prior for the pretraining of the depth net, therefore we decided to experiment with multiple prior shapes as well as no prior shape.
+The original paper did not specify the exact reasons for choosing an ellipsoid prior for the pre-training of the depth net, therefore we decided to experiment with multiple prior shapes as well as no prior shape.
 
 \textbf{No prior.} With the goal of assessing the results of this method when no prior shape is given, we ran a test on one image from the LSUN Car dataset without any prior pre-training, and with random initialization. The reconstruction objective is still satisfied very well, but it has converged to an extremely noisy depth map (see \autoref{fig:no_prior} in \autoref{app:priors} in the appendix). This briefly shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
 % This is intuitively expected, because the network has to choose from infinite depth configurations that could lead to the image when projected onto 2D, and it shows that this method would not work without a strong shape prior to guide it towards a reasonable shape.
@@ -450,7 +450,7 @@ We demonstrate the results of our new training loop on LSUN Cat. We note again t
 
 \subsubsection{Improved initialization}
 \label{sec:init_iter}
-Our final experiment is inspired by the observation of the dependency of the method to the number of pseudo-samples $N_p$ and the variability that follows in the results depending on their quality. We experiment with drastically increasing this number from 16 to 128 for 10 short epochs, in which each training step is performed only once. We observe see marginal improvement in the predicted shape (\autoref{fig:init_iter_general}) and larger improves in the smaller details/features. See the \autoref{app:init-iter} in the appendix for further detail.
+Our final experiment is inspired by the observation of the dependency of the method to the number of pseudo-samples $N_p$ and the variability that follows in the results depending on their quality. We experiment with drastically increasing this number from 16 to 128 for 10 short epochs, in which each training step is performed only once. We observe marginal improvement in the predicted shape (\autoref{fig:init_iter_general}) and larger improvements in the smaller details/features. See the \autoref{app:init-iter} in the appendix for further detail.
 
 Training step 1 was not changed and it is allowed to converge in the first stage, as it does not involve the projected samples. See \autoref{tab:init_iter_single} in the appendix for an exact description of the number of iterations. All other parameters were left as in \autoref{sec:results_priors}, with the smoothed box prior. We experimented with two of the worst performers from the LSUN Cat dataset to evaluate whether this method could improve the results, see \autoref{fig:init_iter_single}. We applied the same idea to the general model described in sections \ref{sec:method-general}, \ref{sec:general} and saw improvements, see \autoref{fig:init_iter_general}. The results can be compared to \autoref{fig:gen_LSUN_Cat_train}.
 \begin{figure}[!htb]
