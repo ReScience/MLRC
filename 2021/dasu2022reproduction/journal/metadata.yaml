@@ -2,136 +2,117 @@
 # -------------------------------------------------------
 
 # Title of the article:
-#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+# Change the default title
+title: "[Re] GANSpace: Discovering Interpretable GAN Controls"
 
 # List of authors with name, orcid number, email and affiliation
-# Affiliation "*" means contact author
+# Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
-    
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Vishnu Asutosh Dasu
+    orcid: 0000-0002-1849-1288
+    email: vishnu98dasu@gmail.com
+    affiliations: 1,*
+
+  - name: Midhush Manohar T.K.
+    orcid: 0000-0003-1044-8709
+    email: mimosk25@gmail.com
+    affiliations: 2      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
+    name:    TCS Research and Innovation
+    address: Bangalore, India
   - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
-  - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
-  - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+    name:    Akamai Technologies, Inc.
+    address: Bangalore, India
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords:  rescience c, machine learning, deep learning, python, tensorflow, numpy, gans, image synthesis
 
-# Code URL and DOI (url is mandatory for replication, doi after acceptance)
-# You can get a DOI for your code from Zenodo,
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
-  - doi: 
+  - url: https://github.com/midsterx/ReGANSpace
+  - doi: 10.5281/zenodo.6511501
+  - swh: 
 
-# Date URL and DOI (optional if no data)
+# Data URL and DOI (optional if no data)
 data:
   - url:
   - doi:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
- - doi:  # Regular digital object identifier
+ - cite: "E. Härkönen, A. Hertzmann, J. Lehtinen, and S. Paris. “GANSpace: Discovering Interpretable GAN Controls.” In: Proc. NeurIPS. 2020."
+ - bib:  GANSpace
+ - url:  https://arxiv.org/pdf/2004.02546.pdf
+ - doi:  10.48550/arXiv.2004.02546 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "This work undertakes a reproducibility study to validate the claims and reproduce the results presented in GANSpace: Discovering Interpretable GAN Controls which was accepted at NeurIPS 2020. GANSpace is a technique to create interpretable controls for image synthesis in an unsupervised fashion using pretrained GANs and Principal Component Analysis (PCA). The authors claim that layer wise perturbations along the principal directions identifying using PCA applied on the latent or feature space can be used to define a large number of interpretable controls that affect, both, low and high level features of the image such as lighting attributes, facial attributes, and object pose and shape. In our study, we primarily focus on reproducing results on the StyleGAN and StyleGAN2 models and also present additional results which were not in the original paper."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
-  
+
 # Type of the article
 # Type can be:
 #  * Editorial
 #  * Letter
 #  * Replication
-type: Editorial
+type: Replication
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2021
 
 # Coding language (main one only if several)
-language:
+language: Python
 
-  
+
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review: 
-  - url: 
+review:
+  - url: https://openreview.net/forum?id=BtZVD2f7n0F
 
 contributors:
-  - name:
-    orcid: 
+  - name: Koustuv Sinha
+    orcid:
     role: editor
-  - name:
+  - name: Anonymous Reviewers
     orcid:
     role: reviewer
   - name:
     orcid:
     role: reviewer
+
 
 # This information will be provided by the editor
 dates:
-  - received:  November 1, 2018
-  - accepted:
-  - published: 
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
 
 # This information will be provided by the editor
 article:
-  - number: # Article number will be automatically assigned during publication
-  - doi:    # DOI from Zenodo
-  - url:    # Final PDF URL (Zenodo or rescience website?)
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
 
 # This information will be provided by the editor
 journal:
   - name:   "ReScience C"
   - issn:   2430-3658
-  - volume: 4
+  - volume: 9
   - issue:  1
