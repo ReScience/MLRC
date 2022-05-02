@@ -110,16 +110,14 @@ The original codebase uses the implementation of both models from the repository
 
 \subsection{Hyperparameters}
 
-For policy search, we used $C_{max} = 1500$ and \emph{max policies} equal to 10. The batch size was 128, and the number of transforms in policy was 3.
+For the policy search, we set $C_{max} = 1500$ and \emph{max policies} equal to 10. The batch size was $128$, and the number of transforms in policy was $3$.
 
-For training, the batch size was also 128 and the number of epochs was 60 (see Section \ref{section:computational-requirements}). To obtain a semi-trained network, we used a subset of 10\% of the training dataset. The attack is performed on image with index $0$, and we reused the remaining setups according to the original paper e.g. "inversed" (default attack). Except for Figure \ref{fig:2}, where a default config was used, with a number of maximum iterations changed to 2500.
-
-Further experiments were run using the same settings.
+For training, the batch size was also $128$ and the number of epochs was $60$ (see Section \ref{section:computational-requirements}). To obtain a semi-trained network, we used a subset of $10\%$ of the training dataset. Attacks are performed on the first six images of the test set, and we used the configurations as described in the original paper. An exception is the experiment that led to Figure \ref{fig:2}, where the original configuration was unclear.
 
 \subsection{Computational requirements}
 \label{section:computational-requirements}
-We ran our experiments using Nvidia GeForce GTX 1080 GPU. The policy search took approximately 10 hours. The training of one model took approximately 2h 40min using the original approach. However, training for 60 epochs achieves the same accuracy but in 50 minutes. It is because there exist periods of plateau, while lr is not scheduled yet to drop. One attack with 2500 iterations took approximately 5 minutes, so measuring the correlation between $S_{pri}$ and PSNR took 8.5 hours (with policy search).
 
+We ran our experiments using an Nvidia GeForce GTX 1080 GPU. The policy search took approximately $10$ hours. The training of one model took approximately 2h 40min using the original approach. However, training for $60$ epochs achieves the same accuracy in only $50$ minutes by reducing the learning rate sooner, thereby skipping long periods of stagnation. Performing one reconstruction attack in $2500$ iterations took approximately $5$ minutes. Measuring the correlation between $S_{pri}$ and PSNR therefore took $8.5$ hours (including policy search).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EXPERIMENTS AND RESULTS %
