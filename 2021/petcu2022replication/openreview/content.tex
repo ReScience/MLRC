@@ -1,0 +1,417 @@
+\section{Reproducibility Summary}
+
+\section*{\centering Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+This report aims to reproduce the results in the paper \textit{Fairness and Bias in Online Selection} \cite{correa21}. The paper presents optimal and fair alternatives for existing Secretary and Prophet algorithms. Reproducing the paper involves validating three claims made by the authors \cite{correa21}: (1) The presented baselines are either unfair or have low performance, (2) The proposed algorithms are perfectly fair, and (3) The proposed algorithms perform comparably to or even better than the presented baselines.
+
+\subsection*{Methodology}
+
+We recreate the algorithms and perform experiments to validate the authors' initial claims for both problems under various settings, with the use of both real and synthetic data. The authors conducted the experiments in the C++ programming language. We mainly used the paper as a resource to reimplement all algorithms and experiments from scratch in Python, only consulting the authors' code base when needed.
+
+\subsection*{Results}
+
+For the Multi-Color Secretary problem, we were able to recreate the outcomes, as well as the performance of the proposed algorithm (with a margin of 3-4\%). However, one baseline within the second experiment returned different results, due to inconsistencies in the original implementation. In the context of the Multi-Color Prophet problem, we were not able to exactly reproduce the original results, as the authors ran their experiments with twice as many runs as reported. After correcting this, the original outcomes are reproduced.
+
+A drawback of the proposed prophet algorithms is that they only select a candidate in 50-70\% of cases. None results are often undesirable, so we extend the paper by proposing adjusted algorithms that pick a candidate (almost) every time. Furthermore, we show empirically that these algorithms maintain similar levels of fairness.
+
+\subsection*{What was easy}
+
+The paper provides pseudocode for the proposed algorithms, making the implementation straightforward. More than that, recreating their synthetic data experiments was easy due to providing clear instructions.
+
+\subsection*{What was difficult}
+However, we did run into several difficulties: 1) There were a number of inconsistencies between the paper and the code, 2) Several parts of the implementation were missing in the code base, and 3) The secretary experiments required running the algorithm over one billion iterations, which makes verifying its results within a timely manner difficult.
+
+\subsection*{Communication with original authors}
+The authors of the original paper were swift in their response with regard to our findings. Our main allegations regarding inconsistencies in both the Secretary and Prophet problems were confirmed by the authors. 
+
+
+\subsection{Submission Checklist}
+
+Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+
+\begin{itemize}
+\item Title should start with "\texttt{[Re]}"
+\item Author information, along with ORCID id
+\item Author affiliations
+\item Code URL, Software Heritage Foundation link
+\item Abstract
+\item Review URL (the OpenReview URL of your report)
+\end{itemize}
+
+\subsection{Continuous Integration}
+
+We use Github Actions CI to check your submission and compile the pdf file subsequently.
+You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+
+\clearpage
+
+\section{Content}
+
+\section{Introduction}
+
+Online selection is challenging, as candidates arrive sequentially and decisions need to be made with incomplete information. Such problems affect our lives in a profound way. Algorithmic credit scores determine who receives a mortgage or who can start a business. Automatic systems even decide who receives an organ transplant or who has priority in being admitted to an Intensive Care Unit. The growing importance of algorithms has prompted concerns about fairness alongside efficiency. Addressing these issues is essential.
+
+% commented out this alinea and added proposed alternative below:
+% In the paper "Fairness and Bias in Online selection" \cite{correa21} three fair selection algorithms are presented to be applied to the  domain of online selection. In particular, they make use of two well-known problems from the literature: the Secretary and the Prophet problems. Research has long focused on the performance of such algorithms, but fairness was not a consideration until recently.\cite{buchbinder2014secretary,Cayci2020} The authors of this paper aim to fill this gap. They consider an algorithm fair when "the solution obtained is balanced with respect to some sensitive attribute (e.g. nationality, race, gender)" \cite{correa21}. This notion is consistent with previous work \cite{ Celis_a, Celis_b, Celis_c, Chierichetti2017,Chierichetti2019, halabi}. More precisely, algorithms are considered fair when they respect the prior probability $p$ that the best candidate belongs to a certain group.
+
+% Alternative for alinea above:
+ Research has long focused on the performance of such algorithms, but fairness was not a consideration until recently.\cite{buchbinder2014secretary,Cayci2020} The paper "Fairness and Bias in Online selection" \cite{correa21} aims to fill this gap. The authors propose three fair selection algorithms for the  domain of online selection. In particular, they focus on two well-known problems from the literature: the Secretary and the Prophet problems.
+
+
+The aim of this study is to validate the claims made in the paper and see if their results can be reproduced. Furthermore, we propose an adjusted version of their prophet algorithms, in order to reduce the number of occurrences where the algorithm does not pick any candidate.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+The focus of our study is to empirically verify the claims of the paper. The mathematical proofs and theorems lie outside our scope. The authors of the original paper propose three online algorithms, namely one Multi-Color Secretary and two Multi-Color Prophet approaches that are both fair and efficient. They also present several existing baseline algorithms. The main empirical claims of the paper are:
+
+\begin{enumerate}[a)]
+    \item The used baselines are either unfair or have low performance.
+    \item The proposed algorithms are perfectly fair.
+    \item The proposed algorithms perform comparably or even better than the presented baselines.
+\end{enumerate}
+
+
+These claims are supported by experiments where all algorithms select a candidate based on a variety of datasets. The original authors consider an algorithm fair when "the solution obtained is balanced with respect to some sensitive attribute (e.g. nationality, race, gender)" \cite{correa21}. This notion is consistent with previous work \cite{ Celis_a, Celis_b, Celis_c, Chierichetti2017,Chierichetti2019, halabi}. More precisely, algorithms are considered fair when they respect the prior probability $p$ that the best candidate belongs to a certain group. Performance is defined as the probability of selecting the optimal candidate (in the Secretary setting) and the average value of the selected candidate (in the Prophet setting). 
+
+We validate their claims by recreating the algorithms and experiments from scratch in Python. We use the description in the paper as a guideline, referring to the original code only when necessary.
+
+\section{Methodology}
+
+\subsection{The Secretary Algorithm}
+
+\begin{minipage}{0.46\textwidth}
+\textbf{Algorithm \ref{alg:secretary}} describes the original authors' fair secretary algorithm. Candidates appear in increasing order of their arrival time $\tau$. The algorithm calculates one threshold $t \in [0,1]^k$ per group $c$, using Formula \ref{eq:arrival_time_sec}.
+
+\begin{equation}
+\label{eq:arrival_time_sec}
+\begin{split}
+t_k^* &= (1 - (k - 1)p_k)^{\frac{1}{k-1}} \\
+t_j^* &= t_{j+1}^* \left( \frac{\sum_{r=1}^j \frac{p_r}{j-1} - p_j}{\sum_{r=1}^j \frac{p_r}{j-1} - p_{j+1}} \right)^{\frac{1}{j-1}},for\;\;2\leq j \leq k - 1 \\
+t_1^* &= t_2^* \cdot e^{\frac{p_2}{p_1} - 1}
+\end{split}
+\end{equation}
+\end{minipage}
+\hfill
+\begin{minipage}{0.46\textwidth}
+\begin{algorithm}[H]
+\caption{Fair Secretary}\label{alg:secretary}
+\begin{algorithmic}
+\State \textbf{Input: t} $\in [0,1]^k $, a time threshold per group
+\State $\qquad \>\>\>$ n candidates scores
+\State \textbf{Output: }$i \in [n]$, index of chosen candidate
+\State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+\State $\quad$ \textbf{if} $\tau_{i^{\prime}} > t_{c(i)}$ \textbf{then}
+\State $\qquad$ \textbf{if} \textit{i} \succ \max \left\{i^{\prime} \mid \tau_{i^{\prime}} \leq \tau_{i}, c\left(i^{\prime} \mid\right)=c(i)\right\} \textbf{then}\\
+\State $\qquad \quad$ \textbf{return} \textit{i}
+\State $\qquad$ \textbf{end}
+\State $\quad$\textbf{end}
+\State \textbf{end}
+\State
+\end{algorithmic}
+\label{alg:fair_secretary}
+\end{algorithm}
+\end{minipage}
+
+
+This threshold determines from which point the algorithm could pick a candidate. Once the thresholds are computed, they are used as input to Algorithm \ref{alg:fair_secretary} along with the data. The algorithm will return its best candidate.
+
+\subsection{Prophet algorithm}
+In contrast to the secretary setting, the prophet algorithm knows the distribution that the scores are drawn from. Furthermore, all prophet experiments occur in a setting where each candidate is in a unique group, meaning each group has a size of one. This constraint aims to create an algorithm that gives candidates in each arrival position the same probability of being picked. Each group represents a position in the queue and arrival order of the candidates in this problem is not random. 
+
+The original authors consider two settings in their paper: one where each candidate is drawn from a separate distribution, and one where the scores are i.i.d.. Pseudocode for both models is illustrated in Algorithms\footnote{Since the original authors refer to Algorithm 2  as the Fair General Prophet and FairPA interchangeably, it makes sense for us to do the same.} \ref{alg:fair_prophet} and \ref{alg:iid_prophet}. 
+
+\begin{minipage}[t]{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+   \caption{Fair General Prophet}\label{alg:fair_prophet}
+\begin{algorithmic}
+\State \textbf{Input: }$F_1 ... F_n$, distributions 
+\State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
+\State $\qquad \>\>\>\>$ n candidates scores
+\State \textbf{Output: }$i \in [n]$, index of chosen candidate
+\State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+\State $\quad$ \textbf{if} $v_{i} \geq F_{i}^{-1} \left (1 - \frac{q_{i} / 2}{1-s / 2}\right)$ \textbf{then}
+\State $\qquad$ \textbf{return} \textit{i}
+\State $\quad$\textbf{end}
+\State $\quad s \leftarrow s+q_{i}$
+\State \textbf{end}
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+  \caption{Fair IID Prophet}\label{alg:iid_prophet}
+\begin{algorithmic}
+\State \textbf{Input: }$F_1 ... F_n$, distributions 
+\State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
+\State $\qquad \>\>\>\>$ n candidates scores
+\State \textbf{Output: }$i \in [n]$, index of chosen candidate
+\State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+\State $\quad$ \textbf{if} $v_{i} \geq F^{-1}\left(1-\frac{2 / 3 n}{1-2(i-1) / 3 n}\right)$ \textbf{then}
+\State $\qquad$ \textbf{return} \textit{i}
+\State $\quad$\textbf{end}
+\State \textbf{end}
+\State
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+
+\subsection{Evaluation metrics}\label{section:evluation_metrics}
+For evaluating the experiments, the authors set several metrics that reflect both the fairness and efficacy of their study. For the Secretary algorithm they report the number of candidates picked by each model, the number of times the chosen candidates correspond to the maximum value $max\;C_j$ within their group, and the probability of choosing the maximum $max\;C$ from the data. Meanwhile, the Prophet algorithms are compared based on the balance in selection rates across arrival order and the average value of the picked candidates.
+
+
+\section{Code implementation}
+Implementation of the experiments was done in Python, making use of the descriptions in the paper and the published code base \footnote{Original code:  \url{https://github.com/google-research/google-research/tree/master/fairness_and_bias_in_online_selection}. Our full implementation is open-sourced and can be found on: \url{https://github.com/pimpraat/FACT-Ai}}. The original authors conducted their experiments in C++. The code was factorized neatly into different files for retrieving the data, implementation of algorithms and experiments.
+
+We were largely able to reproduce all of the code. However, three important elements of the code were lacking:
+\begin{itemize}
+    \item the experiments on the prophet algorithms
+    \item the production of plots and summary statistics of both experiments
+    \item the data preprocessing for real datasets
+\end{itemize}
+Due to these issues, we were unable to review the exact settings of the experiments. This made it difficult to determine the reason behind different results in our reimplementation. Details are expanded on in the following section. As a consequence, we contacted the authors for further specifications of their approach.
+
+Moreover, the naming of the baselines and proposed algorithms in the original implementation is inconsistent with the naming in the paper. The original papers of the baselines were needed to figure out the used naming conventions. 
+
+Lastly, it is important to note that our implementation does not utilise GPUs or parallelisation because we have sequential process. Therefore the results could not be sped up using high performance clusters. As a result, one of our experiments could not be run in a timely manner as it took over 40 hours for $1/5$ of the data.
+
+
+\section{Experimental setup}
+
+\subsection{Secretary problem}
+\textbf{Data:}
+The paper uses four different datasets for the Secretary problem, out of which two are synthetic. For each dataset, the algorithm runs 20,000 times. 
+
+For the first dataset we divide candidates into four groups with $10$, $100$, $1000$, and $10,000$ occurrences. The probability \textit{p} of the best candidate coming from this group is the same for all colors, namely ($p=.25$). In the second setting, this condition is changed and group probabilities differ: $p = (.3, .25, .25, .2)$. Thirdly, the authors use a dataset of phone calls made by a Portuguese banking institution \cite{Moro2014}. For the purpose of this experiment, the score is the length of the phone call. The group probabilities are set to be equal ($p=.2$). Lastly, the algorithm is tested on a dataset of influencers of the social network ‘Pokec’\cite{Takac2012}. The influencers' score is their number of followers and they are divided into five groups with equal probability: ($p=.2$) for each group.
+\\ \\
+\textbf{Baselines:}
+The authors test their fair Secretary algorithm by contrasting it to two baselines. \textbf{Secretary algorithm (SA)} computes the maximum score value assigned in the first $1/e$ part of the arrival sequence of the candidates. After that, it compares the rest of the values with the aforementioned picked one and returns the maximum value across the whole streamline. It does not consider a candidate's group. The \textbf{Single-color secretary algorithm (SCSA)} selects a color with a probability proportional to the provided values of $p$, and then considers only candidates of that color.
+
+\subsection{Prophet problem}
+\textbf{Data:} 
+The prophet algorithms are tested on two synthetic datasets. In the original paper, each algorithm runs $50,000$ times. In the first experiment, $50$ samples are drawn from a uniform distribution $[0,1]$. In the second experiment, $1000$ samples are drawn from a binomial distribution with $1000$ trials and probability of success of $1/2$.
+\\ \\
+\textbf{Baselines:}
+The authors compare their devised algorithms with four baseline algorithms: First, the \textbf{SC algorithm} \cite{SamualCahn1984}, which places a single threshold such that it finds a candidate 50\% of the time. Second, the \textbf{EHKS algorithm }\cite{Ehsani2017} where each candidate is selected with probability $\frac{1}{n}$. Thirdly,  the \textbf{CFHOV algorithm} \cite{correa21b}, which uses a succession of thresholds derived from the probabilities that  candidates are accepted. Lastly, the \textbf{DP algorithm} \cite{Chow1971} that uses a differential equation to create thresholds. This last algorithm is excluded from their plots, as it is so unbalanced that it distorts the readability of the graph.
+
+During implementation we noticed that both the SC and EHKS algorithms were significantly quicker. This is due to their property of using a constant calculated threshold for each run of the algorithm, instead of recalculating the threshold after seeing each candidate.
+
+\section{Replication of results}
+
+\subsection{Secretary problem}
+
+\begin{figure}[h!]
+  \begin{minipage}{\linewidth}
+      \centering
+      \begin{minipage}{0.45\linewidth}
+          \begin{figure}[H]
+              \includegraphics[width=\linewidth]{Images/iteration6_synthetic1.png}
+          \end{figure}
+      \end{minipage}
+      \begin{minipage}{0.45\linewidth}
+          \begin{figure}[H]
+              \includegraphics[width=\linewidth]{Images/iteration6_synthetic2.png}
+          \end{figure}
+      \end{minipage}
+      \begin{minipage}{0.45\linewidth}
+          \begin{figure}[H]
+              \includegraphics[width=\linewidth]{Images/iteration6_bankdata.png}
+          \end{figure}
+      \end{minipage}
+      \begin{minipage}{0.45\linewidth}
+          \begin{figure}[H]
+              \includegraphics[width=\linewidth]{Images/pokec_our_results.png}
+          \end{figure}
+      \end{minipage}
+  \end{minipage}
+  \caption{This plot contains our replication of the results for all four experiments, each one with a different dataset. Within each graph, there are 7 blocks of bars. The first one represents the group sizes of the colors we consider. The next two are called F-Pick and F-Max which illustrate the number of elements picked and the number of maximum among the elements picked by the Multi-Color Secretary Algorithm (MCSA). The same goes for U-Pick and U-Max which are representative of the plain Secretary Algorithm (SA). Lastly, S-Pick and S-Max illustrate the results of the Single-Color Secretary Algorithm (SCSA).}
+  \label{fig:secretary_results}
+\end{figure}
+
+Figure \ref{fig:secretary_results} shows the results of the Secretary experiments from our implementation. Our algorithm is equally fair and appears to pick the optimal candidate with roughly the same frequency in three out of four experiments. The results from the original paper can be found in the Appendix (Figure \ref{fig:secretary_original_results}). Table \ref{tbl:results_comparison} shows the evaluation metrics (as described in section \ref{section:evluation_metrics})  for all experiments. Our scores are generally comparable to those in the original paper, with a margin of just 3-4\%.
+
+
+\begin{table}[]
+\begin{tabular}{C{2.3cm}|C{2.8cm}C{2.2cm}C{2.2cm}C{2.2cm}C{2.2cm}}
+\toprule
+\column{} & \column{} & \textbf{Synthetic Data Equal p} & \textbf{Synthetic Data General p} & \textbf{Feedback maximization} & \textbf{Influence maximization}\\ 
+\midrule
+\multirow{2}{*}{No. picked} & Original results & 1.305 & 1.309 & 1.347 & 1.373 \\\cline{2-6}
+                            & Reproduced results & 1.354 & 1.350 & 1.372 & -\\
+\midrule
+\multirow{2}{*}{Max candidates} & Original results & 1.721 & 1.6302 & 1.760 & 1.756\\\cline{2-6}
+                                & Reproduced results & 1.684 & 1.636 & 1.837 & -\\
+\bottomrule
+\end{tabular}
+\caption{Evaluation metrics for the Secretary Problem. Each score represents how many more times the Multi-color Secretary Algorithm chose a candidate as compared to the most fair baseline, namely the Single-color Secretary algorithm.}
+\label{tbl:results_comparison}
+\end{table}
+
+
+The only algorithm in which our results differ is the SA, illustrated as U-Pick and U-Max. The SA algorithm showed inconsistencies in two respects. To begin with, the authors' experiments show that in setting (a) (synthetic dataset with equal $p$), SA almost exclusively returns candidates from group 4. However, in setting (b) (when p differs per group) it selects from multiple groups. This change is striking, as the SA algorithm should not take into account the probabilities of different groups.
+
+We raised these observations in a chain of discussions with the authors. They confirmed our suspicions that the results of the SA algorithm are not intuitive, but did not know the reason for the discrepancies. They indicated that one possible reason would be the manner of sampling synthetic data. Given their explanation, we chose to further analyze their C++ implementation and figure out whether our results are incorrect or if there are other reasons for these differences. We found out that there are several inconsistencies in their original implementation as compared to the paper:
+
+\begin{itemize}
+    \item New synthetic data are generated for each of the 20,000 iterations of the experiment instead of using the same dataset for all iterations
+    \item When testing whether the returned candidate at index $i$ is the maximum from its group $C_j$, the authors apply a margin of 10. They verify whether $ score(i) \in [max\;C_j - 10]$, where $max\;C_j$ represents the maximum score of color $j$.
+    \item Even though the original paper states that the probabilities $p$ are not taken into account by algorithm SA, the original implementation does take into account the probabilities when creating the synthetic data. It adds bias towards a certain group by assigning one candidate from that group the upper limit value of a $unsigned\;int\;64$ data type in C++ ( $2^{64} - 1$). This happens only in the second experiment.
+\end{itemize}
+
+Because of these implementation inconsistencies, parts of the experiments were not easily reproducible. We claim that they cause a difference in results for experiment (b). We test our claim by running the original code, but without the three inconsistencies mentioned above. The modified implementation outputs results that are much closer to our findings. They are illustrated in the Appendix in Figure \ref{fig:secretary_experimentb_results}.
+
+Furthermore, the SA algorithm also returned different results for dataset (d) on Influence Maximization. The paper illustrates that U-pick selects candidates from two groups, namely \emph{Under} and \emph{Normal}. However, our algorithm picks candidates only from the \emph{Normal} group. To understand why this happened, we ran this experiment using the original code. The authors included neither the data nor the preprocessing steps, so we used our own preprocessed data. The results can be found in the Appendix in Figure \ref{fig:secretary_experimentd_results}\footnote{The authors ran approximately 1 billion iterations over the Pokec dataset. Due to time constraints we had to restrict our experiment to 20,000 iterations. For a clearer comparison between the groups frequency and the experiment results, we  downsampled the size of the input}. When using the same input data,  the original code yields exactly the same results as our implementation. Therefore, the found inconsistencies originate from the data itself, and correcting the BMI formula from the original code should result in identical outcomes.\footnote{For our experiment, we used the formula $BMI = weight/height^2$ and defined the health groups as described by the \hyperlink{https://www.euro.who.int/en/health-topics/disease-prevention/nutrition/a-healthy-lifestyle/body-mass-index-bmi}{WHO}.} We can thus conclude that the Influence Maximization experiment would be exactly reproduced if we were to have access to the originally prepossessed data.
+
+\subsection{Prophet problem}
+\label{sec:prophet_results}
+
+\begin{figure}[h!]
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/50kExperiments_uniform.png}
+    \caption{uniform distribution, 50,000 iterations}
+    \label{fig:prophet_50k_uniform}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/50kExperiments_binomial.png}
+    \caption{binomial distribution, 50,000 iterations}
+    \label{fig:prophet_50k_binomial}
+  \end{subfigure}
+
+  \medskip
+
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/100kExperiments_uniform.png}
+    \caption{uniform distribution, 100,000 iterations}
+    \label{fig:prophet_100k_uniform}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/100kExperiments_binomial.png}
+    \caption{binomial distribution, 100,000 iterations}
+    \label{fig:prophet_100k_binomial}
+  \end{subfigure}
+  \caption{This plot contains our replication of the results for both prophet experiments, depicting the number of times the selected algorithms pick from each position in the candidate stream. Figure \ref{fig:prophet_50k_uniform} \& \ref{fig:prophet_50k_binomial} refer to our experiment setup with 50,000 iterations, while Figure \ref{fig:prophet_100k_uniform} \& \ref{fig:prophet_100k_binomial} refer to 100,000 iterations. The datasets for \ref{fig:prophet_50k_uniform} and \ref{fig:prophet_100k_uniform} are from the uniform distribution, while \ref{fig:prophet_50k_binomial} and \ref{fig:prophet_100k_binomial} come from the binomial distribution. Subfigures \ref{fig:prophet_100k_uniform} and \ref{fig:prophet_100k_binomial} are approximately identical to those in the original paper.}
+  \label{fig:resultsProphet}
+\end{figure}
+
+Figure \ref{fig:resultsProphet} shows the experiment outcomes of our replicated FairPA and FairIID algorithms. Even though the general trends in the plots match, our overall number of picks is far lower for each of the algorithms. The original authors appear to pick a candidate every single time.\footnote{For instance the number of picked candidates per position  for their FairPA algorithm in the uniform distribution is ~1000. This corresponds to 50 positions x 1000 picks = 50,000 total picks, the same as the number of iterations used.} In some cases, the number of picks even exceeds the number of experiments run, which should not be possible.\footnote{The number of picks of the original FairIID algorithm in the uniform distribution dataset hovers around 1200, which would mean 1200 picks x 50 positions = 60,000 total picks, far more than the 50,000 iterations.  The same is true for the FairIID algorithm under the binomial setting. The line is somewhat obscured by other algorithms, but appears to be consistently higher based on the reported number of experiments.}
+
+By contrast, our reproduced FairPA algorithm returns a None result 50\% of the time, and FairIID 30\%. This makes sense, as the algorithm was designed to pick each candidate with probability of $q/2$.\footnote{$q$ is the probability of an optimal offline algorithm choosing a certain candidate. This offline algorithm has a None rate of zero.} We also ran the original code, after making minor adjustments to get it running and to deal with None picks. Running on this code shows identical results to our own reproduced implementation.
+
+The most probable explanation for both discrepancies in the reproduced results is that the original authors ran $100,000$ experiments, instead of $50,000$. Figures \ref{fig:prophet_100k_uniform} and \ref{fig:prophet_100k_binomial} show that when running our algorithms with this number of experiments, the results are strongly comparable to those of the original authors. We also contacted the authors about this discrepancy. They confirmed that their reported number of picks was too high. Similarly to us, they assumed to have run the experiments twice as often as reported. However, they were not able to confirm this at the time. Since the implementation of the Prophet experiments themselves are not included in the code base, we were not able to definitively diagnose the reason for the discrepancy.
+
+% The original paper finds that the average values of chosen candidates for Algorithm 2 (FairPA), Algorithm 3 (FairIID), and the baselines SC, EHKS, CFHOV, and DP are 0.501, 0.661, 0.499, 0.631, 0.752, 0.751 respectively for the uniform distribution. For the binomial distribution, the values were 298.34, 389.24, 277.63, 363.97, 430.08, 513.34. 
+
+Table \ref{tbl:results_comparison_prophet} shows the originally reported mean values, as well as our replication results. As is clear, we were able to closely approximate the original authors' results. However, we were only able to do this after assigning None results a value of zero. Neither the ICML-version nor the full version of the paper mentions how their metrics deals with None picks. Nevertheless, as taking None picks as values of zero generated the same results, we assumed they used this approach.
+
+
+\begin{table}[h!]
+\begin{tabular}{C{1.7cm}|C{1.9cm}C{1.6cm}C{1.6cm}C{1.6cm}C{1.6cm}C{1.6cm}C{1.6cm}}
+\toprule
+\column{} & \column{} & \textbf{FairPA} & \textbf{FairIID} & \textbf{SC} & \textbf{EHKS} & \textbf{CFHOV} & \textbf{DP}\\ 
+
+\midrule
+\multirow{2}{*}{Uniform} & Original & 0.501 & 0.661 & 0.499 & 0.631 & 0.752 & 0.751 \\
+\cline{2-8} & Reproduced & 0.500 & 0.660 & 0.497 & 0.630 & 0.752 & 0.750\\
+\midrule
+\multirow{2}{*}{Binomial} & Original & 298 & 389 & 278 & 364 & 430 & 513\\
+\cline{2-8}& Reproduced & 299 & 389 & 279 & 363 & 429 & 512\\
+\bottomrule
+\end{tabular}
+\caption{ Evaluation metrics for the Prophet Problem. Each score represents the mean value of selected candidates. None picks were considered as having a value of zero. For the reproduced results, we ran 100,000 experiments.}
+\label{tbl:results_comparison_prophet}
+\end{table}
+
+Additionally, the original FairPA and FairIID algorithms selected candidates with an average value of "66.71\% and 88.01\% (for the uniform case), and 58.12\% and 75.82\% (for the binomial case), of the "optimal, but unfair, online algorithm" average.
+    \footnote{During communication with the authors it was brought to our attention that the results for the DP differ in the ICML version and the full version of the original paper, "due to a small issue in the calculation of the DP in the ICML version.". This results in the DP achieving an average score of 0.964 and 548.94 for the uniform and binomial distribution respectively. This then also changes the value of the optimal, but unfair algorithm to the following: " 51.97\% and 68.57\% (for the uniform case), and 54.35\% and 70.91\% (for the binomial case)." \cite{correa21_full}. However, we focus on the ICML paper and thus focus on the presented results in this version. Partly due to the issue that no sufficient documentation could be found in order to solve this addressed issue in the DP algorithm.}
+    \footnote{While the paper does not specify explicitly which unfair algorithm they mean in the paper, this seemed to refer to the DP algorithm.} Here, we again found found the same results (deviation $< 1\%$).
+
+
+% The original paper also mentions statistics on the performance of their algorithms. They reported the average values of chosen candidates as a percentage of "the optimal, but unfair, online algorithm"\footnote{The paper does not specify which unfair algorithm they mean. However, by comparing the values of all baselines, we were able to conclude they were referring to the DP algorithm.} (Correa et al., 2021). In our replication experiments, we found approximately the same results (deviation < 1\% from the results found by the authors) for these scores and percentages, under both experiments, under both the original 50,000 experiments and our 'proposed/found' 100,000 experiments.
+
+% However we found two inconsistencies here. Firstly this does not hold for the DP average candidate values on the uniform distribution. Here the original results show an average candidate value of 0.751 while our reproduced means are 0.500 and 0.498 for both our 50k and 100k experiments respectively. Since the DP algorithm is just a baseline, further investigation if this is indeed due to a result on the side of the authors or in our implementation into this issue is considered outside of the scope of this reproducibility study paper. However, we found it necessarily to include this baseline in our report instead of excluding it altogether.
+% Another discrepancy between the presented results and our found results lie within the percentual value of the optimal, but unfair, online algorithm . The only way to reproduce the original results by the authors was to use for the uniform distribution the CFHOV as the “optimal,  but unfair algorithm”, and the DP algorithm for the binomial distribution. It would be expected that DP was used for both.
+
+\section{Fair online decision making with higher pick-rates}
+%@Pim: Look at what is mentioned in the paper about $\alpha$, add tables/graphs and finish writing/argumentation
+\label{sec:extension}
+
+As mentioned in section \ref{sec:prophet_results} the paper's proposed prophet algorithms pick a candidate in only 50\% of cases. This is often not useful in practice. For this reason, we extended on the original paper by adjusting the (mathematical) parameters used for the FairPA and FairIID algorithms. We contacted the authors to ask about their reasoning for using their parameters. They replied that their parameters achieved: "the best possible approximation ratio guarantee of a $1/2$. However, they added: "It is possible that other algorithms also achieve the $1/2$ guarantee, or something close to it, while having other interesting properties, for instance being less wasteful."
+
+Both algorithms \ref{alg:fair_prophet} and \ref{alg:iid_prophet} depend on calculating a top percentile that the candidate's value needs to be in. Each formula includes a constant of $1$. We change this constant to parameter $\epsilon$:
+
+\begin{itemize}
+    \item The FairProphet algorithm depends essentially on $1 - \frac{q_i/2}{1-s/2}$. We change this fraction to $1 - \frac{q_i/2}{\epsilon-s/2}$
+    \item The FairIID algorithm depends on $1-\frac{2/3n}{1 - 2(i-1)/3n}$, which we change to $1-\frac{2/3n}{\epsilon - 2(i-1)/3n}$.
+\end{itemize}
+and perform a grid search to approximately find the optimal values. For this parameter search, we used values slightly above and below the original parameters. We hypothesise that choosing a lower $\epsilon$ should decrease the top percentile a candidate needs to belong to in order to get selected. This should decrease the probability of finishing without picking any candidate, with the downside of achieving possibly a lower mean value. 
+
+Figure \ref{fig:extension_fairPA} shows the results from our grid search, for the FairPA setting. The experiments for the FairIID setting show similar trends, as can be seen in Appendix section \ref{sec:parameter_extension}. As $\epsilon$ decreases, the number of picks goes up significantly. The algorithm remains approximately equally fair\footnote{We would like to mention that we have not mathematically proven that our version is indeed 'fully' fair as the original authors did}. However, when $\epsilon$ becomes too low, fairness starts to suffer. This is because the algorithm always chooses a candidate before getting to the end, meaning it never sees the last candidates in line.
+
+Our updated version of both the FairPA and FairIID increases performance on almost all originally used metrics in the paper for both distributions (see Appendix section \ref{sec:parameter_extension}). For the best found epsilon values, the None rate is close to zero. When excluding None results from the mean value of candidates, our optimal version performs slightly worse than the original authors' algorithm. This makes sense, as our algorithm is less picky and will also accept candidates with slightly lower scores. On the other hand, when including None results as a $0$ value in the average, our algorithm outperforms that of the original authors.
+
+\begin{figure}[h!]
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/extension/FairGeneralProphet_uniform.jpeg}
+    \caption{uniform}
+    \label{fig:extension_fairPA_uniform}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Images/extension/FairGeneralProphet_binomial.jpeg}
+    \caption{binomial}
+    \label{fig:extension_fairPA_binomial}
+  \end{subfigure}
+  \caption{
+    Results from the gridsearch for the FairPA setting. The figures show the number of picks per position for different values of $\epsilon$. The value $\epsilon = 1.0$ corresponds to the original paper's algorithm.
+    }
+    \label{fig:extension_fairPA}
+\end{figure}
+
+% => Do their baselines have none rates??
+
+% P<.001 (this is change in average candidate value given excluding none') in advantage to our version on the uniform distribution. Results are similar on the binomial distribution, however due to time constraints it was not possible to proof it statistically too.
+
+
+% * Place extension in paper/literature keeping in mind what Sami and Fernando said? (@Pim: see voice memo, send to Naud)
+% It is possibible to frame fairness in different aspects using different metrics, build up on that / further and basically mention that and refer to their use and defintion on fairnss. End up concluding that our version/extension is more fair becuase a high pick-rate so is more likely to pick a candidate at allw which is again more fair for the whole group and each candidate seperately. This is an improvemnt both for each candidate and in/for the whole group, next it it being less wastefull of resources for example. However, we need to keep in mind that our version does not achieve perfect fitness (or at least we haven't proven it)
+
+% We argue/it can be argued that... 
+
+\section{Conclusion}
+
+To summarise this study: for both the Secretary and the Prophet problems we found that the results are largely reproducible. We did however find some inconsistencies in one of the baselines of the secretary problem, and on the scale of the prophet results.
+After further investigation, these discrepancies could be attributed to inconsistencies in the original authors' code. After this reproducibility study we conclude that the main claims made in the paper still hold. 
+
+The paper and the provided code base provided a good resource for reproducing the code. However, due to the absence of several parts of their code and the mentioned inconsistencies, the replication of the (exact) results took longer than expected. Fortunately, the authors showed to be very helpful and willing to answer our questions and concerns.
+
+A drawback of the proposed prophet algorithms is that they only select a candidate in 50\% (FairPA) and 30\% (IID) of cases. Having such a None result is often undesirable, so we introduced two adjusted prophet algorithms which have a pick rate of (close to) 100\%. Our results suggest that these algorithms maintain similar levels of fairness.
+
+As a point of discussion, we would like to note that knowing the group probabilities $p$ beforehand is, in some cases, quite counter intuitive. This fell outside of the scope of this reproducibility study, but it would be an interesting approach for further research to handle this critique.
+
+%  => What are the open questions and/or what might be wrong/questionable in your set-up? Just be open about this.
+
+% => Recommendations for reproducibility. What are the next steps or what is the main upshot in terms of reproducibility?
+
+% => Don't make any strong - general - claims about the original results. If it is impossible to reproduce the original work, just say 'in this specific setting we are not able to reproduce the results'. This leaves open the possibility that it is your set-up is not similar to the original paper. It is up to the reviewer to decide if you are correct or not.  
+
+   % \item Reproducibility based on code was quite hard, reimplementaiton needed, could not be run 'out of the box', not complete (refer to https://github.com/paperswithcode/releasing-research-code and https://www.cs.mcgill.ca/~ksinha4/practices\_for\_reproducibility). Seems like a good idea, refer to "good repro practice", just refer to these sources as good practice seems like a good idea.
+\newpage
+%\section*{References}
+
+\bibliographystyle{abbrv}
+\bibliography{references.bib}
+
+
+
+
