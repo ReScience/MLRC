@@ -12,7 +12,7 @@ ReScience editorial process consists of porting the existing latex sources into 
      - `journal`  <-- location of [ReScience C Template](https://github.com/ReScience/template) files
 
 
-### Step 0: Setup your development environment for Latex
+### Step 0: Setup your development environment for Latex!
 
 Some of you may have used Overleaf to write and submit your papers. We recommend to setup the Latex development pipeline locally in your system for full control over the editorial process. If you use a Mac, then use the following Homebrew formula:
 
