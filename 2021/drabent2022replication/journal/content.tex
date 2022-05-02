@@ -84,7 +84,7 @@ It should be noted that while augmented samples are usually \emph{added} to the 
 \subsection{Reducing the search space}
 \label{sec:3.2search}
 
-To find candidate policies, it is necessary to determine their effect on both privacy and accuracy. The transformations must be applied to training data, and a model must be trained. Because fully training a model is very expensive, the authors propose two metrics that serve as a proxy for the privacy preservation and accuracy of the fully trained model: privacy-score($S_{pri}$) and accuracy-score($S_{acc}$). Low $S_{pri}$ entails the model has high privacy preservation potential, whereas high $S_{acc}$ means the model achieves good accuracy with the applied transformation policies. These metrics produce results on model that are trained with only $10\%$ of the data for only $25\%$ training iterations, reducing the search-space and making the policy search feasible in a reasonable time. Further details about the definition of $S_{pri}$ and $S_{acc}$ can be found in sections $4.2$ and $4.3$ of \cite{gao2021privacy}.
+To find candidate policies, it is necessary to determine their effect on both privacy and accuracy. The transformations must be applied to training data, and a model must be trained. Because fully training a model is computationally expensive, the authors propose two metrics that serve as a proxy for the privacy preservation and accuracy of the fully trained model: a privacy score ($S_{pri}$) and an accuracy score ($S_{acc}$). Low $S_{pri}$ means the model has high privacy preservation potential, and high $S_{acc}$ means the model achieves good accuracy with the applied transformation policies. These metrics produce results on model that are trained with only $10\%$ of the data for only $25\%$ training iterations, reducing the search space and making the policy search feasible in a reasonable time. Further details about the definition of $S_{pri}$ and $S_{acc}$ can be found in sections $4.2$ and $4.3$ of \cite{gao2021privacy}.
 
 \section{Experimental setup and code}
 
@@ -98,13 +98,15 @@ The experiments in \cite{gao2021privacy} are performed on two datasets, CIFAR-10
 On the other hand, the Fashion-MNIST dataset contains $70,000$  grey-scale images of $28\times28$ resolution from $10$ classes. Again the test set is used as a validation set. We run experiments on one additional dataset in our extensions - Tiny ImageNet200\footnote{\url{http://cs231n.stanford.edu/tiny-imagenet-200.zip}} \cite{imagenet_cvpr09}. It contains 120,000, $64\times64$ RGB images of 200 different classes. However, a \emph{tiny} version of the dataset is introduced in the original paper for policy-search purposes. This dataset version contains $10\%$ of the original samples, using the same distribution. It's later used to train the models for the evaluation of $S_{pri}$ and $S_{acc}$ in the search algorithm.
 
 \subsection{Model descriptions}
+
 We use the following models:
-\begin{itemize}[noitemsep,topsep=-3pt]
-    \itemsep0em 
+
+\begin{itemize}[noitemsep]
     \item ResNet20-4, a variation of ResNet20~\cite{he2016deep} that has four times the number of channels also used in \cite{geiping2020inverting}. The total number of parameters is 4.4M.
-    \item ConvNet~\cite{geiping2020inverting} - 8-layer Convolutional Neural Network, with batch normalization and a ReLU layer after each convolution layer. For this model the total number of parameters is 3.7M.
+    \item ConvNet~\cite{geiping2020inverting} -- an 8-layer Convolutional Neural Network, with batch normalization and a ReLU layer after each convolution layer. For this model the total number of parameters is 3.7M.
 \end{itemize}
-The original codebase uses the implementation of both models from the repository\footnote{https://github.com/JonasGeiping/invertinggradients} of \cite{geiping2020inverting}. Our models are re-implemented in Pytorch Lightning. Both models were compared with the models from the original codebase in terms of accuracy; they achieved comparable results.
+
+The original codebase uses the implementation of both models from the repository\footnote{https://github.com/JonasGeiping/invertinggradients} of \cite{geiping2020inverting}. Our models are exact reimplemations in Pytorch Lightning.
 
 \subsection{Hyperparameters}
 
