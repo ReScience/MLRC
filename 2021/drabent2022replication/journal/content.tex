@@ -274,6 +274,26 @@ Table \ref{tab:1} shows similar patterns to the original paper, where the search
 
 \paragraph{Experiment 4} The defensive qualities of the searched transformation policies are benchmarked against existing defenses from the literature \cite{zhu2019} \cite{wei2020} under the Adam+Cosine attack. The results are shown in Table \ref{tab:3}. Although the exact values differ slightly, the overall results are similar to the original paper, where all the existing defenses perform worse than the hybrid strategy.
 
+\begin{table}[htb]
+    \centering
+        \begin{tabular}{lrrr}
+        \hline
+         Defense               &   PSNR &   PSNR (std) &   Acc \\
+        \hline
+         Pruning (70\%)         &       11.62 &       2.18 & 74.61 \\
+         Pruning (95\%)         &       10.41 &       1.32 & 67.91 \\
+         Pruning (99\%)         &        9.96 &       0.57 & 53.43 \\
+         Laplacian ($10^{-3}$) &       10.73 &       1.02 & 71.45 \\
+         Laplacian ($10^{-2}$) &       12.03 &       0.79 & 26.20 \\
+         Gaussian ($10^{-3}$)  &       12.11 &       2.98 & 72.89 \\
+         Gaussian ($10^{-2}$)  &       12.13 &       1.14 & 36.25 \\
+        \hline
+    \end{tabular}
+    \caption{Comparisons with existing defense methods under the Adam+Cosine attack}
+    \label{tab:3}
+    \vspace{-8mm}
+\end{table}
+
 \paragraph{Experiment 5} This experiment concerns \textbf{Claim 2}. Because policies should be general, they are tested against various attack configurations. For this, we again use $6$ images from the test set and perform the different attacks on the images without the transformation policies applied and with the hybrid strategy transformation policies applied. The results are shown in Table \ref{tab:2}. As can be seen from the table, the hybrid strategy works well against all configurations of the reconstruction attack. This is in line with the results from the original paper.
 
 \begin{table}[htb!]
@@ -387,6 +407,28 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
 
 \paragraph{Experiment 9} In \textbf{Claim 6} the authors report their $5$ top transformations. We test whether we can find the same ones by calculating the privacy score on the dataset for each individual augmentation and show the results in Figure \ref{fig:5re} and \ref{fig:5og}. Out of the best $5$ transformations reported in the original paper we found $4$ overlapping ones. 
 
+\paragraph{Experiment 10} The final experiment reproducing the results from the original paper is aimed at \textbf{Claim 7}. The authors claim that their privacy-score $S_{pri}$ is linearly correlated with PSNR with a Pearson-coefficient of $0.697$. We test this by running attacks and evaluating $S_{pri}$ on the model trained on tiny cifar100 for 50 epochs and found a very different result. As shown in Figure \ref{fig:2} there is hardly any correlation (Pearson-coefficient is $0.123$). This might be due to the fact that these $100$ transformation policies are selected at random out of $127.550$ possible options. This is a striking result nonetheless, which we discuss in-depth in Section \ref{sec:discussion}.
+
+\subsection{Results beyond original paper}
+
+\paragraph{Extension 1} We extend the evaluation of the transferability of the found policies by evaluating the performance of the policy found on CIFAR-100 on Rescaled ImageNet. The resulting PSNR values and accuracies are shown in Table \ref{tab:ext1}. As can be seen from the table, the hybrid strategy produces only $1$ dB improvement in PSNR value, and accuracy decreases by more than $4\%$. This weakens the claim of transferability of found policies.
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{lrrr}
+        \hline
+         Policy   &   PSNR &   PSNR (std) &   Acc \\
+        \hline
+         None     &        8.96 &       1.25 & 61.44 \\
+         Hybrid   &        7.92 &       0.79 & 57.38 \\
+        \hline
+    \end{tabular}
+    \caption{PSNR values (dB) and accuracies of policies searched on CIFAR-100 applied to Rescaled ImageNet}
+    \label{tab:ext1}
+\end{table}
+
+\paragraph{Extension 2} We additionally extend the evaluation of the transferability of the searched policies by testing which transformations work best on a different dataset. Since good policies share the same general qualities, as stated in Claim 5, the five best transformations from Claim 6 are expected to be the same when using a different dataset. For this experiment, we use the Rescaled ImageNet dataset. The resulting transformations are shown in Figure \ref{fig:ext1}. Out of the $5$ best transformations on the Rescaled ImageNet $3$ were also found on CIFAR-100 in both our results and the results from the original paper. This shows that, indeed, these transformations contain the desired qualities from Claim 6.
+
 \begin{figure}[h]
     \centering
     \subfloat[Reproduced result]{
@@ -406,66 +448,27 @@ The following experiment is aimed at \textbf{Claim 4}. The authors state that ap
     \label{fig:5}
 \end{figure}
 
-\paragraph{Experiment 10}
-
-The final experiment reproducing the results from the original paper is aimed at \textbf{Claim 7}. The authors claim that their privacy-score $S_{pri}$ is linearly correlated with PSNR with a Pearson-coefficient of $0.697$. We test this by running attacks and evaluating $S_{pri}$ on the model trained on tiny cifar100 for 50 epochs and found a very different result. As shown in Figure \ref{fig:2} there is hardly any correlation (Pearson-coefficient is $0.123$). This might be due to the fact that these $100$ transformation policies are selected at random out of $127.550$ possible options. This is a striking result nonetheless, which we discuss in-depth in Section \ref{sec:discussion}.
-
-\subsection{Results beyond original paper}
-
-\paragraph{Extension 1} We extend the evaluation of the transferability of the searched policies by evaluating the performance of the policy searched on CIFAR-100 on Rescaled ImageNet. The resulting PSNR values and accuracies are shown in Table \ref{tab:ext1}. As can be seen from the table, the hybrid strategy produces only $1$ dB improvement in PSNR value, and accuracy decreases by more than $4\%$. This weakens the claim of transferability made by the authors.
-
-\paragraph{Extension 2} We additionally extend the evaluation of the transferability of the searched policies by testing which transformations work best on a different dataset. Since good policies share the same general qualities, as stated in Claim 5, the five best transformations from Claim 6 can be expected to be the same when using a different dataset. For this experiment, we use the Rescaled ImageNet dataset. The resulting transformations are shown in Figure \ref{fig:ext1}. Out of the $5$ best transformations on the Rescaled ImageNet $3$ were also found on CIFAR-100 in both our results and the results from the original paper. This shows that, indeed, these transformations contain the desired qualities from Claim 6.
-
-\begin{table}[htb]
-    \centering
-    \begin{tabular}{lrrr}
-        \hline
-         Policy   &   PSNR &   PSNR (std) &   Acc \\
-        \hline
-         None     &        8.96 &       1.25 & 61.44 \\
-         Hybrid   &        7.92 &       0.79 & 57.38 \\
-        \hline
-    \end{tabular}
-    \caption{PSNR values (dB) and accuracies of policies searched on CIFAR-100 applied to Rescaled ImageNet}
-    \label{tab:ext1}
-\end{table}
-\begin{table}[htb]
-    \centering
-        \begin{tabular}{lrrr}
-        \hline
-         Defense               &   PSNR &   PSNR (std) &   Acc \\
-        \hline
-         Pruning (70\%)         &       11.62 &       2.18 & 74.61 \\
-         Pruning (95\%)         &       10.41 &       1.32 & 67.91 \\
-         Pruning (99\%)         &        9.96 &       0.57 & 53.43 \\
-         Laplacian ($10^{-3}$) &       10.73 &       1.02 & 71.45 \\
-         Laplacian ($10^{-2}$) &       12.03 &       0.79 & 26.20 \\
-         Gaussian ($10^{-3}$)  &       12.11 &       2.98 & 72.89 \\
-         Gaussian ($10^{-2}$)  &       12.13 &       1.14 & 36.25 \\
-        \hline
-    \end{tabular}
-    \caption{Comparisons with existing defense methods under the Adam+Cosine attack}
-    \label{tab:3}
-    \vspace{-8mm}
-\end{table}
-
 \section{Discussion}
 \label{sec:discussion}
 
-Overall the results in \cite{gao2021privacy} are reproducible, except Figure \ref{fig:2}, with a large discrepancy between our result and the original one -  we are still in contact with the authors on this issue. Nevertheless, augmentation policies tend to work as a defense mechanism rather well. For most images, an attacker using reconstruction attacks is unable to find privacy-sensitive information. However, the standard deviation of our results is more than $25\%$ in some settings, and we consider this a valuable metric to contribute. Some images are vulnerable to the attack even with the proposed defense mechanism, and it is as of yet unclear to us which types of images are more vulnerable than others. This issue must be developed further in future research to make the approach widely applicable in real-world use-cases where private data is at stake.
+Overall the results in \cite{gao2021privacy} are reproducible, with the exception of Figure \ref{fig:2}, where a large discrepancy between our result and the original one exists. Nevertheless, augmentation policies may work well as a defense mechanism against reconstruction attacks. For most images, an attacker using reconstruction attacks is unable to find privacy-sensitive information. However, the standard deviation of our results is high, and we consider this a valuable metric to contribute. Some images are vulnerable to the attack even with the proposed defense mechanism, and it is as of yet unclear to us which types of images are more vulnerable than others. This issue must be examined further in future research to make the approach widely applicable in real-world use-cases where private data is at stake in order to provide predictable privacy guarantees.
 
-Additionally, we made observations in the codebase that, to the best of our knowledge, were not reported in the paper or any other accompanying documentation. The first was the fact that the loss of the training module was multiplied by a factor of $0.5$. This is not a fundamental flaw during the training phase, as it simply produces smaller gradients and therefore leads to a reduced effective learning rate. However, during the reconstruction attacks, the loss used by the attacker was not multiplied by this factor. This makes the attacker in practice use a different loss function from the one used to generate the gradient that it is attempting to match. This may therefore make reconstruction more difficult. Furthermore, we found that two other undocumented augmentations were added in all experiments, namely a random crop and random horizontal flip. Without these, the accuracy of our models decreased by over $10\%$. We are in contact with the authors regarding these observations, they acknowledged the halved loss as a bug.
+Additionally, we made observations in the codebase that, to the best of our knowledge, were not reported in the paper or any other accompanying documentation.
+
+The first observation was that the loss function that was used included a factor of $0.5$. This is not a fundamental flaw during the training phase, as it simply results in smaller gradients and therefore leads to a reduced effective learning rate. However, during the reconstruction attacks, the loss used by the attacker was not multiplied by this factor. This means the attacker in practice uses a different loss function from the one used to generate the gradient that it is attempting to match. This may therefore make reconstruction more difficult. In our correspondence, \citet{gao2021privacy} acknowledged this as a bug and we fixed this in our experiments.
+
+The second observation was that two other undocumented augmentations were added in all experiments, namely a random crop and random horizontal flip. Without these, the accuracy of our models decreased by over $10\%$.
 
 \subsection{What was easy}
 
-The explanation of the general idea and solution of the paper was very clearly put and easy to follow. The codebase contained a README with instructions on how to run some of the paper's experiments, and these instructions could be followed without significant problems. The code produced results as seen in the paper.
+The explanation of the general idea, identified problems and proposed solution of the paper was clearly put and easy to follow. The codebase contained a README with instructions on how to run some of the paper's experiments, and these instructions could be followed without significant problems. Some of the experiments in the original work could be reproduced by running the code as provided.
 
 \subsection{What was difficult}
 
-The most challenging part about reproduction was the unclear description of experiments in the paper and limited clarity in the codebase. Code in the repository was uncommented, used many global variables and many layers of indirection. Many chunks of code were not used, making it harder to follow. Some experimental settings and metrics were not implemented, and some experiment configurations led to fatal errors.
+The most challenging part about reproduction was the unclear description of experiments in the paper and limited clarity in the codebase. Code in the repository was uncommented, used many global variables and many layers of indirection. Many chunks of code were not used. Some experimental settings and metrics were not implemented, and some experiment configurations led to fatal errors.
 
-It was very unclear which steps were originally followed to obtain Figure \ref{fig:2}. Despite the authors' helpful comment on which model was used, we were not able to reproduce the correlation, potentially due to randomness in a vast search space (127,550) and the limited sample size (100). Furthermore, the paper does not state how many images were used to produce the PSNR values in the tables. Finally, undocumented augmentations were added in some but not all settings, which was cause for some delay until this was found to be the cause for a 10\% accuracy-gap with the authors' results.
+It was unclear which steps were originally followed to obtain Figure \ref{fig:2}. Despite the authors' helpful comment on which model was used, we were not able to reproduce the correlation, potentially due to randomness in a vast search space and a relatively limited sample size. Furthermore, the paper does not state how many images were used to produce the PSNR values in the tables. Finally, undocumented augmentations were added in some but not all settings, which was cause for some delay until this was found to be the cause for a $10\%$ accuracy gap with the authors' results.
 
 \subsection{Communication with original authors}
 
-We contacted the authors about multiple clarifications regarding implementation details and notation in the paper. The authors responded promptly and answered almost all of our questions in the first round of contact. We are still in contact on two points. Firstly, regarding our reproduction of Figure \ref{fig:2}. Since we got such differing results for this critical part of the authors' work, we are looking to investigate this further and possibly resolve the discrepancy with them. Secondly, we offered our refactoring of the codebase to the authors as a contribution to their work.
+We contacted the authors about multiple clarifications regarding implementation details and notation in the paper. The authors responded promptly and answered most of our questions in the first round of contact. Firstly, regarding our reproduction of Figure \ref{fig:2}, the correspondence was helpful but did not lead to a reproduction.
