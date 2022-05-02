@@ -13,9 +13,9 @@ def check_ne(store, key, storename):
 
 def check_title(meta):
     check_ne(meta, "title", "Metadata")
-    assert meta["title"].startswith(
-        "[Re] "
-    ), "title in metadata should start with `[Re]`"
+    assert meta["title"].startswith("[Re] ") or meta["title"].startswith(
+        "[¬Re] "
+    ), "title in metadata should start with `[Re]` or `[¬Re]`"
 
 
 def check_authors(meta):
@@ -46,7 +46,7 @@ def check_affiliations(meta):
     for aff in meta["affiliations"]:
         check_ne(aff, "code", "Metadata.affiliations")
         check_ne(aff, "name", "Metadata.affiliations")
-        check_ne(aff, "address", "Metadata.affiliations")
+        # check_ne(aff, "address", "Metadata.affiliations")
 
 
 def check_keywords(meta):
