@@ -84,8 +84,6 @@ if __name__ == '__main__':
     filename_in  = args.filename_in
     filename_out = args.filename_out
 
-    print(filename_in)
-
     # print("Generating latex definitions ({1}) from {0}".format(filename_in, filename_out))
     
     with open(filename_in, "r") as file:

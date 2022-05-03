@@ -15,7 +15,7 @@ article: article.pdf
 # CUSTOM BUILD RULES
 # -----------------------------------------------------------------------------
 metadata.tex: metadata.yaml
-	./yaml-to-latex.py -i $< -o $@
+	python ./yaml-to-latex.py -i $< -o $@
 
 
 # MAIN LATEXMK RULE
