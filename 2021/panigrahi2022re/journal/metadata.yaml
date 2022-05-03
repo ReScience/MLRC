@@ -12,7 +12,7 @@ title: "[Re] Value Alignment Verification"
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
   - name: Siba Smarak Panigrahi
-    orcid: 0000-0000-000-000
+    orcid: 0000-0003-2525-988X
     email: sibasmarak.@gmail.com
     affiliations: 1,2,*
 
@@ -36,16 +36,16 @@ affiliations:
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords:  rescience c, value alignment verification, reinforcement learning, python
+keywords:  rescience c, value alignment verification, reinforcement learning, machine learning, python
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/
-  - doi: 00.0000/zenodo.0000000
-  - swh: swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  - url: https://github.com/AIExL/vav_rc2021
+  - doi: 
+  - swh: swh:1:dir:4d43ea96458cc573dd2b57208fae0b12f8da896f
 
 # Data URL and DOI (optional if no data)
 data:
@@ -54,13 +54,18 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: "Yoshua Bengio, Yann Lecun, Geoffrey Hinton. All you need is AGI (ICML 2042)."
- - bib:  bengio2042
- - url:  https://arxiv.org/pdf/xxxx.pdf
+ - cite: "Daniel S. Brown, Jordan Schneider, Anca D. Dragan, Scott Niekum. Value Alignment Verification (ICML 2021)."
+ - bib:  brown2021value
+ - url:  https://arxiv.org/pdf/2012.01557.pdf
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "AGI is not all you need."
+abstract: "Scope of Reproducibility: The main goal of the paper 'Value Alignment Verification' is to test the alignment of a robot's behavior efficiently with human expectations by constructing a minimal set of questions. To accomplish this, the authors propose algorithms and heuristics to create the above questionnaire. They choose a wide range of gridworld environments and a continuous autonomous driving domain to validate their put forth claims. We explore value alignment verification for gridworlds incorporating a non-linear feature reward mapping as well as an extended action space. 
+Methodology: We re-implemented the pipeline with Python using mathematical libraries such as Numpy and Scipy. We spent approximately two months reproducing the targeted claims in the paper with the first month aimed at reproducing the results for algorithms and heuristics for exact value alignment verification. The second month focused on extending the action space, additional experiments, and refining the structure of our code. Since our experiments were not computationally expensive, we carried out the experiments on CPU. 
+Results: The techniques proposed by authors can successfully address the value alignment verification problem in different settings. We empirically demonstrate the effectiveness of their proposals by performing exhaustive experiments with several variations to their original claims. We show high accuracy and low false positive and false negative rates in the value alignment verification task with a minimum number of questions for different algorithms and heuristics.
+What was easy: The problem statement, as well as the implementation of algorithms and heuristics, were straightforward. We also took aid from the original repository published with the paper. However, we implemented the entire pipeline from scratch and incorporated several variations to our code to perform additional designed experiments.
+What was difficult: Comprehending different algorithms and heuristics proposed in prior works along with their mathematical formulation and reasoning for their success in the given task was considerably difficult. Additionally, the original code base had several redundant files, which created initial confusion. We iterated and discussed the arguments in the paper and prior work several times to thoroughly understand the pipeline. Nevertheless, once the basics were clear, the implementation was comparatively simple.
+Communication with original authors: We reached out to the authors numerous times via email to seek clarifications and additional implementation details. The authors were incredibly receptive to our inquiries, and we appreciate their thorough and prompt responses."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -85,7 +90,7 @@ language: Python
 
 # For example, the URL of the GitHub issue where review actually occured
 review:
-  - url: https://openreview.net/forum?id=forum_id
+  - url: https://openreview.net/forum?id=BFLM3nMmhCt
 
 contributors:
   - name: Koustuv Sinha
