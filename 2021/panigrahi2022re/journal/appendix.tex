@@ -11,7 +11,7 @@ We present a sample gridworld (Figure \ref{fig:gridworld}), a sample human agent
          \caption{Sample gridworld}
          \label{fig:gridworld}
      \end{subfigure}
-
+    %  \hfill
     \hspace{5mm}
      \begin{subfigure}[hbtp]{0.3\textwidth}
          \centering
@@ -19,7 +19,7 @@ We present a sample gridworld (Figure \ref{fig:gridworld}), a sample human agent
          \caption{Human policy}
          \label{fig:human_policy}
      \end{subfigure}
-
+    %  \hfill
     \hspace{5mm}
      \begin{subfigure}[hbtp]{0.3\textwidth}
          \centering
@@ -39,7 +39,7 @@ We present a sample gridworld (Figure \ref{fig:gridworld}), a sample human agent
          \caption{Critical States Tester}
          \label{fig:cst}
      \end{subfigure}
-
+    %  \hfill
     \hspace{5mm}
      \begin{subfigure}[hbtp]{0.3\textwidth}
          \centering
@@ -68,30 +68,30 @@ We observed that the varying width of a gridworld did not affect significantly t
 
 In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fixed the gridworld width at 8. We observed no significant variation in accuracy (Figure \ref{fig:feats_acc_vs_features_plot}), false positive (Figure \ref{fig:feats_fpr_vs_features_plot}), and false negative rates (Figure \ref{fig:feats_fnr_vs_features_plot}). The trend for the number of test queries (Figure \ref{fig:feats_test_queries_vs_features_plot}) increases for \texttt{rt}, \texttt{vft}, and \texttt{arpbbt} while stays the same for \texttt{rwt} and \texttt{scott}. Unlike with different gridworld widths, the number of test queries stays similar with different feature sizes for \texttt{cst}. 
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{acc_vs_gwWidth_plot.png}
          \caption{Accuracy}
          \label{fig:acc_vs_gwWidth_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{fpr_vs_gwWidth_plot.png}
          \caption{False Positive Rate}
          \label{fig:fpr_vs_gwWidth_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{fnr_vs_gwWidth_plot.png}
          \caption{False Negative Rate}
          \label{fig:fnr_vs_gwWidth_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{test_queries_vs_gwWidth_plot.png}
          \caption{Number of Test Queries}
@@ -101,7 +101,7 @@ In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fi
     \label{fig:tester_perf_diff_gwWidth}
 \end{figure}
 
-\begin{table}[!ht]
+\begin{table}[h]
   \caption{Different testers versus gridworld widths}
   \label{tab:diff_gwWidth}
   \centering
@@ -154,30 +154,30 @@ In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fi
   \end{tabular}
 \end{table}
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{feats_acc_vs_features_plot.png}
          \caption{Accuracy}
          \label{fig:feats_acc_vs_features_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{feats_fpr_vs_features_plot.png}
          \caption{False Positive Rate}
          \label{fig:feats_fpr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{feats_fnr_vs_features_plot.png}
          \caption{False Negative Rate}
          \label{fig:feats_fnr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{feats_test_queries_vs_features_plot.png}
          \caption{Number of Test Queries}
@@ -187,7 +187,7 @@ In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fi
     \label{fig:tester_perf_diff_feats}
 \end{figure}
 
-\begin{table}[!ht]
+\begin{table}[h]
     \caption{Different testers versus features sizes}
 
   \label{tab:diff_featureSize}
@@ -256,30 +256,30 @@ In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fi
 \subsection{Diagonal Actions}
 Table \ref{tab:diag_exp} details the performance metrics for \texttt{rwt} and all heuristics in a gridworld with diagonal movements allowed. Again, since we varied the width of a gridworld, we fixed the feature size at 5. We did not perform additional experiments with \texttt{rt}, \texttt{vft}, and \texttt{ptt}, since they are reducible to \texttt{rwt}. We concluded there is no observable difference from the results in gridworlds without the diagonal movements, i.e., the accuracy (Figure \ref{fig:diag_acc_vs_gwWidth_plot}) is extremely high, and the false positive (Figure \ref{fig:diag_fpr_vs_gwWidth_plot}), and false negative rates (Figure \ref{fig:diag_fnr_vs_gwWidth_plot}) are significantly low. Additionally, the number of test queries (Figure \ref{fig:diag_test_queries_vs_gwWidth_plot}) increases for \texttt{cst} with an increase in the width of a gridworld.
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{diag_acc_vs_gwWidth_plot.png}
          \caption{Accuracy}
          \label{fig:diag_acc_vs_gwWidth_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{diag_fpr_vs_gwWidth_plot.png}
          \caption{False Positive Rate}
          \label{fig:diag_fpr_vs_gwWidth_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{diag_fnr_vs_gwWidth_plot.png}
          \caption{False Negative Rate}
          \label{fig:diag_fnr_vs_gwWidth_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{diag_test_queries_vs_gwWidth_plot.png}
          \caption{Number of Test Queries}
@@ -290,7 +290,7 @@ Table \ref{tab:diag_exp} details the performance metrics for \texttt{rwt} and al
 \end{figure}
 
 
-\begin{table}[!ht]
+\begin{table}[h]
     
     \caption{Different testers versus gridworld widths with extended action space}
   \label{tab:diag_exp}
@@ -331,30 +331,30 @@ Table \ref{tab:diag_exp} details the performance metrics for \texttt{rwt} and al
 \subsection{Non-linear reward and state-feature relationship}
 Table \ref{tab:nonlinear_reward} details the performance metrics for \texttt{rwt} and \texttt{cst} in gridworlds of different widths and non-linear relationship between reward and state-feature. The corresponding plot can be found in Figure \ref{fig:cubic_experiments} for \textit{cubic} and Figure \ref{fig:exp_experiments} for \textit{exponential} relationship. These plots and tables contain all the gridworld widths ranging from 4 to 8 (naturally, the feature size is fixed at 5), which are not present in the Results section of the paper. Note that, in \textit{cubic} we approximate the \textit{linear} relationship only when $w^{T}\phi(s) \approx 0$ while \textit{exponential} completely ignores the \textit{linear} relationship. We observed that since the accuracy is high for \textit{cubic} and low for \textit{exponential} relationships, the false positive rates are low and high respectively.
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cubic_acc_vs_gwWidth_plot.png}
          \caption{Accuracy}
          \label{fig:cubic_acc_vs_features_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cubic_fpr_vs_gwWidth_plot.png}
          \caption{False Positive Rate}
          \label{fig:cubic_fpr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cubic_fnr_vs_gwWidth_plot.png}
          \caption{False Negative Rate}
          \label{fig:cubic_fnr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cubic_test_queries_vs_gwWidth_plot.png}
          \caption{Number of Test Queries}
@@ -365,30 +365,30 @@ Table \ref{tab:nonlinear_reward} details the performance metrics for \texttt{rwt
 \end{figure}
 
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{exp_acc_vs_gwWidth_plot.png}
          \caption{Accuracy}
          \label{fig:exp_acc_vs_features_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{exp_fpr_vs_gwWidth_plot.png}
          \caption{False Positive Rate}
          \label{fig:exp_fpr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{exp_fnr_vs_gwWidth_plot.png}
          \caption{False Negative Rate}
          \label{fig:exp_fnr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{exp_test_queries_vs_gwWidth_plot.png}
          \caption{Number of Test Queries}
@@ -398,7 +398,7 @@ Table \ref{tab:nonlinear_reward} details the performance metrics for \texttt{rwt
     \label{fig:exp_experiments}
 \end{figure}
 
-\begin{table}[!ht]
+\begin{table}[h]
     
     \caption{Different testers versus gridworld widths with non-linear reward state-feature relationships}
   \label{tab:nonlinear_reward}
@@ -440,30 +440,30 @@ Table \ref{tab:nonlinear_reward} details the performance metrics for \texttt{rwt
 \subsection{Critical States Tester with different thresholds}
 Table \ref{tab:cst_thresholds} details the performance metrics for \texttt{cst} in different gridworld widths and different threshold values (0.0001, 0.2, and 0.8). As noted earlier, we observed that the number of queries decreases with strict threshold values such as 0.8, which results in reduced verification abilities. The corresponding plots for performance metrics are present in Figure \ref{fig:cst_threshold_experiments}.
 
-\begin{figure}[!ht]
+\begin{figure}[h]
      \centering
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cst_thresh_acc_vs_gwWidth_plot.png}
          \caption{Accuracy}
          \label{fig:cst_threshold_acc_vs_features_plot}
      \end{subfigure}
     \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cst_thresh_fpr_vs_gwWidth_plot.png}
          \caption{False Positive Rate}
          \label{fig:cst_threshold_fpr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-     \begin{subfigure}[!ht]{0.4\textwidth}
+     \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cst_thresh_fnr_vs_gwWidth_plot.png}
          \caption{False Negative Rate}
          \label{fig:cst_threshold_fnr_vs_features_plot}
      \end{subfigure}
      \hspace{5mm}
-    \begin{subfigure}[!ht]{0.4\textwidth}
+    \begin{subfigure}[h]{0.4\textwidth}
          \centering
          \includegraphics[width=\textwidth]{cst_thresh_test_queries_vs_gwWidth_plot.png}
          \caption{Number of Test Queries}
@@ -474,7 +474,7 @@ Table \ref{tab:cst_thresholds} details the performance metrics for \texttt{cst} 
 \end{figure}
 
 
-\begin{table}[!ht]
+\begin{table}[h]
     
     \caption{Critical states tester with different thresholds}
   \label{tab:cst_thresholds}
@@ -509,7 +509,7 @@ Table \ref{tab:cst_thresholds} details the performance metrics for \texttt{cst} 
 \subsection{Time profile for algorithms and heuristics}
 Table \ref{tab:time_profile} details the time taken by all algorithms and heuristics to verify 100 different robots for a single human agent. We observed that due to the complexity of Set Cover Optimal Teaching Heuristic, \texttt{scott} takes the maximum time to complete the verification while \texttt{rwt} takes minimum time. Also, as expected, with the increase in the width of a gridworld, the time taken to verify increases. For most of the algorithms and heuristics, the time taken increases 2X when width of a gridworld increases from 4 to 8 while for \texttt{scott}, the time taken increases by at least 3X.
 
-\begin{table}[!ht]
+\begin{table}[h]
     
     \caption{Different testers versus time taken}
   \label{tab:time_profile}
