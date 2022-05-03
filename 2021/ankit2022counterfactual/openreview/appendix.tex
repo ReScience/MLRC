@@ -7,9 +7,9 @@
 
 We conducted experiments to recreate the MNIST Ablation Study. For this study, the pre-trained model provided by the authors was used. We observed a similar trend to the authors. An increase in the number of counterfactual images used in training resulted in higher training accuracies. However, our values differed significantly from those in the report, as seen in Fig. \ref{fig:mnist-ablation-ours} and Fig.  \ref{fig:mnist-ablation-theirs} . In particular, we observed higher accuracies for each dataset, especially when only $10^4$ counterfactuals were used in training. This difference may be explained by differences between the pre-trained models provided by the authors and the models that were used to generate the plots.
 
-\begin{figure}[ht!]
+\begin{figure}[H]
     \centering
-    \includegraphics[width = 15cm]{../openreview/images/ablation.png}
+    \includegraphics[width=0.9\linewidth]{../openreview/images/ablation.png}
     \caption{Recreated MNIST Ablation Study}
     \label{fig:mnist-ablation-ours}
 \end{figure}
@@ -43,21 +43,21 @@ The following table shows the training time for each generative network against 
 Note: The ImageNet based CGN depends only on the BigGAN-256 backbone and U2-net to train. The MNIST based CGN architecture however, trains using the dataset without any pre-trained weight as backbone.
 ImageNet counterfactual generation was going to run for 1.2 million iterations(0.5s/iteration), which was not computationally feasible with our resources.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|l|l|}
-\toprule
-{} & Training time\\
-{} & (in hours) \\
-Dataset & \\
-\midrule
-Colored MNIST & \approx0.6\\
-Double-colored MNIST & \approx0.6\\
-Wildlife MNIST       & \approx3.5\\
-Imagenet & \approx$167\\
-\end{tabular}
-\caption{Training time for CGN for different datasets}
-\label{table:training_time_cgn}
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \captionsetup{font=footnotesize,skip=1mm}
+    \caption{Training time for CGN for different datasets}
+    \label{table:training_time_cgn}
+    \begin{tabular}{@{}cc@{}}
+    \toprule
+    \textbf{Dataset} & \textbf{Training Time in hours (approx)} \\ \midrule
+    Colored MNIST & 0.6 \\
+    Double-colored MNIST & 0.6 \\
+    Wildlife MNIST & 3.5\\
+    Imagenet & 167 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 
@@ -87,6 +87,23 @@ The following images using the pre-trained CGN model that was provided with the 
 \end{figure}
 
 \newpage
+
+% SSIM $[12]$ is defined using the three aspects of similarities, luminance $\left(l\left(x, x_{g e n}\right)\right)$, contrast $\left(c\left(x, x_{g e n}\right)\right)$ and structure $\left(s\left(x, x_{g e n}\right)\right)$ that are measured for a pair of images $\left\{x_{g}, x_{g e n}\right\}$ as follows: Given two images ground truth $x$ and generated image $x_{g e n}$, the SSIM [12] loss is defined $[Q]$ as follows:
+% $$
+% \mathcal{L}{s \operatorname{sim}}(\alpha)=1-\mathbf{E}{x}[l(\alpha) \cdot \operatorname{cs}(\alpha)]
+% $$
+% $l\left(x, x_{g e n}\right)=\frac{2 \mu_{x} \mu_{x_{g a n}}+C_{1}}{\mu_{x}^{2}+\mu_{x_{g \in \cdot n}}^{2}+C_{1}}$
+% $c\left(x, x_{g e n}\right)=\frac{2 \sigma_{x} \sigma_{x_{g e n}}+C_{2}}{\sigma_{x}^{2}+\sigma_{x_{g e n}}{ }^{2}+C_{2}}$
+% $s\left(x, x_{g e n}\right)=\frac{\sigma_{x x_{g c n}}+C_{3}}{\sigma_{x} \sigma_{x_{g e n}}+C_{3}}$
+% where $\mu^{\prime}$ 's denote sample means and $\sigma^{\prime}$ 's denote variances. $C_{1}, C_{2}$ and $C_{3}$ are constants. With these, SSIM and the corresponding loss function $\mathcal{L}{s s i m}$, for a pair of images $\left\{x, x{g e n}\right\}$ are defined as:
+% $$
+% \operatorname{SSIM}\left(x, x_{g e n}\right)=l\left(x, x_{g e n}\right)^{\alpha} \cdot c\left(x, x_{g e n}\right)^{\beta} \cdot s\left(x, x_{g e n}\right)^{\gamma}
+% $$
+% where $\alpha>0, \beta>0$ and $\gamma>0$ are parameters used to adjust the relative importance of the three components.
+% $$
+% \mathcal{L}{s s i m}\left(x, x{g e n}\right)=1-\operatorname{SSIM}\left(x, x_{g e n}\right)
+% $$
+%!!!! There is some issue with this section
 \section{SSIM Loss function}
 SSIM \cite{wang2004image} helps preserve the structural properties between the two images by using luminance, contrast and structural information. Additionally, SSIM \cite{wang2004image} leads to generating better structured masks using the 'm' that helps to localize the digits in a better way in the final output $x_{gen}$.
 
@@ -148,21 +165,21 @@ Wildlife              &        71.89 &        61.94 &         10  \\
 
 
 To determine why the color jitter augmentation decreases training accuracy, we observed the results visually through the samples generated across 40K iterations by the CGN. 
-  It can be seen that digit 6 loses its shape over iterations. Digits 0 and 1 have the same background and similar digit font. These artefacts produced by the CGN\cite{sauer2021counterfactual} are a likely cause of the classifier's decreased performance. Which might indicate that the CGN is overfitting itself to the image backgrounds while learning the generative model cGAN using the loss functions. 
+It can be seen that digit 6 loses its shape over iterations. Digits 0 and 1 have the same background and similar digit font. These artefacts produced by the CGN\cite{sauer2021counterfactual} are a likely cause of the classifier's decreased performance. Which might indicate that the CGN is overfitting itself to the image backgrounds while learning the generative model cGAN using the loss functions. 
 
-\begin{figure}[ht!]
-\centering
-    \includegraphics[width=0.8\textwidth,height=0.5\textwidth]{../openreview/images/x_gen_original.pdf}
-    \caption{Double Colored MNIST samples obtained using default hyper-parameters mentioned in CGN \cite{sauer2021counterfactual}.
-    }
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{../openreview/images/x_gen_original.pdf}
+        \caption{Double Colored MNIST samples obtained using default hyper-parameters mentioned in CGN \cite{sauer2021counterfactual}.
+        }
     \label{fig:original_grid}
 \end{figure}
 
-\begin{figure}[ht!]
-\centering 
-    \includegraphics[width=0.8\textwidth,height=0.5\textwidth]{images/x_gen_data_augment.pdf}
-    \caption{Double Colored MNIST samples obtained using addition of color jitter. We observe that it leads to generation of samples that are not indicative of the actual samples from the Double Colored MNIST dataset.  We observe that there is difference between with/without augmentation in terms of the brightness, contrast, overall image representations. Specifically, digit 6 loses its shape, texture, colors. Similarly, digits 0,1 are generated using different colors in contrast to Fig. \ref{fig:original_grid}. Therefore, the visual samples indicate possibly why the classifier's accuracy drops by around 10\%. 
-    }
+\begin{figure}[H]
+    \centering 
+    \includegraphics[width=0.9\linewidth]{../openreview/images/x_gen_data_augment.pdf}
+        \caption{Double Colored MNIST samples obtained using addition of color jitter. We observe that it leads to generation of samples that are not indicative of the actual samples from the Double Colored MNIST dataset.  We observe that there is difference between with/without augmentation in terms of the brightness, contrast, overall image representations. Specifically, digit 6 loses its shape, texture, colors. Similarly, digits 0,1 are generated using different colors in contrast to Fig. \ref{fig:original_grid}. Therefore, the visual samples indicate possibly why the classifier's accuracy drops by around 10\%. 
+        }
     \label{fig:data_augment_grid}
 \end{figure}
 
