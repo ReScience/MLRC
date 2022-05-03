@@ -1,0 +1,391 @@
+\vspace{-4em}
+\section*{\centering Reproducibility Summary}
+The following paper is a reproducibility report for "Social NCE: Contrastive Learning of Socially-aware Motion Representations" {\cite{liu2020snce}} published in ICCV 2021 as part of the ML Reproducibility Challenge 2021. The original code was made available by the author \footnote{\href{https://github.com/vita-epfl/social-nce}{https://github.com/vita-epfl/social-nce}}. We attempted to verify the results claimed by the authors and reimplemented their code in PyTorch Lightning.
+
+
+\subsection*{Scope of Reproducibility}
+
+The central claim of the paper is that the consideration of negative (collision) cases in trajectory prediction models through a socially contrastive loss function Social-NCE will improve the robustness of the models. We verify their claim on various models, with special focus on improvements in the human trajectory prediction models Social-STGCNN and Trajectron++ and on robot navigation through an imitation learning model. 
+
+\subsection*{Methodology}
+
+We used the codebase made publicly available by the authors for our work. We trained the models used in the paper from scratch and reimplemented the code in PyTorch Lightning. We evaluated both, and compared them with the results in the original paper. Further, we attempted additional experiments to find suitable hyperparameters in the Trajectron++ and Social-STGCNN models.
+
+\subsection*{Results}
+
+We were able to reproduce majority of the results claimed in the paper except the Social-LSTM and Directional-LSTM models due to lack of time, and got a maximum of 2\% deviation from that of the original paper. 
+\subsection*{What was easy}
+
+The publicly available codebases were well documented and easy to follow. The authors have also mentioned sources for the processed datasets that they have used. The simulation data generation code for the imitation learning model was also shared.
+
+\subsection*{What was difficult}
+
+The proposed contrastive loss was implemented on different trajectory prediction models, the understanding of which was required to reimplement the code from PyTorch to PyTorch Lightning. Experiments on the entire ETH and UCY dataset on restricted computational resources took a considerable amount of time and we had to restrict our ablation study to one model.
+
+\subsection*{Communication with original authors}
+We contacted the authors with some queries on their implementation and on the importance of some hyperparameters. They replied promptly and their input was pivotal while conducting experiments.
+
+
+\section{Introduction}
+Humans tend to develop a strong intuition towards predicting future motions of other people, while navigating in crowded spaces. This is essential for carrying out daily tasks without any discomfort and to maintain a safe distance from others while moving around. However, building neural models that can replicate similar nature of accurate predictions is often challenging, even with a large training set.
+
+Multi-agent problems such as trajectory forecasting and robot navigation, require the model to learn socially aware motion representations. Previously, several papers have proposed neural network based models to achieve these tasks. However, these models still fail to generalize well with different scenarios, often outputting colliding trajectories. The original authors aim to tackle this issue by feeding explicit negative examples into the network, while teaching the model to differentiate between the two using a newly proposed Social Contrastive Loss.
+
+We exhaustively carry out all the experiments done in the paper and verify all claims and tables. We then review the results and present an assessment. We further ported the code to the PyTorch Lightning framework. This allowed us to train the code flexibly over different platforms and automate the optimization process. We also expect this to help in future implementation or reproduction of the codebase. Then we proceed to present a few ablations in the original code, especially hyperparameter tuning. 
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+Existing work on multi-agent trajectory prediction problems sometimes output colliding trajectories which makes them unsuitable for deployment. The authors claim that this is due to the bias in existing datasets which only consist of safe trajectories and no collision scenarios, giving the models no negative cases to train on. The original paper proposes a modified contrastive loss (Social-NCE) which incorporates ground truth knowledge to generate negative cases to reduce collision rates on several benchmarks. The details of this loss have been discussed later (in Methodology section) in the report. The key claims that we aim to verify in our reproducibility report are:
+\begin{enumerate}
+  \item Addition of the Social-NCE loss in human trajectory forecasting models significantly decreases collision rate while maintaining similar final displacement error.
+  \item Addition of the Social-NCE loss in imitation learning models for robot navigation in crowded environments significantly decreases the collision rate. 
+  \item Addition of the Social-NCE loss in reinforcement learning models increases sample efficiency, and they obtain a collision-free policy quickly. 
+\end{enumerate}
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+The authors have a detailed public repository\footnote{\href{https://github.com/YuejiangLIU/social-nce-trajectron-plus-plus}{https://github.com/YuejiangLIU/social-nce-trajectron-plus-plus}} on the addition of Social-NCE on Trajectron++ \cite{salzmann2020trajectron++}, Social-STGCNN \cite{mohamed2020social}, models for human trajectory prediction and on an existing imitation learning model \cite{chen2019crowdnav} for robot navigation. Further, we contacted the authors and they gave us their implementation of Social-NCE in reinforcement learning using Rainbow DQN \cite{hessel2017rainbow} as the baseline. We reproduced the findings of the paper based on these repositories. We focused primarily on the human trajectory prediction models Social-STGCNN and Trajectron++ and attempted ablations on Social-NCE hyperparameters in the Trajectron++ model to improve its performance. Lastly we ported the codebase for Trajectron++, Social-STGCNN and the imitation learning model to PyTorch Lightning \cite{falcon2019pytorch}.
+
+\vspace{90pt}
+
+\subsection{Social-NCE Loss and Negative Data Augmentation}
+
+
+Consider M agents with index $i$ 	$\in \{1...M\}$, 
+the state of agent $i$ at time $t$ is given by $s^{i}_{t} = (x^{i}_{t}, y^{i}_{t})$ which are its position coordinates. 
+State of all agents combined is given by $s_t = \{s^{1}_{t}, s^{2}_{t}....s^{M}_{t}$\}.  
+Given $s_{1:t}$ the model predicts $s_{t+1:T}$.
+
+{\bf {Encoder $f(\cdot)$ :}} \\
+Gives vector encoding( ${h^{i}_{t}$) for agent $i$ at time $t$ given state of all agents till time t and index of agent:\\
+\begin{equation}
+h^{i}_{t} = f(s_{1:t}, i)\\
+\end{equation}
+Encoder has two sub-modules: sequential $f_s(.)$ and interaction $f_i(.)$ modules to make encoding of one agent dependent on the state of other agents.
+
+{\bf {Decoder $g(\cdot)$ :}} \\
+Returns predicted state from vector encoding\\
+\begin{equation}
+{s^{i}_{t+1:T}} = g(h^{i}_{t})
+\end{equation}
+
+
+
+
+\subsubsection {Social-NCE loss}
+{\bf{Embedding Models}}
+
+\begin{itemize}
+  \setlength{\itemindent}{-1em}    
+  \item \textbf{Query:} Projection head that embeds the vector encoding of the agent $i$ till time $t$
+  \begin{equation}
+    q = \psi(h^{i}_{t})
+  \end{equation}
+  \item \textbf{Key:} Encoder that embeds the future state of agent i at time $t + {\delta}t$ where ${\delta}t$ is the sampling horizon in a given range
+  \begin{equation}
+  k = \phi(s^{i}_{t+{\delta}t}, {\delta}t)
+  \end{equation}
+\end{itemize}
+  
+Both the query and key are 2-layer MLPs which return 8-dimensional encoded vectors.
+
+
+{\bf{Loss}}
+\\
+The InfoNCE Loss \cite{pmlr-v9-gutmann10a} is given by: 
+
+\begin{equation}
+L_{NCE} = -log\frac{exp(sim(q,k^+)/\tau)}{\sum_{n=0}^{N} exp(sim(q, k_n)/\tau)}
+\end{equation}
+
+
+In standard InfoNCE loss the similarity function sim(q, k) is the cosine similarity between the two vectors. In the Social-NCE variation this similarity function has been modified to the dot product of the two embedded vectors returned from the encoders. The Social-NCE Loss is given by: 
+\begin{mdframed}
+\begin{equation}
+L_{Social-NCE} = -log\frac{exp((\psi({h^i}_t){\cdot}\phi(s^{i,+}_{t+{\delta}t}, {\delta}t)/\tau)}{\sum_{{\delta}t \in \Lambda}\sum_{n=0}^{N} exp((\psi({h^i}_t){\cdot}\phi(s^{i,n}_{t+{\delta}t}, {\delta}t)/\tau)}
+\end{equation}
+\end{mdframed}
+
+The three encoders $f(\cdot)$, $\psi(\cdot)$ and $\phi(\cdot)$ are jointly trained such that the query is encoded closer to the positive key and further from the negative keys. The keys are made through data augmentation as discussed next. The final loss for a specific model would be given by the weighted sum of the model task loss and the Social-NCE loss.
+
+\subsubsection{Data Augmentation}
+Negative samples: The state of the agent i at time $t + {\delta}t$ cannot be same as the state of any of the other agents at time $t + {\delta}t$, so the states of the $M - 1$ elements other than the agent i can be used as negative keys for it. \\
+For each agent $j \in \{1,...M\} - \{i\}$, 8 points are taken uniformly from a circle with radius of minimum distance of comfort around the agent j as negative keys for agent $i$
+
+
+\begin{equation}
+s_{t+{\delta}t}^{i,n-} = s_{t+{\delta}t}^{j} + {\Delta}s_p + \epsilon
+\end{equation}
+
+${\Delta}s_p = ({\rho}cos{\theta}_p, {\rho}sin{\theta}_p), \rho$ being minimum distance of comfort and ${\theta}_p = 0.25p\pi, p \in \{0, 1,...,7\}$ \\
+$\epsilon$ is a normally distributed added noise 
+
+
+Each agent $i$ thus has $8(M - 1)$ negative keys.\\ 
+Positive samples: Single positive key is taken from state of agent $i$ at time $t + {\delta}t$ after adding normally distributed noise $\epsilon$\\
+\begin{equation}
+s_{t+{\delta}t}^{i,+} = s_{t+{\delta}t}^{i} + \epsilon
+\end{equation}
+
+The data augmentation is made clearer by the following diagram given by the authors \cite {liu2020snce}. For an agent $i$ (in blue) the areas of Collision and Discomfort as shown are used as negative samples.
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=7cm]{../openreview/illustration.png}
+    \caption{Social Negative Augmentation}
+    \label{fig:Social Negative Augmentation}
+\end{figure}
+
+\subsection{Datasets}
+The human trajectory prediction models were run on a processed version of ETH and UCY datasets. The original dataset is a collection of 5 video segments of pedestrian trajectories from which the states of each agent per frame id had been stored and the dataset had been pre-divided into train, test and validation sets to maintain uniformity in accuracy comparison. The processed ETH and UCY datasets are are available in the repository linked\footnote{\href{https://github.com/StanfordASL/Trajectron-plus-plus/tree/master/experiments/pedestrians/raw}{https://github.com/StanfordASL/Trajectron-plus-plus/tree/master/experiments/pedestrians/raw}}.\\
+The imitation and reinforcement learning models used pedestrian data from an open-source simulator based on OpenAI gym library \footnote{\href{https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}{https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}}. The dataset\footnote{\href{https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}{https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}} consisted of 5000 simulated situations in which the position of 5 random agents are stored for each time step. A validation split of 0.3 was taken. 
+
+\subsection{Hyperparameters}
+Apart from the hyperparameters required for regular network training, the Social-NCE included three additional hyperparameters, specific to the model. These were: the temperature hyperparameter $\tau$, the sampling horizon $\delta t $ and the contrastive weight $\lambda$. In the original paper, there values were set by default. We improvised upon previous work by performing a thorough random search for these hyperparameters using WandB \cite{wandb}. We further do a sensitivity analysis, and check whether hyperparameter tuning offers any significant benefit. The details of the search can be summarised as follows:
+\vspace{10pt}
+\begin{table}[H]
+\caption{Search on model hyperparameters}
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Hyperparameter&\ Original Value&\ Method of Search&\ Range of Search\ \\ [0.5ex]
+\hline 
+Temperature \tau &  0.1 & Random & 0.1 - 0.5\\
+Sampling Horizon \delta t & 4 & Grid & {1, 2, 3, 4, 5}\\
+Contrastive Weight \lambda  &  2 & Random & 0 - 50\\
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+Details on the loss hyperparameters:
+\begin{itemize}
+    \item Temperature($\tau$): Part of the Social-NCE loss which controls the weight of the penalty and reward for negative and postive samples respectively.
+    \item Sampling Horizon({$\delta t$}): The future time step till which the negative samples are considered for data augmentation
+    \item Contrastive Weight($\lambda$): The weight between the main loss of the model and the Social-NCE Loss
+\end{itemize}
+A similar search was performed separately for the hyperparameters pertaining to data augmentation, with the default values for the hyperparameters discussed in the previous section. These hyperparameters were: Minimum Separation, Maximum Separation and the weight between maximum separation and noise. The details of this search can be summarised as follows:
+\begin{table}[H]
+\caption{Search on hyperparameters of data augmentation}
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Hyperparameter&\ Original Value&\ Method of Search&\ Range of Search\ \\ [0.5ex]
+\hline 
+Minimum Separation &  0.2 & Random & 0.1 - 0.5\\
+Maximum Separation & 2.5 & Random & 2.2 - 2.8\\
+Weight between maximum separation and noise &  0.2 & Random & 0 - 0.5\\
+\hline
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+Details on the augmentation hyperparmeters:
+\begin{itemize}
+    \item Minimum Separation: Minimum admissible value of $\rho$ in negative augmentation which is the minimum comfortable distance between two agents
+    \item Maximum Separation: Maximum admissible value of $\rho$ in negative augmentation which is the maximum distance after which agents can pass each other with collision.
+    \item Weight between maximum separation and noise: The weight between the added normal noise and the position of the augmented sample.
+\end{itemize}
+
+\subsection{Experimental setup and code}
+The encoder models were trained with Adam Optimizer. For the training of the Trajectron++, Social-STGCNN and imitation learning models 300, 500 and 200 epochs were used respectively. There were two runs of the reinforcement learning model on 2000 and 5000 episodes respectively. As mentioned in the original paper, the models were evaluated on the following metrics:
+\begin{itemize}
+  \item Final displacement error (FDE): the Euclidean distance between the predicted output and the ground truth at the last time step.
+  \item Collision rate (COL): the percentage of test cases where the predicted trajectories of agents run into collisions.
+\end{itemize}
+
+A lower FDE is preferred, however the current reproduction mainly aims to see the decrease in collision rate. 
+The code was also integrated with WandB to conduct further experiments. This process involved constructing a config dictionary, which included the list of all possible hyperparameters and the values it could potentially take. The main function was modified with WandB initialisation and the logging function to log the value of the Loss after training is complete. The function was then passed to the WandB agent to carry out sweeps. The code can be found in this link \footnote{\href{https://anonymous.4open.science/r/social-nce-stgcnn-62D5/README.md}{https://anonymous.4open.science/r/social-nce-stgcnn-62D5/README.md}}.
+\subsection{Computational requirements}
+The training code for Trajectron++ and Social-STGCNN was run on Kaggle with GPU (Tesla P100-PCIE-16GB) and CPU (13GB RAM + 2-core of Intel Xeon).The average training runtimes are listed in the tables below. It can be seen clearly that porting to lightning has not caused any increase in training time. 
+
+\begin{table}[H]
+\caption{Training Runtimes} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Codebase&\ Original Codebase Training Time&\ Ported Codebase Training Time&\ \\ [0.5ex]
+\hline 
+Trajectron++ &    4hr 28mins & 4hrs 24mins\\
+Social-STGCNN &  8hr 32mins & 8hr 30mins\\
+Imitation Learning &   53min & 50mins\\
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+\\
+
+\section{Results}
+\label{sec:results}
+The following experiments support the claims made by the authors. We compared the results from training the model from scratch(Reproduced) and reimplementing the model in PyTorch Lightning (Ported Code) with the results given by the authors (Original Paper).
+
+\subsection{Results reproducing original paper}
+A comparison of the FDE (Final Displacement Error) and COL (Collision Rate) for the addition of Social-NCE to Trajectron++ and Social-STGCNN models in original paper, reproduced and ported code.
+
+\begin{table}[H]
+\caption{Social-STGCNN} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Dataset&\ Ported Code&\ Reproduced&\ Original Paper&\ \\ [0.5ex]
+\multirow{} & FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\  
+\hline 
+ETH &    1.442 \hspace{0.25cm} {\bf{0.53}} & 1.249 \hspace{0.25cm} 1.11 & {\bf{1.224}} \hspace{0.25cm} 0.61\\
+Hotel&   {\bf{0.598}} \hspace{0.25cm} 3.49 & 0.681 \hspace{0.25cm} \bf{3.25} & 0.678 \hspace{0.25cm} 3.35\\
+Univ &   {\bf{0.856}} \hspace{0.25cm} {\bf{6.39}} & 0.878 \hspace{0.25cm} 6.44 & 0.879 \hspace{0.25cm} 6.44\\
+Zara1&   {\bf{0.492}} \hspace{0.25cm} 1.29 & 0.515 \hspace{0.25cm} {\bf{1.02}} & 0.515 \hspace{0.25cm} \bf{1.02}\\  
+Zara2&   {\bf{0.453}} \hspace{0.25cm} 3.58 & 0.481 \hspace{0.25cm} {\bf{3.26}} & 0.482 \hspace{0.25cm} 3.37\\
+\hline
+Average& 0.768 \hspace{0.25cm} 3.05 & 0.761 \hspace{0.25cm} 3.02 & {\bf{0.756}} \hspace{0.25cm} {\bf{2.96}}\\
+
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+\begin{table}[H]
+\caption{Trajectron++} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Dataset&\ Ported Code&\ Reproduced&\ Original Paper&\ \\ [0.5ex]
+\multirow{} & FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\  
+\hline 
+ETH &    {\bf{0.632}} \hspace{0.25cm} 0.00 & 0.791 \hspace{0.25cm} 0.00 & 0.791 \hspace{0.25cm} 0.00\\
+Hotel&   0.193 \hspace{0.25cm} {\bf{0.29}} & {\bf{0.163}} \hspace{0.25cm} 0.32 & 0.177 \hspace{0.25cm} 0.38\\
+Univ &   {\bf{0.426}} \hspace{0.25cm} {\bf{2.95}} & 0.442 \hspace{0.25cm} 3.29 & 0.435 \hspace{0.25cm} 3.08\\
+Zara1&   0.439 \hspace{0.25cm} 0.18 & 0.338 \hspace{0.25cm} {\bf{0.14}} & {\bf{0.330}} \hspace{0.25cm} 0.18\\  
+Zara2&   0.452 \hspace{0.25cm} 0.95 & 0.281 \hspace{0.25cm} 1.02 & {\bf{0.255}} \hspace{0.25cm} 0.99\\
+\hline
+Average& 0.428 \hspace{0.25cm} {\bf{0.88}} & 0.403 \hspace{0.25cm} 0.95 & {\bf{0.398}} \hspace{0.25cm} 0.93\\
+
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+A comparison of the collision rate and time taken for the robot to reach destination for the addition of Social-NCE in the imitation learning model in original paper, reproduced and ported code.
+
+\begin{table}[H]
+\caption{Imitation Learning} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Code&\ Time(s)&\ Collision(\%)&\ \\ [0.5ex]
+\hline 
+Original &    10.33 & 3.40\\
+Reproduced &  10.49 & {\bf{3.36}}\\
+Ported &   {\bf{10.28}} & 3.45\\
+
+
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+A table of reward vs number of episodes trained for the implementation of Social-NCE on the reinforcement learning model.
+\begin{table}[H]
+\caption{Reinforcement Learning} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Episodes&\ 0&\ 1000&\ 2000&\ 3000&\ 4000&\ 5000&\\ [0.5ex]
+\hline 
+Reward&    -0.10& 0.42& 0.61& 0.63& 0.64& 0.64&\\
+
+
+
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+\subsection{Hyperparameter tuning}
+The performance of any model, critically depends on the choice of hyperparameters. In the original paper, the values of these hyperparameters were set by default. We identified critical hyperparameters, specific to the Social-NCE, and conducted a thorough hyperparameter search, to find out the best possible combination of hyperparameters. Due to lack of time, this was done only on the Social STGCNN model and trained over the ETH dataset.
+The following table summarises the results of the search:
+\begin{table}[H]
+\caption{Hyperparameter Search} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Hyperparameter&\ Original Value&\ Best Value\ \\ [0.5ex]
+\hline 
+Temperature \tau &  0.1 & 0.1412\\
+Sampling Horizon \delta t & 4 & 1\\
+Contrastive Weight \lambda  &  2 & 16\\
+\hline % inserts single-line
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+A similar search was performed separately for the hyperparameters pertaining to Data Augmentation:
+
+\begin{table}[!h]
+\caption{Hyperparameter Search} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Hyperparameter&\ Default Value&\ Best Value&\ \\ [0.5ex]
+\hline 
+Minimum Separation &  0.2 & 0.22\\
+Maximum Separation & 2.5 & 3.1\\
+Weight between maximum separation and noise &  0.2 & 0.24\\
+\hline
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+The FDE and collision rate after training the Social-STGCNN model for 400 epochs on the original (Original Parameters) and tuned hyperparameters(Tuned Parameters) are:
+\begin{table}[!h]
+\caption{Metrics on Original and Tuned Hypeparameters} %title of the table
+\centering % centering table
+\begin{tabular}{ccc rrrrr} 
+\hline 
+&\ \ \ \ \ \\
+Model&\ FDE&\ COL&\ \\ [0.5ex]
+\hline 
+Tuned Parameters&\ 0.674&\ 3.45&\ \\
+Original Parameters&\ 0.678&\ 3.54&\ \\
+
+\hline
+\end{tabular}
+\label{tab:hresult}
+\end{table}
+
+\section{Discussion}
+
+Our results support the authors' claim that modelling of social knowledge through the addition of negative test cases reduce the collision rate of trajectory prediction models. In both training from scratch in the original code and in the ported code, the results have remained consistent with that of the original paper. 
+\begin{enumerate}
+  \item In human trajectory forecasting, the addition of Social-NCE to the models Trajectron++ and social-STGCNN showed a 35.7\% and 35.1\% decrease in collision rate on average respectively(Table 4 and Table 5) in our reproduced results. The Final Displacement Error(FDE) showed deviation of less than 1\%, showing that addition of Social-NCE adds to the robustness of the models without affecting it's accuracy.
+  \item In the imitation learning model the collision rate decreased by 68.9\% on average in our reproduced results with the time taken showing little deviation (Table 6). 
+  \item The Social-NCE addition to the Rainbow-DQN based reinforcement learning model, as in the original paper, achieves a reward of 0.6 in 2000 episodes in comparison to 4000 episodes of the original Reinforcement Learning model(Table 7).
+\end{enumerate}
+The hyperparameter tuning conducted was also vastly helpful and lead to an increase of accuracy by 0.91 \%. The loss hyperparameters, determined the sensitivity of the model. The contrastive weight, determined emphasis of the Social-NCE loss. The more the emphasis, the better the model learnt to differentiate between a positive and negative sample, but at the expense of loss of proximity to the actual training examples. It remains difficult to analytically understand the effect of change in the temperature hyperparameter.\\
+Hyperparameter search, even though tedious, can lead to a great increase in accuracy. The tuning of hyperparameters involved in the model, lead to an overall increase in accuracy. In task like trajectory prediction and motion forecasting, it might be crucial to try and increase the accuracy as much as possible. However, one thing to be noted is that the Social-STGCNN had a huge running time, and one sweep took a huge amount of time.\\
+The effect of the Data Augmentation hyperparameters, seem to be highly variable. It is natural that results are likely to vary greatly with the choice of dataset, and the nature of the problem statement. This is because these hyperparameters are physical constraints put on the model, and hence might lead to different results for different datasets.\\
+Further, it was found that best results were found when the value of the contrastive weight to be 16, while the default value was 2. The values might differ distinctly, but this reinforces confidence in the proposed Social-NCE loss. 
+\subsection{What was easy}
+The authors have provided a detailed public codebase on the implementation of Social-NCE on Trajectron++, Social-STGCNN and imitation learning model. Further, they shared the codebase for the reinforcement learning model. All the codebases have instructions on how to set up the environment and logs the important metrics, which proved to be helpful in reproduction. 
+
+\subsection{What was difficult}
+The porting of the implementation of Social-NCE in the Trajectron++ and Social-STGCNN models from PyTorch to PyTorch Lightning required an understanding of those models and their original codebase which required additional time. Training of the models from scratch required large computation power. All the training was done over cloud GPUs with limited runtimes which often fell short of the time required for training.
+
+\subsection{Communication with original authors}
+We mailed the authors listing down some of the queries we had on their code implementation. We also had some queries regarding the important hyperparameters that we could tune to improve model performance. The authors gave a prompt reply to our questions. They shared the codebase for the reinforcement learning model as well. Their contribution has helped us with some crucial points in the report. 
+
+\section{Future Work}
+We originally planned to perform the following additional experiments which we couldn't finish due to lack of time. They have been listed down below and we believe that future work on this paper can be done in this direction.
+\begin{itemize}
+    \item A best hyperparameter search on Social-NCE in Trajectron++, the imitation learning model and the Rainbow-DQN based Reinforcement Learning model as well and comparison of the variation in results for different models.
+    \item Implementation of Social-NCE on the Social-LSTM and Directional-LSTM models on the Trajnet++ benchmark, the results for which have been given in the original paper.
+    \item Implementation of Social-NCE on state of the art models in other benchmarks such as on the PGP model \cite{deo2021multimodal} for the nuScences dataset.
+\end{itemize}
