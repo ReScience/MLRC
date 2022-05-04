@@ -3,7 +3,6 @@
 In this work, the paper Strategic Classification Made Practical is evaluated through a reproduction study. We successfully reproduced the original results using the same dataset and hyperparameters. In addition, we conducted an additional experiment that tests the framework's performance on a dataset containing both strategic and non-strategic users. The results show significant decrease in accuracy of linear models proportional to the number of non-strategic users. The non-linear RNN model achieves good performance regardless of the proportion of strategic users. The results provide insight into the limitations of the claims that the original approach is flexible and practical.
 
 \clearpage
-\section{Content}
 \section{Reproducibility Summary}
 
 In this work, the paper Strategic Classification Made Practical\cite{levanon2021strategic} is evaluated through a reproduction study. The results from the reproduction examines if the claims made in the paper are valid. We could find two main claims that were made by the authors that we will attempt to reproduce. Those are as follows:
@@ -104,13 +103,13 @@ This problem of classification while users strategically modify their features i
 
 % Consistently use moving points/editing features to avoid confusion
 This paper describes our efforts to reproduce the work from the paper Strategic Classification Made Practical\cite{levanon2021strategic}, which addresses the problem of strategic classification in a manner that is more practical than previous approaches, more flexible than previous approaches and takes social good into account.\\
-The original paper describes strategic classification as a classification task on a set of points $x \in \mathbb{R}^D$. A classifier $h(x)$ is tasked to classify $x$ to into classes $y = \{-1,1\}$, which is determined by a score function $f$ via the decision rule $h(x) = \sign(f(x))$. In strategic classification, the assumption is made that points can move according to a cost function $c(x,x')$. Therefore, users can modify their original features $x$ to their repsonse $x'$ to improve their outcome using the best move for $x$; $\Delta_h(x)$. Where this best move $\Delta_h(x)$ can be described as follows: 
+The original paper describes strategic classification as a classification task on a set of points $x \in \mathbb{R}^D$. A classifier $h(x)$ is tasked to classify $x$ to into classes $y = \{-1,1\}$, which is determined by a score function $f$ via the decision rule $h(x) = \sign(f(x))$. In strategic classification, the assumption is made that points can move according to a cost function $c(x,x')$. Therefore, users can modify their original features $x$ to their response $x'$ to improve their outcome using the best move for $x$; $\Delta_{h}(x)$. Where this best move $\Delta_{h}(x)$ can be described as follows: 
 \begin{equation} \label{eq:resp_map}
-  \Delta_h(x) = \argmax_{x' \in \chi} h(x') - c(x,x') 
+  \Delta_{h}(x) = \argmax_{x' \in \chi} h(x') - c(x,x') 
 \end{equation}\\
 To accurately classify points that are able to to modify their features, the error function has to take this into account. This results in an empirical loss function of: 
 \begin{equation} \label{eq:SERM}
- \min_{f \in F} \sum^m_{i=1} \mathds{I}\{y \neq h(\Delta_f(x))\} + \lambda R(f)
+ \min_{f \in F} \sum^{m}_{i=1} \mathds{I}\{y \neq h(\Delta_{f}(x))\} + \lambda R(f)
 \end{equation}
 Which translates to choosing a score function $f$ such that misclassification of manipulated datapoints is minimized according to regularization method $R$ and $\lambda$ that determines the regularization strength. Optimizing equation \ref{eq:SERM} is referred to as strategic empirical risk minimization (SERM) in the original paper, which functions as the main loss function of the framework.
 \\\\
@@ -136,6 +135,7 @@ The focus of the original paper is on proposing a new framework, rather than a n
 The claims made in the paper were proven independently of each other in different experiments using different datasets, \textit{spam, credit, fraud} and \textit{financial distress} (datasets will be elaborated upon in section \ref{sec:datasets}). This was done to demonstrate the flexibility of the framework as well as to demonstrate the generalizability of the framework on different datasets.\\\\ To verify said generalizability and flexibility, we repeated these experiments using the code provided by the authors. Similar to the original paper, results were compared to two "simpler", non-strategic models to verify performance. By non-strategic, we mean a standard classifier which assumes that the datapoints cannot move in any way. These models are referred to as \textbf{benchmark}, which is a non-strategic classifier trained and evaluated on non-strategic data, and \textbf{blind}, which is a non-strategic classifier evaluated on strategic data. To clarify: performing strategic classification is the act of training a model on a dataset and consequently performing a classification task where strategic movement of points according to a cost function is taken into account.
 
 In the original paper, the model calculates the cost depending on the scale. Therefore, we will also be using scale to calculate the cost. Similar to the original paper, the influence of scale on model performance will be examined, where scale will take on the following values: $[0.5, 1, 2]$. These values were chosen such that the results can be compared to the original paper. This means that for each run of the model the cost is increased or decreased depending on the scale. The cost function used is:
+
 \begin{equation}\label{eq:r_util}
      Cost = scale * squared\_error
 \end{equation}
@@ -157,9 +157,9 @@ Social burden: minimal cost value from among users classified as positive.
 \\
 Recourse: the capacity of a user who classified negative to restore approval through reasonable action
 \begin{equation}\label{eq:r_recourse}
-    R_{recourse} = \sum^m_{i=1}\sigma(-f(x)) * \sigma(-f(\Delta_f(x)))
+    R_{recourse} = \sum^m_{i=1}\sigma(-f(x)) * \sigma(-f(\Delta_{f}(x)))
 \end{equation}
-Where $\Delta(x)$ is the best response for $x$, $\Delta_f(x)$ is the best response for $x$ with regard to $f$, $x'$ is the strategically modified datapoint (as described in section \ref{sec:scope}), and $\sigma(x)$ is the sigmoid function of $x$.  Similar to the first experiment, this experiment uses a linear classifier with a SERM loss function. For every regularisation method, differing ranges of regularisation were analysed and compared to a benchmark model. The experiment on utility used a log range for $\lambda \in [-0.4,-0.2]$ of 10 steps, the experiment on social burden used a log range for $\lambda \in [-2,1]$ of 30 steps, and the experiment on recourse used a log range for $\lambda \in [0,0.3]$ of 15 steps.
+Where $\Delta(x)$ is the best response for $x$, $\Delta_{f}(x)$ is the best response for $x$ with regard to $f$, $x'$ is the strategically modified datapoint (as described in section \ref{sec:scope}), and $\sigma(x)$ is the sigmoid function of $x$.  Similar to the first experiment, this experiment uses a linear classifier with a SERM loss function. For every regularisation method, differing ranges of regularisation were analysed and compared to a benchmark model. The experiment on utility used a log range for $\lambda \in [-0.4,-0.2]$ of 10 steps, the experiment on social burden used a log range for $\lambda \in [-2,1]$ of 30 steps, and the experiment on recourse used a log range for $\lambda \in [0,0.3]$ of 15 steps.
 
 \subsubsection{Additional experiments} 
 The authors make an assumption that all the users of the system will game according to their cost function. However, in many real life situations this assumption may not hold. For instance, in an email spam classification setting, people who write regular non-spam emails will most likely not think about gaming the spam classifier system. Assuming that every user is gaming might lead to a situation where a non-gaming email is falsely classified as spam due to the classifier being too strict. The case in which the strategic model is evaluated on a dataset consisting of non-gaming users is not taken into account in the paper. \\ \\
@@ -188,7 +188,7 @@ The datasets that were used in the original paper were also used in this work. A
 % Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
 
 As described in section \ref{sec:model_desc}, a seperate model was trained for every experiment. In turn, every model had seperate hyperparameters as well. As such, hyperparameters were chosen based on their performance in the original paper. Figure \ref{tab:hyperparams_vanilla} and figure \ref{tab:hyperparams_reg} (see Appendix B) show the hyperparameters that were used per experiment.
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
 \begin{tabular}{l|llll|}
 \cline{2-5}
@@ -263,7 +263,7 @@ To prove the second claim about social impact, the authors made plots similar to
 \begin{figure}
     \centering
     \hspace*{-.5in}
-    \includegraphics[scale=0.5]{../openreview/plots/Extentions.png}
+    \includegraphics[width=\columnwidth]{../openreview/plots/Extentions.png}
     \caption{Graphs showing the relationship between the social welfare metrics and model accuracy (left: recourse, center: social burden, right: utility). Points correspond 
     to different degrees of regularization $\lambda$. }
     \label{fig:extention_results}
@@ -274,7 +274,7 @@ To prove the second claim about social impact, the authors made plots similar to
 % \centering
 %     \begin{subfigure}[b]{0.45\textwidth}
 %     \centering
-%     \includegraphics[scale=0.4]{../openreview/plots/burden.jpg}
+%     \includegraphics[scale=0.4]{plots/burden.jpg}
 %     \caption{A graph showing model performance as the amount of social burden increases.}
 %     \label{fig:burden_result}
 %     \end{subfigure}
@@ -283,7 +283,7 @@ To prove the second claim about social impact, the authors made plots similar to
 %     %
 %     \begin{subfigure}[b]{0.45\textwidth}
 %     \centering
-%     \includegraphics[scale=0.4]{../openreview/plots/recourse.png}
+%     \includegraphics[scale=0.4]{plots/recourse.png}
 %     \caption{A graph showing model performance as the amount of recourse increases.}
 %     \label{fig:recourse_result}
 %     \end{subfigure}
@@ -292,7 +292,7 @@ To prove the second claim about social impact, the authors made plots similar to
 %     %
 %     \begin{subfigure}[b]{0.45\textwidth}
 %     \centering
-%     \includegraphics[scale=0.45]{../openreview/plots/utility.jpg}
+%     \includegraphics[scale=0.45]{plots/utility.jpg}
 %     \caption{A graph showing model performance as the amount of utility increases.}
 %     \label{fig:utility_result}
 %     \end{subfigure}
@@ -302,9 +302,9 @@ To prove the second claim about social impact, the authors made plots similar to
 \subsection{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
 
-The results in terms of accuracy, presented in Figure \ref{fig:semi-strat}, show that for 3 out of 4 datasets, there is a clear linear relationship between the amount of gaming users and both models' performance, with roughly the same slope and opposite direction. For fraud and spam data, the point of equal performance is around 0.6, which suggests that the non-strategic model is better, assuming uniform probability distribution of $\beta$. The plots of false positive and negative errors (Fig \ref{fig:confusion}) show, in line with our initial hypothesis, that the drop in performance of the strategic model is caused by more false negative errors, and by false positive in case of the non-strategic model.
+The results in terms of accuracy, presented in Figure \ref{fig:semi-strat}, show that for 3 out of 4 datasets, there is a clear linear relationship between the amount of gaming users and both models' performance, with roughly the same slope and opposite direction. For fraud and spam data, the point of equal performance is around 0.6, which suggests that the non-strategic model is better, assuming uniform probability distribution of $\beta$. The plots of false positive and negative errors (Fig \ref{fig:confusion}) show, in line with our initial hypothesis, that the drop in performance of the strategic model is caused by more false negative errors, and by false positive in case of the non-strategic model. 
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[scale=0.6]{../openreview/plots/semi-strategic.png}
     \caption{A comparison of non-strategic and strategic model accuracy as the proportion of gaming  users changes, evaluated on four datasets used in the original paper. }
@@ -315,7 +315,7 @@ The distress data is an outlier, in which the strategic model is at the benchmar
 
 The experimental results show a practical limitation in the presented method, which comes from the assumption that all users game in the same way and according to the same cost function. However, the distress model shows that decreased performance for non-strategic users is not always the case. Looking into this relationship is a potential direction of new research, which might result in improvements to the proposed framework.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[scale=0.7]{../openreview/plots/mistake_rates.png}
     \caption{Fractions of different datasets classified as false negative and false positive by the non-strategic (top row) and strategic (bottom row) models. Evaluated on four datasets used in the original paper. }
