@@ -42,7 +42,6 @@ The focus of our study is to empirically verify the claims of the paper. The mat
     \item The proposed algorithms perform comparably or even better than the presented baselines.
 \end{itemize}
 
-% removed citation halabi
 These claims are supported by experiments where all algorithms select a candidate based on a variety of datasets. The original authors consider an algorithm fair when "the solution obtained is balanced with respect to some sensitive attribute (e.g. nationality, race, gender)" \citet{correa21}. This notion is consistent with previous work \citet{ Celis_a, Chierichetti2019}. More precisely, algorithms are considered fair when they respect the prior probability $p$ that the best candidate belongs to a certain group. Performance is defined as the probability of selecting the optimal candidate (in the Secretary setting) and the average value of the selected candidate (in the Prophet setting).
 
 We validate their claims by recreating the algorithms and experiments from scratch in Python. We use the description in the paper as a guideline, referring to the original code only when necessary.
@@ -52,41 +51,37 @@ We validate their claims by recreating the algorithms and experiments from scrat
 \subsection{The Secretary Algorithm}
 
 \begin{minipage}{0.46\textwidth}
-
-\textbf{Algorithm \ref{alg:secretary}} describes the original authors' fair secretary algorithm. Candidates appear in increasing order of their arrival time $\tau$. The algorithm calculates one threshold $t \in [0,1]^k$ per group $c$, using Formula \ref{eq:arrival_time_sec}.
-
-\begin{equation}
-\label{eq:arrival_time_sec}
-\begin{split}
-t_k^* &= (1 - (k - 1)p_k)^{\frac{1}{k-1}} \\
-t_j^* &= t_{j+1}^* \left( \frac{\sum_{r=1}^j \frac{p_r}{j-1} - p_j}{\sum_{r=1}^j \frac{p_r}{j-1} - p_{j+1}} \right)^{\frac{1}{j-1}},for\;\;2\leq j \leq k - 1 \\
-t_1^* &= t_2^* \cdot e^{\frac{p_2}{p_1} - 1}
-\end{split}
-\end{equation}
+  \textbf{Algorithm \ref{alg:secretary}} describes the original authors' fair secretary algorithm. Candidates appear in increasing order of their arrival time $\tau$. The algorithm calculates one threshold $t \in [0,1]^k$ per group $c$, using Formula \ref{eq:arrival_time_sec}.
+  \begin{equation}
+    \label{eq:arrival_time_sec}
+    \begin{split}
+    t_k^* &= (1 - (k - 1)p_k)^{\frac{1}{k-1}} \\
+    t_j^* &= t_{j+1}^* \left( \frac{\sum_{r=1}^j \frac{p_r}{j-1} - p_j}{\sum_{r=1}^j \frac{p_r}{j-1} - p_{j+1}} \right)^{\frac{1}{j-1}} \\
+             &\;\;\;\;for\;\;2\leq j \leq k - 1 \\
+    t_1^* &= t_2^* \cdot e^{\frac{p_2}{p_1} - 1}
+    \end{split}
+  \end{equation}
+  \end{minipage}
+  \hfill
+\begin{minipage}{0.50\textwidth}
+  \begin{algorithm}[H]
+    \caption{Fair Secretary}
+    \label{alg:secretary}
+    \begin{algorithmic}
+    \State \textbf{Input: t} $\in [0,1]^k $, a time threshold per group
+    \State $\qquad \>\>\>$ n candidates scores
+    \State \textbf{Output: }$i \in [n]$, index of chosen candidate
+    \State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+    \State $\quad$ \textbf{if} $\tau_{i^{\prime}} > t_{c(i)}$ \textbf{then}
+    \State $\qquad$ \textbf{if} \textit{i} $\succ \max \left\{i^{\prime} \mid \tau_{i^{\prime}} \leq \tau_{i}, c\left(i^{\prime} \mid\right)=c(i)\right\}$ \textbf{then}
+    \State $\qquad \quad$ \textbf{return} \textit{i}
+    \State $\qquad$ \textbf{end}
+    \State $\quad$\textbf{end}
+    \State \textbf{end}
+    \end{algorithmic}
+    \label{alg:fair_secretary}
+  \end{algorithm}
 \end{minipage}
-\hfill
-\begin{minipage}{0.46\textwidth}
-\begin{algorithm}[H]
-\caption{Fair Secretary}
-\label{alg:secretary}
-% \begin{algorithmic}
-% \State \textbf{Input: t} $\in [0,1]^k $, a time threshold per group
-% \State $\qquad \>\>\>$ n candidates scores
-% \State \textbf{Output: }$i \in [n]$, index of chosen candidate
-% \State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
-% \State $\quad$ \textbf{if} $\tau_{i^{\prime}} > t_{c(i)}$ \textbf{then}
-% \State $\qquad$ \textbf{if} \textit{i} \succ \max \left\{i^{\prime} \mid \tau_{i^{\prime}} \leq \tau_{i}, c\left(i^{\prime} \mid\right)=c(i)\right\} \textbf{then}\\
-% \State $\qquad \quad$ \textbf{return} \textit{i}
-% \State $\qquad$ \textbf{end}
-% \State $\quad$\textbf{end}
-% \State \textbf{end}
-% \State
-% \end{algorithmic}
-\label{alg:fair_secretary}
-\end{algorithm}
-\end{minipage}
-
-
 This threshold determines from which point the algorithm could pick a candidate. Once the thresholds are computed, they are used as input to Algorithm \ref{alg:fair_secretary} along with the data. The algorithm will return its best candidate.
 
 
@@ -95,44 +90,44 @@ In contrast to the secretary setting, the prophet algorithm knows the distributi
 
 The original authors consider two settings in their paper: one where each candidate is drawn from a separate distribution, and one where the scores are i.i.d.. Pseudocode for both models is illustrated in Algorithms\footnote{Since the original authors refer to Algorithm 2  as the Fair General Prophet and FairPA interchangeably, it makes sense for us to do the same.} \ref{alg:fair_prophet} and \ref{alg:iid_prophet}.
 
-% \begin{minipage}[t]{0.46\textwidth}
-% \begin{algorithm}[H]
-%     \centering
-%    \caption{Fair General Prophet}\label{alg:fair_prophet}
-% \begin{algorithmic}
-% \State \textbf{Input: }$F_1 ... F_n$, distributions
-% \State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
-% \State $\qquad \>\>\>\>$ n candidates scores
-% \State \textbf{Output: }$i \in [n]$, index of chosen candidate
-% \State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
-% \State $\quad$ \textbf{if} $v_{i} \geq F_{i}^{-1} \left (1 - \frac{q_{i} / 2}{1-s / 2}\right)$ \textbf{then}
-% \State $\qquad$ \textbf{return} \textit{i}
-% \State $\quad$\textbf{end}
-% \State $\quad s \leftarrow s+q_{i}$
-% \State \textbf{end}
-% \end{algorithmic}
-% \end{algorithm}
-% \end{minipage}
-% \hfill
-% \begin{minipage}[t]{0.46\textwidth}
-% \begin{algorithm}[H]
-%     \centering
-%   \caption{Fair IID Prophet}\label{alg:iid_prophet}
-% \begin{algorithmic}
-% \State \textbf{Input: }$F_1 ... F_n$, distributions
-% \State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
-% \State $\qquad \>\>\>\>$ n candidates scores
-% \State \textbf{Output: }$i \in [n]$, index of chosen candidate
-% \State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
-% \State $\quad$ \textbf{if} $v_{i} \geq F^{-1}\left(1-\frac{2 / 3 n}{1-2(i-1) / 3 n}\right)$ \textbf{then}
-% \State $\qquad$ \textbf{return} \textit{i}
-% \State $\quad$\textbf{end}
-% \State \textbf{end}
-% \State
-% \end{algorithmic}
-% \end{algorithm}
-% \end{minipage}
-%
+\begin{minipage}[t]{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+   \caption{Fair General Prophet}\label{alg:fair_prophet}
+\begin{algorithmic}
+\State \textbf{Input: }$F_1 ... F_n$, distributions
+\State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
+\State $\qquad \>\>\>\>$ n candidates scores
+\State \textbf{Output: }$i \in [n]$, index of chosen candidate
+\State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+\State $\quad$ \textbf{if} $v_{i} \geq F_{i}^{-1} \left (1 - \frac{q_{i} / 2}{1-s / 2}\right)$ \textbf{then}
+\State $\qquad$ \textbf{return} \textit{i}
+\State $\quad$\textbf{end}
+\State $\quad s \leftarrow s+q_{i}$
+\State \textbf{end}
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+  \caption{Fair IID Prophet}\label{alg:iid_prophet}
+\begin{algorithmic}
+\State \textbf{Input: }$F_1 ... F_n$, distributions
+\State $\qquad \>\>\>\>\> q_1 ... q_n$, fair optimal pick probability
+\State $\qquad \>\>\>\>$ n candidates scores
+\State \textbf{Output: }$i \in [n]$, index of chosen candidate
+\State \textbf{for} $i \leftarrow 1$ \textbf{to} \textit{n} \textbf{do}
+\State $\quad$ \textbf{if} $v_{i} \geq F^{-1}\left(1-\frac{2 / 3 n}{1-2(i-1) / 3 n}\right)$ \textbf{then}
+\State $\qquad$ \textbf{return} \textit{i}
+\State $\quad$\textbf{end}
+\State \textbf{end}
+\State
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+
 \subsection{Evaluation metrics}\label{section:evluation_metrics}
 For evaluating the experiments, the authors set several metrics that reflect both the fairness and efficacy of their study. For the Secretary algorithm they report the number of candidates picked by each model, the number of times the chosen candidates correspond to the maximum value $max\;C_j$ within their group, and the probability of choosing the maximum $max\;C$ from the data. Meanwhile, the Prophet algorithms are compared based on the balance in selection rates across arrival order and the average value of the picked candidates.
 
