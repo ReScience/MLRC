@@ -1,0 +1,54 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/pimpraat/FACT-Ai}
+\def \codeDOI{00.0000/zenodo.0000000}
+\def \codeSWH{swh:1:dir:da9cb18759db5ecf30608639d8b35a4b247a483d}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha}
+\def \editorORCID{}
+\def \reviewerINAME{Anonymous Reviewers}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{}
+\def \dateACCEPTED{}
+\def \datePUBLISHED{}
+\def \articleTITLE{[Re] Replication Study of "Fairness and Bias in Online Selection"}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2021}
+\def \articleBIBLIOGRAPHY{references.bib}
+\def \articleYEAR{2022}
+\def \reviewURL{https://openreview.net/forum?id=S9gs3MmhAY}
+\def \articleABSTRACT{Scope of Reproducibility This report aims to reproduce the results in the paper 'Fairness and Bias in Online Selection'. The paper presents optimal and fair alternatives for existing Secretary and Prophet algorithms. Reproducing the paper involves validating three claims made by the authors: (1) The presented baselines are either unfair or have low performance, (2) The proposed algorithms are perfectly fair, and (3) The proposed algorithms perform comparably to or even better than the presented baselines.
+Methodology
+We recreate the algorithms and perform experiments to validate the authors' initial claims for both problems under various settings, with the use of both real and synthetic data. The authors conducted the experiments in the C++ programming language. We largely used the paper as a resource to reimplement all algorithms and experiments from scratch in Python, only consulting the authors' code base when needed.
+Results
+For the Multi-Color Secretary problem, we were able to recreate the outcomes, as well as the performance of the proposed algorithm (with a margin of 3-4%). However, one baseline within the second experiment returned different results, due to inconsistencies in the original implementation. In the context of the Multi-Color Prophet problem, we were not able to exactly reproduce the original results, as the authors ran their experiments with twice as many runs as reported. After correcting this, the original outcomes are reproduced.
+A drawback of the proposed prophet algorithms is that they only select a candidate in 50-70% of cases. None-result are often undesirable, so we extend the paper by proposing adjusted algorithms that pick a candidate (almost) every time. Furthermore, we show empirically that these algorithms maintain similar levels of fairness.
+What was easy
+The paper provides pseudocode for the proposed algorithms, making the implementation straightforward. More than that, recreating their synthetic data experiments was easy due to providing clear instructions.
+What was difficult However, we did run into several difficulties: 1) There were a number of inconsistencies between the paper and the code, 2) Several parts of the implementation were missing in the code base, and 3) The secretary experiments required running the algorithm over one billion iterations which makes verifying its results within timely manner difficult.
+Communication with original authors The authors of the original paper were swift in their response with regard to our findings. Our main allegations regarding inconsistencies in both the Secretary and Prophet problems were confirmed by the authors. }
+\def \replicationCITE{José Correa, Andrés Cristi, Paul Dütting, Ashkan Norouzi-Fard. Fairness and Bias in Online Selection (ICML 2021).}
+\def \replicationBIB{pmlr-v139-correa21a}
+\def \replicationURL{https://proceedings.mlr.press/v139/correa21a.html}
+\def \replicationDOI{}
+\def \contactNAME{Jeroen Wijnen}
+\def \contactEMAIL{j.wijnen@outlook.com}
+\def \articleKEYWORDS{rescience c, machine learning, online selection, prophet problem, secretary problem, fairness, bias, Python}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{9}
+\def \journalISSUE{1}
+\def \articleNUMBER{}
+\def \articleDOI{10.0000/zenodo.0000000}
+\def \authorsFULL{Roxana Petcu et al.}
+\def \authorsABBRV{R. Petcu et al.}
+\def \authorsSHORT{Petcu et al.}
+\title{\articleTITLE}
+\date{}
+\author[1,\orcid{0000-0002-2617-205X}]{Roxana Petcu}
+\author[1,\orcid{0000-0003-1412-3389}]{Pim Praat}
+\author[1,\orcid{0000-0002-1145-3596}]{Jeroen Wijnen}
+\author[1,\orcid{0000-0002-3849-6529}]{Manolis Rerres}
+\affil[1]{University of Amsterdam, Amsterdam, The Netherlands}
