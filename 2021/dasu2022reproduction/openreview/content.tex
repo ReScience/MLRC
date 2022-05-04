@@ -31,7 +31,7 @@ While conducting our experiments, we did not contact the original authors. The p
 
 \section{Introduction}
 
-Generative Adversarial Networks (GANs) \cite{gan} are a type of machine learning frameworks where two neural networks, the discriminator and the generator, compete with each other in a zero-sum game. The generator tries to trick the discriminator into believing that artificially generated samples belong to real data.
+A Generative Adversarial Network (GAN) \cite{gan} is a machine learning framework where two neural networks, the discriminator and the generator, compete with each other in a zero-sum game. The generator tries to trick the discriminator into believing that artificially generated samples belong to real data.
 
 GANs have proven to be powerful image synthesis tools, which are capable of producing high quality images. However, they provide little control over the features of the generated image. Existing solutions to add user control over the generated images require expensive supervised training on latent vectors.
 
@@ -54,15 +54,15 @@ The following claims of the paper have been verified and tested successfully:
 
 \section{Methodology}
 
-The principal components of a collection of points in real coordinate space are a sequence of $p$ unit vectors, where the $i^{th}$ vector is a direction of the line that best fits the data while being orthogonal to the remaining $i-1$ vectors. Principal Component Analysis (PCA) is an unsupervised algorithm used to compute the principal components and perform a change of basis of the data, using one or more of the computed components \cite{pca_wiki}. It is commonly used in exploratory data analysis and for dimensionality reduction when dealing with high-dimensional noisy data. The authors of GANSpace propose a technique for identifying interpretable controls in an unsupervised fashion on pretrained GANs using PCA. Specifically, they show that layer-wise perturbations along the principal components generated using PCA on the latent space of StyleGAN based networks can be used to generate human-interpretable transformations on the synthesized images.
+The principal components \cite{hotelling1933analysis} of a collection of points in real coordinate space are a sequence of $p$ unit vectors, where the $i^{th}$ vector is a direction of the line that best fits the data while being orthogonal to the remaining $i-1$ vectors. Principal Component Analysis (PCA) is an unsupervised algorithm used to compute the principal components and perform a change of basis of the data using one or more of the computed components, increasing the interpretability of the data while minimizing its information loss \cite{jolliffe2016principal}. It is commonly used in exploratory data analysis and for dimensionality reduction when dealing with high-dimensional noisy data. The authors of GANSpace propose a technique for identifying interpretable controls in an unsupervised fashion on pretrained GANs using PCA. Specifically, they show that layer-wise perturbations along the principal components generated using PCA on the latent space of StyleGAN based networks can be used to generate human-interpretable transformations on the synthesized images.
 
-Mathematically, a GAN can be expressed as a neural network $G(\mathbf{z})$ that generates an image $I: \mathbf{z} \sim p(\mathbf{z}), I = G(\mathbf{z})$. Here, $p(\mathbf{z})$ is a probability distribution from which the latent vector $\mathbf{z}$ is sampled. The network $G(\mathbf{z})$ can be further decomposed into $L$ intermediate layers $G_1\ldots G_L$. In the StyleGAN/StyleGAN2 models, the input to the first layer is a constant $y_0$. The output and input to the remaining layers is computed as
+Mathematically, a GAN can be expressed as a neural network $G(\textbf{z})$ that generates an image $I: \textbf{z} \sim p(\textbf{z}), I = G(\textbf{z})$. Here, $p(\textbf{z})$ is a probability distribution from which the latent vector $\textbf{z}$ is sampled. The network $G(\textbf{z})$ can be further decomposed into $L$ intermediate layers $G_1\ldots G_L$. In the StyleGAN/StyleGAN2 models, the input to the first layer is a constant $\textbf{y}_0$. The output and input to the remaining layers is computed as:
 
 \begin{equation}
   y_i = G_i(y_{i-1}, \mathbf{w}),\text{ where }\mathbf{w} = M(\mathbf{z})
 \end{equation}
 
-$M$ is a an $8$-layer multilayer perceptron which is a non-linear function of $\mathbf{z}$. The number of layers $L$ depends on the resolution of the generated image. At each layer, the generated image is upsampled by a factor of $2$.
+$M$ is a an $8$-layer multilayer perceptron which is a non-linear function of $\textbf{z}$. The number of layers $L$ depends on the resolution of the generated image. At each layer, the generated image is upsampled by a factor of $2$.
 
 \begin{figure}[H]
   \centering
@@ -78,15 +78,15 @@ $M$ is a an $8$-layer multilayer perceptron which is a non-linear function of $\
   \label{fig:stylegan2}
 \end{figure}
 
-The images generated by StyleGAN and StyleGAN2 can be controlled by identifying principal axes of $p(\textbf{w})$, which is the probability distribution of the output of the mapping network $M$. First, we sample $N$ latent vectors $\textbf{z}_{1:N}$ and compute the corresponding $\textbf{w}_{i} = M(\textbf{z}_{i})$. The PCA of these $\textbf{w}_{1:N}$ values gives us the basis $\textbf{V}$ for $\mathcal{W}$. The output attributes of a new image given by $\textbf{w}$ can then be controlled by varying the PCA coordinates of \textbf{x} before feeding them into the synthesis network. 
+The images generated by StyleGAN and StyleGAN2 can be controlled by identifying principal axes of $p(\textbf{w})$, which is the probability distribution of the output of the mapping network $M$. First, we sample $N$ latent vectors $\textbf{z}_{1:N}$ and compute the corresponding $\textbf{w}_{i} = M(\textbf{z}_{i})$. The PCA of these $\textbf{w}_{1:N}$ values gives us the basis $\textbf{V}$ for $\mathcal{W}$. The output attributes of a new image given by $\textbf{w}$ can then be controlled by varying the PCA coordinates of \textbf{x} before feeding them into the synthesis network:
 
 \begin{equation}
-    \textbf{w'} = \textbf{w} + \textbf{Vx}
+    \mathbf{w'} = \mathbf{w} + \mathbf{Vx}
 \end{equation}
 
 Each entry $x_{k}$ of \textbf{x} is a separate control parameter which can be modified to update the desired attributes of the output image.
 
-We follow the same notation used by the authors to denote edit directions in this report. $E(\textbf{v}_{i}, j-k)$ means moving along component $v_{i}$ from layers $j$ to $k$. Identifying specific edits, for example "changing the color of a car", is done via exploratory analysis using a trial-and-error method. The authors have created a GUI-based application for this purpose.
+We follow the same notation used by the authors to denote edit directions in this report. $E(\textbf{v}_{i}, j-k)$ means moving along component $\textbf{v}_{i}$ from layers $j$ to $k$. Identifying specific edits, for example "changing the color of a car", is done via exploratory analysis using a trial-and-error method. The authors have created a GUI-based application for this purpose.
 
 \subsection{Model descriptions}
 
@@ -175,10 +175,10 @@ We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 
 
 The "truncation trick" is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of diversity in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) score.
 
-In the StyleGAN/StyleGAN2 models, the truncation trick is applied on the latent space $\textbf{w}$, which is the output of the mapping network $M$. During the training process, a running average $\textbf{w}_{avg}$ of the latents is computed. Later, the latents sampled during inference are truncated to lie close to $\textbf{w}_{avg}$. Equation~\ref{eq:2} shows the truncation process on StyleGAN/StyleGAN2 models.
+In the StyleGAN/StyleGAN2 models, the truncation trick is applied on the latent space $\textbf{w}$, which is the output of the mapping network $M$. During the training process, a running average $\textbf{w}_{avg}$ of the latents is computed. Later, the latents sampled during inference are truncated to lie close to $\textbf{w}_{avg}$. Equation~\ref{eq:2} shows the truncation process on StyleGAN/StyleGAN2 models:
 
 \begin{equation}
-    \textbf{w}' = \textbf{w}_{avg} + \psi (\textbf{w} - \textbf{w}_{avg})
+    \mathbf{w'} = \mathbf{w}_{avg} + \psi (\mathbf{w} - \mathbf{w}_{avg})
     \label{eq:2}
 \end{equation}
 
@@ -228,7 +228,7 @@ Numpy 1.20.1            & 0.49671415             \\ \hline
 \caption{Random values generated using different Python libraries seeded with 42}
 \end{table}
 
-We were not able to replicate the author's experiments on BigGAN-512 deep due to time constraints. 
+We were not able to replicate the author's experiments on BigGAN512-deep due to time constraints. 
 
 \subsection{Communication with original authors}
 
