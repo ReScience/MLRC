@@ -10,7 +10,7 @@ In \cref{fig:cgn-architecture}, we provide an overview of the architecture of th
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{../openreview/media/cgn-architecture.pdf}
-    \caption{\textbf{CGN architecture.} Components with \textcolor{Blue}{trainable parameters are blue}, components with \textcolor{Green}{fixed parameters are green} \cite{Sauer2021ICLR}. The dotted lines indicate that the cGAN is only used for training \cite{Sauer2021ICLR}.}
+    \caption{\textbf{CGN architecture.} Components with \textcolor{Blue}{trainable parameters are blue}, components with \textcolor{Green}{fixed parameters are green}. The dotted lines indicate that the cGAN is only used for training \cite{Sauer2021ICLR}.}
     \label{fig:cgn-architecture}
 \end{figure}
 
@@ -94,15 +94,17 @@ where $N$ denotes the number of pixels in mask $\v m$, and $[\cdot]$ denotes the
 \footnotesize
 \captionsetup{skip=2mm}
     \centering
+    \scriptsize
     \begin{tabular}{c@{ }c@{ \ }c@{ \ }c@{ }c}
         \multicolumn{2}{c}{(a) Original training} & & \multicolumn{2}{c}{(b) Improved training} \\
-        \includegraphics[width=0.15\linewidth]{../openreview/media/cmnist_without_Ledge_mask.png} &
-         \includegraphics[width=0.15\linewidth]{../openreview/media/cmnist_without_Ledge.png} & &
-         \includegraphics[width=0.15\linewidth]{../openreview/media/cmnist_with_Ledge_mask.png} &
-         \includegraphics[width=0.15\linewidth]{../openreview/media/cmnist_with_Ledge.png} \\
+        \includegraphics[width=0.1\linewidth]{../openreview/media/cmnist_without_Ledge_mask.png} &
+         \includegraphics[width=0.1\linewidth]{../openreview/media/cmnist_without_Ledge.png} & &
+         \includegraphics[width=0.1\linewidth]{../openreview/media/cmnist_with_Ledge_mask.png} &
+         \includegraphics[width=0.1\linewidth]{../openreview/media/cmnist_with_Ledge.png} \\
          Masks & Generated & & Masks & Generated
     \end{tabular}
-    \caption{\textbf{Qualitative edge loss evaluation.} Adding the edge loss significantly improves CGN training on colored MNIST.}
+    % \caption{\textbf{Qualitative edge loss evaluation.} Adding the edge loss significantly improves CGN training on colored MNIST.}
+    \caption{\textbf{Qualitative edge loss evaluation.} Generated samples with and without the edge loss.}
     \label{fig:mnist-failed-samples}
 \end{figure}
 
