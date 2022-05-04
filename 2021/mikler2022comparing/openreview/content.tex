@@ -1,6 +1,3 @@
-
-\clearpage
-
 \section{Reproducibility Summary}
 
 \subsection*{Scope of Reproducibility}
@@ -8,7 +5,7 @@
 We are reproducing \emph{Comparing Rewinding and Fine-tuning in Neural Networks}, by \cite{Renda}.
 In this work the authors compare three different approaches to retraining neural networks after pruning: 1) fine-tuning, 2) rewinding weights as in \cite{Frankle} and 3) a new, original method involving learning rate rewinding, building upon \cite{Frankle}. We reproduce the results of all three approaches, but we focus on verifying their approach, learning rate rewinding, since it is newly proposed and is described as a universal alternative to other methods.
 
-We used CIFAR10 for most reproductions along with additional experiments on the larger CIFAR100, which extends the results originally provided by the authors. We have also extended the list of tested network architectures to include Wide ResNets (\cite{wrn}). The new experiments led us to discover the limitations of learning rate rewinding which can worsen pruning results on large architectures.
+We used CIFAR10 for most reproductions along with additional experiments on the larger CIFAR100, which extends the results originally provided by the authors. We have also extended the list of tested network architectures to include Wide ResNets \cite{wrn}. The new experiments led us to discover the limitations of learning rate rewinding which can worsen pruning results on large architectures.
 
 \subsection*{Methodology}
 
@@ -32,28 +29,8 @@ Not every design choice was mentioned in the paper, thus reproducing the exact r
 
 We did not consult the original authors, as there was no need to.
 
-\subsection{Submission Checklist}
-
-Double check the file \texttt{journal/metadata.yaml} to contain the following information:
-
-\begin{itemize}
-\item Title should start with "\texttt{[Re]}"
-\item Author information, along with ORCID id
-\item Author affiliations
-\item Code URL, Software Heritage Foundation link
-\item Abstract
-\item Review URL (the OpenReview URL of your report)
-\end{itemize}
-
-\subsection{Continuous Integration}
-
-We use Github Actions CI to check your submission and compile the pdf file subsequently.
-You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
-
 \clearpage
 
-
-\newpage
 \renewcommand{\arraystretch}{1.5}
 
 \section{Introduction}
@@ -61,10 +38,10 @@ You can also run the tests locally by running \texttt{python check\_yaml.py}, an
 Neural network pruning is an algorithm leading to decrease the size of a network, usually by removing its connections or setting their weights to 0. 
 This procedure generally allows obtaining smaller and more efficient models.
 It often turns out that these smaller networks are as accurate as their bigger counterparts or the accuracy loss is negligible.
-A common way to obtain such high quality sparse network is to prune it after the training has finished (\cite{rethinking}, \cite{Frankle}).
-Networks that have already converged are easier to prune than randomly initialized networks (\cite{rethinking}, \cite{snip}).
+A common way to obtain such high quality sparse network is to prune it after the training has finished \cite{rethinking}, \cite{Frankle}.
+Networks that have already converged are easier to prune than randomly initialized networks \cite{rethinking}, \cite{snip}.
 After pruning, more training is usually required to restore the lost accuracy.
-Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners (\cite{rethinking}, \cite{Renda}).
+Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners \cite{rethinking}, \cite{Renda}.
 
 Lottery Ticket Hypothesis from \cite{Frankle} formulates a hypothesis that for every dense neural network, there exists a smaller subnetwork that matches or exceeds results of the original. The algorithm originally used to obtain examples of such networks is iterative magnitude pruning with weight rewinding, and it is one of the methods of retraining after pruning compared in this work.
 
@@ -80,7 +57,8 @@ Lottery Ticket Hypothesis from \cite{Frankle} formulates a hypothesis that for e
 % An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
 
 % This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
-\cite{Renda} formulated the following claims:
+Our reproducibility study will try to confirm claims from \cite{Renda}.
+Following claims were formulated in \cite{Renda}:
 \begin{itemize}
     \item [Claim 1:] Widely used method of training after pruning: finetuning yields worse results than rewinding based methods (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table \ref{tab:resnet110})
     \item [Claim 2:] Newly introduced learning rate rewinding works as good or better as weight rewinding in all scenarios (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table \ref{tab:resnet110}, but not supported by Figure \ref{fig:wrn-1})
@@ -103,7 +81,7 @@ We aimed to compare three retraining approaches: 1) finetuning, 2) weight rewind
     \item retrain the network using selected retraining approach.
 \end{enumerate}
 
-In the case of structured pruning: in step 2, we removed structures (rows or convolutional channels) with the smallest average L1 norm (\cite{structured}), rather than removing separate connections. 
+In the case of structured pruning: in step 2, we removed structures (rows or convolutional channels) with the smallest average L1 norm \cite{structured}, rather than removing separate connections. 
 
 In the case of iterative pruning: the network in step 1 was not randomly initialized, but instead: weights from a model from a previous iterative pruning step were loaded as the starting point.
 
@@ -111,14 +89,14 @@ We trained all our networks using Stochastic Gradient Descent with Nesterov Mome
 
 \subsection{Model descriptions}
 
-In this report, we were focusing on an image recognition task using convolutional neural networks (\cite{lecun_convnet}). 
+In this report, we were focusing on an image recognition task using convolutional neural networks \cite{lecun_convnet}. 
 For most of our experiments, we chose to use identical architectures as \cite{Renda} to better validate their claims and double-check their results, rather than provide additional ones.
 Therefore, most of the used networks are residual networks, which were originally proposed in \cite{resnet}.
 Additionally, to verify the general usefulness of pruning and retraining methods proposed in \cite{Renda} we extend the list of tested network architectures to much larger wide residual networks from \cite{wrn}.
 
 \subsubsection{Residual networks (ResNet)}
 
-Just as \cite{Renda}, we chose to use the original version of ResNet as described in \cite{resnet} rather than the more widely used, improved version (with preactivated blocks) from \cite{resnetv2}. We created the models ourselves, using TensorFlow (\cite{tensorflow}) and Keras. We strove to replicate the exact architectures used by \cite{Renda} and \cite{resnet} and train them from scratch.
+Just as \cite{Renda}, we chose to use the original version of ResNet as described in \cite{resnet} rather than the more widely used, improved version (with preactivated blocks) from \cite{resnetv2}. We created the models ourselves, using TensorFlow \cite{tensorflow} and Keras. We strove to replicate the exact architectures used by \cite{Renda} and \cite{resnet} and train them from scratch.
 
 \begin{table}[H]
 \small
@@ -140,7 +118,7 @@ Just as \cite{Renda}, we chose to use the original version of ResNet as describe
 
 % GOOD PLACE TO INSERT MERMAID DIAGRAM TO SHOW DIFFERENCES BETWEEN v1 and v2 ResNets
 
-\textbf{Hyper-parameters}
+\subsubsection{Hyper-parameters}
 
 % \nopagebreak
 Learning rate started with $0.1$ and was multiplied by $0.1$ twice, after \numprint{36000} and \numprint{54000} iterations. One training cycle was \numprint{72000} iterations in total.
@@ -148,16 +126,27 @@ For all batch normalization layers, we set the batch norm decay to 0.997, follow
 We initialize network's weights with what is known as He uniform initialization from \cite{he_uniform}.
 We regularize ResNets, during both training and finetuning, using $L2$ penalty with $10^{-4}$ coefficient.
 In other words, the loss function (from which we calculate the gradients) looks as follows:
-$$\texttt{FinalLoss} = \texttt{CategoricalCrossentropy}(\texttt{GroundTruth}, \texttt{Prediction}) + 10^{-4} \times \sum_{i\in W} w_i^2$$
+
+\begin{equation}
+  L = \textup{CC}(Y, P) + 10^{-4} \times \sum_{i\in W} w_i^2
+  \end{equation}
+  where:
+  \begin{conditions}
+   L     &  value of the final loss function \\
+   \textup{CC}    &  categorical crossentropy loss function \\
+   Y     &  ground truth label of a sample or batch \\   
+   P &  model's prediction \\
+   W & parameters of the model
+  \end{conditions}
 
 \subsubsection{Wide Residual Networks (Wide ResNet, WRN)}
 
 WRN networks were introduced in \cite{wrn}.
-They are networks created by simply increasing the number of filters in preactivated ResNet networks (\cite{resnetv2}).
+They are networks created by simply increasing the number of filters in preactivated ResNet networks \cite{resnetv2}.
 
 \begin{table}[H]
 \small
-\setlength{\tabcolsep}{20pt}
+\setlength{\tabcolsep}{12pt}
   \begin{center}
     \begin{tabular}{l|c|c|c}
       \specialrule{1pt}{2pt}{2pt}
@@ -176,7 +165,18 @@ They are networks created by simply increasing the number of filters in preactiv
 \nopagebreak
 As Wide ResNets are newer and much larger than ResNets, hyper-parameters are slightly different.
 To choose them, we follow \cite{wrn}. Learning rate starts with $0.1$ and multiplied by $0.2$ thrice: after \numprint{32000}, \numprint{48000} and \numprint{64000} iterations. Training lasts for \numprint{80000} iterations. For all batch normalization layers, we use hyper-parameters from the newer TensorFlow implementation\footnote{\url{https://github.com/tensorflow/models/blob/r2.5.0/official/vision/image_classification/resnet/resnet_model.py}} with batch norm decay set to 0.9. Following \cite{wrn}, we use larger $L2$ penalty for this network: $2\times10^{-4}$. Finally, the loss function is as follows:
-$$\texttt{FinalLoss} = \texttt{CategoricalCrossentropy}(\texttt{GroundTruth}, \texttt{Prediction}) + 2 \times 10^{-4} \times \sum_{i\in W} w_i^2$$
+
+\begin{equation}
+  L = \textup{CC}(Y, P) + 2 \times 10^{-4} \times \sum_{i\in W} w_i^2
+  \end{equation}
+  where:
+  \begin{conditions}
+   L     &  value of the final loss function \\
+   \textup{CC}    &  categorical crossentropy loss function \\
+   Y     &  ground truth label of a sample or batch \\   
+   P &  model's prediction \\
+   W & parameters of the model
+  \end{conditions}
 
 \subsection{Datasets}
 
@@ -184,7 +184,7 @@ CIFAR-10 and CIFAR-100 are image classification datasets introduced in \cite{cif
 
 \begin{table}[H]
 \small
-\setlength{\tabcolsep}{14pt}
+\setlength{\tabcolsep}{6pt}
   \begin{center}
     \begin{tabular}{l|c|c|c|c}
       \specialrule{1pt}{2pt}{2pt}
@@ -201,7 +201,7 @@ CIFAR-10 and CIFAR-100 are image classification datasets introduced in \cite{cif
 
 
 \subsubsection{Postprocessing}
-We used a standard postprocessing for both CIFAR-10 and CIFAR-100 datasets (\cite{Renda}, \cite{Frankle}, \cite{wrn}). During training and just before passing data to the model, we:
+We used a standard postprocessing for both CIFAR-10 and CIFAR-100 datasets \cite{Renda}, \cite{Frankle}, \cite{wrn}. During training and just before passing data to the model, we:
 \begin{enumerate}
     \item standardized the input by subtracting the mean and dividing by the std of RGB channels (calculated on training dataset),
     \item randomly flipped in horizontal axis,
@@ -223,7 +223,7 @@ During the validation, we did only the first step of the above.
 Our ready-to-use code, which includes experiment definitions, can be found at 
 % \url{https://anonymous.4open.science/r/reproducing-comparing-rewinding-and-finetuning-1C5A}.
 \url{https://github.com/gahaalt/reproducing-comparing-rewinding-and-finetuning}.
-It's written using TensorFlow (\cite{tensorflow}) version 2.4.2 in Python. More details are included in the repository.
+It's written using TensorFlow \cite{tensorflow} version 2.4.2 in Python. More details are included in the repository.
 
 \subsection{Computational requirements}
 % Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
@@ -235,11 +235,11 @@ Recreating the experiments required a modern GPU, training all models on CPU was
 
 \begin{table}[H]
 \small
-\setlength{\tabcolsep}{12pt}
+\setlength{\tabcolsep}{6pt}
   \begin{center}
     \begin{tabular}{l|c|c|c|c}
       \specialrule{1pt}{2pt}{2pt}
-\textbf{Model} & \textbf{Dataset} & \textbf{Number of iterations} & \textbf{Iterations per second} & \textbf{Time for training cycle}\\ 
+\textbf{Model} & \textbf{Dataset} & \textbf{Number of updates} & \textbf{Updates per second} & \textbf{Training time}\\ 
       \specialrule{0.5pt}{2pt}{2pt}
       ResNet-20  & CIFAR-10 & \numprint{72000} & 59.0 & 22 min \\
       ResNet-56  & CIFAR-10 & \numprint{72000} & 28.6 & 43 min \\
@@ -282,7 +282,7 @@ They match the original ones within 1\% error margin.
 
 Across all scenarios where finetuning was tested, it was by far the worst of the three methods, which directly supports claim 1 (Section \ref{sec:claims}). Weight rewinding and learning rate rewinding most often are equally matched, but in some cases learning rate rewinding works a little better.
 
-\textbf{ResNets on CIFAR-10 dataset}
+\subsubsection{ResNets on CIFAR-10 dataset}
 
 \nopagebreak
 
@@ -353,7 +353,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 \subsection{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
  
-\textbf{ResNets on CIFAR-100 dataset}
+\subsubsection{ResNets on CIFAR-100 dataset}
 \nopagebreak
 \begin{figure}[H]
 \setlength{\tabcolsep}{0pt}
@@ -365,7 +365,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 \label{fig:resnet56-2}
 \end{figure}
 
-\textbf{WRN-16-8 on CIFAR-10 dataset}
+\subsubsection{WRN-16-8 on CIFAR-10 dataset}
 \nopagebreak
 
 WRN-16-8 shows consistent behaviour -- accuracy in the low sparsity regime is reduced in comparison to the baseline. In the case of iterative pruning, where each step is another pruning in the low sparsity regime, it leads to a large difference between the two retraining methods. Since for WRN-16-8 one-shot, low sparsity pruning shows a small regression in comparison to the baseline, this regression accumulates when pruning multiple times, as we do in iterative pruning. This can be seen in Figure \ref{fig:wrn-1}.
@@ -402,6 +402,5 @@ We were able to confirm the general conclusion of \cite{Renda}. Fine-tuning can 
 
 \section*{Acknowledgements}
 The authors thank Polish National Science Center for funding
-under the OPUS-18 2019/35/B/ST6/04379 grant and the PlGrid
+under the OPUS-18\linebreak[4] 2019/35/B/ST6/04379 grant and the PlGrid
 consortium for computational resources.
-
