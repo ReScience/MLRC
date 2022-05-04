@@ -1,3 +1,5 @@
+
+
 \section{Reproducibility Summary}
 
 \textit{This is a report of reproducibility of paper \cite{lv2021learning}, submited to  \href{https://paperswithcode.com/rc2021}{ML Reproducibility Challenge 2021}.}
@@ -34,7 +36,7 @@ We communicated with authors through email. They provided some useful clarificat
 
 \clearpage
 
-\section{Content}
+% \section{Content}
 
 \section{Introduction}
 The study of multi-type Protein-Protein Interaction (PPI) is fundamental for understanding biological processes from a systematic perspective and revealing disease mechanisms. Existing methods suffer from significant performance degradation when tested on different dataset, that was not used for training (in comparison to only dividing one dataset into train and test set). In this paper, authors investigate the problem and find that it is mainly attributed to the poor performance for inter-novel-protein interaction prediction. However, current evaluations overlook the inter-novel-protein interactions, and thus fail to give an instructive assessment. 
@@ -145,37 +147,71 @@ The comparison of general performance, that refers to the first claim, can be se
 The second claim is that GNN-PPI predicts inter-novel-protein interactions better. The subsets we are observing are denoted with \emph{bs}, standing for both proteins being seen during training, \emph{es}, either of the proteins seen during training and \emph{ns}, neither of the proteins seen before. So for the second claim, we need to compare the performance on subsets \emph{es} and \emph{ns}. The results in the table are \textbf{in bold where} uncertainty is small enough that \textbf{we can confirm it}. We can also observe that even where it is not, mean is never bigger for PIPR. 
 
 \begin{table}[h]
-\small
-\caption{\label{subsets} \textbf{Results on test subsets for GNN-PPI (G) and PIPR (P)} on all datasets and splitting schemes. The results show mean F1-micro scores and their standard deviations, based on 5 runs on SHS datasets, and one run on STRING.}
-\begin{tabular}{LLLLLLLLLL}
-\toprule
-\multirow{2}{*}[-3pt]{Dataset} & \multirow{2}{*}[-3pt]{Scheme} &
-\multirow{2}{*}{} & \multirow{2}{*}[-3pt]{Average} & \multicolumn{3}{c}{Test subsets} & \multicolumn{3}{c}{Test subset sizes} \\ 
-        \cmidrule(l{3pt}r{3pt}){5-7} \cmidrule(l{3pt}r{3pt}){8-10}
-{} &   &  & &   X_{BS} &  X_{ES} &  X_{NS} &  \#BS  &     \#ES &    \#NS \\
-\midrule
-\multirow{6}{*}{SHS27k} & \multirow{2}{*}{rand} & G &  \textbf{0.88} \pm 0.01 &  \textbf{0.89} \pm 0.01 &  \textbf{0.72} \pm 0.04 &  0.44 \pm 0.16 &  \multirow{2}{*}{1429 \pm 11} &      \multirow{2}{*}{91 \pm 10} &       \multirow{2}{*}{4 \pm 2} \\
-& & P & 0.81 \pm 0.01 &  0.82 \pm 0.01 &   0.6 \pm 0.01 &  0.25 \pm 0.24 & & & \\
-& \multirow{2}{*}{BFS}  & G   &  0.54 \pm 0.12 &   \multirow{2}{*}{/} &  0.58 \pm 0.12 &  0.37 \pm 0.16 &       \multirow{2}{*}{0} &  \multirow{2}{*}{1180 \pm 103} &    \multirow{2}{*}{368 \pm 9} \\
-& & P & 0.49 \pm 0.05 &    &  0.52 \pm 0.05 &  0.37 \pm 0.08 & & & \\
-& \multirow{2}{*}{DFS}   & G  & \textbf{ 0.66} \pm 0.12 &   \multirow{2}{*}{/} & \textbf{ 0.68} \pm 0.12 &   0.5 \pm 0.15 &       \multirow{2}{*}{0} &   \multirow{2}{*}{1353 \pm 35} &    \multirow{2}{*}{191 \pm 25} \\
-& & P & 0.48 \pm 0.06 &    &   0.5 \pm 0.06 &  0.35 \pm 0.08 & & & \\
-\midrule
-\multirow{6}{*}{SHS148k} & \multirow{2}{*}{rand} & G &   \textbf{0.92} \pm 0.0 &   \textbf{0.92} \pm 0.0 &  \textbf{0.75} \pm 0.02 &  0.19 \pm 0.29 &  \multirow{2}{*}{8649 \pm 26} &    \multirow{2}{*}{245 \pm 26} &       \multirow{2}{*}{3 \pm 3} \\
-& & P & 0.85 \pm 0.0 &   0.85 \pm 0.0 &  0.63 \pm 0.03 &  0.12 \pm 0.21 & & \\
-&\multirow{2}{*}{BFS}   & G  &  \textbf{0.57} \pm 0.05 &   \multirow{2}{*}{/} &  \textbf{0.59} \pm 0.05 &  0.39 \pm 0.05 &       \multirow{2}{*}{0} &  \multirow{2}{*}{7699 \pm 352} &  \multirow{2}{*}{1265 \pm 332} \\
-& & P & 0.5 \pm 0.01 &    &  0.51 \pm 0.01 &  0.37 \pm 0.02 & & & \\
-&\multirow{2}{*}{DFS}   & G  &  \textbf{0.79} \pm 0.03 &   \multirow{2}{*}{/} &   \textbf{0.8} \pm 0.03 &  \textbf{0.66} \pm 0.06 &       \multirow{2}{*}{0} &   \multirow{2}{*}{8247 \pm 82} &    \multirow{2}{*}{707 \pm 83} \\
-& & P & 0.54 \pm 0.03 &  &  0.55 \pm 0.03 &  0.36 \pm 0.07 & & & \\
-\midrule
-\multirow{6}{*}{STRING} & \multirow{2}{*}{rand} & G &   \textbf{0.95} &   \textbf{0.95} &  \textbf{0.72} &  \textbf{0.99} &  \multirow{2}{*}{118410} &    \multirow{2}{*}{268} &       \multirow{2}{*}{2} \\
-& & P & 0.87 & 0.87 & 0.57 & 0.33 & & \\
-&\multirow{2}{*}{BFS}  & G   &  \textbf{0.85} &   \multirow{2}{*}{/} &  \textbf{0.86} &  \textbf{0.75} &       \multirow{2}{*}{0} &  \multirow{2}{*}{107018} &  \multirow{2}{*}{11689} \\
-& & P & 0.58 & & 0.59 & 0.51 & & \\
-&\multirow{2}{*}{DFS}  & G   &  \textbf{0.89} &   \multirow{2}{*}{/} &   \textbf{0.89} &  \textbf{0.83} &       \multirow{2}{*}{0} &   \multirow{2}{*}{112328} &    \multirow{2}{*}{7058} \\
-& & P & 0.62 & & 0.63 & 0.47 & & & \\
-\bottomrule
-\end{tabular}
+    \small
+    \caption{\label{subsets} \textbf{Results on test subsets for GNN-PPI (G) and PIPR (P)} on all datasets and splitting schemes. The results show mean F1-micro scores and their standard deviations, based on 5 runs on SHS datasets, and one run on STRING.}
+    \centering
+    \begin{tabular}{ccccccc}
+        \toprule
+        \multirow{2}{*}[-3pt]{Dataset} & \multirow{2}{*}[-3pt]{Scheme} &
+        \multirow{2}{*}{} & \multirow{2}{*}[-3pt]{Average} & \multicolumn{3}{c}{Test subsets} \\ 
+                \cmidrule(l{3pt}r{3pt}){5-7}
+          & &  & &   $X_{BS}$ &  $X_{ES}$ &  $X_{NS}$ \\
+        \midrule
+        \multirow{6}{*}{SHS27k} & \multirow{2}{*}{rand} & G &  \textbf{0.88} $\pm 0.01$ &  \textbf{0.89} $\pm 0.01$ &  \textbf{0.72} $\pm 0.04$ &  $0.44 \pm 0.16 $\\
+        & & P & $0.81 \pm 0.01$ &  $0.82 \pm 0.01$ &   $0.6 \pm 0.01$ &  $0.25 \pm 0.24$ \\
+        &\multirow{2}{*}{BFS}  & G   &  $0.54 \pm 0.12$ &   \multirow{2}{*}{/} &  $0.58 \pm 0.12$ &  $0.37 \pm 0.16$\\
+        & & P & $0.49 \pm 0.05$ &    &  $0.52 \pm 0.05$ &  $0.37 \pm 0.08$ \\
+        &\multirow{2}{*}{DFS}   & G  & \textbf{ 0.66} $\pm 0.12 $&   \multirow{2}{*}{/} & \textbf{ 0.68} $\pm 0.12$ &   $0.5 \pm 0.15$ \\
+        & & P & $0.48 \pm 0.06$ &    &   $0.5 \pm 0.06 $&  $0.35 \pm 0.08$ \\
+        \midrule
+        \multirow{6}{*}{SHS148k} & \multirow{2}{*}{rand} & G &   \textbf{0.92} $\pm 0.0 $ &   \textbf{0.92} $\pm 0.0$ &  \textbf{0.75} $\pm 0.02$ &  $0.19 \pm 0.29$\\
+        & & P & $0.85 \pm 0.0$ &   $0.85 \pm 0.0$ &  $0.63 \pm 0.03$ &  $0.12 \pm 0.21 $\\
+        & \multirow{2}{*}{BFS}   & G  &  \textbf{0.57} $\pm 0.05 $&   \multirow{2}{*}{/} &  \textbf{0.59} $\pm 0.05 $&  $0.39 \pm 0.05$ \\
+        & & P & $0.5 \pm 0.01 $&    &  $0.51 \pm 0.01 $&  $0.37 \pm 0.02 $\\
+        & \multirow{2}{*}{DFS}   & G  &  \textbf{0.79}$ \pm 0.03 $&   \multirow{2}{*}{/} &   \textbf{0.8}$ \pm 0.03$ &  \textbf{0.66} $\pm 0.06 $\\
+        & & P & $0.54 \pm 0.03 $&  &  $0.55 \pm 0.03 $&  $0.36 \pm 0.07 $\\
+        \midrule
+        \multirow{6}{*}{STRING} & \multirow{2}{*}{rand} & G &   \textbf{0.95} &   \textbf{0.95} &  \textbf{0.72} &  \textbf{0.99}  \\
+        & & P & 0.87 & 0.87 & 0.57 & 0.33 \\
+        & \multirow{2}{*}{BFS}  & G   &  \textbf{0.85} &   \multirow{2}{*}{/} &  \textbf{0.86} &  \textbf{0.75} \\
+        & & P & 0.58 & & 0.59 & 0.51 \\
+        & \multirow{2}{*}{DFS}  & G   &  \textbf{0.89} &   \multirow{2}{*}{/} &   \textbf{0.89} &  \textbf{0.83}\\
+        & & P & $0.62$ & & $0.63$ & $0.47$ \\
+        \bottomrule
+    \end{tabular}
+
+    \caption{\label{subsets} \textbf{Test subset sizes} for experiments above.}
+    \centering
+    \begin{tabular}{cccccc}
+    \toprule
+    \multirow{2}{*}[-3pt]{Dataset} & \multirow{2}{*}[-3pt]{Scheme} &
+    \multirow{2}{*}{} & \multicolumn{3}{c}{Test subset sizes} \\ 
+            \cmidrule(l{3pt}r{3pt}){4-6}
+      & &  &  $\#BS$  &     $\#ES$ &    $\#NS$ \\
+    \midrule
+    \multirow{6}{*}{SHS27k} & \multirow{2}{*}{rand} & G &  \multirow{2}{*}{$1429 \pm 11$} &      \multirow{2}{*}{$91 \pm 10$} &       \multirow{2}{*}{$4 \pm 2$} \\
+    & & P &  &\\
+    &\multirow{2}{*}{BFS}  & G   &       \multirow{2}{*}{0} &  \multirow{2}{*}{$1180 \pm 103$} &    \multirow{2}{*}{$368 \pm 9$} \\
+    & & P &  & \\
+    &\multirow{2}{*}{DFS}   & G   &       \multirow{2}{*}{0} &   \multirow{2}{*}{$1353 \pm 35$} &    \multirow{2}{*}{$191 \pm 25$} \\
+    & & P &  & \\
+    \midrule
+    \multirow{6}{*}{SHS148k} & \multirow{2}{*}{rand} & G  &  \multirow{2}{*}{$8649 \pm 26$} &    \multirow{2}{*}{$245 \pm 26$} &       \multirow{2}{*}{$3 \pm 3$} \\
+    & & P & & \\
+    & \multirow{2}{*}{BFS}   & G  &     \multirow{2}{*}{0} &  \multirow{2}{*}{$7699 \pm 352$} &  \multirow{2}{*}{$1265 \pm 332$} \\
+    & & P & & \\
+    & \multirow{2}{*}{DFS}   & G  &      \multirow{2}{*}{0} &   \multirow{2}{*}{$247 \pm 82$} &    \multirow{2}{*}{$707 \pm 83$} \\
+    & & P &  & \\
+    \midrule
+    \multirow{6}{*}{STRING} & \multirow{2}{*}{rand} & G &  \multirow{2}{*}{118410} &    \multirow{2}{*}{268} &       \multirow{2}{*}{2} \\
+    & & P  & & \\
+    & \multirow{2}{*}{BFS}  & G    &       \multirow{2}{*}{0} &  \multirow{2}{*}{107018} &  \multirow{2}{*}{11689} \\
+    & & P & & \\
+    & \multirow{2}{*}{DFS}  & G    &       \multirow{2}{*}{0} &   \multirow{2}{*}{112328} &    \multirow{2}{*}{7058} \\
+    & & P & & \\
+    \bottomrule
+    \end{tabular}
+
 \end{table}
 
 \subsection{Generalization performance}
@@ -185,18 +221,18 @@ The results in Table \ref{generalize} \textbf{confirm claim 3}. As we can see ge
 
 \begin{table}[h] \centering
 \caption{\label{generalize} \textbf{Results of GNN-PPI generalization}.}
-\begin{tabular}{lllLLL}
+\begin{tabular}{lllccc}
 \toprule
 \multirow{2}{*}[-3pt]{Method} & \multirow{2}{*}[-3pt]{Trainset} &
 \multirow{2}{*}[-3pt]{Testset} & \multicolumn{3}{c}{Partition Scheme} \\ 
         \cmidrule(l{4pt}r{4pt}){4-6} 
 {} &    & &    random &           BFS &           DFS \\
 \midrule
-\multirow{4}{*}[-3pt]{GNN-PPI} &\multirow{2}{*}{SHS27k-Train} & SHS27k-Test & 0.88 \pm 0.01 & 0.54 \pm 0.12 & 0.66 \pm 0.12 \\
-& & STRING &  0.62 \pm 0.01 &  0.56 \pm 0.14 &  0.61 \pm 0.04 \\
+\multirow{4}{*}[-3pt]{GNN-PPI} &\multirow{2}{*}{SHS27k-Train} & SHS27k-Test & $0.88 \pm 0.01$ & $0.54 \pm 0.12$ & $0.66 \pm 0.12$ \\
+& & STRING &  $0.62 \pm 0.01$ &  $0.56 \pm 0.14$ &  $0.61 \pm 0.04$ \\
 \cmidrule{2-6}
-& \multirow{2}{*}{SHS148k-Train} & SHS148k-Test & 0.92 \pm 0.0 & 0.57 \pm 0.05 & 0.79 \pm 0.03 \\
-& & STRING &  0.72 \pm 0.01 &   0.7 \pm 0.01 &   0.7 \pm 0.02 \\
+& \multirow{2}{*}{SHS148k-Train} & SHS148k-Test & $0.92 \pm 0.0$ & $0.57 \pm 0.05 $& $0.79 \pm 0.03$ \\
+& & STRING &  $0.72 \pm 0.01$ &   $0.7 \pm 0.01$ &   $0.7 \pm 0.02$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -207,17 +243,17 @@ This results \textbf{confirm claim 4}, but in a different way as those in the or
 
 \begin{table}[h] \centering
 \caption{\label{graph} \textbf{Performance of GNN-PPI with different graph construction method}.}
-\begin{tabular}{lLLL}
+\begin{tabular}{lccc}
 \toprule
 \multirow{2}{*}[-3pt]{Scheme} &    \multirow{2}{*}[-3pt]{Graph} &   \multicolumn{2}{c}{Dataset} \\
 \cmidrule(l{6pt}r{6pt}){3-4}
- & &    SHS27k &       SHS148k \\
+    & &    SHS27k &       SHS148k \\
 \midrule
-\multirow{2}{*}{BFS} & GCA &  0.54 \pm 0.12 &  0.57 \pm 0.05 \\
-& GCT &   0.66 \pm 0.1 &  0.66 \pm 0.04 \\
+\multirow{2}{*}{BFS} & GCA &  $0.54 \pm 0.12$ &  $0.57 \pm 0.05$ \\
+& GCT &   $0.66 \pm 0.1$ &  $0.66 \pm 0.04$ \\
 \midrule
-\multirow{2}{*}{DFS} & GCA &  0.66 \pm 0.12 &  0.79 \pm 0.03 \\
-& GCT &  0.71 \pm 0.09 &   0.8 \pm 0.02 \\
+\multirow{2}{*}{DFS} & GCA &  $0.66 \pm 0.12$ &  $0.79 \pm 0.03$ \\
+& GCT &  $0.71 \pm 0.09$ &   $0.8 \pm 0.02$ \\
 \bottomrule
 \end{tabular}
 \end{table}
