@@ -11,36 +11,32 @@ title: "[Re] A report in MLRC 2021"
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: John Doe
-    orcid: 0000-0000-000-000
-    email: johndoe@gmail.com
+  - name: Szymon Mikler
+    orcid: 0000-0002-7549-571X
+    email: sjmikler@gmail.com
     affiliations: 1,*
 
-  - name: Foo Bar
-    orcid: 0000-0000-000-001
-    email: foobar@gmail.com
-    affiliations: 1      # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Hogwarts University
-    address: Hogsmeade, UK
+    name:    University of Wroclaw
+    address: Poland
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords:  rescience c, machine learning, deep learning, python, pytorch
+keywords:  rescience c, machine learning, deep learning, python, tensorflow, computer vision, pruning
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/
+  - url: https://github.com/gahaalt/reproducing-comparing-rewinding-and-finetuning
   - doi: 00.0000/zenodo.0000000
-  - swh: swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  - swh: swh:1:dir:886a4c9a0bdecdbf65f2cab3ae7404a6796bc451
 
 # Data URL and DOI (optional if no data)
 data:
@@ -49,13 +45,16 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: "Yoshua Bengio, Yann Lecun, Geoffrey Hinton. All you need is AGI (ICML 2042)."
- - bib:  bengio2042
- - url:  https://arxiv.org/pdf/xxxx.pdf
- - doi:  # Regular digital object identifier
+ - cite: "Renda, Alex and Frankle, Jonathan and Carbin, Michael. Comparing Rewinding and Fine-tuning in Neural Network Pruning (ICLR 2020)."
+ - bib:  renda2020
+ - url:  https://arxiv.org/abs/2003.02389
+ - doi:  https://doi.org/10.48550/arXiv.2003.02389
 
 # Don't forget to surround abstract with double quotes
-abstract: "AGI is not all you need."
+abstract: "We are reproducing Comparing Rewinding and Fine-tuning in Neural Networks, by Renda.
+In this work the authors compare three different approaches to retraining neural networks after pruning: 1) fine-tuning, 2) rewinding weights as in Frankle and 3) a new, original method involving learning rate rewinding, building upon Frankle. We reproduce the results of all three approaches, but we focus on verifying their approach, learning rate rewinding, since it is newly proposed and is described as a universal alternative to other methods.
+
+We used CIFAR10 for most reproductions along with additional experiments on the larger CIFAR100, which extends the results originally provided by the authors. We have also extended the list of tested network architectures to include Wide ResNets. The new experiments led us to discover the limitations of learning rate rewinding which can worsen pruning results on large architectures."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
@@ -80,13 +79,13 @@ language: Python
 
 # For example, the URL of the GitHub issue where review actually occured
 review:
-  - url: https://openreview.net/forum?id=forum_id
+  - url: https://openreview.net/forum?id=HxWEL2zQ3AK
 
 contributors:
-  - name: Koustuv Sinha
+  - name: 
     orcid:
     role: editor
-  - name: Anonymous Reviewers
+  - name: 
     orcid:
     role: reviewer
   - name:
