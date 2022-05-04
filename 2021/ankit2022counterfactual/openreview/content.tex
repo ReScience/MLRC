@@ -1,62 +1,17 @@
 \section*{\centering Reproducibility Summary}
-% Sections:
-% 1. Introduction (Ankit math for explainibility) 
-
-% 2.  Scope of reproducibility (check and modify/add )
-
-% 3. Methodology 
-% -  3.1 Scope of reproducibility  (check and modify/add )
-% - 3.2 Datasets (adding and mentioning about everything is pending) 
-% - 3.3 Hyperparameters (later) 
-% - 3.4 Experimental setup and code (pending) 
-% - 3.5 Computational requirements (done)
-
-% 4. Results (imagenet pending, proofread all, link, cite, ref)
-% - 4.1  Results reproducing original paper
-% - 4.1.1 Result 1 
-% - 4.1.2 Result 2 
-% - 4.2 Results beyond the original paper 
-% - 4.2.1 Additional Result 1 (mini imagenet dataset empirical results pending)
-% - 4.2.2 Additional Result 2 (SSIM results pending)
-
-% 5. Discussion
-% - 5.1 What was easy (adding about imagenet dataset, proofread/add mnist) 
-% - 5.2 What was difficult  (adding about imagenet dataset, proofread/add mnist) 
-% - 5.3 Communication with original authors (later)
-% Template and style guide to % % %   https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
 
 \subsection*{Scope of Reproducibility}
 
 In this paper, we attempt to verify the claims that the paper \citep{sauer2021counterfactual} makes about their proposed CGN framework that decomposes the image generation process into independent causal mechanisms. Further, the author claims that these counterfactual images improves the out-of-distribution robustness of the classifier. We use the code provided by the authors to replicate several experiments in the original paper and draw conclusions based on these results.  
 
-% and its effect on making robust decisions during the classification task. (1)The image generation process can be decomposed into independent causal inductive biases(object shape, object texture, and background), allowing for creation of counterfactual images. (2) Counterfactual images improve the out-of-distribution robustness during the classification task. (3) Generating high-quality counterfactual images with direct control over shape, texture, and background using proposed loss functions by CGN \cite{sauer2021counterfactual}. (4) The Generative model can be trained efficiently on a single GPU with the help of powerful pre-trained models.
-
-% \begin{itemize}
-%     \setlength\itemsep{0.1mm}
-%     \item The image generation process can be decomposed into independent causal inductive biases(object shape, object texture, and background), allowing for creation of counterfactual images
-%     \item Counterfactual images improve the out-of-distribution robustness during the classification task 
-%     \item  Generating high-quality counterfactual images with direct control over shape, texture, and background using proposed loss functions by CGN \cite{sauer2021counterfactual}
-%     \item The Generative model can be trained efficiently on a single GPU with the help of powerful pre-trained models
-    
-%     % \item Empirical results that have been mentioned in the paper in table 1-4 using both pretrained models and training from scratch. 
-%     % \item Empirical results of ablation study reported in the paper. 
-%     % \item Perform hyperparmeter search and observe/report the trend in results. 
-% \end{itemize}    
-
-% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
-% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
-
 \subsection*{Methodology}
-We use the same hyperparameters and architecture as mentioned in CGN \cite{sauer2021counterfactual}. We use the PyTorch code from \href{www.github.com/autonomousvision/counterfactual_generative_networks}{the authors' publicly available repository}. We make several changes to their code for the MNIST datasets since it gives spurious results/errors. Since we use ImageNet 1000 as a replacement for the ImageNet dataset, we modify the code accordingly. We reproduce tables 1-6 from CGN \cite{sauer2021counterfactual} paper, excluding results for models from other papers.
+We use the same hyperparameters and architecture as mentioned in CGN \cite{sauer2021counterfactual}. We use the PyTorch code publicly available by the author. We make several changes to their code for the MNIST datasets since it gives spurious results/errors. Since we use ImageNet 1000 as a replacement for the ImageNet dataset, we modify the code accordingly. We reproduce tables 1-6 from CGN \cite{sauer2021counterfactual} paper, excluding results for models from other papers.
 
 \subsection*{Results}
 We validated each of the author's claim through the experiments given in the original paper and few additional experiments of our own. Overall, we found many experiments yielding identical results while some deviations were observed with both the Counterfactual Generative Network and the subsequent classification task. We were able to explain most of these deviations through our additional experiments while some couldn't be validated due to computational limitations.
 
 
 \subsection*{What was easy}
-% It was easy to get started with setting up the environment as listed/indicated in the .env file of the Github repository. Although not all commands were listed specifically, but it helped us to navigate through and run the code. Presence of .yaml files for each dataset in case of MNIST \cite{lecun1998gradient} helps us to run existing and also to modify the hyperparameters quickly. Existence of pretrained weight files helped us to generate counterfactual images and train the invariant classifier quickly in case of MNIST \cite{lecun1998gradient}. Which easens the overall process in case of MNIST datasets \cite{lecun1998gradient}. 
-% The pretrained models for MNIST\cite{lecun1998gradient}, ImageNet\cite{imagenet} were a great help in verifying the validity of the  results stated in CGN \cite{sauer2021counterfactual}.  
-% In the MNIST dataset case, the GitHub repository offers usable commands, pre-trained models, and corresponding hyperparameters.
 Overall, clear environment setup instructions, well working code and availability of pretrained CGN models for both datasets proved valuable to validate the authors' claim. 
 
 % pending: Barath add what helped you for ImageNet. 
@@ -73,9 +28,8 @@ Overall, clear environment setup instructions, well working code and availabilit
 Some experimental details were not reported in the original paper which made validations time consuming. ImageNet based experiments were replaced with ImageNet-1k(mini) due to the computational limitation which made it difficult to validate the author's original claims. Pre-trained classification models could have proven helpful in this case, but were unavailable, which meant we had to train the classifier from scratch. Code changes were required to obtain baseline results which was tedious considering different code architecture was implemented for MNIST \& ImageNet.
 
 \subsection*{Communication with original authors}
-We emailed the authors regarding inception score, MNIST dataset hyperparameters and ImageNet hyperparameters. We are awaiting a response from their end. 
+We emailed the authors regarding inception score, MNIST dataset hyperparameters and ImageNet hyperparameters. %We are awaiting a response from their end. 
 
-Code available at \url{https://anonymous.4open.science/r/re_counterfactual_generative-E18F}
 \newpage
 % The following section formatting is optional, you can also define sections as you deem fit.
 %Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.
@@ -91,7 +45,7 @@ Neural Networks (NNs) have become ubiquitous in machine learning due to their pr
 
 % Deep Generative Modelling has been a prominent research topic in recent times. The key concept is to transform a known random noise distribution using a deep neural network that acts as a generator. The three main approaches are Flow-based Generative Models, Variational Autoencoders \cite{kingma2014autoencoding}, and Generative Adversarial Networks(GANs) \cite{goodfellow2014generative}. A shortcoming of these models is that they tend to learn simple correlations rather than more generalisable, complex correlations.
 
-The authors take a causal approach to image generation by splitting the generation task into independent causal mechanisms. The authors considered three separately learned Independent Mechanisms (IMs) to generate shapes, textures and backgrounds for an image. For the MNIST setting, all IM specific losses are optimized end-to-end from scratch, while in the ImageNet setting, each IM is initialized with weights from pre-trained BigGAN-deep-256\citep{brock2019large}. The counterfactual image is then generated by passing the result of each IM to a deterministic composer function.
+The authors take a causal approach to image generation by splitting the generation task into independent causal mechanisms. The authors considered three separately learned Independent Mechanisms (IMs) to generate shapes, textures and backgrounds for an image. For the MNIST setting, all IM specific losses are optimized end-to-end from scratch, while in the ImageNet setting, each IM is initialized with weights from pre-trained BigGAN-deep-256 \citep{brock2019large}. The counterfactual image is then generated by passing the result of each IM to a deterministic composer function.
 
 In this report, we use the publicly available code provided by the authors to reproduce the results of the paper and validate the authors' claims. In this endeavour, we made modifications to the code to determine the efficacy of their generative model and validate its impact on improving the out of distribution robustness of a classifier.
 
@@ -145,7 +99,7 @@ Each IM samples random noise $\mu \sim$ N(0,1), along with an independently samp
 $$x_{gen} = C(m,f,b) = m \otimes f + (1-m) \otimes b$$ 
 where 'm' is the mask (alpha map), f is foreground and b is background. $\otimes$  denotes the element wise multiplication. 
 
-The losses $\mathcal{L}_{rec}$ ($x_{gt}$, $x_{gen}$), $\mathcal{L}_{1}$ reconstruction loss, $\mathcal{L}_{perceptual}$ as shown in Fig. \ref{fig:arch_digram} are used to improve the quality of generated images. Once the CGN is trained, u and y are randomized per mechanism such that new counterfactual $x_{gen}$ are generated. Furthermore, hyperparameters such as CF ratio (the ratio indicates how many counterfactuals are generated per sampled noise) can be used to control the number of samples that are being generated. These samples are then used to train the classifier and evaluated on the corresponding test set. 
+The losses $\mathcal{L}_{rec}$ ($x_{gt}$, $x_{gen}$), $\mathcal{L}_{1}$ reconstruction loss, $\mathcal{L}_{perceptual}$ as shown in Fig. \ref{fig:arch_diagram} are used to improve the quality of generated images. Once the CGN is trained, u and y are randomized per mechanism such that new counterfactual $x_{gen}$ are generated. Furthermore, hyperparameters such as CF ratio (the ratio indicates how many counterfactuals are generated per sampled noise) can be used to control the number of samples that are being generated. These samples are then used to train the classifier and evaluated on the corresponding test set. 
 
 
 \begin{figure}[H]
@@ -166,7 +120,7 @@ The losses $\mathcal{L}_{rec}$ ($x_{gt}$, $x_{gen}$), $\mathcal{L}_{1}$ reconstr
 %  The only difference between the MNIST variants and ImageNet is the background mechanism. For the MNIST variants, we can simplify the SCM to include
 % a second texture mechanism instead of a dedicated background mechanism. There is no need for a
 % globally coherent background in the MNIST setting
-The ImageNet variant follows the architecture that is illustrated in Fig. \ref{fig:arch_digram}. The MNIST variant applies a simpler architecture by applying a second texture mechanism rather than a background mechanism.
+The ImageNet variant follows the architecture that is illustrated in Fig. \ref{fig:arch_diagram}. The MNIST variant applies a simpler architecture by applying a second texture mechanism rather than a background mechanism.
 
 
 \subsection{Experimental setup and code}
@@ -174,17 +128,6 @@ The ImageNet variant follows the architecture that is illustrated in Fig. \ref{f
 % \subsection{Datasets}
 % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any pre-processing done, and 4) a link to download the data (if available).
 We use the datasets mentioned in \cite{sauer2021counterfactual}, excluding ImageNet \cite{deng2009imagenet} due to limited resources and computational constraints.
-\iffalse
-\begin{itemize}
-    \setlength\itemsep{0.1mm}
-    \item Colored MNIST: Introduced in \cite{arjovsky2019invariant} since usual MNIST digits correlates with the background. Colored MNIST consists of digits in red or green. 
-    \item Double Colored MNST: Introduced in \cite{sauer2021counterfactual},consists of more varied backgrounds and digits than Colored MNIST. 
-    \item Wildlife MNIST: Introduced in \cite{sauer2021counterfactual}, In an attempt to build MNIST \cite{lecun1998gradient} closer to the ImageNet\cite{deng2009imagenet}, texture was added as a bias to the data. The ten digits of the striped texture class encode the foreground lables and the background is labelled with the with the texture class 'veiny'.
-    \item Mini-ImageNet\cite{mini-imagenet} instead of ImageNet\cite{deng2009imagenet} due to smaller size and given resources: Introduced in \cite{vinyals2016matching}. It consists of 100 classes with 600 samples of 84x84 sized images in every class.
-    \item ImageNet-1k(mini): Subset of the ImageNet-1k\cite{ImageNet-1k} that contains 34745 images in train set and 3923 for validation set, each split among 1000 classes individually.
-\end{itemize}
-
-\fi
 
 
 \begin{table}[h]
@@ -197,14 +140,14 @@ Dataset&\\
 \midrule
 Colored MNIST & Consists of digits in red or green.  \\ 
 Double Colored MNIST & Consists of more varied backgrounds and digits than Colored MNIST.  \\
-Wildlife MNIST & An attempt to build MNIST \cite{lecun1998gradient} closer to the ImageNet\cite{deng2009imagenet}, texture was added as a bias to the data. The ten digits of the striped texture class encode the foreground lables and the background is labelled with the with the texture class 'veiny'.  \\
-ImageNet-1k(mini) & Subset of the ImageNet-1k\cite{ImageNet-1k},available here\textsuperscript{1} that contains 34745 images in train set and 3923 for validation set, each split among 1000 classes individually.
+Wildlife MNIST & An attempt to build MNIST \cite{lecun1998gradient} closer to the ImageNet \cite{deng2009imagenet}, texture was added as a bias to the data. The ten digits of the striped texture class encode the foreground lables and the background is labelled with the with the texture class 'veiny'.  \\
+ImageNet-1k(mini) & Subset of the ImageNet-1k \cite{Imagenet-1k}, available here \textsuperscript{1} that contains 34745 images in train set and 3923 for validation set, each split among 1000 classes individually.
 \label{table:imagenet_ood}
 \end{tabularx}
 \caption{Datasets used}
 \end{table}
 \footnotetext{\textsuperscript{1}https://kaggle.com/ifigotin/imagenetmini-1000}
-For all the experiments, we make use of standard dataset splits akin to the CGN paper \cite{sauer2021counterfactual}. Considering the computational constraint to train a classifier on ImageNet\cite{imagenet}, we used the pre-trained CGN to generate counterfactual images and trained a classifier on ImageNet-1k(mini) and mini-imagenet datasets.
+For all the experiments, we make use of standard dataset splits akin to the CGN paper \cite{sauer2021counterfactual}. Considering the computational constraint to train a classifier on ImageNet \cite{imagenet}, we used the pre-trained CGN to generate counterfactual images and trained a classifier on ImageNet-1k(mini) and mini-imagenet datasets.
 
 
 \subsection{Hyperparameter search}
@@ -225,7 +168,6 @@ A lack of compute power prevented us from replicating the experiments on ImageNe
 We begin the experiment by training a CGN on the three variants of the MNIST dataset. We observe in Fig. \ref{fig:original_counterfactuals_mnist} that the digits in case of colored MNIST dataset lose their shape when reconstructed, whereas for double colored and wildlife MNIST, the digits look much better. Since we do not clearly understand why the shape in Colored MNIST is poor, we generated a mask timeline to verify any patterns. Fig. \ref{fig:original_grid_mask1} details the same. Further analysis on this was conducted and recorded in \ref{section:resultsbeyondpaper}. We also propose an additional loss function to help mitigate this problem.
 
 \begin{figure}[ht!]
-  \vspace{-5mm}
   \centering
     \includegraphics[width=0.5\textwidth,height=0.3\textwidth]{../openreview/images/mnist_cfgs/mnist_cfg.png}
     \caption{For brevity, we display only first 3 digits that were generated by training from scratch by us for the given three MNIST datasets.  
@@ -234,13 +176,10 @@ We begin the experiment by training a CGN on the three variants of the MNIST dat
 \end{figure}
 
 
-\textbf{Quality of Counterfactual Images on ImageNet-1k}
-
+\subsubsection{Quality of Counterfactual Images on ImageNet-1k}
 
 To quantify the quality of the composite images produced by the CGN, the authors calculate the inception score (IS). The details of the IS calculations (inception model used, number of images used) were not mentioned in the paper. In an attempt to recreate the results regarding IS, we use the OpenAI implementation \footnote{https://github.com/nnUyi/Inception-Score}. We plot the results of IS vs the number images using 10 splits in Fig. \ref{fig:inception}. We observe the IS converges to an IS of 198.
 
-
-% (unsure about this number).
 We made use of the pre-trained CGN trained on ImageNet-1k that was present as part of the codebase to generate counterfactual images. 
 Since there is no quantitative way to measure the quality of counterfactual images, we reproduced the images given in the original paper. We achieved a similar quality of counterfactual images but also noted deviations. 
 Fig. \ref{fig:original_counterfactuals} shows all the images that were given in the original paper. A deviation in the mask is observed for the class 'Agaric' and 'Cauliflower'. 
@@ -252,7 +191,7 @@ Images under the classes 'Cliff dwelling' 'American Chameleon' suffer from Textu
 
 \subsubsection{Impact of counterfactual images towards shape-bias of the classifier}
 
-\textbf{Experiments conducted with ImageNet-1k(mini) dataset}
+\subsubsection{Experiments conducted with ImageNet-1k(mini) dataset}
 \label{section:textshapebg}
 
 In order to identify the impact of shape bias on the classifier, we made use of the proposed architecture for the classifier ensemble that included 3 different heads. The ensemble includes a pre-trained classifier(we made use of Resnet-50) as the backbone, while attaching 3 different heads to it. Each head controls the variance with respect to one of the 3 independent mechanism(Shape, Texture, Background) which are individually trained from scratch. The result from these heads are averaged to get the prediction accuracy of the classifier ensemble.
@@ -310,7 +249,7 @@ ImageNet-1k(mini) + CGN & 90.32\% & 97.24\% & 11.36\%
 \label{table:imagenet-experiments}
 \end{table}
 \subsubsection{Do Counterfactual images improve the OOD robustness of the classifier?}
-\textbf{Classification Accuracy (MNIST Dataset)}
+\subsubsection{Classification Accuracy (MNIST Dataset)}
 Firstly, we trained a classifier on counterfactuals generated by the pre-trained CGN provided by the authors. It was not clear how many counterfactual images the classifier should be trained on, but the accuracies in Table \ref{table:mnist-classification} were similar to the results in the ablation study in Fig. 7 using $10^6$ counterfactuals, so this is the number we chose. There was also ambiguity between the statements in the paper and the code about the classifier being trained on any real images, so we trained two classifiers. One classifier was shown real images, and the other was not. 
 \\
 \begin{table}[h]
@@ -337,19 +276,15 @@ The classifier trained with counterfactuals generated by the pre-trained models 
 
 The presence of real images in the dataset for the pretrained models appeared not to have a significant effect on train or test accuracy. The largest gain obtained by including real images was approximately 4\%. This demonstrates that the ambiguity regarding whether or not real images were used in the training of the classifier was inconsequential. For the CGNs that we trained, however, the presence of real images improved the performance of the classifier significantly. 
 
-% \subsection*{ImageNet}
 
-
-
-
-\textbf{Classification Accuracy(ImageNet Dataset)}
+\subsubsection{Classification Accuracy(ImageNet Dataset)}
 
 The classifier was trained on counterfactual images from pre-trained CGN and ImageNet-1k(mini). The results in table \ref{table:imagenet-experiments}(c) indicate the trend that was observed. 
 The training accuracy showed a similar trend to the original paper's classifier (trained on ImageNet). There is a similar drop in the training accuracy compared to the baseline(ImageNet-1k). 
 
 Even though the original paper does not include the test accuracy for the classifier for the same distribution, we found that the classifier does not perform well with respect to the test data. The drop in top-1(the predicted class is the correct class that the image corresponds to) \& top-5(5 out of 1000 classes with the highest probability as predicted by the classifier matches the actual label) accuracy compared to the baseline was attributed to the ability of the counterfactual models to reduce the shape bias of classifier which would improve the classifier's robustness to unseen data. However, this is invalidated by the low percentage of the test accuracy. To further understand why the classifier ensemble is not performing well with unseen test data, we conducted additional experiments to explain the same behaviour.
 
-\textbf{Out of distribution accuracy}:
+\subsubsection{Out of distribution accuracy}:
 A similar study as given in the paper was conducted to understand how the trained model performs with an out-of-distribution dataset. Table \ref{table:imagenet-experiments}(b) contains the information with respect to the ImageNet-1k(mini) + CGN. There is a significant reduction in the accuracy of the out-of-distribution dataset. The baseline also showed a similar trend, and we could not achieve the higher percentage reported as part of the paper. 
 We concluded that the baseline result is on the lower side primarily because of the size of the ImageNet-1k(mini) dataset that was used for training. Since the results show that the ensemble classifier improves the out-of-distribution robustness compared to the baseline, the percentage was still very low to make any conclusion.
 
@@ -359,83 +294,43 @@ Both the trend with the test accuracy and out-of-distribution accuracy falls on 
 \label{section:resultsbeyondpaper}
 % Result beyond the ones stated in the paper. 
 % pending: add motivation for why ssim loss works.
-\textbf{For Additional Result 1 we make use of CGN\cite{sauer2021counterfactual} architecture that has been designed for MNIST datasets due to computational limitations.}
+\subsubsection{For Additional Result 1 we make use of CGN \cite{sauer2021counterfactual} architecture that has been designed for MNIST datasets due to computational limitations.}
 \subsubsection{Additional Result 1 - Does  $f_{bg}$, $f_{texture}$, $f_{shape}$ and $\mathcal{L}_{perceptual}$ (Perceptual loss) proposed in \cite{sauer2021counterfactual} cover all aspects of background, shape, texture? }
 
 CGN \cite{sauer2021counterfactual} makes use of texture loss $\mathcal{L}_{text}$ ($x_{gt}$, $x_{gen}$), = sampling 36 patches of size 15 x 15 grid from regions wherever mask has values near 1. Further, from these 36 patches, a patch grid of 6 x 6 is used. It is then upscaled to 256 x 256 resolution, which is in turn used an input to the Perceptual loss $\mathcal{L}_{perceptual}$ between foreground f and patch grid $\mathcal{L}_{text} (f, pg)$. 
 However, we observe that important image properties such as luminance, contrast, structure are not taken into consideration with the $\mathcal{L}_{text}$ loss proposed in CGN \cite{sauer2021counterfactual} for the generated image and the ground truth image and also because 
 
-Hence, we propose the usage of an additional Loss function $\mathcal{L}_{ssim}$ (SSIM) \cite{wang2004image}. In addition, motivated by results as shown in \cite{zhao2016loss}, \cite{pandey2020unsupervised} L2 loss unlike SSIM \cite{wang2004image} over different distortions of the image remains constant instead of recognising them . It complements the structural loss $\mathcal{L}_{rec}$. 
-Default Gaussian Kernel of 11 was used as a hyperparameter for SSIM \cite{wang2004image}.
+Hence, we propose the usage of an additional Loss function $\mathcal{L}_{ssim}$ (SSIM) \citep{wang2004image}. In addition, motivated by results as shown in \cite{zhao2016loss}, \cite{pandey2020unsupervised} L2 loss unlike SSIM \cite{wang2004image} over different distortions of the image remains constant instead of recognising them . It complements the structural loss $\mathcal{L}_{rec}$. 
+Default Gaussian Kernel of 11 was used as a hyperparameter for SSIM \citep{wang2004image}.
 
-We observe from Table \ref{table:ssim-table} that using SSIM \cite{wang2004image} loss improves classification accuracy on the Wildlife MNIST dataset. Qualitative improvements in the generated images can be seen in Fig \ref{fig:ssim_grid_mask}. Images trained with SSIM \cite{wang2004image} loss show better structure and crisper outlines. Improvements can be seen using SSIM \cite{wang2004image} loss on the  Double Colored MNIST dataset to a lesser extent. However, accuracy on the colored MNIST dataset decreases. This may be due to the dataset's shape/structure/bias.
+We observe from Table \ref{table:ssim-table} that using SSIM \citep{wang2004image} loss improves classification accuracy on the Wildlife MNIST dataset. Qualitative improvements in the generated images can be seen in Fig \ref{fig:ssim_grid_mask}. Images trained with SSIM \citep{wang2004image} loss show better structure and crisper outlines. Improvements can be seen using SSIM \citep{wang2004image} loss on the  Double Colored MNIST dataset to a lesser extent. However, accuracy on the colored MNIST dataset decreases. This may be due to the dataset's shape/structure/bias.
 
-% \begin{figure}[H]
-% \centering
-% \tiny
-% \begin{tabular}{@{}c@{}c}
-% \includegraphics[width=0.4\textwidth]{../openreview/images/mask_original.pdf} &
-
-% \includegraphics[width=0.4\textwidth]{../openreview/images/mask_ssim.pdf} \\
-% \scriptsize (a) Wildlife MNIST mask samples 
-% obtained using default hyper-parameters 
-% mentioned in CGN \cite{sauer2021counterfactual}. & 
-% \scriptsize (b) Wildlife MNIST mask samples 
-% obtained by adding SSIM \cite{wang2004image} loss.
-% \end{tabular}
-% \caption{Results for experiments conducted using Wildlife MNIST dataset}
-% \label{fig:mnist_ssim_both}
-% \end{figure}
-
-\subsection{Results for Manhattan neighbourhoods and incorporating demographic data}
 \begin{figure}[ht]
     \centering
     \begin{subfigure}{0.5\textwidth}
       \centering
       \includegraphics[width=0.9\linewidth]{../openreview/images/mask_original.pdf}
-      \caption{Wildlife MNIST mask samples obtained using \\default hyper-parameters mentioned in CGN \cite{sauer2021counterfactual}.
+      \caption{Wildlife MNIST mask samples obtained using \\default hyper-parameters mentioned in CGN \citep{sauer2021counterfactual}.
       }
-      \label{fig:demographic_1_success_rates}
+      \label{fig:original_grid_mask1}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}
       \centering
       \includegraphics[width=0.9\linewidth]{../openreview/images/mask_ssim.pdf}
-      \caption{Wildlife MNIST mask samples obtained by adding SSIM \cite{wang2004image} loss.
+      \caption{Wildlife MNIST mask samples obtained by adding SSIM \citep{wang2004image} loss.
       }
-      \label{fig:demographic_1_avg_success_rates}
+      \label{fig:ssim_grid_mask}
     \end{subfigure}
     \caption{Results for experiments conducted using Wildlife MNIST dataset}
     \label{fig:demographic_1}
 \end{figure}
-
-
-% \begin{figure}[H]
-%     \begin{subfigure}[b]{0.5\textwidth}
-%     \centering
-%     \includegraphics[width=0.9\linewidth]{..openreview/images/mask_original.pdf}
-%     \subcaption{Wildlife MNIST mask samples obtained using default hyper-parameters mentioned in CGN \cite{sauer2021counterfactual}.
-%     }
-%     \label{fig:original_grid_mask1}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[b]{0.5\textwidth}
-%     \centering 
-%     \includegraphics[width=0.9\linewidth]{../openreview/images/mask_ssim.pdf}
-%     \subcaption{Wildlife MNIST mask samples obtained by adding SSIM \cite{wang2004image} loss.
-%     }
-%     \label{fig:ssim_grid_mask}
-% \end{subfigure}
-% \caption{Results for experiments conducted using Wildlife MNIST dataset}
-% \label{fig:mnist_ssim_both}
-% \end{figure}
-%  Comparing Fig. \ref{fig:original_grid_mask1} and Fig. \ref{fig:ssim_grid_mask}, we observe that usage SSIM \cite{wang2004image} leads to generation of mask samples that are sharper, capture more structure details, clearer outputs. Specifically, when compared to Fig. \ref{fig:original_grid_mask1} the digits 0, 2, 4 lead to better visual outputs. As a result, we show in Table \ref{ssim_loss} that the overall classifier's accuracy increases by around 16\% when compared to training from scratch by us, and around 6\% when compared to accuracy of given pre-trained model. 
 
 \begin{table}[h]
 \centering
 \tiny
 \begin{tabular}{lrrrr}
 \toprule
-{} & Using pretrained weights &  Training from scratch & Trained from scratch with SSIM \cite{wang2004image}\\
+{} & Using pretrained weights &  Training from scratch & Trained from scratch with SSIM \citep{wang2004image}\\
 Datasets  &              &              &                            \\
 \midrule
 Colored MNIST              &        96.42 &        61.12 &         44.77  \\
@@ -443,14 +338,11 @@ Double Colored MNIST              &        86.26  &        86.19 &         87.88
 Wildlife MNIST              &        71.89 &        61.94 &         77.64  \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy for MNIST datasets when SSIM  \cite{wang2004image} loss function is used. For the Wildlife dataset  and Double colored dataset we observe an increase in the overall accuracy when compared to what has been reported in the paper with the usage of SSIM \cite{wang2004image} }
+\caption{Accuracy for MNIST datasets when SSIM  \citep{wang2004image} loss function is used. For the Wildlife dataset  and Double colored dataset we observe an increase in the overall accuracy when compared to what has been reported in the paper with the usage of SSIM \citep{wang2004image} }
 \label{table:ssim-table}
 
 \end{table}
 
-% To determine why the color jitter augmentation decreases training accuracy, we opt to observe the results visually through the samples generated across iterations by the CGN. Fig. \ref{fig:original_grid} shows that the xgen images generated using default hyperparameters using Wildlife MNIST dataset. Similarly, Fig. \ref{fig:data_augment_grid} shows the xgen images with color jitter augmentation. We observe that there is difference between with/without augmentation in terms of the brightness, contrast, overall image representations. Specifically, the digits such as 6 which loses its shape over iterations. Digits 0,1 are generated such that they have same background and similar digit font. These artefacts produced by the CGN\cite{sauer2021counterfactual} in turn affect the classifier's performance and the accuracy decreases by around 50\% in the case of Wildlife MNIST. 
-
-%\vspace{-}
 \subsubsection{Exploring classifier robustness with ImageNet}
 
 From \ref{table:imagenet-experiments}(c), we find a considerable drop in the training and test accuracies(top-1) compared to the baseline. To explain the performance of the model, we integrated lime\cite{lime} package to generate explainability heatmap plots.(code reference \textit{lime\_plots.py})
@@ -467,7 +359,7 @@ From the above experiments through visual plots, we are able to determine that t
 \vspace{-4mm}
 \centering
     \includegraphics[width=0.5\textwidth]{../openreview/limeplots/ipod_lime_plot.png}
-    \caption{Heatmap plots and corresponding classification(probability in \%) of the top 5 best classes for the image iPod. From left to right, same image classified with a pre-trained Resnet-50 \& Classifier ensemble architecture from the original paper\cite{sauer2021counterfactual}. Green regions contribute towards the classification while red regions do not.
+    \caption{Heatmap plots and corresponding classification(probability in \%) of the top 5 best classes for the image iPod. From left to right, same image classified with a pre-trained Resnet-50 \& Classifier ensemble architecture from the original paper \cite{sauer2021counterfactual}. Green regions contribute towards the classification while red regions do not.
     }
     \label{fig:lime_plot}
 \end{figure}
