@@ -1,214 +1,233 @@
+\newpage
+\section*{Appendix}
+\subsection{More details}
+This is an \textit{extended appendix}.
+
+
+
 \section{Datasets}\label{appendix:datasets}
 
 \begin{table}[H]
-\scriptsize
-\centering
-% \begin{tabular}{|l|l|c|l|l|c|c|l|}
-\begin{tabular}{|m{.7cm}|m{2.6cm}|m{1.2cm}|m{.9cm}|m{1.3cm}|m{1.3cm}|m{1.4cm}|m{1.4cm}|}
-\hline
-Dataset   & Description                                                                                                                               & \begin{tabular}[c]{@{}c@{}}Original #\\ of datapoints\end{tabular} & Sensitive attribute & Demographic groups                                                            & Preprocessing                                               & \begin{tabular}[c]{@{}c@{}}# of datapoints \\ postprocessing\end{tabular} & Other attributes                                                                   \\ \hline
-Bank      & Marketing campaigns of a Portuguese banking institution corresponding to each client                                                      & 41,188                                                             & Marital status      & single, married, divorced, unknown                                            & \begin{tabular}[c]{@{}c@{}}Removing \\ unknown\end{tabular} & 41,108                                                                    & \begin{tabular}[c]{@{}l@{}}6 categorical, \\ 4 binary, \\ 6 numerical\end{tabular} \\ \hline
-Adult     & \begin{tabular}[c]{@{}l@{}}US census record dataset \\ from 1994\end{tabular}                                                             & 32,561                                                             & Gender              & female, male                                                                  & N/A                                                         & N/A                                                                       & \begin{tabular}[c]{@{}l@{}}6 numerical, \\ 7 categorical, \\ 2 binary\end{tabular} \\ \hline
-Census II & \begin{tabular}[c]{@{}l@{}}Large scale US census \\ record data from 1990\end{tabular}                                                    & 2,458,285                                                          & Gender              & female, male                                                                  & N/A                                                         & N/A                                                                       & 67 other attributes                                                                \\ \hline
-Student   & \begin{tabular}[c]{@{}l@{}}Achievements in \\ Portuguese schools on the \\ subject of mathematics\end{tabular}                            & 395                                                                & Sex                 & female, male                                                                  & N/A                                                         & N/A                                                                       & 6 other attributes                                                                 \\ \hline
-Drugnet   & \begin{tabular}[c]{@{}l@{}}Habits of drug users in \\ Hartford. The edges \\ represent acquaintance-\\ ship. (graph dataset)\end{tabular} & 293                                                                & Gender              & female, male                                                                  & N/A                                                         & N/A                                                                       & 1 numerical                                                                        \\ \hline
-\end{tabular}
-    \caption{Characteristics of datasets}
-    \label{tab:datasetreprod}
+	\scriptsize
+	\centering
+	% \begin{tabular}{|l|l|c|l|l|c|c|l|}
+	\begin{tabular}{|m{.7cm}|m{1.7cm}|m{1.2cm}|m{.9cm}|m{1.3cm}|m{1.3cm}|m{1.3cm}|m{1.4cm}|}
+	\hline
+    Dataset   & Description                                                                                & Original \# of datapoints  & Sensitive attribute & Demographic groups                  & Preprocessing    & \# of datapoints postprocessing & Other attributes                     \\ \hline
+	Bank      & Marketing campaigns of a Portuguese banking institution corresponding to each client       & 41,188                     & Marital status      & single, married, divorced, unknown  & Removing unknown & 41,108                          & 6 categorical, 4 binary, 6 numerical \\ \hline
+	Adult     & US census record dataset from 1994                                                         & 32,561                     & Gender              & female, male                        & N/A              & N/A                             & 6 numerical, 7 categorical, 2 binary \\ \hline
+	Census II & Large scale US census record data from 1990                                                & 2,458,285                  & Gender              & female, male                        & N/A              & N/A                             & 67 other attributes                  \\ \hline
+	Student   & Achievements in Portuguese schools on the subject of mathematics                           & 395                        & Sex                 & female, male                        & N/A              & N/A                             & 6 other attributes                   \\ \hline
+	Drugnet   & Habits of drug users in Hartford. The edges represent acquaintanceship. (graph dataset)    & 293                        & Gender              & female, male                        & N/A              & N/A                             & 1 numerical                          \\ \hline
+	\end{tabular}
+	\caption{Characteristics of datasets}
+	\label{tab:datasetreprod}
 \end{table}
+
+
 
 \section{Hyperparameters}\label{appendix:hyperparams}
 \begin{table}[H]
-    \small
-    \centering
-    \begin{tabular}{|c|c|ccccc|}    \hline
-    \multirow{4}{*}{}   & \multirow{2}{*}{} & \multicolumn{5}{c|}{Dataset} \\ \cline{3-7}
-                        &                   & Synthetic & Synthetic-unequal & Adult & Bank  & Census II \\ \cline{2-7}
-                        & Lipschitz         & \multicolumn{5}{c|}{$\lambda$}\\ \hline
-    $K$-medians         & 2.0               & 10 (600) & 10 & 9000 & 9000 & 500000 \\\hline
-    $K$-means           & 2.0               & 10 (100) & 10 & 9000 & 6000 & 500000 \\    \hline
-    Ncut                & 1.0/2.0           & 10 & 10 & 10 & 40 & 100 \\    \hline
-    \end{tabular}
-    
-    \begin{tablenotes}
-      \small
-      \item The Ncut shows two Lipschitz constants because different values are used for reproduction: \autoref{tab:comparisontab} \& \autoref{fig:lambda_reprod_plots}
-      \item The $\lambda$ value in parentheses indicate the tuned lambda found in \autoref{ssec:tunelambdalipschitz}. 
-    \end{tablenotes}
-    \caption{Hyperparameters}
-    \label{tab:hyperparamreprod}
+	\small
+	\centering
+	\begin{tabular}{|c|c|ccccc|}    \hline
+	\multirow{4}{*}{}   & \multirow{2}{*}{} & \multicolumn{5}{c|}{Dataset} \\ \cline{3-7}
+						&                   & Synthetic & Synthetic-unequal & Adult & Bank  & Census II \\ \cline{2-7}
+						& Lipschitz         & \multicolumn{5}{c|}{$\lambda$}                            \\ \hline
+	$K$-medians         & 2.0               & 10 (600)  & 10                & 9000  & 9000  & 500000    \\ \hline
+	$K$-means           & 2.0               & 10 (100)  & 10                & 9000  & 6000  & 500000    \\ \hline
+	Ncut                & 1.0/2.0           & 10        & 10                & 10    & 40    & 100       \\ \hline
+	\end{tabular}
+	
+	\begin{tablenotes}
+		\small
+		\item The Ncut shows two Lipschitz constants because different values are used for reproduction: \autoref{tab:comparisontab} \& \autoref{fig:lambda_reprod_plots}
+		\item The $\lambda$ value in parentheses indicate the tuned lambda found in \autoref{ssec:tunelambdalipschitz}. 
+	\end{tablenotes}
+	\caption{Hyperparameters}
+	\label{tab:hyperparamreprod}
 \end{table}
+
+
 
 \section{Outlier detection (Chauvenet's criterion)}
 \label{sec:outlierdet}
 
 The idea behind Chauvenet's criterion is similar to standard hypothesis testing using $Z$-scores. The aim is to find the corresponding standard normal distribution to the distribution that is being considered and see if the relevant point is reasonably close to the mean. The Chauvenet's maximum allowed deviation for a dataset of size $N$, denoted as $T_N$, is given by the the inverse of the standard normal cumulative distribution in $\frac{1}{4N}$, and therefore a data point $\textbf{x}_p$ is considered an outlier if
 \begin{align*}
-  \frac{|\textbf{x}_p - \bar{\textbf{x}}|}{s_x} > T_N,  
+	\frac{|\textbf{x}_p - \bar{\textbf{x}}|}{s_x} > T_N,  
 \end{align*}
 where $\bar{\textbf{x}}$ denotes the sample mean, $s_x$ denotes the sample standard deviation.
 
-\newpage
+
+
+
+
 
 \section{Proofs}
 \label{appendix:proof_prop_1}
 
 \subsection*{Proof of Proposition 1}
 
-\begin{proof}
-As seen in \autoref{eq:KBC_objective}, the $K$-means objective can be altered to
-$$\min_{\mathbf{S}} \sum_k \sum_p s_{p, k} d(\textbf{x}_p, \textbf{c}_k) ~\text{ s.t. }~ \textbf{s}_p \in \nabla_K \forall p,$$
-where $d$ is some kernel-based distance metric. Let $\kappa: X \times X \to \mathbb{R}$ be an arbitrary kernel function. We can define the following distance-based metric based on $\kappa$ \citep{hall2012objective}:
-\begin{equation}
-\label{KBC_metric}
-  d(\textbf{x}_p, \textbf{c}_k) = \kappa(\textbf{x}_p, \textbf{x}_p) - 2 \frac{\sum_{l=1}^n s_{l, k} \kappa(\textbf{x}_l, \textbf{x}_p)}{\sum_{l=1}^n s_{l, k}} + \frac{\sum_{q=1}^n \sum_{l=1}^n s_{q, k} s_{l, k} \kappa(\textbf{x}_q, \textbf{x}_l)}{(\sum_{q=1}^n s_{q, k})^2}.
-\end{equation}
+	As seen in \autoref{eq:KBC_objective}, the $K$-means objective can be altered to
+	$$\min_{\mathbf{S}} \sum_k \sum_p s_{p, k} d(\textbf{x}_p, \textbf{c}_k) ~\text{ s.t. }~ \textbf{s}_p \in \nabla_K \forall p,$$
+	where $d$ is some kernel-based distance metric. Let $\kappa: X \times X \to \mathbb{R}$ be an arbitrary kernel function. We can define the following distance-based metric based on $\kappa$ \cite{hall2012objective}:
+	\begin{equation}
+		\label{KBC_metric}
+		d(\textbf{x}_p, \textbf{c}_k) = \kappa(\textbf{x}_p, \textbf{x}_p) - 2 \frac{\sum_{l=1}^n s_{l, k} \kappa(\textbf{x}_l, \textbf{x}_p)}{\sum_{l=1}^n s_{l, k}} + \frac{\sum_{q=1}^n \sum_{l=1}^n s_{q, k} s_{l, k} \kappa(\textbf{x}_q, \textbf{x}_l)}{(\sum_{q=1}^n s_{q, k})^2}.
+	\end{equation}
+	
+	By a similar argument as given in Proposition 2 of the OP, it follows that
+	\begin{align*}
+		\sum_p s_{p, k}(\textbf{x}_p - \textbf{c}_k)^2 \leq \sum_p s_{p, k}d(\textbf{x}_p - \textbf{c}^i_k).
+	\end{align*}
+	
+	hence, the auxiliary function for Kernel-Based Clustering can be written as
+	\begin{equation*}
+		\mathcal{H}_i(\mathbf{S}) = \sum_p \textbf{s}_p^t  \textbf{a}_p^i,
+	\end{equation*}
+	where $a_{p, k}^i$ is given by $d(\textbf{x}_p, \textbf{c}_k^i)$ as given in \autoref{KBC_metric}.
 
-By a similar argument as given in Proposition 2 of the OP, it follows that
-\begin{align*}
-    \sum_p s_{p, k}(\textbf{x}_p - \textbf{c}_k)^2 \leq \sum_p s_{p, k}d(\textbf{x}_p - \textbf{c}^i_k).
-\end{align*}
-
-hence, the auxiliary function for Kernel-Based Clustering can be written as
-\begin{equation*}
-    \mathcal{H}_i(\mathbf{S}) = \sum_p \textbf{s}_p^t  \textbf{a}_p^i,
-\end{equation*}
-where $a_{p, k}^i$ is given by $d(\textbf{x}_p, \textbf{c}_k^i)$ as given in \autoref{KBC_metric}.\end{proof}
 
 
-\newpage
+
+
 \section{Experimental results}\label{appendix:figsandtabs}
 \label{figures}
 
 \subsection*{Comparison between OP and reproduction results}
 
 \begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-            & \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-medians}} \\
-            \cline{2-5}
-        \textbf{Dataset} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
-        & Original & Reproduction & Original & Reproduction \\
-        \hline
-        Synthetic & 292.40 & 289.08($\pm 2.03$) & \color{orange}0.00\color{black} / \color{red}1.00\color{black} & 0.82($\pm 1.05$) / 0.34($\pm 0.21$) \\
-        Synthetic-unequal & 174.81 & 174.82($\pm 0.00$) & 0.00 / 0.33 & 0.00($\pm 0.00$) / 0.33($\pm 0.00$) \\
-        Adult & 18467.75 & 17887.87($\pm 307.59$) & 0.01 / \color{red}0.43\color{black} & 0.01($\pm 0.00$) / 0.42($\pm 0.01$) \\
-        Bank & \color{red}19527.08\color{black} & 20242.38($\pm 403.62$) & \color{red}0.02\color{black} / \color{red}0.18\color{black} & 0.04($\pm 0.00$) / 0.17($\pm 0.00$) \\
-        Census II & 1754109.46 & 1746911.27($\pm 10270.47$) & 0.02 / \color{orange}0.78\color{black} & 0.02($\pm 0.00$) / 0.75($\pm 0.04$) \\
-        \hline
-    \end{tabular}
-    \caption{Comparison of Fair $K$-medians results by the original paper to this paper's reproduction}
-    \label{tab:comparison_originalVSreproduction_kmedian}
+	\centering
+	% \begin{tabular}{|l|c|c|c|c|}
+	\begin{tabular}{|m{1.4cm}|m{1.6cm}|m{3.1cm}|m{1.6cm}|m{3.5cm}|}
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-medians}} \\
+		\cline{2-5}
+		\textbf{Dataset} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+							& Original                          & Reproduction                  & Original                                                       & Reproduction \\ \hline
+        Synthetic           & 292.40                            & 289.08 ($\pm 2.03$)            & \color{orange}0.00 \color{black} / \color{red}1.00\color{black} & 0.82($\pm 1.05$) /\;0.34($\pm 0.21$) \\
+        Synthetic-unequal   & 174.81                            & 174.82 ($\pm 0.00$)            & 0.00 / 0.33                                                    & 0.00($\pm 0.00$) /\;0.33($\pm 0.00$) \\
+        Adult               & 18467.75                          & 17887.87 ($\pm 307.59$)        & 0.01 / \color{red}0.43\color{black}                            & 0.01($\pm 0.00$) /\;0.42($\pm 0.01$) \\
+        Bank                & \color{red}19527.08\color{black}  & 20242.38 ($\pm 403.62$)        & \color{red}0.02 \color{black} / \color{red}0.18\color{black}    & 0.04($\pm 0.00$) /\;0.17($\pm 0.00$) \\
+        Census II           & 1754109.46                        & 1746911.27 ($\pm 10270.47$)    & 0.02 / \color{orange}0.78\color{black}                         & 0.02($\pm 0.00$) /\;0.75($\pm 0.04$) \\
+		\hline
+	\end{tabular}
+	\caption{Comparison of Fair $K$-medians results by the original paper to this paper's reproduction}
+	\label{tab:comparison_originalVSreproduction_kmedian}
 \end{table}
 
 \begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|c|c|}
+	\centering
+	% \begin{tabular}{|l|c|c|c|c|}
+	\begin{tabular}{|m{1.4cm}|m{1.6cm}|m{3.1cm}|m{1.6cm}|m{3.5cm}|}
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-means}} \\
+		\cline{2-5}
+		\textbf{Dataset} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+							& Original                              & Reproduction                  & Original                                                          & Reproduction \\
         \hline
-            & \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-means}} \\
-            \cline{2-5}
-        \textbf{Dataset} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
-        & Original & Reproduction & Original & Reproduction \\
-        \hline
-        Synthetic & 207.80 & 203.66($\pm 2.55$) & \color{red}0.00\color{black} / \color{red}1.00\color{black} & 2.43($\pm 1.47$) / 0.27($\pm 0.44$) \\
-        Synthetic-unequal & 159.75 & 159.75($\pm 0.00$) & 0.00 / 0.33 & 0.00($\pm 0.00$) / 0.33($\pm 0.00$) \\
-        Adult & \color{red}9984.01\color{black} & 10355.98($\pm 328.43$) & 0.02 / \color{red}0.41\color{black} & 0.01($\pm 0.00$) / 0.40($\pm 0.01$) \\
-        Bank & \color{orange}9392.20\color{black} & 9907.19($\pm 550.52$) & \color{red}0.05\color{black} / 0.17 & 0.08($\pm 0.00$) / 0.17($\pm 0.00$) \\
-        Census II & \color{orange}1018996.53\color{black} & 2279984.75($\pm 1548556.61$) & \color{orange}0.02\color{black} / \color{red}0.78\color{black} & 41.86($\pm 51.83$) / 0.42($\pm 0.34$) \\
-        \hline
-    \end{tabular}
-    \caption{Comparison of Fair $K$-means results by the original paper to this paper's reproduction}
-    \label{tab:comparison_originalVSreproduction_kmeans}
+        Synthetic           & 207.80                                & 203.66 ($\pm 2.55$)            & \color{red}0.00 \color{black} / \color{red}1.00\color{black}       &  2.43($\pm  1.47$) /\;0.27($\pm 0.44$) \\
+        Synthetic-unequal   & 159.75                                & 159.75 ($\pm 0.00$)            & 0.00 / 0.33                                                       &  0.00($\pm  0.00$) /\;0.33($\pm 0.00$) \\
+        Adult               & \color{red}9984.01\color{black}       & 10355.98 ($\pm 328.43$)        & 0.02 / \color{red}0.41\color{black}                               &  0.01($\pm  0.00$) /\;0.40($\pm 0.01$) \\
+        Bank                & \color{orange}9392.20\color{black}    & 9907.19 ($\pm 550.52$)         & \color{red}0.05 \color{black} / 0.17                               &  0.08($\pm  0.00$) /\;0.17($\pm 0.00$) \\
+        Census II           & \color{orange}1018996.53\color{black} & 2279984.75 ($\pm 1548556.61$)  & \color{orange}0.02 \color{black} / \color{red}0.78\color{black}    & 41.86($\pm 51.83$) /\;0.42($\pm 0.34$) \\
+		\hline
+	\end{tabular}
+	\caption{Comparison of Fair $K$-means results by the original paper to this paper's reproduction}
+	\label{tab:comparison_originalVSreproduction_kmeans}
 \end{table}
 
 \begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-            & \multicolumn{4}{c|}{\textbf{Fair Ncut}} \\
-            \cline{2-5}
-        \textbf{Dataset} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
-        & Original & Reproduction & Original & Reproduction \\
-        \hline
-        Synthetic & \color{red}0.00\color{black} & 0.20($\pm 0.10$) & 0.00 / \color{red}1.00\color{black} & 0.00($\pm 0.00$) / 0.98($\pm 0.02$) \\
-        Synthetic-unequal & 0.06 & 0.02($\pm 0.03$) & 0.00 / \color{red}0.33\color{black} & 0.00($\pm 0.00$) / 0.32($\pm 0.01$) \\
-        Adult & \color{red}0.74\color{black} & 0.78($\pm 0.02$) & 0.08 / 0.30 & 0.08($\pm 0.02$) / 0.36($\pm 0.03$) \\
-        Bank & \color{red}0.58\color{black} & 0.65($\pm 0.01$) & 0.39 / 0.14 & 0.25($\pm 0.03$) / 0.14($\pm 0.01$) \\
-        Census II & \color{red}0.52\color{black} & 1.74($\pm 0.14$) & \color{red}0.41\color{black} / \color{red}0.43\color{black} & 21.84($\pm 10.02$) / 0.00($\pm 0.00$) \\
-        \hline
-    \end{tabular}
-    \caption{Comparison of Fair Ncut results by the original paper to this paper's reproduction}
-    \label{tab:comparison_originalVSreproduction_ncut}
+	\centering
+	% \begin{tabular}{|l|c|c|c|c|}
+	\begin{tabular}{|m{1.4cm}|m{1.5cm}|m{2cm}|m{1.6cm}|m{4.7cm}|}
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Fair Ncut}} \\
+		\cline{2-5}
+		\textbf{Dataset} 	& \multicolumn{2}{c|}{Objective} 					&   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+							& Original 					   & Reproduction 		& Original & Reproduction \\
+		\hline
+		Synthetic 			& \color{red}0.00\color{black} & 0.20 ($\pm 0.10$)  & 0.00 / \color{red}1.00\color{black} 							& 0.00($\pm 0.00$) / 0.98($\pm 0.02$) \\
+		Synthetic-unequal 	& 0.06 						   & 0.02 ($\pm 0.03$)  & 0.00 / \color{red}0.33\color{black} 							& 0.00($\pm 0.00$) / 0.32($\pm 0.01$) \\
+		Adult 				& \color{red}0.74\color{black} & 0.78 ($\pm 0.02$)  & 0.08 / 0.30 													& 0.08($\pm 0.02$) / 0.36($\pm 0.03$) \\
+		Bank 				& \color{red}0.58\color{black} & 0.65 ($\pm 0.01$)  & 0.39 / 0.14 													& 0.25($\pm 0.03$) / 0.14($\pm 0.01$) \\
+		Census II 			& \color{red}0.52\color{black} & 1.74 ($\pm 0.14$)  & \color{red}0.41 \color{black} / \color{red}0.43\color{black} 	& 21.84($\pm 10.02$) / 0.00($\pm 0.00$) \\
+		\hline
+	\end{tabular}
+	\caption{Comparison of Fair Ncut results by the original paper to this paper's reproduction}
+	\label{tab:comparison_originalVSreproduction_ncut}
 \end{table}
 
 \subsection*{Tuned Lipschitz hyperparameters}
 
 \begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|c|c|c|c|}
-        \hline
-        \textbf{Dataset} & \multicolumn{2}{c|}{\textbf{Fair $\boldsymbol{K}$-medians}} & \multicolumn{2}{c|}{\textbf{Fair $\boldsymbol{K}$-means}} & \multicolumn{2}{c|}{\textbf{Fair Ncut}} \\
-            \cline{2-7}
-        & $\lambda$ & Lipschitz & $\lambda$ & Lipschitz & $\lambda$ & Lipschitz \\
-        \hline
-        Adult & 6500 & 0.5 & 9500 & 1.0 & 2 & 1e-5 \\
-        Bank & 9000 & 1.0 & 9500 & 1.0 & 1.2 & 0.0001 \\
-        Census II & N/A & N/A & N/A & N/A & 0.5 & 1e-5 \\
-        \hline
-    \end{tabular}
-    \caption{Lipschitz / $\lambda$ combinations for the results in \autoref{tab:comparison_lmbda-tuned-allVSLipschitz-test}}
-    \label{tab:hyperparam_Lipschitz}
+	\centering
+	\begin{tabular}{|l|c|c|c|c|c|c|}
+		\hline
+		\textbf{Dataset} & \multicolumn{2}{c|}{\textbf{Fair $\boldsymbol{K}$-medians}} & \multicolumn{2}{c|}{\textbf{Fair $\boldsymbol{K}$-means}} & \multicolumn{2}{c|}{\textbf{Fair Ncut}} \\
+		\cline{2-7}
+		& $\lambda$ & Lipschitz & $\lambda$ & Lipschitz & $\lambda$ & Lipschitz \\
+		\hline
+		Adult & 6500 & 0.5 & 9500 & 1.0 & 2 & 1e-5 \\
+		Bank & 9000 & 1.0 & 9500 & 1.0 & 1.2 & 0.0001 \\
+		Census II & N/A & N/A & N/A & N/A & 0.5 & 1e-5 \\
+		\hline
+	\end{tabular}
+	\caption{Lipschitz / $\lambda$ combinations for the results in \autoref{tab:comparison_lmbda-tuned-allVSLipschitz-test}}
+	\label{tab:hyperparam_Lipschitz}
 \end{table}
 
 \subsection*{Excluded outlier seeds}
 
 \begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-            & \multicolumn{3}{c|}{Outliers} \\
-            \cline{2-4}
-        \textbf{Datasets} & $K$-medians & $K$-means & Ncut \\ 
-	\cline{2-4}
-        \hline
-        Synthetic & N/A & N/A & N/A \\
-	Synthetic-unequal & N/A & 20, 22, 24 & 20, 22, 24 \\
-	Adult & 5 & 5 & N/A \\
-	Bank & N/A & N/A & 2 \\
-	Census II & 4 & N/A & N/A \\
-        \hline
-    \end{tabular}
-    \caption{Seeds of the outliers that were excluded from analysis per algorithm-dataset combination}
-    \label{tab:outliers}
+	\centering
+	\begin{tabular}{|l|c|c|c|}
+		\hline
+		& \multicolumn{3}{c|}{Outliers} \\
+		\cline{2-4}
+		\textbf{Datasets} & $K$-medians & $K$-means & Ncut \\ 
+		\cline{2-4}
+		\hline
+		Synthetic & N/A & N/A & N/A \\
+		Synthetic-unequal & N/A & 20, 22, 24 & 20, 22, 24 \\
+		Adult & 5 & 5 & N/A \\
+		Bank & N/A & N/A & 2 \\
+		Census II & 4 & N/A & N/A \\
+		\hline
+	\end{tabular}
+	\caption{Seeds of the outliers that were excluded from analysis per algorithm-dataset combination}
+	\label{tab:outliers}
 \end{table}
 
 \subsection*{Runtime}
 
 \begin{table}[H]
-\small 
-    \centering
+	\small 
+	\centering
     % \begin{tabular}{|l|c|c|c|c|}
-    \begin{tabular}{|m{1.5cm}|m{2.5cm}|m{2.5cm}|m{2.5cm}|m{2.5cm}}
-        \hline
-            & \multicolumn{4}{c|}{Runtime in seconds} \\
-            \cline{2-5}
-        \textbf{Datasets} & $K$-medians & $K$-means & Ncut & Ncut Lipschitz \\ 
-	\cline{2-5}
-        \hline
-        Synthetic & $4.8 (\pm1.7) \times 30$ & $4.6 (\pm2.3) \times 30$ & $5.8 (\pm1.9) \times 30$ & N/A \\
-	Synthetic-unequal & $3.7 (\pm0.9) \times 30$ & $4.0 (\pm1.6) \times 30$ & $2.5 (\pm1.4) \times 30$ & N/A \\
-	Adult & $44.6 (\pm23.3) \times 30$ & $56.6 (\pm39.6) \times 30$ & $3785.0 (\pm752.7) \times 10$ & $52.8 (\pm61.4) \times 30$ \\
-	Bank & $43.1 (\pm27.1) \times 30$ & $70.1 (\pm49.0) \times 30$ & $2835.4 (\pm532.1) \times 5$ & $109.2 (\pm65.0) \times 30$ \\
-	Census II & $6423.5 (\pm4072.2) \times 5$ & $7838.7 (\pm6202.4) \times 5$ & $261.6 (\pm1.3) \times 5$ (invalid results) & $127174.1 (\pm13039.6) \times 3$ \\
-        \hline
-    \end{tabular}
-    \caption{Runtime in seconds for different algorithm-dataset combinations. The number after $\times$ indicates how many runs were executed. "Ncut Lipschitz" indicates the Fair Ncut algorithm with tuned (lower) Lipschitz values.}
-    \label{tab:runtime}
+	\begin{tabular}{|m{1.4cm}|m{2.4cm}|m{2.4cm}|m{2.4cm}|m{2.6cm}|}
+			\hline
+		& \multicolumn{4}{c|}{Runtime in seconds} \\
+		\cline{2-5}
+		\textbf{Datasets} & $K$-medians & $K$-means & Ncut & Ncut Lipschitz \\ 
+		\cline{2-5}
+		\hline
+		Synthetic 			& $   4.8 (\pm   1.7) \times 30$ & $   4.6 (\pm   2.3) \times 30$ & $   5.8 (\pm  1.9) \times 30$ 					& N/A \\
+		Synthetic-unequal 	& $   3.7 (\pm   0.9) \times 30$ & $   4.0 (\pm   1.6) \times 30$ & $   2.5 (\pm  1.4) \times 30$ 					& N/A \\
+		Adult 				& $  44.6 (\pm  23.3) \times 30$ & $  56.6 (\pm  39.6) \times 30$ & $3785.0 (\pm752.7) \times 10$					& $    52.8 (\pm   61.4) \times 30$ \\
+		Bank 				& $  43.1 (\pm  27.1) \times 30$ & $  70.1 (\pm  49.0) \times 30$ & $2835.4 (\pm532.1) \times  5$ 					& $   109.2 (\pm   65.0) \times 30$ \\
+		Census II 			& $6423.5 (\pm4072.2) \times  5$ & $7838.7 (\pm6202.4) \times  5$ & $ 261.6 (\pm  1.3) \times  5$ (invalid results) & $127174.1 (\pm13039.6)$ $\times  3$ \\
+		\hline
+	\end{tabular}
+	\caption{Runtime in seconds for different algorithm-dataset combinations. The number after $\times$ indicates how many runs were executed. "Ncut Lipschitz" indicates the Fair Ncut algorithm with tuned (lower) Lipschitz values.}
+	\label{tab:runtime}
 \end{table}
 
 
-\newpage
+
+
+
 
 \section{Kernel}\label{appendix:kernel}
 
@@ -217,75 +236,62 @@ In each iteration of the kernel-based clustering algorithm, a kernel matrix $\ma
 
 \subsection{Kernel choice}
 
-Not any function $\kappa: X \times X \to \mathbb{R}$ describes a useful kernel. To allow the underlying function that is described by the kernel to map to an infinite dimensional space, the kernel $\kappa$ needs to satisfy Mercer's condition \citep{cortes1995support}, i.e. it must hold that 
+Not any function $\kappa: X \times X \to \mathbb{R}$ describes a useful kernel. To allow the underlying function that is described by the kernel to map to an infinite dimensional space, the kernel $\kappa$ needs to satisfy Mercer's condition \cite{cortes1995support}, i.e. it must hold that 
 \begin{align*}
-    \iint \kappa(\textbf{x}, \textbf{y}) g(\textbf{x}) g(\textbf{y}) d \textbf{x} d\textbf{y} > 0,
+	\iint \kappa(\textbf{x}, \textbf{y}) g(\textbf{x}) g(\textbf{y}) d \textbf{x} d\textbf{y} > 0,
 \end{align*}
 for all $g$ such that
 \begin{align*}
-    \int g^2(\textbf{x})d\textbf{x} < \infty.
+	\int g^2(\textbf{x})d\textbf{x} < \infty.
 \end{align*}
 Three well-known kernels to satisfy Mercer's condition are the polynomial kernel, the Gaussian kernel, and the hyperbolic tangent kernel, which is why these kernels are the ones analysed in this work. 
 
 \begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|}
-    \hline
-    Kernel type & Definition & Parameters \\
-    \hline
-    Polynomial & $\kappa(\textbf{x}_i, \textbf{x}_j) = (\textbf{x}_i \cdot \textbf{x}_j + b)^d.$ & $b, d$ \\
-    Gaussian & $\kappa(\textbf{x}_i, \textbf{x}_j) =\exp (-\nicefrac{||\textbf{x}_i - \textbf{x}_j||^2}{2\sigma^2})$ & $\sigma$ \\
-    Hyperbolic Tangent & $\kappa(\textbf{x}_i, \textbf{x}_j) = \tanh (a(\textbf{x}_i \cdot \textbf{x}_j) + b)$ & $a, b$ \\
-    \hline
-    \end{tabular}
-    \caption{Definition of three kernel types that satisfy Mercer's condition.}
-    \label{tab:kernels}
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\hline
+		Kernel type & Definition & Parameters \\
+		\hline
+		Polynomial & $\kappa(\textbf{x}_i, \textbf{x}_j) = (\textbf{x}_i \cdot \textbf{x}_j + b)^d.$ & $b, d$ \\
+		Gaussian & $\kappa(\textbf{x}_i, \textbf{x}_j) =\exp (-\nicefrac{||\textbf{x}_i - \textbf{x}_j||^2}{2\sigma^2})$ & $\sigma$ \\
+		Hyperbolic Tangent & $\kappa(\textbf{x}_i, \textbf{x}_j) = \tanh (a(\textbf{x}_i \cdot \textbf{x}_j) + b)$ & $a, b$ \\
+		\hline
+	\end{tabular}
+	\caption{Definition of three kernel types that satisfy Mercer's condition.}
+	\label{tab:kernels}
 \end{table}
 
 \subsection{Kernel results}
 
 
 \begin{table}[H]
-    \small
-    \centering
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        & \multicolumn{2}{c|}{SC} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
-        \textbf{Dataset} & VFC & VFC (kernel) & VFC &  VFC (kernel) \\ \cline{2-5}
-        & \multicolumn{4}{c|}{\textbf{Polynomial Kernel} ($b = d = 2$)} \\
-        \hline
-        Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
-        Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
-        Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
-        \hline
-        & \multicolumn{4}{c|}{\textbf{Radial Kernel} ($\sigma = 2$)} \\
-            \cline{2-5}
-        \hline
-        Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
-        Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
-        Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
-        \hline
-        & \multicolumn{4}{c|}{\textbf{Hyperbolic Tangent} ($a = b = 2$)} \\
-            \cline{2-5}
-        \hline
-        Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
-        Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
-        Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
-        \hline        
-    \end{tabular}
-    \caption{Comparison of the vanilla $K$-means, and kernel-based VFC algorithms using SC, fairness error and balance.}
-    \label{Tab:KBresSC}
+	\small
+	\centering
+	\begin{tabular}{|l|c|c|c|c|}
+		\hline
+		& \multicolumn{2}{c|}{SC} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+		\textbf{Dataset} & VFC & VFC (kernel) & VFC &  VFC (kernel) \\ \cline{2-5}
+		& \multicolumn{4}{c|}{\textbf{Polynomial Kernel} ($b = d = 2$)} \\
+		\hline
+		Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
+		Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
+		Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Radial Kernel} ($\sigma = 2$)} \\
+		\cline{2-5}
+		\hline
+		Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
+		Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
+		Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Hyperbolic Tangent} ($a = b = 2$)} \\
+		\cline{2-5}
+		\hline
+		Synthetic $(\lambda = 100)$ & 0.649 & 0.649 & 0.00/1.00 & 0.00/1.00  \\
+		Synthetic-unequal $(\lambda = 100)$ & 0.739 & 0.739 & 0.00/0.33 & 0.00/0.33 \\
+		Bank 2.5k $(\lambda=100)$ & 0.598 & 0.598 & 0.02/0.18 & 0.02/0.18 \\
+		\hline        
+	\end{tabular}
+	\caption{Comparison of the vanilla $K$-means, and kernel-based VFC algorithms using SC, fairness error and balance.}
+	\label{Tab:KBresSC}
 \end{table}
-
-
-% Moreover, \ref{claim:2} is verified through additional experiments. The large dataset Census II took 34 hours to be run for the Ncut algorithm on average, using a Lipschitz constant of $10^{-5}$. This resulted in fewer runs for this specific dataset.
-
-% Lastly, \ref{claim:3} focused on obtaining the best clustering objective with the smallest $\lambda$ that satisfies a pre-defined fairness level $\sum_k\mathcal{D}_{KL}(U||\mathcal{P}_k)\leq \epsilon$. Given the inverse trends of the fairness errors, and the discrete energy in \autoref{fig:lambda_reprod_plots}, it can be concluded that the best clustering objective can be obtained with the smallest $\lambda$ that satisfies a pre-defined fairness level; thereby validating \ref{claim:3}. 
-
-% claim 4 capable of performing prototype-based and graph-based clustering 
-
-% Despite, this has been achieved with an additional experiment rather than solely reproducing the initial experiments. 
-
-% The reproduction parameters only partially support \ref{claim:1}. Hence, it was required to investigate the $\lambda$ parameter. While running $K$-medians and $K$-means on the the Synthetic dataset, different $\lambda$ values proved to be more robust in computing the fairness error and balance measure, thus verifying \ref{claim:1}. The experiments of the reproduction research showed different results than reported on the Synthetic-unequal and Census II datasets. This seems to be a result of bad seeds, which could be ignored for Synthetic-unequal by using the outlier detection described in \autoref{sec:outlierdet}, but not for Census II as bad seeds were too prevalent here.
-
-% Finally, \ref{claim:4} is verified as well as the reproduced algorithm does (partially) outperform the baselines on both the prototype-based tasks (i.e. Synthetic, Synthetic-Unequal, Adult, Bank, and Census II datasets) and the graph-based task (Drugnet).

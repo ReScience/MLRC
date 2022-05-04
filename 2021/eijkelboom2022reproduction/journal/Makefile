@@ -17,7 +17,6 @@ article: article.pdf
 metadata.tex: metadata.yaml
 	python ./yaml-to-latex.py -i $< -o $@
 
-
 # MAIN LATEXMK RULE
 # -----------------------------------------------------------------------------
 # -pdf tells latexmk to generate PDF directly (instead of DVI).
