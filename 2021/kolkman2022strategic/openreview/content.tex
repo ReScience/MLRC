@@ -14,24 +14,6 @@ In this work, the paper Strategic Classification Made Practical\cite{levanon2021
     \item "We propose several forms of regularization that encourage learned models to promote favorable social outcomes."
 \end{enumerate}
 
-\subsection{Submission Checklist}
-
-Double check the file \texttt{journal/metadata.yaml} to contain the following information:
-
-\begin{itemize}
-\item Title should start with "\texttt{[Re]}"
-\item Author information, along with ORCID id
-\item Author affiliations
-\item Code URL, Software Heritage Foundation link
-\item Abstract
-\item Review URL (the OpenReview URL of your report)
-\end{itemize}
-
-\subsection{Continuous Integration}
-
-We use Github Actions CI to check your submission and compile the pdf file subsequently.
-You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
-
 \clearpage
 
 \section{Content}
@@ -48,20 +30,8 @@ You can also run the tests locally by running \texttt{python check\_yaml.py}, an
 % authors names on the first line, and the last on the second line, try using
 % \AND instead of \And before the third author name.
 
-\author{%
-  David S.~Hippocampus\thanks{Use footnote for providing further information
-    about author (webpage, alternative address)---\emph{not} for acknowledging
-    funding agencies.} \\
-  Department of Computer Science\\
-  Cranberry-Lemon University\\
-  Pittsburgh, PA 15213 \\
-  \texttt{hippo@cs.cranberry-lemon.edu} \\
+\author{}
 
-}
-
-\begin{document}
-
-\maketitle
 
 \section*{\centering Reproducibility Summary}
 
@@ -134,13 +104,13 @@ This problem of classification while users strategically modify their features i
 
 % Consistently use moving points/editing features to avoid confusion
 This paper describes our efforts to reproduce the work from the paper Strategic Classification Made Practical\cite{levanon2021strategic}, which addresses the problem of strategic classification in a manner that is more practical than previous approaches, more flexible than previous approaches and takes social good into account.\\
-The original paper describes strategic classification as a classification task on a set of points $x \in \mathbb{R}^D$. A classifier $h(x)$ is tasked to classify $x$ to into classes $y = \{-1,1\}$, which is determined by a score function $f$ via the decision rule $h(x) = \sign(f(x))$. In strategic classification, the assumption is made that points can move according to a cost function $c(x,x')$. Therefore, users can modify their original features $x$ to their repsonse $x'$ to improve their outcome using the best move for $x$; $\Delta_{h}(x)$. Where this best move $\Delta_{h}(x)$ can be described as follows: 
+The original paper describes strategic classification as a classification task on a set of points $x \in \mathbb{R}^D$. A classifier $h(x)$ is tasked to classify $x$ to into classes $y = \{-1,1\}$, which is determined by a score function $f$ via the decision rule $h(x) = \sign(f(x))$. In strategic classification, the assumption is made that points can move according to a cost function $c(x,x')$. Therefore, users can modify their original features $x$ to their repsonse $x'$ to improve their outcome using the best move for $x$; $\Delta_h(x)$. Where this best move $\Delta_h(x)$ can be described as follows: 
 \begin{equation} \label{eq:resp_map}
-  \Delta_{h}(x) = \argmax_{x' \in \chi} h(x') - c(x,x') 
+  \Delta_h(x) = \argmax_{x' \in \chi} h(x') - c(x,x') 
 \end{equation}\\
 To accurately classify points that are able to to modify their features, the error function has to take this into account. This results in an empirical loss function of: 
 \begin{equation} \label{eq:SERM}
- \min_{f \in F} \sum^m_{i=1} \mathds{I}\{y \neq h(\Delta_{f}(x))\} + \lambda R(f)
+ \min_{f \in F} \sum^m_{i=1} \mathds{I}\{y \neq h(\Delta_f(x))\} + \lambda R(f)
 \end{equation}
 Which translates to choosing a score function $f$ such that misclassification of manipulated datapoints is minimized according to regularization method $R$ and $\lambda$ that determines the regularization strength. Optimizing equation \ref{eq:SERM} is referred to as strategic empirical risk minimization (SERM) in the original paper, which functions as the main loss function of the framework.
 \\\\
@@ -178,18 +148,18 @@ The claim of socially-aware learning was verified by performing strategic classi
 
 Expected utility: summed utility that the users gain from classification results, minus the total cost of gaming
 \begin{equation}\label{eq:r_util}
-     $R_{utility} = -\sum^m_{i=1} h(\Delta(x)) - c(x,\Delta(x))$
+     R_{utility} = -\sum^m_{i=1} h(\Delta(x)) - c(x,\Delta(x))
 \end{equation}\\
 Social burden: minimal cost value from among users classified as positive.
 \begin{equation}\label{eq:r_burden}
-    $R_{burden} = \sum \min c(x,\Delta(x)) $%maybe put $\Delta(x)$ here to be consistent
+    R_{burden} = \sum \min c(x,\Delta(x)) %maybe put $\Delta(x)$ here to be consistent
 \end{equation}
 \\
 Recourse: the capacity of a user who classified negative to restore approval through reasonable action
 \begin{equation}\label{eq:r_recourse}
-    $R_{recourse} = \sum^m_{i=1}\sigma(-f(x)) * \sigma(-f(\Delta_f(x)))$
+    R_{recourse} = \sum^m_{i=1}\sigma(-f(x)) * \sigma(-f(\Delta_f(x)))
 \end{equation}
-Where $\Delta(x)$ is the best response for $x$, $\Delta_{f}(x)$ is the best response for $x$ with regard to $f$, $x'$ is the strategically modified datapoint (as described in section \ref{sec:scope}), and $\sigma(x)$ is the sigmoid function of $x$.  Similar to the first experiment, this experiment uses a linear classifier with a SERM loss function. For every regularisation method, differing ranges of regularisation were analysed and compared to a benchmark model. The experiment on utility used a log range for $\lambda \in [-0.4,-0.2]$ of 10 steps, the experiment on social burden used a log range for $\lambda \in [-2,1]$ of 30 steps, and the experiment on recourse used a log range for $\lambda \in [0,0.3]$ of 15 steps.
+Where $\Delta(x)$ is the best response for $x$, $\Delta_f(x)$ is the best response for $x$ with regard to $f$, $x'$ is the strategically modified datapoint (as described in section \ref{sec:scope}), and $\sigma(x)$ is the sigmoid function of $x$.  Similar to the first experiment, this experiment uses a linear classifier with a SERM loss function. For every regularisation method, differing ranges of regularisation were analysed and compared to a benchmark model. The experiment on utility used a log range for $\lambda \in [-0.4,-0.2]$ of 10 steps, the experiment on social burden used a log range for $\lambda \in [-2,1]$ of 30 steps, and the experiment on recourse used a log range for $\lambda \in [0,0.3]$ of 15 steps.
 
 \subsubsection{Additional experiments} 
 The authors make an assumption that all the users of the system will game according to their cost function. However, in many real life situations this assumption may not hold. For instance, in an email spam classification setting, people who write regular non-spam emails will most likely not think about gaming the spam classifier system. Assuming that every user is gaming might lead to a situation where a non-gaming email is falsely classified as spam due to the classifier being too strict. The case in which the strategic model is evaluated on a dataset consisting of non-gaming users is not taken into account in the paper. \\ \\
@@ -300,6 +270,35 @@ To prove the second claim about social impact, the authors made plots similar to
 \end{figure}
 
 
+% \begin{figure}[H]
+% \centering
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.4]{../openreview/plots/burden.jpg}
+%     \caption{A graph showing model performance as the amount of social burden increases.}
+%     \label{fig:burden_result}
+%     \end{subfigure}
+%     %
+%     \hfill
+%     %
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.4]{../openreview/plots/recourse.png}
+%     \caption{A graph showing model performance as the amount of recourse increases.}
+%     \label{fig:recourse_result}
+%     \end{subfigure}
+%     %
+%     % \hfill
+%     %
+%     \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[scale=0.45]{../openreview/plots/utility.jpg}
+%     \caption{A graph showing model performance as the amount of utility increases.}
+%     \label{fig:utility_result}
+%     \end{subfigure}
+    
+%     \caption{Results of social regularization experiments. While the model was being regularized base on utility, social burden and recourse, accuracy was monitored.}
+% \end{figure}
 \subsection{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
 
@@ -356,12 +355,8 @@ The communication with the authors was minimal. We asked about a clarification p
 
 %\section*{References}
 
-\bibliographystyle{abbrv}
-\bibliography{bibliography.bib}
+% \bibliographystyle{abbrv}
+% \bibliography{references.bib}
 
 
-
-
-
-\end{document}
 
