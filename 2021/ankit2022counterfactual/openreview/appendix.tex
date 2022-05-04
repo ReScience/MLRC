@@ -88,25 +88,6 @@ The following images using the pre-trained CGN model that was provided with the 
 
 \newpage
 
-% SSIM $[12]$ is defined using the three aspects of similarities, luminance $\left(l\left(x, x_{g e n}\right)\right)$, contrast $\left(c\left(x, x_{g e n}\right)\right)$ and structure $\left(s\left(x, x_{g e n}\right)\right)$ that are measured for a pair of images $\left\{x_{g}, x_{g e n}\right\}$ as follows: Given two images ground truth $x$ and generated image $x_{g e n}$, the SSIM [12] loss is defined $[Q]$ as follows:
-% $$
-% \mathcal{L}{s \operatorname{sim}}(\alpha)=1-\mathbf{E}{x}[l(\alpha) \cdot \operatorname{cs}(\alpha)]
-% $$
-% $l\left(x, x_{g e n}\right)=\frac{2 \mu_{x} \mu_{x_{g a n}}+C_{1}}{\mu_{x}^{2}+\mu_{x_{g \in \cdot n}}^{2}+C_{1}}$
-% $c\left(x, x_{g e n}\right)=\frac{2 \sigma_{x} \sigma_{x_{g e n}}+C_{2}}{\sigma_{x}^{2}+\sigma_{x_{g e n}}{ }^{2}+C_{2}}$
-% $s\left(x, x_{g e n}\right)=\frac{\sigma_{x x_{g c n}}+C_{3}}{\sigma_{x} \sigma_{x_{g e n}}+C_{3}}$
-% where $\mu^{\prime}$ 's denote sample means and $\sigma^{\prime}$ 's denote variances. $C_{1}, C_{2}$ and $C_{3}$ are constants. With these, SSIM and the corresponding loss function $\mathcal{L}{s s i m}$, for a pair of images $\left\{x, x{g e n}\right\}$ are defined as:
-% $$
-% \operatorname{SSIM}\left(x, x_{g e n}\right)=l\left(x, x_{g e n}\right)^{\alpha} \cdot c\left(x, x_{g e n}\right)^{\beta} \cdot s\left(x, x_{g e n}\right)^{\gamma}
-% $$
-% where $\alpha>0, \beta>0$ and $\gamma>0$ are parameters used to adjust the relative importance of the three components.
-% $$
-% \mathcal{L}{s s i m}\left(x, x{g e n}\right)=1-\operatorname{SSIM}\left(x, x_{g e n}\right)
-% $$
-%!!!! There is some issue with this section
-% \section{SSIM Loss function}
-% SSIM \cite{wang2004image} helps preserve the structural properties between the two images by using luminance, contrast and structural information. Additionally, SSIM \cite{wang2004image} leads to generating better structured masks using the 'm' that helps to localize the digits in a better way in the final output $x_{gen}$.
-
 \section{SSIM Loss function}
 SSIM \cite{wang2004image} is defined using the three aspects of similarities, luminance $\left(l\left(x, x_{g e n}\right)\right)$, contrast $\left(c\left(x, x_{g e n}\right)\right)$ and structure $\left(s\left(x, x_{g e n}\right)\right)$ that are measured for a pair of images $\left\{x_{g}, x_{g e n}\right\}$ as follows: Given two images ground truth $x$ and generated image $x_{gen}$, the SSIM \cite{wang2004image} loss is defined as follows:
 $$
@@ -124,29 +105,6 @@ $$
 \mathcal{L}_{ssim}\left(x, x{g e n}\right)=1-\operatorname{SSIM}\left(x, x_{g e n}\right)
 $$
 
-% SSIM \cite{wang2004image} is defined using the three aspects of similarities, luminance $\big(l(\mathf{x}, x_{gen})\big)$, contrast $\big(c(\mathf{x}, x_{gen})\big)$ and structure $\big(s(\mathf{x}, x_{gen})\big)$ that are measured for a pair of images $\{\mathf{x}, x_{gen}\}$ as follows:
-% Given two images ground truth $\mathf{x}$ and generated image $x_{gen}$, the SSIM \cite{wang2004image} loss is defined \cite{pandey2020unsupervised} as follows:
-% \begin{equation}
-% \mathcal{L}_{ssim}(\alpha) = 1-\mathbf{E}_\mathf{x}\left[l(\alpha).cs(\alpha)\right]
-% \label{ssim_loss}
-% \end{equation}
-% \begin{equation}
-% l(\mathf{x}, x_{gen}) = \frac{2\mu_\mathf{x}\mu_{x_{gen}}+C_1}{\mu_\mathf{x}^2+ \mu_{x_{gen}}^2 + C_1}
-% \end{equation}
-% \begin{equation}
-% c(\mathf{x}, x_{gen}) = \frac{2\sigma_{\mathf{x}}\sigma_{x_{gen}}+C_2}{{\sigma_\mathf{x}}^2+ {\sigma_{x_{gen}}}^2 + C_2}
-% \end{equation}
-% \begin{equation}
-% s(\mathf{x}, x_{gen}) = \frac{\sigma_{\mathf{x}{x_{gen}}}+C_3}{\sigma_{\mathf{x}}\sigma_{x_{gen}} + C_3}
-% \end{equation}
-% where $\mu$'s denote sample means and $\sigma$'s denote variances. $C_1, C_2$ and $C_3$ are constants. With these, SSIM and the corresponding loss function $\mathcal{L}_{ssim}$, for a pair of images $\{\mathf{x}, x_{gen}\}$ are defined as: 
-% \begin{equation}
-% \text{SSIM}(\mathf{x}, x_{gen}) = l(\mathf{x}, x_{gen})^{\alpha} \cdot c(\mathf{x}, x_{gen})^{\beta} \cdot s(\mathf{x}, x_{gen})^{\gamma}  
-% \end{equation}
-% where $\alpha>0$, $\beta>0$ and $\gamma>0$ are parameters used to adjust the relative importance of the three components.
-% \begin{equation}
-% \mathcal{L}_{ssim}(\mathf{x}, x_{gen}) = 1 - \text{SSIM}(\mathf{x}, x_{gen})
-% \end{equation}
 
 \subsubsection{Additional Result 2 - Exploring the biased behaviour of CGN\cite{sauer2021counterfactual} with the datasets}
 
