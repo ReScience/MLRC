@@ -1,0 +1,200 @@
+\section{Methodology}
+
+Throughout our reproduction attempt, we have made great use of the code, provided in a supplementary repository to the original paper \cite{gitlab}. To replicate the author's experimental environment, we try to make the same assumptions and hyperparameter choices than those provided either in the original paper, or the documentation of the supplementary repository. A fork of this repository with our changes and additions is available at \cite{Git}.
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+\subsection{Model descriptions}
+\label{subsec:models}
+In the first class of experiments, we train 2 GEN models, one using the adapted cross-entropy loss (GEN-XE) and the other using the adapted hinge loss (GEN), described in the paper. Both models are parametrized by their input, output and hidden dimensionalities, as well as their used nonlinearities. Given the short edit scripts expected in these scenarios, no edge filtering is used in these models.
+
+We also train the Variational Graph autoencoder model, as described in \cite{vgae}. Apart from its input, output and hidden dimensionalities, it is also parametrized by the size of its encoding space, the regularization strength $\beta$ and a scaling factor for the noise on the last layer node features $\sigma$. It also takes a hyperparametric definition of the used nonlinearity. 
+
+The GEN models used in the experiments, governed by the Peano addition and Boolean formulae DGPs, are similar to those in the \textit{Dynamical graph systems} class. The models here, however, use an author-defined loss function, with respect to a custom teaching protocol, with only a single predictive step between graphs. Similarly to before, no edge filtering is used.
+
+
+In the experiments on the social network dataset, we train two variations of the GEN model. The first sets up two binary classifiers for each node to decide whether to consider changing outgoing/incoming edges or not. This approach is denoted in the results as \textit{flexible edge filtering}. The second model limits the number of permitted edge edits with a fixed upper bound - this is denoted as \textit{fixed edge filtering}. 
+The models use a simplified single-step teaching protocol, over which its loss function is defined. In the protocol, all edits, except for node insertion, are processed as expected. For insertion, however, the protocol lets a given node $n$ insert a neighbor $n'$ when there is at least one edge \textit{(n, n')} found in $G_{t+1},$ where $n'$ is not a node found in $G_{t}.$ The authors acknowledge potential shortcomings of this method, but cite the desire of using a single-step protocol as the reason for choosing it.
+
+
+%  If set to True, this class sets up two binary classifiers for each
+%         node to decide whether to make any changes to outgoing/incoming edges
+%         or not. This can speed up processing significantly for large graphs,
+%         but is more challenging to learn. If set to an integer, the number of
+%         nodes with edge changes is limited to that integer.
+
+
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+\begin{figure}
+    \centering
+    
+    \includegraphics[width=0.8\linewidth]{cycles2.png}
+    \caption{The three cyclical time series yielded by the Edit Cycles DGP.}
+    \label{fig:Cyclical}
+\end{figure}
+\subsection{Data}
+The paper contains three classes of experiments. The first two use user created DGPs, whereas the last one works with an external, well established social network. We describe the dataset and DGPs in accordance to the class of experiments they correspond to, in the following subsections.
+
+\subsubsection{Dynamical graph systems}
+\label{sec:DGS}
+The \textit{Dynamical graph systems} class of DGPs governs the train and test set generation in Experiments \ref{exp:first}, \ref{exp:our1} and \ref{exp:our2}. The class contains three discrete processes, provided in the supplementary repository in the form of scripts for the python programming language. During training/testing time, the time series generator function is called, always returning a sequence of graphs based on DGP-specific function arguments.
+
+The \textbf{Edit Cycles} DGP always yields one of three author specified cyclical time series, the outputs only differing in length and the starting time index. The edit script $\bar{\delta}_{t}$ between two graphs is always of cardinality $|\bar{\delta}| \leq 2$ and all possible generated graphs consist of between two and four nodes. The cyclical series that the DGP yields are visualized in Figure \ref{fig:Cyclical}.
+
+The \textbf{Degree Rules} data generating function generates a series of a determined length using the edit rules, described in Algorithm \ref{alg:degree}. The generator function accepts parameters, corresponding to the series length and the number of nodes in the initial graph $G_{0}.$ $G_{0}$'s adjacency matrix is then randomly initialized. Consequentially, given a fixed time series length, the returned series is fully dependant on the random initialization of $G_{0},$ as the rules are deterministic. In the examples in section~\ref{subsec:original}, as per the author's source code, the randomization from NumPy's \texttt{random.rand} is used, and all series' initial graphs $G_{0}$ start with exactly 8 nodes. We comment on this choice of randomization and provide our alternative in Section \ref{subsec:our}.
+
+The third and final DGP in this class is inspired by Conway's \textbf{Game of Life} \cite{GoL}. Similarly to \textit{Degree Rules}, it takes an input graph and applies a graph-to-graph mapping function. This one is specified by Algorithm \ref{alg:gol} and is used to create a time-series of a specified length. This function is also deterministic.
+In the resulting graphs, the nodes considered \textit{alive} in the Game of Life rule set are denoted with the feature value $x_{n}=1.$ In contrast to degree rules, Game of Life graphs retain their number of nodes throughout evolution, as the graph will always denote the $D \times D$ grid with the neighborhood structure modeling a nodes' 8-neighborhood, and only the nodes' alive/dead state will change. In each time series, a number of random Game of Life oscilators (randomly chosen between 5 candidates) is chosen and made alive. Afterwards, each still dead cell will be made alive with a probability $\text{Pr}(\texttt{repl}_{0,1}(n)) = p$. In the experiments in section~\ref{subsec:original}, we report results using the parameters $p = 0.1, D=10,$ and always placing a single oscillator on the grid at initialization.
+
+\subsubsection{Tree dynamical systems}
+\label{subsec:trees}
+The \textit{Tree dynamical systems} class of DGPs governs the train and test set generation in Experiments \ref{exp:second} and \ref{exp:our3}. It contains two distinct processes. They are distinguished from the DGP class in the previous section because they both generate strictly tree-structured graphs, with no loops. Furthermore, they both include more complex node attribute encodings in the form of one-hot vectors.
+
+The initial graph in a series, generated by the \textbf{Boolean Formulae} generator function, corresponds to a random Boolean formula. The time series following such a $G_{0}$ represents gradual simplifications of the formula, ending with a logic graph that can not be simplified any longer. An example evolution is given in Figure \ref{fig:bool} for the formula  $(x \lor (y \land \lnot y)) \lor x$. The initial trees are generated via a stochastic regular tree grammar with a $\text{Pr}(\land) = \text{Pr}(\lor) = 0.3$ and $\text{Pr}(x) = \text{Pr}(\lnot x) = \text{Pr}(y) = \text{Pr}(\lnot y) = 0.1$. The generator functions also offer a hyperparametric maximal number of applied rules $p$, where the authors use $p=3$ in the original experiments.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{bool2.png}
+    \caption{Example time series evolution of a graph, sampled from the Boolean Formulae DGP. The leftmost graph denotes the logical formula, $(x \lor (y \land \lnot y)) \lor x$, whereas each evolution corresponds to a logical simplification of the previous graph. }
+    \label{fig:bool}
+\end{figure}
+
+
+\begin{algorithm}[H]
+\centering
+\caption{The $G_{t} \to G_{t+1}$ mapping for the Degree rules DGP. The function \texttt{shareN} returns true if the nodes share at least one neighbor.}\label{alg:degree}
+\begin{algorithmic}[1]
+\Require Graph $G_{t},$ containing nodes $n$.
+\MyFor{$\text{component } C \in G_{t}$}
+\MyFor{$ n \in C$}
+\State $d \gets \texttt{degree}(n)$
+\If{$d \geq 3$} \texttt{del}($n$)
+\ElsIf{\text{ }$\exists n' \in C: \texttt{shareN}(n, n')$}
+\MyFor{$n' \in C: \texttt{shareN}(n, n')$}
+    \State{$\texttt{eins}(n, n')$}
+\EndMyFor
+\Else{ $\texttt{ins}_{1}(n^{*})$, \texttt{eins}$(n, n^{*})$}
+%\EndFor
+\EndIf
+\EndMyFor
+\EndMyFor
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+    \centering
+    \caption{The $G_{t} \to G_{t+1}$ mapping for the Game of Life DGP. The \texttt{AliveDegree} function returns the number of neighboring nodes $n'$ with the attribute $x_{n'}=1$. }\label{alg:gol}
+   \begin{algorithmic}[1]
+\Require $\text{Graph } G_{t}, $ containing nodes $n$.
+\MyFor{$n \in G_{t}$}
+    \State $d \gets \texttt{AliveDegree}(n)$
+    \If{$(x_{n}==1) \Andd (d < 2 \Or 4 \leq d)$}
+        \State $\texttt{repl}_{1,0}(n)$
+    \ElsIf{$(x_{n}==0)  \Andd (d==3)$}
+        \State $\texttt{repl}_{0,1}(n)$
+\EndIf
+\EndMyFor
+% \State $d \gets \text{degree}(n)$
+% \If{$d \geq 3$}
+%         \State \texttt{delete}($n$)
+% \ElsIf{\text{ }$\exists n' \in C: \texttt{shareN}(n, n')$}
+% \ForEach{$n' \in C: \texttt{shareN}(n, n')$}
+%     \State{$\texttt{addEdge}(n, n')$}
+% \EndFor
+% \Else{\text{ }$\texttt{addNeighborTo}(n)$}
+% \EndIf
+% \EndFor
+% \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{table}[h]
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}rccccc@{}}
+\toprule
+\textbf{}                    & \textbf{Graph Cycles} & \textbf{Degree Rules} & \textbf{Game of Life}  & \textbf{Boolean Formulae} & \textbf{Peano Addition} \\ \midrule
+\textbf{unique graph \#} & 9                     & 12346                 & $2^{100}$ & 10788                     & 34353                   \\ \bottomrule
+\end{tabular}}
+\vspace{1mm}
+\caption{The number of unique graphs that can appear in the time series, sampled from the DGPs in sections \ref{sec:DGS} and \ref{subsec:trees}. as reported by the authors.}
+\label{tab:numunique}
+\vspace{1mm}
+\end{table}
+
+
+
+The \textbf{Peano addition} DGP models Peano's recursive definition of addition. The operations are encoded similarly as in the Boolean formulae DGP, where both the operands and the arguments are represented as nodes in the dynamical tree graph.The initial graph generator function receives an argument, specifying the maximal number $n$ of additions. The authors use $n=3$ in their experiments. Peano's addition rules simplify into four edit rules, the edit scripts of which are all upper bound as $|\bar{\delta}| \leq 3.$ The node attributes appearing in the set are the 10 digit values, the summation operation $+(m,n) = m+n$ and the successor operation $succ(m) = m+1$.
+
+The author-reported numbers of possible graphs, appearing in the time series, resultant from the five described DGPs, is tabulated in Table \ref{tab:numunique}. Note, however, that not all of these graphs can be sampled as the initial graphs $G_{0}$ in a given series and that the mappings $\psi: G_{t}\to G_{t+1}$ are deterministic in all DGPs. Hence, the actual number of unique pairs $(G_{t}, G_{t+1})$ is much lower.
+
+\subsubsection{Real-world social network}
+For the final class of experiments, the arXiv HEP-Th citation network data set, first described in \cite{hep}, is used. It describes a graph, parsed from the e-print arXiv and covers all mutual citations within a set of 27,700 papers. In it, a paper $x$, that cites paper $y$ is connected with it with an outgoing edge. From this network, the authors parse sub-graphs with a rolling window approach - considering only papers published within $\tau$ months of a given time point between January 1993 to April 2003. The number of nodes naturally grows with $\tau,$ so the result is a collection of graphs with different orders of node-count magnitude. In the presented experiment, these 1554 discovered sub-graphs of node count $N_{G}\in [100, 2786]$ are assumed as undirected.
+
+
+% Arxiv HEP-TH (high energy physics theory) citation graph is from the e-print arXiv and covers all the citations within a dataset of 27,770 papers with 352,807 edges. If a paper i cites paper j, the graph contains a directed edge from i to j. If a paper cites, or is cited by, a paper outside the dataset, the graph does not contain any information about this.
+
+\subsection{Hyperparameters}
+For all the GNN-based models in the first two classes of experiments, the authors use two hidden layers with 64 neurons each. As far as the architecture specification is concerned, the GENs use summation as the aggregation function and concatenation as the merge function. All networks are trained with the Adam optimizer using the learning rate of $10^{-3}$. The weight decay is set to $10^{-5}$ in the graph dynamical systems class of experiments and to $10^{-3}$ in the dynamical tree class of experiments.
+
+The results for the VGAE model are reported using $\beta=10^{-3}, \gamma=10^{-3}$. The dimensionality of its embedding space is always equal to the size of the last hidden layer, so 64. As per the provided code by the authors, all models use the sigmoid nonlinearity in the experiment on the \textit{Game of Life} dataset, whereas we employ ReLU for all other experiments on synthetic data.
+
+In the experiments reported in section~\ref{subsec:original}, both the training and the testing time series are sampled independently from their corresponding DGP, without special assertions of training and testing set discrepancy. 
+All models train on 30,000 series, whereas the testing results are reported for 10 samples. We comment on the authors' methods of risk estimation and provide alternatives for these parameters in section~\ref{subsec:our}. For the experiments on the social network dataset, a 3-hidden layer architecture with the tanh nonlinearity, and PyTorch's default learning rate and weight decay are used.
+
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+
+\subsection{Experimental setup and code}
+\label{sec:methodology}
+In our experiments, we use the metrics of precision and recall to evaluate the performance on insertion and deletion tasks. The experiments done on \textit{Tree dynamical systems} use the notion of \textit{accuracy}, which is an indicator function, defined at the value 1 when the nodes in the two input graphs match in all their features, and their adjacency matrices are identical. The reported \textit{accuracy} is the average value of these indicator functions across all graph pairs in all time-series in the test set.
+
+The experiments in section~\ref{subsec:original} were run in a loop across an entire class of DGPs, with 5 repetitions being ran for each considered model. In the training phase, a time series was independently generated on each epoch using its corresponding generator function. As per the original paper, the considered stopping criterion was a rolling 10-epoch average stop loss. Upon finishing training, the model was evaluated on time series, generated by the same generator functions as during training.
+
+We recognized this method of risk estimation as potentially problematic, given that there is no special care taken to ensure the discrepancy of the tranining and testing sets. It is for this reason that we change the used approach in some experiments, reported in section~\ref{subsec:our}. In them, we sample our test set of graphs $G_{0}^{\text{Test}}$ ahead of time, and ensure that at each sampled training time series, the function $\psi: G_{0}^{\text{Test}} \to G_{1}^{\text{Test}},\text{  } \forall \text{  } G_{0}^{\text{Test}} \in T$ remains hidden from the algorithm.
+
+
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+\subsection{Computational requirements}
+All experimentation was done on a desktop machine, running Windows 11, powered by an AMD Ryzen 7 2700X processor and 32 GB of RAM. The code was evaluated locally, in an environment, based on Python 3.8. The code base provided by the authors is dependant on the NumPy, PyTorch, PyTorch Geometric, Edist \cite{Edist} and MatPlotLib packages.
+
+One repetition of running all three considered models on all three Graph dynamical systems (together) takes 90 minutes on average, with the VGAE taking the bulk of time to train, as the hinge-loss GEN usually hits the stop loss threshold and stops training earlier. A single repetition of the experiment on the Peano addition DGP takes approximately 15 minutes, whereas one over the Boolean formulae experiment takes 1 minute. On average, 60 minutes required to compute a full pass over all 12 months on the Social network experiment, for both edit schemas together. Working only with the largest graphs, i.e. $\tau=12$, takes 8 minutes on average.
+
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+
+\begin{figure}[t]
+\begin{minipage}{0.45\textwidth}
+%\begin {table}
+\small
+\begin{tabular}{@{}rll@{}}
+\toprule
+\multicolumn{1}{l}{\textbf{\begin{tabular}[c]{@{}l@{}}Pass \\ direction\end{tabular}}} & \textbf{\begin{tabular}[c]{@{}l@{}}Edge \\ filtering \end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Log-log \\ linear fit slope\end{tabular}} \\ \midrule
+\multirow{2}{*}{\textbf{Forward}}                                                      & Flexible                & $1.38 \pm 0.02$                                                                 \\ \cmidrule(l){2-3} 
+                                                                                       & Constant                & $1.31 \pm 0.02$                                                                 \\ \midrule
+\multirow{2}{*}{\textbf{Backward}}                                                     & Flexible                & $1.30 \pm 0.01$                                                                 \\ \cmidrule(l){2-3} 
+                                                                                       & Constant                & $1.69 \pm 0.10$                                                                 \\ \bottomrule
+\end{tabular}
+\captionof{table}{Slopes of log-log linear models on the Runtime/Graph scale scatter plot. The uncertainty denotes the standard deviation of slopes accross 5 repetitions of the experiment \ref{exp:sn}.}
+\label{tab:sn}
+%\end{table}
+
+
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+%\begin{figure}[htbp]
+
+    \includegraphics[width=\linewidth]{wider.png}
+    \captionof{figure}{The runtime - graph scale dependence in the experiment \ref{exp:sn}, with overlaid fitted loess models.
+    Each facet corresponds to an individual experiment, and the grey bands denote the 95\% confidence interval of the fit.}
+    \label{fig:arxiv}
+%\end{figure}
+
+\end{minipage}
+\end{figure}

@@ -1,0 +1,32 @@
+\section*{Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+
+The studied paper proposes a novel output layer for graph neural networks (the graph edit network - GEN). The objective of this reproduction is to assess the possibility of its re-implementation in the Python programming language and the adherence of the provided code to the methodology, described in the source material. Additionally, we rigorously evaluate the functions used to create the synthetic data sets, on which the models are evaluated. Finally, we also pay attention to the claim that the proposed architecture scales well to larger graphs.  
+
+
+\subsection*{Methodology}
+
+
+For most of our work, we were able to use the code, provided in the supplementary repository. We also offer our own variations of the experimental setup, with an alternative method of risk estimation. A portion of the report is also devoted to a more exhaustive description of the included data generating functions, otherwise not offered original paper.
+
+\subsection*{Results}
+
+We were able to reproduce GEN's out-performance of a chosen baseline and its perfect scores on synthetic data sets. We also confirm the author's claims of the sub-quadratic scaling of GEN's forward passes and deduce that they reported the scaling of back-passes too favourably. We conclude our work with scepticism of the chosen experiments' suitability to evaluate the model's performance and discuss our findings.
+
+
+\subsection*{What was easy}
+
+
+
+All the provided code has extensive documentation which made the paper's experiments easy to reproduce. The entire code base is readable, modular and adheres to established practices on code readability. The authors also provide some unit tests for all of their models and have pre-implemented several useful diagnostic measures.
+
+
+\subsection*{What was difficult}
+
+
+Running some of the provided code on a consumer-grade laptop (as reported in the original work) was prohibitively expensive. The lack of transparency about the code base's runtimes made our work here much more difficult. Another time-consuming task was the debugging of a section of author-provided code. We've helped the authors identify the problem, which has now been resolved.
+
+\subsection*{Communication with original authors}
+
+The authors were prompt with their responses, welcomed our efforts in reproducing their work and made themselves available for any questions. Upon our request, they happily provided additional implementations, not originally available in their repository, and offered their counter-arguments to some methodological concerns that we expressed to them.

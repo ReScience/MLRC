@@ -1,0 +1,136 @@
+\section{Experiments}
+\label{sec:results}
+Our results confirm the authors' findings from claims (i) - (iii) when considering the results of the strict reproduction. We find that the scaling of the backward passes from claim (iv) is not linear, but remains sub-quadratic. However, we show that these results are achieved by an architecture that is not able to optimize its loss function successfully. 
+
+Our additional experiments in Subsection \ref{subsec:our} show that the experimental results are stable for different choices of the initial graph $G_{0}$. The results also stand for more robust method of risk estimation. From these additional experiments, we derive important insights about the testing scenarios, presented in Section \ref{sec:discuss}. 
+
+% While our more robust method of risk estimation retrieves differing results, it only contradicts claim (ii).
+
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+\subsection{Experiments reproducing original paper}
+\label{subsec:original}
+% For each experiment, say 1) which claim in section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+\subsubsection{Precision/Recall on Dynamical Graph System DGPs}
+\label{exp:first}
+In this task, we aimed to reproduce the results, stated in Claim (i) in Section \ref{sec:claims}. For almost all the metrics, we were able to reproduce the values originally reported in the paper, with the difference $\delta := (\text{our results} - \text{reported results})$ within a standard deviation of 0. The only major discrepancy we noticed was an increase in mean deletion precision and insertion recall for the VGAE model in the edit cycle task, when comparing to the results, reported in the original paper. However, both GEN models still outperformed the VGAE, which supports Claim (i).  
+
+\subsubsection{Accuracy on Tree dynamical system DGPs}
+\label{exp:second}
+In this task, we address Claim (ii) from Section \ref{sec:claims}. In the original paper, the authors reported a 100\% accuracy for both \textit{Tree dynamical system} scenarios. While our results returned an accuracy of $0.98 \pm 0.02$ in the Boolean Formulae task (and a perfect score for Peano addition), we can conclude that these results are convincing enough to support Claim (ii).
+
+
+
+
+
+\subsubsection{Scaling of GENs on bigger graphs}
+\label{exp:sn}
+This experiment addresss claims (iii) and (iv) from Section \ref{sec:claims}. In the original paper, the authors claim that GENs were able to scale sub-quadratically in their forward passes and approximately linearly in their backward passes, when using appropriate edge filtering approaches. Figure \ref{fig:arxiv} shows scatter plots of the runtime-graph scale dependency on a log-log scale. Notice, that the runtime duration of the backward passes with constant edge filtering is very unstable, when compared to other scenarios. This is likely due to a higher difference in the fraction of considered edges, when compared to the flexible filtering approach. The scaling coefficients of the fitted linear models are further tabulated in Table \ref{tab:sn}. These results support Claim (iii) in that the forward passes scale sub-quadratically. However, the lower of the two average coefficients for computing the gradient (the flexible approach) is still substantially larger than one. This indicates an exponential, albeit sub-quadratic scaling of the backward passes. We conclude that these results do not support Claim (iv).
+
+\subsection{Experiments beyond original paper}
+
+\label{subsec:our}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+\subsubsection{Established methods of random graph generation}
+\label{exp:our1}
+It is a common practice in the social network analysis (SNA) community to, when initializing random graphs, use specific methods of graph generation. Namely, if we want to make general statements about SNA methods, inferred from experiments on random graphs, these should be similar to those that tend to appear in nature. At the very least, it is considered a good practice to use established randomization methods, to more easily compare to results in other publications. In this experiment, we repeat the methods from experiment \ref{exp:first} on the Degree rules DGP. However, instead of randomly initializing the adjecency matrix, we use two established methods of random graph generation: the Erdős–Rényi model \cite{erdHos1959renyi} and the Configuration graph model \cite{newman2003structure}. In our experiment, graphs $G_{0}$ were always initialized with 36 nodes in both models. We set the edge creation probability in the Erdős-Renyi model $p=0.5$ and the degree sequence of the Configuration model follows a random power-law sequence with the exponent $\gamma = 3$.
+
+All metrics on these newly generated random graphs remained in the 0.05-neighborhood of the originally reported results. We conclude that the performed experiments are robust to different methods of random graph generation, and that the change in graph generation does not disprove Claim (i).
+
+
+\begin{figure}[t]
+\begin{minipage}{0.42\textwidth}
+\begin{center}
+    \includegraphics[width=\textwidth]{gol_unique_test100_gen.png}
+  \end{center}
+  \captionof{figure}{Diagnostic $\delta$-boxplot comparing the initially reported scores to our results using the alternative risk estimation method and a larger test set, performed on the Game of Life DGP for the hinge-loss based GEN.}
+  \label{fig:golBoxPlot}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{center}
+    \includegraphics[width=\textwidth]{newe_peanos2.png}
+  \end{center}
+  \captionof{figure}{Distributions of time series lengths, sampled from the Tree Dynamic Systems DGPs. The facet rows correspond to the maximal number of operations (3-5).}
+  \label{fig:PeanoProblem}
+  \vspace{5mm}
+\end{minipage}
+\end{figure}
+
+
+\subsubsection{Alternative methods of risk estimation - Dynamical graph systems}
+\label{exp:our2}
+As established above, no special care is taken to ensure the discrepancy between the training and testing set of time-series in the original results. In this experiment, we re-run experiments \ref{exp:first} and \ref{exp:second} with our changed method of risk assessment, described in Section \ref{sec:methodology}. We also raise the cardinality of testing set to 100, attempting to achieve stable results. We analyze our results by comparing several repetitions of the new experiment with the reported values. As a diagnostic tool, we employed the automatic plotting of $\delta$-boxplots. An example of such a plot - describing the testing scenario where the discrepancy between the reported results and our experiments was the largest, is provided in \ref{fig:golBoxPlot}. Notice that, while our change in the experimental setup did contribute to slightly worse metric scores, these changes are still minimal $(\delta \in [-0.1, 0.05]\text{ for all observed testing scenarios}).$ Consequentially, we conclude that the experimental results are robust for our method of risk estimation. Other diagnostic boxplots are available in the supplementary repository \cite{Git}. The insights of Figure \ref{fig:golBoxPlot} should not be interpreted as solely positive, as we discuss in Section \ref{sec:discuss}.
+
+
+
+\subsubsection{Alternative methods of risk estimation - Dynamical tree systems}
+\label{exp:our3}
+For the Peano addition and Boolean Formulae DGPs, we attempted to employ a similar sampling restriction for training series generation, as described above. During sampling, however, we noticed that our described methodology failed to sample a sufficient amount of training examples. Our troubleshooting lead us towards the realization, that these DGPs were very prone to generating trees that could not be simplified any further, which meant that no mapping pairs $(G_{0}, G_{1})$ could be generated from such a sample. Our diagnostic results in Figure \ref{fig:PeanoProblem} show the overwhelming majority of samples being part of this group, which casts doubt on the claims, made in \ref{tab:numunique}. We evaluated the empirical probability of a unique, simplifyable tree $G_{0},$ being sampled from a DGP. Our results show that the Boolean addition DGP sampled such a tree with probability $\text{Pr}_\text{Boolean}=0.13 \pm 0.003$, while the Peano addition DGP performed at $\text{Pr}_\text{Peano}=0.26 \pm 0.002$. These results are derived over 300,000 DGP samples with uniformly distributed hyperparametric values of maximal permited operations $p \in [3, 5],$ with 3 repetitions.
+
+In an attempt to evaluate the performance of the GEN on this family of data, we loosen our restrictions, set in Subsection \ref{sec:methodology}. Instead, we run 5 repetitions of training, with holdout estimation ($|\text{Test set}| = 100$) on the time series, generated by the unique graphs $G_{0}$, described in the previous paragraph. In this setup, the results were not perfect, but remained in the $\pm 0.05$ standard-deviation-neighborhood of the reported results.
+
+\begin{wrapfigure}{R}{0.5\textwidth}
+  \begin{center}
+    \includegraphics[width=0.48\textwidth]{LossCurves.png}
+  \end{center}
+  \caption{The loss curves for training the GEN with the authors' custom defined loss function. The differently-colored lines correspond to the values $\tau$, with respect to which the model's training set is generated.}
+  \label{fig:LossCurves}
+  \vspace{3mm}
+\end{wrapfigure}
+
+
+
+\subsubsection{Performance on the social network dataset}
+The authors use the social network data set only to evaluate the scaling capabilities of the GEN, but do not offer any information on the model's performance on the set.\footnote{This concern was also raised to the authors during the paper's submission and review process by \textit{AnonReviewer4}. See the section \textit{Weak points} in: \texttt{https://openreview.net/forum?id=dlEJsyHGeaL\&noteId=Sg922s85khx}} Since the model's scaling may be dependant on specific model parameters (specifically, the used user-defined loss function), we examine if the model is capable of training using gradient descent in this experiment.
+
+
+
+We visualize the loss curves of training the model over 1554 iterations (one pass of each available graph in Figure \ref{fig:LossCurves}, with all hyper parameters similar to the original experiment, and using the Adam optimizer. We see that the model, implemented in the scenario, does not optimize its loss function successfully.
+
+
+\section{Discussion}
+\label{sec:discuss}
+
+Our experimental results conclusively show that most of the claims in the original work hold. It is imperative, however, to discuss the choice of DGPs on which the model was evaluated to achieve these results.
+Consider, for example, the Game of Life DGP, used for evaluating the precision and recall of the test set. While at first glance, a perfect result on a relatively involved system might be impressive, we must recall that node/edge edits and insertions should never appear in an edit script $\bar{\delta}$ between two Game of life graphs, as the only changes in the systems correspond to replication edits. Consequentially, the system in the scenario is only asked to output without any addition or insertion edits. Since experiment \ref{exp:our1} showed that this output does not always appear, this casts a doubt over the model's expressive power. Another example of a somewhat poor test setup is the Edit Cycles DGP, in which the network will always test on transitions $\psi$, to which it was already introduce during training, given that the series are cyclical and Markovian. Adding to this, it is very likely that, due to the nature of the problem they describe, the mappings $\psi$, inferred from the Peano addition and Degree formulae DGPs, are often seen during training. We support this claim with our description of the sampling problems we encountered in Experiment \ref{exp:our2}.
+
+Our experimental results on the arXiv citation network show that the network's runtimes are subquadratically dependant on the number of nodes in the given graph. This partially corroborates the authors' claims. However, we note that these results are achieved by an architecture, that is not able to optimize its loss function correctly. Given that the loss cumulative loss increases with $\tau$ (as one would expect), we hypothesize that this performance is not a result of a simple syntactical error in the author-defined loss function. While this additional insight does not disprove Claim (iii), 
+we note that a different, better performing loss function, might.
+
+We propose that th weakneseses we higlighted here be considered in future work, We believe that a more in-depth and practical experimental evaluation of an otherwise elegant and interpretable solution could greatly benefit the machine learning community in the years to come.
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{What was easy}
+
+All the provided code has extensive and clear documentation which made the paper's experiments easy to reproduce. The entire code base is readable, very modular, adheres to established practices on code readability, and goes hand-in-hand with the nomenclature of the paper. While the presented implementations do require intermediate familiarity with common PyTorch constructs, the authors do admirable work in explaining everything else as-they-go, almost always without using unnecessary dependencies or needlessly referencing the reader elsewhere. The authors also provide a moderate amount of clearly written unit tests for all of their models and have already pre-implemented several diagnostic measures, such as execution runtime logging, repetition handling and plotting of training curves, which made our work a lot easier.
+
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\subsection{What was difficult}
+
+Even with the extensive supplementary material, we believe that it would have been very difficult to reproduce the exact implementation of GEN and the presented DGPs by reading the paper alone, as we've discovered many important details from the supplementary documentation. 
+
+In the paper, the authors state that all experiments were run on a consumer-grade laptop. While this may be the case, running some of the provided code is prohibitively time consuming to run on such a machine. For example, we were not able to finish a single pairwise distance calculation in a day's worth of computing time (and have thus not reported on the results of that method here) on  the kernel-based baseline from \cite{paassen2018time}. The lack of transparency about the code base's runtimes made our work here much more difficult.
+
+The original paper also uses a direct implementation of the \cite{VGRNN} as a baseline for experiments, relating to \mbox{Claim (i).} This model was not provided in the repository at the beginning of our work. The authors later provided us with the implementation, which encountered runtime errors. Even though the model now works, the trouble-shooting of this part of the code was especially time-consuming. The author's repository also lacks a hierarchical structure of related items. While the purpose of every file is clearly explained, our reproduction would have been easier with some reorganization.
+
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\subsection{Communication with original authors}
+
+We contacted Mr. Paaßen, along with his colleagues to inform them about our efforts to reproduce their work in mid-January. He was prompt with his responses, welcomed our work and made himself available for any questions. Upon our request, he forwarded the code with which the authors evaluated a baseline, reported in the paper, but not available in the repository. Upon our discovering of its aforementioned problems, he was prompt to offer solutions and sent us an adapted file in a couple of days. He let us know that the authors plan to update the repository with this working file shortly, which we see as an aditional benefit of our effort reproducing this article.
+
+When asked about their method of risk estimation, the author argued that the combinatorial explosion of possible starting states makes it unlikely that GEN just memorizes the training data without generalization. For the case of the Edit Cycles dataset, where this obviously has to happen, since there is no underlying ground-truth function $\psi$, he offered the insight that generalization was not the main aim of the inclusion of this dataset. Rather, it was intended to test the expresiveness of the edits, as memoriztation alone does not suffice to solve the task of mapping $G_{t} \to G_{t+1}$.
+
+Summing up, we greatly appreciate the authors' responses and their general attitude towards their work being reproduced as a part of this challenge.
