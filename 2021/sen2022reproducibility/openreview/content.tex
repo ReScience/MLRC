@@ -59,15 +59,17 @@ the state of agent $i$ at time $t$ is given by $s^{i}_{t} = (x^{i}_{t}, y^{i}_{t
 State of all agents combined is given by $s_t = \{s^{1}_{t}, s^{2}_{t}....s^{M}_{t}$\}.  
 Given $s_{1:t}$ the model predicts $s_{t+1:T}$.
 
-{\bf {Encoder $f(\cdot)$ :}} \\
-Gives vector encoding( ${h^{i}_{t}$) for agent $i$ at time $t$ given state of all agents till time t and index of agent:\\
+{\bf {Encoder $f(\cdot)$ :}}
+\\
+Gives vector encoding( ${h^{i}_{t}}$) for agent $i$ at time $t$ given state of all agents till time t and index of agent:
 \begin{equation}
 h^{i}_{t} = f(s_{1:t}, i)\\
 \end{equation}
 Encoder has two sub-modules: sequential $f_s(.)$ and interaction $f_i(.)$ modules to make encoding of one agent dependent on the state of other agents.
 
-{\bf {Decoder $g(\cdot)$ :}} \\
-Returns predicted state from vector encoding\\
+{\bf {Decoder $g(\cdot)$ :}} 
+\\
+Returns predicted state from vector encoding
 \begin{equation}
 {s^{i}_{t+1:T}} = g(h^{i}_{t})
 \end{equation}
@@ -124,8 +126,8 @@ ${\Delta}s_p = ({\rho}cos{\theta}_p, {\rho}sin{\theta}_p), \rho$ being minimum d
 $\epsilon$ is a normally distributed added noise 
 
 
-Each agent $i$ thus has $8(M - 1)$ negative keys.\\ 
-Positive samples: Single positive key is taken from state of agent $i$ at time $t + {\delta}t$ after adding normally distributed noise $\epsilon$\\
+Each agent $i$ thus has $8(M - 1)$ negative keys.\\
+Positive samples: Single positive key is taken from state of agent $i$ at time $t + {\delta}t$ after adding normally distributed noise $\epsilon$
 \begin{equation}
 s_{t+{\delta}t}^{i,+} = s_{t+{\delta}t}^{i} + \epsilon
 \end{equation}
@@ -133,14 +135,17 @@ s_{t+{\delta}t}^{i,+} = s_{t+{\delta}t}^{i} + \epsilon
 The data augmentation is made clearer by the following diagram given by the authors \cite {liu2020snce}. For an agent $i$ (in blue) the areas of Collision and Discomfort as shown are used as negative samples.
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=7cm]{../openreview/illustration.png}
+    \includegraphics[width=7cm]{illustration.png}
     \caption{Social Negative Augmentation}
     \label{fig:Social Negative Augmentation}
 \end{figure}
 
 \subsection{Datasets}
 The human trajectory prediction models were run on a processed version of ETH and UCY datasets. The original dataset is a collection of 5 video segments of pedestrian trajectories from which the states of each agent per frame id had been stored and the dataset had been pre-divided into train, test and validation sets to maintain uniformity in accuracy comparison. The processed ETH and UCY datasets are are available in the repository linked\footnote{\href{https://github.com/StanfordASL/Trajectron-plus-plus/tree/master/experiments/pedestrians/raw}{https://github.com/StanfordASL/Trajectron-plus-plus/tree/master/experiments/pedestrians/raw}}.\\
-The imitation and reinforcement learning models used pedestrian data from an open-source simulator based on OpenAI gym library \footnote{\href{https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}{https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}}. The dataset\footnote{\href{https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}{https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}} consisted of 5000 simulated situations in which the position of 5 random agents are stored for each time step. A validation split of 0.3 was taken. 
+The imitation and reinforcement learning models used pedestrian data from an open-source simulator based on OpenAI gym library %\footnote{$\href${https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}{https://github.com/vita-epfl/CrowdNav/blob/master/crowd_sim/README.md}}. 
+The dataset consisted of 5000 simulated situations in which the position of 5 random agents are stored for each time step. A validation split of 0.3 was taken. 
+%\footnote{$\href${https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}{https://drive.google.com/uc?id=1D2guAxD_EgrKnJFMcLSBkf10SOagz0mr}} 
+
 
 \subsection{Hyperparameters}
 Apart from the hyperparameters required for regular network training, the Social-NCE included three additional hyperparameters, specific to the model. These were: the temperature hyperparameter $\tau$, the sampling horizon $\delta t $ and the contrastive weight $\lambda$. In the original paper, there values were set by default. We improvised upon previous work by performing a thorough random search for these hyperparameters using WandB \cite{wandb}. We further do a sensitivity analysis, and check whether hyperparameter tuning offers any significant benefit. The details of the search can be summarised as follows:
@@ -153,9 +158,9 @@ Apart from the hyperparameters required for regular network training, the Social
 &\ \ \ \ \ \\
 Hyperparameter&\ Original Value&\ Method of Search&\ Range of Search\ \\ [0.5ex]
 \hline 
-Temperature \tau &  0.1 & Random & 0.1 - 0.5\\
-Sampling Horizon \delta t & 4 & Grid & {1, 2, 3, 4, 5}\\
-Contrastive Weight \lambda  &  2 & Random & 0 - 50\\
+Temperature $\tau$ &  0.1 & Random & 0.1 - 0.5\\
+Sampling Horizon $\delta$ t & 4 & Grid & {1, 2, 3, 4, 5}\\
+Contrastive Weight $\lambda$  &  2 & Random & 0 - 50\\
 \hline % inserts single-line
 \end{tabular}
 \label{tab:hresult}
@@ -217,7 +222,7 @@ Imitation Learning &   53min & 50mins\\
 \end{tabular}
 \label{tab:hresult}
 \end{table}
-\\
+
 
 \section{Results}
 \label{sec:results}
@@ -233,7 +238,7 @@ A comparison of the FDE (Final Displacement Error) and COL (Collision Rate) for 
 \hline 
 &\ \ \ \ \ \\
 Dataset&\ Ported Code&\ Reproduced&\ Original Paper&\ \\ [0.5ex]
-\multirow{} & FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\  
+&\ FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\ 
 \hline 
 ETH &    1.442 \hspace{0.25cm} {\bf{0.53}} & 1.249 \hspace{0.25cm} 1.11 & {\bf{1.224}} \hspace{0.25cm} 0.61\\
 Hotel&   {\bf{0.598}} \hspace{0.25cm} 3.49 & 0.681 \hspace{0.25cm} \bf{3.25} & 0.678 \hspace{0.25cm} 3.35\\
@@ -255,7 +260,7 @@ Average& 0.768 \hspace{0.25cm} 3.05 & 0.761 \hspace{0.25cm} 3.02 & {\bf{0.756}} 
 \hline 
 &\ \ \ \ \ \\
 Dataset&\ Ported Code&\ Reproduced&\ Original Paper&\ \\ [0.5ex]
-\multirow{} & FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\  
+&\ FDE \hspace{0.25cm} COL&   FDE \hspace{0.25cm} COL& FDE \hspace{0.25cm} COL\\  
 \hline 
 ETH &    {\bf{0.632}} \hspace{0.25cm} 0.00 & 0.791 \hspace{0.25cm} 0.00 & 0.791 \hspace{0.25cm} 0.00\\
 Hotel&   0.193 \hspace{0.25cm} {\bf{0.29}} & {\bf{0.163}} \hspace{0.25cm} 0.32 & 0.177 \hspace{0.25cm} 0.38\\
@@ -318,9 +323,9 @@ The following table summarises the results of the search:
 &\ \ \ \ \ \\
 Hyperparameter&\ Original Value&\ Best Value\ \\ [0.5ex]
 \hline 
-Temperature \tau &  0.1 & 0.1412\\
-Sampling Horizon \delta t & 4 & 1\\
-Contrastive Weight \lambda  &  2 & 16\\
+Temperature $\tau$ &  0.1 & 0.1412\\
+Sampling Horizon $\delta$t & 4 & 1\\
+Contrastive Weight $\lambda$  &  2 & 16\\
 \hline % inserts single-line
 \end{tabular}
 \label{tab:hresult}
@@ -387,5 +392,5 @@ We originally planned to perform the following additional experiments which we c
 \begin{itemize}
     \item A best hyperparameter search on Social-NCE in Trajectron++, the imitation learning model and the Rainbow-DQN based Reinforcement Learning model as well and comparison of the variation in results for different models.
     \item Implementation of Social-NCE on the Social-LSTM and Directional-LSTM models on the Trajnet++ benchmark, the results for which have been given in the original paper.
-    \item Implementation of Social-NCE on state of the art models in other benchmarks such as on the PGP model \cite{deo2021multimodal} for the nuScences dataset.
+    \item Implementation of Social-NCE on state of the art models in other benchmarks such as on the PGP model \cite {deo2021multimodal} for the nuScences dataset.
 \end{itemize}
