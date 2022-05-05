@@ -49,6 +49,7 @@ The following claims of the paper have been verified and tested successfully:
     \item PCA can be used to highlight important directions in the GAN's latent space.
     \item The GAN's output can be controlled easily in an unsupervised fashion.
     \item The earlier components control the higher-level aspects of an image, while the later directions primarily affect the minute details.
+    \item Random directions do not yield meaningful decompositions as compared to the principal components identified using PCA.
 \end{itemize}
 
 
@@ -122,40 +123,39 @@ Figure \ref{fig:cars} highlights the effectiveness of PCA on changing the low an
 
 The edit directions corresponding to each of the edits are: $E(\textbf{v}_{22}, 9-10)$ ("Change Color"), $E(\textbf{v}_{11}, 9-10)$ ("Add Grass"), $E(\textbf{v}_{0}, 0-4)$ ("Rotate") and $E(\textbf{v}_{16}, 3-5)$ ("Change type").
 
-\subsection{Unsupervised vs Supervised methods}
+\subsection{Unsupervised vs. Supervised methods}
 
 \begin{figure}[H]
-
-\subfloat[Edit directions identified by PCA ($E(\textbf{v}_{1}, 0-1)$)]{%
-  \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-GANSpace_scale=-3dot2.png}
-}
-
-\subfloat[Edit directions identified by supervised methods \cite{supervised}]{%
-  \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-Supervised_scale=1dot2.png}
-}
-
-\caption{Comparison of edits using unsupervised and supervised methods}
-
+  \subfloat[Edit directions identified by PCA ($E(\textbf{v}_{1}, 0-1)$)]{%
+    \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-GANSpace_scale=-3dot2.png}
+  }
+  \subfloat[Edit directions identified by supervised methods \cite{supervised}]{%
+    \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-Supervised_scale=1dot2.png}
+  }
+  \caption{Comparison of edits using unsupervised and supervised methods}
+  \label{fig:faces}
 \end{figure}
 
-The original authors point out that previous methods for finding interpretable directions in GAN latent spaces require outside supervision, such as labeled training images or pretrained classifiers, whereas GANSpace aims to automatically identify variations intrinsic to the model without supervision. This has been validated using the CelebA HQ Faces dataset by comparing the edit directions found through PCA to those found in previous works using supervised methods.
+Previous methods for finding interpretable directions in GAN latent spaces require outside supervision, such as labeled training images or pretrained classifiers. GANSpace, on the other hand, automatically identifies variations intrinsic to the model without supervision. This has been validated using the CelebA-HQ Faces dataset by comparing the edit directions found through PCA to those found in previous works using supervised methods.
 
-\subsection{Effect of different components}
+Figure \ref{fig:faces} shows that comparable edits can be obtained in a completely unsupervised fashion. Additionally, GANSpace can be used to identify new edits which have not been previously demonstrated. Supervised methods are not viable for this task as supervising each new edit would be costly. It is also difficult to know in advance which edits are even possible in supervised approaches.
+
+\subsection{PCA components vs. random directions}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figs/figure4_randomize_8_first_random-little_variation.png}
+    \includegraphics[width=\textwidth]{figs/cats.png}
     \caption{Illustration of the significance of the principal components as compared to random directions in the intermediate latent space of StyleGAN2.}
     \label{fig:cats}
 \end{figure}
 
-The original authors claim that the earlier components primarily control the geometry and other high-level aspects, while the lower components capture minute details. This has been illustrated in Figure \ref{fig:cats}. Fixing and randomizing the early principal components shows a separation between pose and style. In contrast, fixing and randomizing randomly-chosen directions does not yield a similar meaningful decomposition.
+The original authors claim that the earlier PCA components primarily control the geometry and other high-level aspects (pose and style), while the lower components capture minute details. Additionally, they claim that fixing and randomizing randomly-chosen directions do not yield PCA-like meaningful decompositions, thus showing the importance of identifying a good direction using PCA. This has been illustrated in Figure \ref{fig:cats}, where different subsets of principal coordinates and random coordinates are randomized while keeping the latent vector constant. In Figure \ref{fig:cats}a, the first eight principal coordinates $\textbf{x}_{0:7}$ are fixed and the remaining $504$ coordinates $\textbf{x}_{8:512}$ are randomized. This changes the background and appearance of the cat while keeping the cat's pose and camera angle constant. Conversely, Figure \ref{fig:cats}b shows that fixing the last $504$ coordinates and randomizing the first eight yields images where the camera and orientation vary, but the color and appearance are held roughly constant. Figure \ref{fig:cats}c and Figure \ref{fig:cats}d shows the results of the same process applied to random directions. The images illustrate that any given $8$ directions have no distinctive effect on the output.
 
 \subsection{Additional results not present in the original paper}
 
 \subsubsection{New edits}
 
-We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 0-17)$, referred to as "Patterns", adds a pattern on the shell of the beetle. The generated pattern varies depending on the seed used to sample $\textbf{w}$.
+We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 0-17)$, referred to as "Patterns", adds a pattern on the shell of the beetle as well as increasing the overall size of the beetle. The generated pattern varies depending on the seed used to sample $\textbf{w}$.
 
 \begin{figure}[H]
 
@@ -173,7 +173,7 @@ We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 
 
 \subsubsection{Truncation Trick on StyleGAN}
 
-The "truncation trick" is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of variety in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
+The \textit{Truncation Trick} is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of variety in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
 
 In the StyleGAN/StyleGAN2 models, the truncation trick is applied on the latent space $\textbf{w}$, which is the output of the mapping network $M$. During the training process, a running average $\textbf{w}_{avg}$ of the latents is computed. Later, the latents sampled during inference are truncated to lie close to $\textbf{w}_{avg}$. Equation~\ref{eq:2} shows the truncation process on StyleGAN/StyleGAN2 models:
 
