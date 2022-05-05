@@ -6,7 +6,7 @@ The authors introduce a novel approach to analyze Generative Adversarial Network
 
 \subsection*{Methodology}
 
-The code that was provided by the authors in Pytorch was reimplemented in \textbf{Tensorflow 1.x} for the pretrained \textit{StyleGAN} and \textit{StyleGAN2} architectures. This was done with the help of the APIs provided by the original authors of these models.
+The code that was provided by the authors in Pytorch was reimplemented in \textbf{Tensorflow 1.x} for the pretrained StyleGAN and StyleGAN2 architectures. This was done with the help of the APIs provided by the original authors of these models.
 \\
 The experiments were run on a laptop with an Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz processor, 16GB RAM, NVIDIA GeForce GTX 1060 with Max-Q Design (6GB VRAM) GPU, and Ubuntu 18.04.5 LTS.
 
@@ -21,7 +21,7 @@ The paper provides detailed explanations for the different mathematical concepts
 
 \subsection*{What was difficult}
 
-Originally we were attempting to recreate identical images with zero delta in the RGB values. However, due to differences in the random number generators between PyTorch-CPU, PyTorch-GPU and Numpy, the random values were not the same even with the same seed. This resulted in minute differences in the background artifacts of the generated images. Additionally, there is a lack of open source Tensorflow 1.x APIs to access the intermediate layers of the \textit{BigGAN} model. Due to time constraints, we were unable to implement these accessors and verify the images that the authors of GANSpace created using \textit{BigGAN}.
+Originally we were attempting to recreate identical images with zero delta in the RGB values. However, due to differences in the random number generators between PyTorch-CPU, PyTorch-GPU and Numpy, the random values were not the same even with the same seed. This resulted in minute differences in the background artifacts of the generated images. Additionally, there is a lack of open source Tensorflow 1.x APIs to access the intermediate layers of the BigGAN model. Due to time constraints, we were unable to implement these accessors and verify the images that the authors of GANSpace created using BigGAN.
 
 \subsection*{Communication with original authors}
 
@@ -176,7 +176,7 @@ We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 
 
 \subsubsection{Truncation Trick on StyleGAN}
 
-The \emph{Truncation Trick} is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of variety in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
+The "Truncation Trick" is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of variety in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
 
 In the StyleGAN/StyleGAN2 models, the truncation trick is applied on the latent space $\textbf{w}$, which is the output of the mapping network $M$. During the training process, a running average $\textbf{w}_{avg}$ of the latents is computed. Later, the latents sampled during inference are truncated to lie close to $\textbf{w}_{avg}$. Equation~\ref{eq:2} shows the truncation process on StyleGAN/StyleGAN2 models:
 
