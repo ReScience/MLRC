@@ -3,9 +3,9 @@
 \subsection*{Scope of Reproducibility}
     
 We are reproducing \emph{Comparing Rewinding and Fine-tuning in Neural Networks}, by \cite{Renda}.
-In this work the authors compare three different approaches to retraining neural networks after pruning: 1) fine-tuning, 2) rewinding weights as in \cite{Frankle} and 3) a new, original method involving learning rate rewinding, building upon \cite{Frankle}. We reproduce the results of all three approaches, but we focus on verifying their original approach: learning rate rewinding, since it is newly proposed and is described as a universal alternative to other methods.
+In this work the authors compare three different approaches to retraining neural networks after pruning: 1) fine-tuning, 2) rewinding weights as in \cite{Frankle} and 3) a new, original method involving learning rate rewinding, building upon \cite{Frankle}. We reproduce the results of all three approaches, but we focus on verifying Renda's original approach: learning rate rewinding, since it is newly proposed and is described as a universal alternative to other methods.
 
-We used CIFAR10 for most reproductions along with additional experiments on the larger CIFAR100, which extends the results originally provided by the authors. We have also extended the list of tested network architectures to include Wide ResNets \cite{wrn}. The new experiments led us to discover the limitations of learning rate rewinding which can worsen pruning results on large neural network architectures.
+As the authors of \cite {Renda}, we used CIFAR10 for most of the experiments, but we added experiments on a larger version of this dataset: CIFAR100. We have also extended the list of tested network architectures to include Wide ResNets \cite{wrn}. The new experiments led us to discover the limitations of learning rate rewinding which in some cases can worsen pruning results on large neural network architectures.
 
 \subsection*{Methodology}
 
@@ -13,11 +13,11 @@ We implemented the code ourselves in Python with TensorFlow 2, basing our implem
 
 \subsection*{Results}
 
-We were able to reproduce the exact results reported by the authors in all originally reported scenarios. However, extended results on larger Wide Residual Networks have demonstrated the limitations of the newly proposed learning rate rewinding -- we observed a previously unreported accuracy degradation for low sparsity ranges. Nevertheless, the general conclusion of the paper still holds and was indeed reproduced.
+We were able to reproduce the exact results reported by the authors in all originally reported scenarios. However, extended results on larger Wide Residual Networks have demonstrated the limitations of the newly proposed learning rate rewinding -- we observed a previously unreported accuracy degradation in low sparsity ranges. Nevertheless, the general conclusion of the paper still holds and was indeed reproduced.
 
 \subsection*{What was easy}
 
-Re-implementation of the pruning and retraining methods was technically easy, as it is based on a popular and simple pruning criterion -- magnitude pruning. Original work was descriptive enough to reproduce the results with satisfying results without consulting the code.
+Re-implementation of pruning and retraining methods was technically easy, as it is based on a popular and simple pruning criterion -- magnitude pruning. Original work was descriptive enough to reproduce the results with satisfying results without consulting the code.
 
 \subsection*{What was difficult}
 
@@ -35,22 +35,22 @@ We did not consult the original authors, as there was no need to.
 
 \section{Introduction}
 
-Neural network pruning is an algorithm leading to decrease the size of a network, usually by removing its connections or setting their weights to 0. 
+Neural network pruning is an algorithm that intends to decrease the size of a network, usually by removing some of its connections or setting their weights to 0. 
 This procedure generally allows obtaining smaller and more efficient models.
 It often turns out that these smaller networks are as accurate as their bigger counterparts or the accuracy loss is negligible.
-A common way to obtain such high quality sparse network is to prune it after the training has finished \cite{rethinking}, \cite{Frankle}.
-Networks that have already converged are easier to prune than randomly initialized networks \cite{rethinking}, \cite{snip}.
+A common way to obtain such high quality sparse network is to prune it after the training has finished \cite{Frankle, rethinking}.
+Networks that have already converged are easier to prune than randomly initialized networks \cite{snip, rethinking}.
 After pruning, more training is usually required to restore the lost accuracy.
-Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners \cite{rethinking}, \cite{Renda}.
+Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners \cite{Renda, rethinking}.
 
-Lottery Ticket Hypothesis from \cite{Frankle} formulates a hypothesis that for every non-pruned neural network, there exists a smaller subnetwork that matches or exceeds results of the original. The algorithm originally used to obtain examples of such networks is iterative magnitude pruning with weight rewinding, and it is one of the methods of retraining after pruning compared in this work.
+Lottery Ticket Hypothesis from \cite{Frankle} formulates a hypothesis that for every non-pruned neural network, there exists a smaller subnetwork that matches or exceeds results of the original. The algorithm originally used to obtain examples of such networks is iterative magnitude pruning with weight rewinding, and it is one of the three methods of retraining after pruning compared in this work.
 
 \subsection{Structured and Unstructured Pruning}
 
 One of the first papers about neural network pruning \cite{optimal} focused solely on unstructured pruning.
 However, current hardware limitations do not allow to take full advantage of this form of pruning.
 Structured pruning is a workaround to this problem.
-In structured pruning, we remove the basic building blocks of the network instead of single connections.
+In structured pruning, we remove the basic building blocks of a network instead of single connections.
 In the case of dense linear neural networks, these structures are neurons and their connections -- neuron's inputs and outputs.
 Depending on the network's type, this can be something else.
 In every case, it should be a minimal unit such that the remaining neural network can be represented as a smaller, but still dense (non-pruned) neural network.
@@ -71,9 +71,9 @@ In the case of structured pruning of convolutional neural networks, whole channe
 Our reproducibility study tries to confirm claims from \cite{Renda}.
 Following claims were formulated:
 \begin{itemize}
-    \item [Claim 1:] Widely used method of training after pruning: finetuning yields worse results than rewinding based methods (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table \ref{tab:resnet110})
-    \item [Claim 2:] Newly introduced learning rate rewinding works as good or better as weight rewinding in all scenarios (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table \ref{tab:resnet110}, but not supported by Figure \ref{fig:wrn-1})
-    \item [Claim 3:] Iterative pruning with learning rate rewinding matches state-of-the-art pruning methods \\(supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table \ref{tab:resnet110}, but not supported by Figure \ref{fig:wrn-1})
+    \item [Claim 1:] Widely used method of training after pruning: finetuning yields worse results than rewinding based methods (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table~\ref{tab:resnet110})
+    \item [Claim 2:] Newly introduced learning rate rewinding works as good or better as weight rewinding in all scenarios (supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table~\ref{tab:resnet110}, but not supported by Figure~\ref{fig:wrn-1})
+    \item [Claim 3:] Iterative pruning with learning rate rewinding matches state-of-the-art pruning methods \\(supported by figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:resnet20-2}, \ref{fig:resnet56-2} and Table~\ref{tab:resnet110}, but not supported by Figure~\ref{fig:wrn-1})
 \end{itemize}
 
 % Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
@@ -87,27 +87,30 @@ Following claims were formulated:
 
 We aimed to compare three retraining approaches: 1) finetuning, 2) weight rewinding and 3) learning rate rewinding. Our general strategy that repeated across all experiments was as follows:
 \begin{enumerate}
-    \item train a non-pruned network to convergence,
+    \item train a neural network to convergence,
     \item prune the network using magnitude criterion: remove parameters with the smallest absolute value,
-    \item retrain the network using selected retraining approach.
+    \item retrain the network using one of the three retraining approaches.
 \end{enumerate}
 
 In the case of structured pruning: in step 2, we removed structures (either neurons or convolutional channels) with the smallest L1 norm \cite{structured}, rather than removing separate connections. 
 
 In the case of iterative pruning: the network in step 1 was not randomly initialized, but instead: weights from a model from a previous iterative pruning step were loaded as the starting point.
-On the other hand, one-shot pruning is a procedure where pruning is done only once.
-Depending on the approach, this might be done on a randomly initialized neural network or on an already trained one.
+Then the three steps were repeated.
+On the other hand, one-shot pruning is a procedure where pruning is done only once, so there was only one cycle.
+In some methods, this might be done on a randomly initialized neural network, like in \cite{snip}.
+Here, however, one-shot pruning is done after the network reaches convergence.
+So the three steps are not repeated in case of one-shot pruning.
 
 We trained all our networks using Stochastic Gradient Descent with Nesterov Momentum \cite{nesterov}. The learning rate was decreased in a piecewise manner during the training, but momentum coefficient was constant and equal to $0.9$.
 
-\subsection{Model descriptions}
+\section{Model descriptions}
 
 In this report, we were focusing on an image recognition task using convolutional neural networks \cite{lecun_convnet}. 
 For most of our experiments, we chose to use identical architectures as \cite{Renda} to better validate their claims and double-check their results, rather than only provide additional ones.
 Therefore, most of the used networks are residual networks, which were originally proposed in \cite{resnet}.
 Additionally, to verify the general usefulness of pruning and retraining methods proposed in \cite{Renda} we extend the list of tested network architectures to much larger wide residual networks from \cite{wrn}.
 
-\subsubsection{Residual networks (ResNet)}
+\subsection{Residual networks (ResNet)}
 
 Just as \cite{Renda}, we chose to use the original version of ResNet as described in \cite{resnet} rather than the more widely used, improved version (with preactivated blocks) from \cite{resnetv2}. We created the models ourselves, using TensorFlow \cite{tensorflow} and Keras. We strove to replicate the exact architectures used by \cite{Renda} and \cite{resnet} and train them from scratch.
 
@@ -125,17 +128,17 @@ Just as \cite{Renda}, we chose to use the original version of ResNet as describe
       \specialrule{0.5pt}{2pt}{2pt}
     \end{tabular}
   \end{center}
-\caption{ResNets architecture description, including baseline accuracy across datasets.}
+\caption{ResNets architecture summary, including baseline accuracy across datasets.}
 \label{tab:resnet}
 \end{table}
 
 % GOOD PLACE TO INSERT MERMAID DIAGRAM TO SHOW DIFFERENCES BETWEEN v1 and v2 ResNets
 
-\subsubsection{Hyper-parameters}
+\subsubsection{ResNet hyperparameters}
 
 % \nopagebreak
-Learning rate started with $0.1$ and was multiplied by $0.1$ twice, after \numprint{36000} and \numprint{54000} iterations. One training cycle was \numprint{72000} iterations in total.
-For all batch normalization layers, we set the batch norm decay to 0.997, following \cite{Renda} which was also used in the original TensorFlow implementation\footnote{\url{https://github.com/tensorflow/models/blob/r1.13.0/official/resnet/resnet_model.py}}.
+Learning rate started with $0.1$ and was multiplied by $0.1$ twice, after \numprint{36000} and \numprint{54000} iterations. One training cycle had \numprint{72000} iterations in total.
+For all batch normalization layers, we set the batch norm decay to 0.997, following \cite{Renda}, which is also the default used in the original TensorFlow implementation\footnote{\url{https://github.com/tensorflow/models/blob/r1.13.0/official/resnet/resnet_model.py}}.
 We initialize network's weights with what is known as He uniform initialization from \cite{he_uniform}.
 We regularize ResNets, during both training and finetuning, using $L2$ penalty with $10^{-4}$ coefficient.
 In other words, the loss function (from which we calculate the gradients) looks as follows:
@@ -152,10 +155,10 @@ In other words, the loss function (from which we calculate the gradients) looks 
    W & parameters of the model
   \end{conditions}
 
-\subsubsection{Wide Residual Networks (Wide ResNet, WRN)}
+\subsection{Wide Residual Networks (Wide ResNet, WRN)}
 
 WRN networks were introduced in \cite{wrn}.
-They are networks created by simply increasing the number of filters in preactivated ResNet networks \cite{resnetv2}.
+They are residual networks created by simply increasing the number of filters in preactivated ResNet networks \cite{resnetv2}.
 
 \begin{table}[H]
 \small
@@ -169,11 +172,11 @@ They are networks created by simply increasing the number of filters in preactiv
       \specialrule{0.75pt}{2pt}{2pt}
     \end{tabular}
   \end{center}
-\caption{Wide ResNet architecture description.}\label{tab:wrn}
+\caption{Wide ResNet architecture summary.}\label{tab:wrn}
 \end{table}
 % Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
 
-\textbf{Hyper-parameters}
+\subsubsection{WRN hyperparameters}
 
 \nopagebreak
 As Wide ResNets are newer and much larger than ResNets, hyper-parameters are slightly different.
@@ -211,15 +214,13 @@ CIFAR-10 and CIFAR-100 are image classification datasets introduced in \cite{cif
 \caption{CIFAR datasets description.}\label{tab:cifar}
 \end{table}
 
-
-
-\subsubsection{Preprocessing and data augmentation}
-We used a standard data processing for both CIFAR-10 and CIFAR-100 datasets \cite{Renda}, \cite{Frankle}, \cite{wrn}. During training and just before passing data to the model, we:
+\subsection{Preprocessing and data augmentation}
+We used a standard data processing for both CIFAR-10 and CIFAR-100 datasets \cite{Renda, Frankle, wrn}. During training and just before passing data to the model, we:
 \begin{enumerate}
     \item standardized the input by subtracting the mean and dividing by the std of RGB channels (calculated on training dataset),
     \item randomly flipped in horizontal axis,
     \item added a four pixel reflection padding,
-    \item randomly cropped the image to its original size.
+    \item randomly cropped the image to its original resolution.
 \end{enumerate}
 
 During the validation, we did only the first step of the above.
@@ -244,7 +245,7 @@ It's written using TensorFlow \cite{tensorflow} version 2.4.2 in Python. More de
 % For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
 % (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
 
-Recreating the experiments required a modern GPU, training all models on CPU was virtually impossible. Training time varies depending on a lot of factors: network version and size, exact version of the deep learning library, and even the operating system. In our case, using TensorFlow 2.4.2 on Ubuntu and a single RTX 3080 GPU, the smallest of the used models, ResNet-20, takes about 20 minutes to train on CIFAR-10 dataset. To replicate our experiments, training at least a single baseline network and then, separately, a single pruned network, is required. To reduce computational requirements, we reused one non-pruned baseline for multiple compression ratios. Approximated training time requirements can be seen in the table below.
+Recreating the experiments required a modern GPU, training all models on CPU was virtually impossible. Training time varies depending on a lot of factors: network variation and size, exact version of the deep learning library, and even the operating system. In our case, using TensorFlow 2.4.2 on Ubuntu and a single RTX 3080 GPU, the smallest of the used models, ResNet-20, takes about 20 minutes to train on CIFAR-10 dataset. To replicate our experiments, training at least a single baseline network and then, once more, a single pruned network, is required. To reduce computational requirements, we reused one non-pruned baseline for multiple compression ratios. Approximated training time requirements can be seen in the table below.
 
 \begin{table}[H]
 \small
@@ -283,21 +284,19 @@ When rewinding a network to iteration $K$ that originally trained for $N$ iterat
 \subsection{Learning rate rewinding}
 Learning rate rewinding continues training with weights that have already converged, but restores the learning rate schedule to the beginning, just as if we were training from scratch, and then trains to the convergence once again. This reminds the cyclical learning rates from \cite{cyclical}. Learning rate rewinding really is weight rewinding for $K = N$, but the final retraining is always for $N$ iterations.
 
-\section{Results}
+\section{Results reproducing original paper}
 In most of our experiment, just as \cite{Renda}, we investigate how does the trade-off between prediction accuracy and compression ratio look like. 
-In one of the experiments (Table \ref{tab:resnet110}) we verify only one compression ratio, but for the rest, we verify multiple.
+In one of the experiments (Table~\ref{tab:resnet110}) we verify only one compression ratio, but for the rest, we verify multiple.
 We report a median result out of 2 up to 12 trials for each compression ratio. To better utilize our compute capabilities, we decided to spend more training cycles in situations where there is no clear winner between the compared methods. On each plot, we include error bars showing 80\% confidence intervals.
-
-\subsection{Results reproducing original paper}
 
 In this section, we include experiments that we successfully reproduced.
 Most of them match the original ones within 1\% error margin.
 We noticed some of our results were slightly better than authors of \cite{Renda} originally reported.
 
 
-Across all scenarios where finetuning was tested, it was by far the worst of the three methods, which directly supports claim 1 (Section \ref{sec:claims}). Weight rewinding and learning rate rewinding most often are equally matched, but in some cases learning rate rewinding works a little better.
+Across all scenarios where finetuning was tested, it was by far the worst of the three methods, which directly supports claim 1 (Section~\ref{sec:claims}). Weight rewinding and learning rate rewinding most often are equally matched, but in some cases learning rate rewinding works a little better.
 
-\subsubsection{ResNets on CIFAR-10 dataset}
+\subsection{ResNets on CIFAR-10 dataset}
 
 \nopagebreak
 
@@ -307,7 +306,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 \begin{tabular}{c}
 \includegraphics[width=1.0\linewidth]{pics/Resnet20-1s-iterative.pdf}
 \end{tabular}
-\caption{Results of ResNet-20 (Table \ref{tab:resnet}) on CIFAR-10 (Table \ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section \ref{sec:claims}).}
+\caption{Results of ResNet-20 (Table~\ref{tab:resnet}) on CIFAR-10 (Table~\ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section~\ref{sec:claims}).}
 \label{fig:resnet20-1}
 \end{figure}
 
@@ -317,7 +316,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
     \begin{tabular}{c}
       \includegraphics[width=1.0\linewidth]{pics/Resnet56-1s-iterative.pdf}
     \end{tabular}
-\caption{Results of ResNet-56 (Table \ref{tab:resnet}) on CIFAR-10 (Table \ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results with varying compression ratios. Maximal compression ratio means (22.73$\times$) that there are only \numprint{37600} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section \ref{sec:claims}).}
+\caption{Results of ResNet-56 (Table~\ref{tab:resnet}) on CIFAR-10 (Table~\ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results with varying compression ratios. Maximal compression ratio means (22.73$\times$) that there are only \numprint{37600} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section~\ref{sec:claims}).}
 \label{fig:resnet56}
 \end{figure}
 
@@ -336,7 +335,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
       \specialrule{0.75pt}{2pt}{2pt}
     \end{tabular}
   \end{center}
-\caption{Results of ResNet-110 (Table \ref{tab:resnet}) trained on CIFAR-10 (Table \ref{tab:cifar}) with unstructured, one-shot magnitude pruning. Sparsity $89.3\%$ corresponds to $9.35\times$ compression ratio. This experiment supports claims 1, 2, 3 (Section \ref{sec:claims}).}
+\caption{Results of ResNet-110 (Table~\ref{tab:resnet}) trained on CIFAR-10 (Table~\ref{tab:cifar}) with unstructured, one-shot magnitude pruning. Sparsity $89.3\%$ corresponds to $9.35\times$ compression ratio. This experiment supports claims 1, 2, 3 (Section~\ref{sec:claims}).}
 \label{tab:resnet110}
 \end{table}
 
@@ -346,7 +345,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
     \begin{tabular}{c}
       \includegraphics[width=0.7\linewidth]{pics/Resnet20-structured.pdf}
     \end{tabular}
-\caption{Results of ResNet-20 (Table \ref{tab:resnet}) on CIFAR-10 (Table \ref{tab:cifar}) with structured, one-shot, magnitude pruning. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left in ResNet-20.}
+\caption{Results of ResNet-20 (Table~\ref{tab:resnet}) on CIFAR-10 (Table~\ref{tab:cifar}) with structured, one-shot, magnitude pruning. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left in ResNet-20.}
 \label{fig:resnet20-2}
 \end{figure}
 
@@ -365,10 +364,10 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 % Logically group related results into sections. 
 
 
-\subsection{Results beyond original paper}
+\section{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
  
-\subsubsection{ResNets on CIFAR-100 dataset}
+\subsection{ResNets on CIFAR-100 dataset}
 \nopagebreak
 \begin{figure}[H]
 \setlength{\tabcolsep}{0pt}
@@ -376,14 +375,14 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
     \begin{tabular}{c}
       \includegraphics[width=0.7\linewidth]{pics/Resnet56-C100.pdf}
     \end{tabular}
-\caption{Results of ResNet-56 (Table \ref{tab:resnet}) on CIFAR-100 (Table \ref{tab:cifar}) with unstructured, one-shot, magnitude pruning. Results with varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{91500} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section \ref{sec:claims}) even though this scenario wasn't originally tested in \cite{Renda}.}
+\caption{Results of ResNet-56 (Table~\ref{tab:resnet}) on CIFAR-100 (Table~\ref{tab:cifar}) with unstructured, one-shot, magnitude pruning. Results with varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{91500} non-zero kernel parameters left. This experiment supports claims 1, 2, 3 (Section~\ref{sec:claims}) even though this scenario wasn't originally tested in \cite{Renda}.}
 \label{fig:resnet56-2}
 \end{figure}
 
-\subsubsection{WRN-16-8 on CIFAR-10 dataset}
+\subsection{WRN-16-8 on CIFAR-10 dataset}
 \nopagebreak
 
-WRN-16-8 shows consistent behaviour -- accuracy in the low sparsity regime is reduced in comparison to the baseline. In the case of iterative pruning, where each step is another pruning in the low sparsity regime, it leads to a large difference between the two retraining methods. Since for WRN-16-8 one-shot, low sparsity pruning shows a small regression in comparison to the baseline, this regression accumulates when pruning multiple times, as we do in iterative pruning. This can be seen in Figure \ref{fig:wrn-1}.
+WRN-16-8 shows consistent behaviour -- accuracy in the low sparsity regime is reduced in comparison to the baseline. In the case of iterative pruning, where each step is another pruning in the low sparsity regime, it leads to a large difference between the two retraining methods. Since for WRN-16-8 one-shot, low sparsity pruning shows a small accuracy regression in comparison to the baseline, this regression accumulates when pruning multiple times, which we do in iterative pruning. We think that the degradation we observe in the case of iterative pruning is an effect of stacking multiple smaller defects that we observe in the case of one-shot pruning. This can be seen in Figure~\ref{fig:wrn-1}.
 
 \begin{figure}[H]
 \setlength{\tabcolsep}{0pt}
@@ -392,11 +391,11 @@ WRN-16-8 shows consistent behaviour -- accuracy in the low sparsity regime is re
       \includegraphics[width=1.0\linewidth]{pics/WRN-16-8-LR-rewinding-is-flawed2.pdf}\\
     \end{tabular}
   \end{center}
-\caption{Results of WRN-16-8 (Table \ref{tab:wrn}) on CIFAR-10 (Table \ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results with varying compression ratios. Maximal compression ratio (100$\times$) leaves \numprint{109500} non-zero kernel parameters while achieving around 94\% accuracy or around 95\% when leaving \numprint{153400} non-zero parameters. One can see catastrophic effects of high-sparsity pruning when using learning rate rewinding procedure.}
+\caption{Results of WRN-16-8 (Table~\ref{tab:wrn}) on CIFAR-10 (Table~\ref{tab:cifar}) with unstructured, magnitude pruning in versions: one-shot and iterative. Results with varying compression ratios. Maximal compression ratio (100$\times$) leaves \numprint{109500} non-zero kernel parameters while achieving around 94\% accuracy or around 95\% when leaving \numprint{153400} non-zero parameters. One can see catastrophic effects of high-sparsity pruning when using learning rate rewinding procedure.}
 \label{fig:wrn-1}
 \end{figure}
 
-For iterative pruning (figures \ref{fig:resnet20-1}, \ref{fig:resnet56}) we used a nonstandard step size of 30\% per iterative pruning iteration, which was a way to reduce the computational requirements. We provide a comparison of our step size to the more commonly used 20\%. We show that there is virtually no difference between both versions and the aforementioned catastrophic degradation occurs in both cases, as long as the step size is in the low sparsity regime.
+For iterative pruning (figures \ref{fig:resnet20-1}, \ref{fig:resnet56}, \ref{fig:wrn-1}) we used a nonstandard step size of 30\% per iterative pruning iteration, which was a way to reduce the computational requirements. We believe this choice does not change the validity of the claims, and to support it, we provide a comparison of our step size to the more commonly used 20\%. We show that there is virtually no difference between both versions and the aforementioned catastrophic degradation occurs in both cases, as long as the step size is in the low sparsity regime.
 
 \begin{figure}[H]
 \setlength{\tabcolsep}{0pt}
@@ -405,13 +404,13 @@ For iterative pruning (figures \ref{fig:resnet20-1}, \ref{fig:resnet56}) we used
       \includegraphics[width=0.7\linewidth]{pics/WRN-16-8-LR-rew-compare2v3.pdf}\\
     \end{tabular}
   \end{center}
-\caption{Results of WRN-16-8 (Table \ref{tab:wrn}) on CIFAR-10 (Table \ref{tab:cifar}) with unstructured, iterative, magnitude pruning with two different step sizes. Results show varying compression ratios and accuracy.}
+\caption{Results of WRN-16-8 (Table~\ref{tab:wrn}) on CIFAR-10 (Table~\ref{tab:cifar}) with unstructured, iterative, magnitude pruning with two different step sizes. Results show varying compression ratios and accuracy.}
 \label{fig:wrn-2}
 \end{figure}
 
 \section{Discussion}
 
-We were able to confirm the general conclusion of \cite{Renda}. Fine-tuning can be mostly replaced by other retraining techniques, e.g., by weight rewinding as it was already done by \cite{Frankle}. We confirmed that learning rate rewinding worked even better in some scenarios. However, we have also shown in Figure \ref{fig:wrn-1} that the newly proposed learning rate rewinding is a poor choice when we are pruning large networks -- in our case that is WRN-16-8. We believe this should be examined further as there might exist a simple workaround to this problem -- a retraining procedure between weight rewinding and learning rate rewinding, which works even for larger networks. Furthermore, it would be interesting to see what happens in the network when this catastrophic accuracy degradation occurs. Perhaps, the reason for it not occurring with the original ResNet, but occurring with larger architectures, is the degree to which the larger networks overtrain -- larger networks tend to overfit more. And such an overfitted network might be not a good starting point for the retraining.
+We were able to confirm the general conclusion of \cite{Renda}. Fine-tuning can be mostly replaced by other retraining techniques, e.g., by weight rewinding as it was done by \cite{Frankle}. We confirmed that learning rate rewinding worked even better in some scenarios. However, we have also shown in Figure~\ref{fig:wrn-1} that the newly proposed learning rate rewinding is a poor choice when we are pruning large networks -- in our case that is WRN-16-8. We believe this should be examined further as there might exist a simple workaround to this problem -- a retraining procedure between weight rewinding and learning rate rewinding, which works even for larger networks. Furthermore, it would be interesting to see what happens in the network when this catastrophic accuracy degradation occurs. Perhaps, the reason for it not occurring with the original ResNet, but occurring with larger architectures, is the degree to which the larger networks overtrain -- larger networks tend to overfit more. And such an overfitted network might be not a good starting point for the retraining.
 
 % Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
 
