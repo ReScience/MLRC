@@ -31,11 +31,11 @@ While conducting our experiments, we did not contact the original authors. The p
 
 \section{Introduction}
 
-A Generative Adversarial Network (GAN) \cite{gan} is a machine learning framework where two neural networks, the discriminator and the generator, compete with each other in a zero-sum game. The generator tries to trick the discriminator into believing that artificially generated samples belong to real data.
+A Generative Adversarial Network (GAN)\cite{gan} is a machine learning framework where two neural networks, the discriminator and the generator, compete with each other in a zero-sum game. The generator tries to trick the discriminator into believing that artificially generated samples belong to real data.
 
-GANs have proven to be powerful image synthesis tools and are capable of producing high quality images. However, they provide little control over the features of the generated image. Existing solutions \cite{supervised} that add user control over the generated images require expensive supervised training on latent vectors.
+GANs have proven to be powerful image synthesis tools and are capable of producing high quality images. However, they provide little control over the features of the generated image. Existing solutions\cite{supervised} that add user control over the generated images require expensive supervised training on latent vectors.
 
-GANSpace \cite{GANSpace} proposes a simple technique to discover interpretable GAN controls in an unsupervised manner. This is done by identifying important latent directions based on Principal Component Analysis (PCA) applied either on the latent space or the feature space. The author's experiments on StyleGAN \cite{stylegan}, StyleGAN2 \cite{stylegan2} and BigGAN512-deep \cite{biggan} demonstrate that layer-wise decomposition of PCA directions leads to many interpretable controls, which affect both low and high level attributes of the output image.
+GANSpace\cite{GANSpace} proposes a simple technique to discover interpretable GAN controls in an unsupervised manner. This is done by identifying important latent directions based on Principal Component Analysis (PCA) applied either on the latent space or the feature space. The author's experiments on StyleGAN\cite{stylegan}, StyleGAN2\cite{stylegan2} and BigGAN512-deep\cite{biggan} demonstrate that layer-wise decomposition of PCA directions leads to many interpretable controls, which affect both low and high level attributes of the output image.
 
 
 \section{Scope of reproducibility}
@@ -55,7 +55,7 @@ The following claims of the paper have been verified and tested successfully:
 
 \section{Methodology}
 
-The principal components \cite{hotelling1933analysis} of a collection of points in real coordinate space are a sequence of $p$ unit vectors, where the $i^{th}$ vector is a direction of the line that best fits the data while being orthogonal to the remaining $i-1$ vectors. Principal Component Analysis (PCA) is an unsupervised algorithm used to compute the principal components and perform a change of basis of the data using one or more of the computed components, increasing the interpretability of the data while minimizing its information loss \cite{jolliffe2016principal}. It is commonly used in exploratory data analysis and for dimensionality reduction when dealing with high-dimensional noisy data. The authors of GANSpace propose a technique for identifying interpretable controls in an unsupervised fashion on pretrained GANs using PCA. Specifically, they show that layer-wise perturbations along the principal components generated using PCA on the latent space of StyleGAN based networks can be used to generate human-interpretable transformations on the synthesized images.
+The principal components\cite{hotelling1933analysis} of a collection of points in real coordinate space are a sequence of $p$ unit vectors, where the $i^{th}$ vector is a direction of the line that best fits the data while being orthogonal to the remaining $i-1$ vectors. Principal Component Analysis (PCA) is an unsupervised algorithm used to compute the principal components and perform a change of basis of the data using one or more of the computed components, increasing the interpretability of the data while minimizing its information loss\cite{jolliffe2016principal}. It is commonly used in exploratory data analysis and for dimensionality reduction when dealing with high-dimensional noisy data. The authors of GANSpace propose a technique for identifying interpretable controls in an unsupervised fashion on pretrained GANs using PCA. Specifically, they show that layer-wise perturbations along the principal components generated using PCA on the latent space of StyleGAN based networks can be used to generate human-interpretable transformations on the synthesized images.
 
 Mathematically, a GAN can be expressed as a neural network $G(\textbf{z})$ that generates an image $I: \textbf{z} \sim p(\textbf{z}), I = G(\textbf{z})$. Here, $p(\textbf{z})$ is a probability distribution from which the latent vector $\textbf{z}$ is sampled. The network $G(\textbf{z})$ can be further decomposed into $L$ intermediate layers $G_1\ldots G_L$. In the StyleGAN/StyleGAN2 models, the input to the first layer is a constant $\textbf{y}_0$. The output and input to the remaining layers is computed as:
 
@@ -68,14 +68,14 @@ $M$ is a an $8$-layer multilayer perceptron which is a non-linear function of $\
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.25]{figs/stylegan.png}
-  \caption{Architecture of StyleGAN \cite{stylegan}}
+  \caption{Architecture of StyleGAN\cite{stylegan}}
   \label{fig:stylegan}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{figs/stylegan2.png}
-  \caption{Architecture of StyleGAN2 \cite{stylegan2}}
+  \caption{Architecture of StyleGAN2\cite{stylegan2}}
   \label{fig:stylegan2}
 \end{figure}
 
@@ -131,7 +131,7 @@ The edit directions corresponding to each of the edits are: $E(\textbf{v}_{22}, 
     \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-GANSpace_scale=-3dot2.png}
   }
 
-  \subfloat[Edit directions identified by supervised methods \cite{supervised}]{%
+  \subfloat[Edit directions identified by supervised methods\cite{supervised}]{%
     \includegraphics[clip,width=\columnwidth]{figs/figure5_Gender-Supervised_scale=1dot2.png}
   }
   
