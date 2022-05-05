@@ -173,7 +173,7 @@ We identify new edits on the Stylegan2 Beetles dataset. Edit $E(\textbf{v}_{2}, 
 
 \subsubsection{Truncation Trick on StyleGAN}
 
-The "truncation trick" is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of diversity in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
+The "truncation trick" is a procedure applied to the latent vectors to improve the quality of the generated images at the expense of variety in the images. It does this by sampling the latent vectors from a truncated distribution that is closer to the average of the latent vectors sampled during training, thereby reducing the variance of the latent vectors used during inference. The authors of \cite{biggan} show that using the truncation trick improves the Fréchet Inception Distance (FID) and Inception Score (IS).
 
 In the StyleGAN/StyleGAN2 models, the truncation trick is applied on the latent space $\textbf{w}$, which is the output of the mapping network $M$. During the training process, a running average $\textbf{w}_{avg}$ of the latents is computed. Later, the latents sampled during inference are truncated to lie close to $\textbf{w}_{avg}$. Equation~\ref{eq:2} shows the truncation process on StyleGAN/StyleGAN2 models:
 
