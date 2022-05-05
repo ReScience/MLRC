@@ -38,10 +38,10 @@ We did not consult the original authors, as there was no need to.
 Neural network pruning is an algorithm that intends to decrease the size of a network, usually by removing some of its connections or setting their weights to 0. 
 This procedure generally allows obtaining smaller and more efficient models.
 It often turns out that these smaller networks are as accurate as their bigger counterparts or the accuracy loss is negligible.
-A common way to obtain such high quality sparse network is to prune it after the training has finished \cite{Frankle, rethinking}.
-Networks that have already converged are easier to prune than randomly initialized networks \cite{snip, rethinking}.
+A common way to obtain such high quality sparse network is to prune it after the training has finished \cite{Frankle}, \cite{rethinking}.
+Networks that have already converged are easier to prune than randomly initialized networks \cite{snip}, \cite{rethinking}.
 After pruning, more training is usually required to restore the lost accuracy.
-Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners \cite{Renda, rethinking}.
+Although there are a few ways to retrain the network, finetuning might be the easiest and most often chosen by researchers and practitioners \cite{Renda}, \cite{rethinking}.
 
 Lottery Ticket Hypothesis from \cite{Frankle} formulates a hypothesis that for every non-pruned neural network, there exists a smaller subnetwork that matches or exceeds results of the original. The algorithm originally used to obtain examples of such networks is iterative magnitude pruning with weight rewinding, and it is one of the three methods of retraining after pruning compared in this work.
 
@@ -215,7 +215,7 @@ CIFAR-10 and CIFAR-100 are image classification datasets introduced in \cite{cif
 \end{table}
 
 \subsection{Preprocessing and data augmentation}
-We used a standard data processing for both CIFAR-10 and CIFAR-100 datasets \cite{Renda, Frankle, wrn}. During training and just before passing data to the model, we:
+We used a standard data processing for both CIFAR-10 and CIFAR-100 datasets \cite{Renda}, \cite{Frankle}, \cite{wrn}. During training and just before passing data to the model, we:
 \begin{enumerate}
     \item standardized the input by subtracting the mean and dividing by the std of RGB channels (calculated on training dataset),
     \item randomly flipped in horizontal axis,
@@ -300,6 +300,27 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 
 \nopagebreak
 
+Results we observe here are consistent with what we see in \cite{Renda}, \cite{Frankle}.
+Iterative pruning is better than one-shot pruning, but more time consuming.
+In extreme cases, iterative pruning requires 20 times as many iterations than one-shot pruning to complete.
+But it is not as bad for moderate sparsity pruning.
+Larger networks work better than smaller ones.
+Even when the number of parameters left after pruning is the same -- originally larger network will outperform the smaller one.
+
+Out of the retraining methods, weight rewinding and learning rate rewinding seem to be similar, but finetuning is visibly worse.
+In some cases, learning rate rewinding outperforms weight rewinding.
+Similar conclusions can be drawn from both structured and unstructured pruning results.
+
+\begin{figure}[H]
+  \setlength{\tabcolsep}{0pt}
+  \centering
+      \begin{tabular}{c}
+        \includegraphics[width=0.7\linewidth]{pics/Resnet20-structured.pdf}
+      \end{tabular}
+  \caption{Results of ResNet-20 (Table~\ref{tab:resnet}) on CIFAR-10 (Table~\ref{tab:cifar}) with structured, one-shot, magnitude pruning. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left in ResNet-20.}
+  \label{fig:resnet20-2}
+  \end{figure}
+
 \begin{figure}[H]
 \centering
 \setlength{\tabcolsep}{0pt}
@@ -339,15 +360,7 @@ Across all scenarios where finetuning was tested, it was by far the worst of the
 \label{tab:resnet110}
 \end{table}
 
-\begin{figure}[H]
-\setlength{\tabcolsep}{0pt}
-\centering
-    \begin{tabular}{c}
-      \includegraphics[width=0.7\linewidth]{pics/Resnet20-structured.pdf}
-    \end{tabular}
-\caption{Results of ResNet-20 (Table~\ref{tab:resnet}) on CIFAR-10 (Table~\ref{tab:cifar}) with structured, one-shot, magnitude pruning. Results show varying compression ratios. Maximal compression ratio (9.35$\times$) means that there are only \numprint{29000} non-zero kernel parameters left in ResNet-20.}
-\label{fig:resnet20-2}
-\end{figure}
+
 
 
 % \begin{center}
