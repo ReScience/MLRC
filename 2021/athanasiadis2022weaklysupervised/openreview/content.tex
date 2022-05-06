@@ -57,10 +57,12 @@ Attention is a mechanism for weighting representations learned in a neural netwo
 every block and residual connections after every block in our implementation as it is described in \cite{visiontransformer}.
 
 \begin{table}[]
+\centering \begin{adjustbox}{width=0.7\textwidth} \small
 \begin{tabular}{l c c c c c}
 Model            & Layers & Hidden size $D$ & MLP size &  Heads  & Params \\
 ViT-Base   &   12   &        768      &   3072   &   12    &   86M  \\
 \end{tabular}
+\end{adjustbox}
 \caption{Details of ViT model variants. Table extracted from \cite{visiontransformer}.}
 \label{tbl:models}
 \end{table}
@@ -160,7 +162,8 @@ As part of replicating the target paper \cite{mainpaper}, we conducted perturbat
 table \ref{tab:perturbations} we report the AUC metric for the perturbation tests considering the explainability cues corresponding to both the most confident (predicted) and the ground truth class (target).
 
 \begin{table}[!h]
-    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llccccccc}
+\centering \begin{adjustbox}{width=0.9\textwidth} \small
+     \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llccccccc}
         &&rollout & raw  & GradCAM & LRP & partial LRP & Target paper & Ours\\
         & &~\cite{samira2005} & attention &~\cite{selvaraju2017grad} &~\cite{binder2016layer} &~\cite{voita2019analyzing} &~\cite{mainpaper} & \\
        {Negative} &Predicted & 53.1 & 45.55 & 41.52 & 43.49 & 50.49 & \textbf{54.16} & 54.13\\
@@ -168,6 +171,7 @@ table \ref{tab:perturbations} we report the AUC metric for the perturbation test
         {Positive} &Predicted & 20.05 & 23.99 & 34.06 & 41.94 & 19.64 & \textbf{17.03} & \textbf{17.03}\\
         &Target & - & - & 33.56 & 41.93 & 19.64 & \textbf{16.04} & 16.38\\
     \end{tabular*}
+    \end{adjustbox}
     \caption{Positive and Negative perturbation AUC results (percents) for the predicted and target classes, on the ImageNet~\cite{russakovsky2015ImageNet} validation set. For positive perturbation lower is better, and for negative perturbation higher is better. Table partly extracted from \cite{mainpaper}.}
     \label{tab:perturbations}
 \end{table}
@@ -175,6 +179,7 @@ table \ref{tab:perturbations} we report the AUC metric for the perturbation test
 Additionally, in table \ref{tab:segmentation} we evaluate the segmentation quality of the extracted cues by comparing them with the provided ground truth segmentation masks. In Appendix \ref{ImageNet_results} we provide qualitative results corresponding to explainability cues in ImageNet; generated using our ViT-Base implementation.
 
 \begin{table}[!h]
+\centering \begin{adjustbox}{width=0.9\textwidth} \small
     \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccccccc}
         &rollout & raw  & GradCAM & LRP & partial LRP & Target paper & Ours\\
         &~\cite{samira2005} & attention &~\cite{selvaraju2017grad} &~\cite{binder2016layer} &~\cite{voita2019analyzing} &~\cite{mainpaper} & \\
@@ -182,6 +187,7 @@ Additionally, in table \ref{tab:segmentation} we evaluate the segmentation quali
         mAP & 84.76 & 80.24 & 71.60 & 55.68 & 84.67 & \textbf{86.03} & \textbf{86.03}\\
         mIoU & 55.42 & 46.37 & 40.82 & 32.89 & 57.94 & 61.95 & \textbf{62.01}\\
     \end{tabular*}
+        \end{adjustbox}
     \caption{Segmentation performance on the ImageNet-segmentation~\cite{imagenet-seg} dataset (percent). Higher is better. Table partly extracted from \cite{mainpaper}.}
     \label{tab:segmentation}
 \end{table}
@@ -190,10 +196,12 @@ Additionally, in table \ref{tab:segmentation} we evaluate the segmentation quali
 For the purpose of generating competent segmentation masks given only image-level supervision, we relied on AffinityNet to refine the initially incomplete explainability cues derived from the Hybrid-ViT image classification network. We evaluated the class-wise mIoU in the PASCAL VOC validation dataset in table \ref{tab:Affinity} where we compare the mIoU performance of the explainability cues prior and post employing the AffinityNet-based refinement \cite{ahn2018learning}. In Appendix \ref{Pascal_results} we provide qualitative results corresponding to the refinement of the ViT-derived explainability cues via the AffinityNet.
 
 \begin{table}[!h]
+\centering \begin{adjustbox}{width=0.9\textwidth} \small
     \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc}
         &CAM \cite{zhou2016learning} & AffinityNet \cite{ahn2018learning} & Ours & Ours AffinityNet \\        &[VGG-16] & [VGG-16] & [ViT-Hybrid] & [ViT-Hybrid] \\  
         mIoU & 46.60 & \textbf{54.00} & 44.60 & 50.90\\
     \end{tabular*}
+    \end{adjustbox}
     \caption{Segmentation performance on the Pascal VOC segmentation \cite{pascalvoc} dataset (percent). Higher is better.}
     \label{tab:Affinity}
 \end{table}
@@ -205,7 +213,7 @@ Regarding the replication of paper \cite{mainpaper}, no training was required as
 \section{Conclusions}
 In the context of this study, we replicated the ViT explainability approach proposed in \cite{mainpaper}. Additionally, we capitalized on the explainability seeds derived from a Hybrid-ViT architecture to generate competent semantic segmentation labels for weak-supervision. More specifically, the AffinityNet \cite{ahn2018learning} was employed with the purpose of refining the initially incomplete explainability cues into segmentation masks of higher quality. The quantitative results provided in tables \ref{tab:perturbations} and table \ref{tab:segmentation} indicate that we have successfully implemented the explainability method described in \cite{mainpaper} since our results are identical to those originally reported in the latter for all the considered metrics. Regarding the AffinityNet, we evaluated the class-wise mIoU performance that we have achieved based on the explainability seeds as generated by the Hybrid-ViT architecture. 
 
-Furthermore, according to table \ref{tab:Affinity}, we observe that the performance we achieved is lower compared to the one reported in \cite{ahn2018learning}, however segmentation masks of improved quality were generated. One reason for that could be the lower quality of ViT explainability seeds compared to the CNN-based ones. Another potential reason for the lacking performance of the AffinityNet, when given explainability cues from ViT architecture, could be that the feature map $f^\text{aff}$ in our case, derives from low-level image representation where as in the original paper \cite{ahn2018learning} feature representation from multiple levels were aggregated. Such multi-level aggregation was not feasible in our scenario due to the nature of the transformer architecture. 
+Furthermore, according to table \ref{tab:Affinity}, we observe that the performance we achieved is lower compared to the one reported in \cite{ahn2018learning}, however segmentation masks of improved quality were generated. One reason for that could be the lower quality of ViT explainability seeds compared to the CNN-based ones. Another potential reason for the lacking performance of the AffinityNet, when given explainability cues from ViT architecture, could be that the feature map $f^\text{aff}$ in our case, derives from low-level image representation where as in the original paper \cite{ahn2018learning} feature representation from multiple levels were aggregated. Such multi-level aggregation was not feasible in our scenario due to the nature of the transformer architecture.
 
 Concluding, in this work we have demonstrated the feasibility of using ViT-derived explainability cues with the purpose of training the AffinityNet. Although, we were able to increase the quality of the ViT explainability cues by refining them with the AffinityNet, the CNN-based architectures perform better while using lighter models.
 
