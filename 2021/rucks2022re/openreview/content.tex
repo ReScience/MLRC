@@ -413,31 +413,29 @@ Overall, we can validate the reported results from~\cite{hyder2020solving}, in p
 	\label{images}
 \end{figure}
 
-\subsection{Comparison With Baseline Algorithm}
+\subsection{Comparison With Baseline Algorithms}
 
 %Experiment~4.6 from~\cite{hyder2020solving} compares the proposed method to other phase retrieval methods and show that their approach performs best in comparison.
-In this section, we validate the reported results of the hybrid-input-output algorithm (HIO)~\cite{Fienup:82} and extend the experimental evaluation by including two more baseline phase retrieval algorithms: Fienup's input-output and the Gerchberg-Saxton (GS) algorithm~\cite{Gerchberg1972APA}. We re-implement all three algorithms from scratch using NumPy~\cite{numpy}. We oversample the test images four times in spatial domain and run the algorithms for $100$ iterations on each image with a step size of $\beta=0.8$ for input-output~\cite{Fienup:82} and HIO~\cite{Fienup:82}. Also, the reconstructions are clipped to intensity values in range $[0, 1]$. For each image, we select the best PSNR from the cropped reconstruction and the cropped, flipped and shifted one. Tab.~\ref{results:baseline} shows the results on the different datasets. Overall, we can validate the claim by Hyder et al.~\cite{hyder2020solving}, even though our HIO~\cite{Fienup:82} implementation performs slightly better than the one reported in the original work.
-\begin{landscape}
+In this section, we validate the reported results of the hybrid-input-output algorithm (HIO)~\cite{Fienup:82} and extend the experimental evaluation by including two more baseline phase retrieval algorithms: Fienup's input-output (IO) and the Gerchberg-Saxton (GS) algorithm~\cite{Gerchberg1972APA}. We re-implement all three algorithms from scratch using NumPy~\cite{numpy}. We oversample the test images four times in spatial domain and run the algorithms for $100$ iterations on each image with a step size of $\beta=0.8$ for input-output~\cite{Fienup:82} and HIO~\cite{Fienup:82}. Also, the reconstructions are clipped to intensity values in range $[0, 1]$. For each image, we select the best PSNR from the cropped reconstruction and the cropped, flipped and shifted one. Tab.~\ref{results:baseline} shows the results on the different datasets. Overall, we can validate the claim by Hyder et al.~\cite{hyder2020solving}, even though our HIO~\cite{Fienup:82} implementation performs slightly better than the one reported in the original work.
+
 \begin{table*}
-	\centering\small
-	\begin{tabular}{llccccc}
+	\centering
+	\begin{tabular}{lccccc}
 		\toprule
-		& Algorithm & MNIST& EMNIST& FMNIST & SVHN & CIFAR-10 \\
-		\midrule
-
-		\multirow{3}{*}{Ours} & Input-Output & $ \phantom{0}9.80\pm \phantom{0}1.35$ & $ \phantom{0}9.85\pm \phantom{0}1.46$ & $\phantom{0}8.74 \pm  \phantom{0}2.63$ & $\phantom{0}6.68 \pm \phantom{0}1.85$ & $\phantom{0}7.80 \pm \phantom{0}1.73$ \\
-
-		& GS & $\phantom{0}9.82\pm \phantom{0}2.44$ & $ \phantom{0}9.99\pm \phantom{0}2.41$ & $11.25 \pm  \phantom{0}3.63$ & $17.89 \pm \phantom{0}3.77$ & $ 16.34\pm \phantom{0}3.08$ \\
-
-		& HIO  & $10.53\pm \phantom{0}3.81 $& $10.81\pm \phantom{0}3.93$ & $14.06 \pm \phantom{0}8.54$ &  $31.90 \pm 16.45$ & $28.33 \pm 13.92$ \\
-		\midrule
-		\multirow{1}{*}{Hyder et al. \cite{hyder2020solving}} & HIO & $\phantom{0}9.04$ & $\phantom{0}8.42 $ & $\phantom{0}9.65$ & $19.87$ & $14.70$ \\
+        & \multicolumn{3}{c}{Ours} & & Hyder et al.~\cite{hyder2020solving} \\
+        \cmidrule{2-4} \cmidrule{6-6}
+        & IO & GS & HIO & &  HIO\\
+        \midrule
+        MNIST & $ \phantom{0}9.80\pm \phantom{0}1.35$ & $\phantom{0}9.82\pm \phantom{0}2.44$ & $10.53\pm \phantom{0}3.81 $ & & $\phantom{0}9.04$ \\
+        EMNIST& $ \phantom{0}9.85\pm \phantom{0}1.46$ &$ \phantom{0}9.99\pm \phantom{0}2.41$ & $10.81\pm \phantom{0}3.93$ & & $\phantom{0}8.42 $\\
+		FMNIST & $\phantom{0}8.74 \pm  \phantom{0}2.63$ & $11.25 \pm  \phantom{0}3.63$ & $14.06 \pm \phantom{0}8.54$ & & $\phantom{0}9.65$\\
+        SVHN & $\phantom{0}6.68 \pm \phantom{0}1.85$ & $17.89 \pm \phantom{0}3.77$ & $31.90 \pm 16.45$ & & $19.87$\\
+        CIFAR-10 & $\phantom{0}7.80 \pm \phantom{0}1.73$ &$ 16.34\pm \phantom{0}3.08$ & $28.33 \pm 13.92$ & & $14.70$ \\
 		\bottomrule
 	\end{tabular}
-	\caption{Comparison of mean PSNR values (with standard deviation) by the baseline methods without use of a reference signal. Additionally, to the results of the HIO algorithm, we report the results for the input-output and the GS algorithm.}
+	\caption{Comparison of mean PSNR values (with standard deviation) by the baseline methods without use of a reference signal. In addition to the results of the HIO algorithm, we report the results for the IO and the GS algorithm.}
 	\label{results:baseline}
 \end{table*}
-\end{landscape}
 
 \subsection{Hyperparameter Search}
 \label{sec:hyperp-search}
