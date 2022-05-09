@@ -1,25 +1,14 @@
-\section{Reproducibility Summary}
+%\section{Reproducibility Summary}
+%
+%In this work, the paper Strategic Classification Made Practical is evaluated through a reproduction study. We successfully reproduced the original results using the same dataset and hyperparameters. In addition, we conducted an additional experiment that tests the framework's performance on a dataset containing both strategic and non-strategic users. The results show significant decrease in accuracy of linear models proportional to the number of non-strategic users. The non-linear RNN model achieves good performance regardless of the proportion of strategic users. The results provide insight into the limitations of the claims that the original approach is flexible and practical.
+%
+%\clearpage
 
-In this work, the paper Strategic Classification Made Practical is evaluated through a reproduction study. We successfully reproduced the original results using the same dataset and hyperparameters. In addition, we conducted an additional experiment that tests the framework's performance on a dataset containing both strategic and non-strategic users. The results show significant decrease in accuracy of linear models proportional to the number of non-strategic users. The non-linear RNN model achieves good performance regardless of the proportion of strategic users. The results provide insight into the limitations of the claims that the original approach is flexible and practical.
-
-\clearpage
-\section{Reproducibility Summary}
-
-In this work, the paper Strategic Classification Made Practical\cite{levanon2021strategic} is evaluated through a reproduction study. The results from the reproduction examines if the claims made in the paper are valid. We could find two main claims that were made by the authors that we will attempt to reproduce. Those are as follows:
-
- The claims made in the paper that will be reproduced are as follows:
-\begin{enumerate}
-    \item "We propose a novel learning framework for strategic classification that is practical, effective, and flexible. This allows for differentiation through strategic user responses, which supports end-to-end training."
-    \item "We propose several forms of regularization that encourage learned models to promote favorable social outcomes."
-\end{enumerate}
-
-\clearpage
-
-\section{Content}
-\newif{\ifhidecomments}
-
-
-\title{Strategic classification made practical: reproduction}
+%\section{Content}
+%\newif{\ifhidecomments}
+%
+%
+%\title{Strategic classification made practical: reproduction}
 
 % The \author macro works with any number of authors. There are two commands
 % used to separate the names and addresses of multiple authors: \And and \AND.
@@ -29,13 +18,13 @@ In this work, the paper Strategic Classification Made Practical\cite{levanon2021
 % authors names on the first line, and the last on the second line, try using
 % \AND instead of \And before the third author name.
 
-\author{}
+%\author{}
 
 
-\section*{\centering Reproducibility Summary}
+\section{ Reproducibility Summary}
 
 
-\subsection*{Scope of Reproducibility}
+\subsection{Scope of Reproducibility}
 
 In this work, the paper Strategic Classification Made Practical\cite{levanon2021strategic} is evaluated through a reproduction study. The results from the reproduction examines if the claims made in the paper are valid. We could find two main claims that were made by the authors that we will attempt to reproduce. Those are as follows:
 
@@ -47,37 +36,27 @@ In this work, the paper Strategic Classification Made Practical\cite{levanon2021
 
 We interpret \textit{practical, effective and flexible} as such that the model should work better on a variety of real life problems than their non-strategic counterpart.
 
-\subsection*{Methodology}
+\subsection{Methodology}
 
 In this paper, the same code, datasets and hyperparameters were used as the original paper to reproduce the results.
 To further validate the claims from the original paper, we extended the original implementation to include an experiment that tests performance on a dataset containing both strategic (also referred to as gaming) and non-strategic users.
 
-\subsection*{Results}
-%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
-The reproduction of the original paper as well as the extended implementation were successful. We were able to reproduce the original results and examine the performance of the proposed model in an environment where strategic and non-strategic users both present. Linear models seem to struggle with different proportions of strategic users, while the non-linear model (RNN) achieves good performance regardless of the proportion of strategic users.
-\subsection*{What was easy}
+\subsection{Results}
 
-% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The reproduction of the original paper as well as the extended implementation were successful. We were able to reproduce the original results and examine the performance of the proposed model in an environment where strategic and non-strategic users both present. Linear models seem to struggle with different proportions of strategic users, while the non-linear model (RNN) achieves good performance regardless of the proportion of strategic users.
+
+\subsection{What was easy}
 
 The codebase for the paper was available on GitHub which meant that we didn't have to start from scratch. They also provided us with the original data. The codebase also came with the original results from the authors which meant that comparing the results was easy.
 
-% The codebase that was used for the original paper was written and organized well enough, thus verifying that the results from the original paper were valid results was not a problem.
+\subsection{What was difficult}
 
-%The codebase of the authors when we were able to run it was easily done, because all of the code was in notebooks. We could run the notebooks and it would produce the results. 
+Although the code was available, documentation of the code was quite sparse. Therefore, it was hard to figure out what each part of the code did and made it difficult to interpret what the results actually meant at certain stages.
 
-\subsection*{What was difficult}
-
-% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
-%% No need for details on env files i think
-Although the code was available, documentation of the code was quite sparse. Therefore, it was hard to figure out what each part of the code did and made it difficult to interpret what the results actually meant at certain stages. % Another problem with the code was the environment file that was supposed to be used to run the notebooks. This file gave errors when creating an environment and we needed to manually install the packages. The paper itself did have all the formula's for the math. However, the variables in the formulas were not clearly explained in the text. Lastly, we would have liked if there was a final table which summarised all the accuracy's for the different methods used.
-
-\subsection*{Communication with original authors}
+\subsection{Communication with original authors}
 The University of Amsterdam communicated before the course with the authors about the datasets. While working on the reproduction we sent one email about clarification of their method and to request a missing dataset.
-% Briefly describe how much contact you had with the original authors (if any).
 \newpage
-% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
-% \\
-% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+
 \section{Introduction}
 % A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
 As consequential decisions such as loan approval and fraud detection are increasingly made by predictive machine learning systems, it is important to consider the weaknesses and vulnerabilities of these systems. Users may gain knowledge of the model and use this knowledge to modify their features to improve their outcomes. Therefore, a model must be resilient against strategic modification of features to classify these users properly.\\\\
@@ -85,21 +64,6 @@ This problem of classification while users strategically modify their features i
 
 \section{Scope of reproducibility} \label{sec:scope}
 \label{sec:claims}
-
-% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
-
-% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
-% This is concise, and is something that can be supported by experiments.
-% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
-
-% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
-% \begin{itemize}
-%     \item Claim 1
-%     \item Claim 2
-%     \item Claim 3
-% \end{itemize}
-
-% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
 
 % Consistently use moving points/editing features to avoid confusion
 This paper describes our efforts to reproduce the work from the paper Strategic Classification Made Practical\cite{levanon2021strategic}, which addresses the problem of strategic classification in a manner that is more practical than previous approaches, more flexible than previous approaches and takes social good into account.\\
@@ -120,8 +84,6 @@ The claims that the paper made are as follows:
 \end{enumerate}
 
 In addition to reproducing the results presented in the paper, we perform novel experiments that test the claimed practicality, effectiveness and flexibility of the approach. In the experiments, we lift the assumption that all the users of the system are modifying their features to game the classifier. We make the case that this assumption cannot be applied to many real life settings. The experimental results show that in some settings the proposed method leads to decreased performance.
-
-%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
 
 \section{Methodology}
 % Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
@@ -185,6 +147,7 @@ The datasets that were used in the original paper were also used in this work. A
     \caption{Description of the datasets that were used in this project. All of these datasets have previously been used in the context of strategic classification, which makes them suitable to use when comparing models. Each dataset was gathered from the respective paper that they were first mentioned in.}
     \label{tab:datasets}
 \end{figure}
+
 \subsection{Hyperparameters}
 % Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
 
@@ -211,14 +174,8 @@ As described in section \ref{sec:model_desc}, a seperate model was trained for e
 % Provide a link to your code.
 The reproduction of the results was done with jupyter notebooks, this is the same as the original authors. Each notebook specialises in one part of the methods used in the original paper. The results of these different notebooks are then summarised in a plotting notebook called "reproduction plots.ipynb". Each notebook trains the respective model and saves the results to a .csv file. The measure used to evaluate the experiments is the accuracy of the model with the different datasets. The code can be found at this \href{https://anonymous.4open.science/r/Strategic_classification_made_practical_reproduce_91BD/README.md}{\textbf{github}}.
 
-% Using the Jupyter notebook code provided by the original authors, reproducing the experiments was simply a matter of installing the correct libraries and running the notebooks. (Something about bad environment file?)\\
-% In the additional experiment, we evaluated the performance of the model in a situation where the amount of users that strategically modify their features was varied. After being trained on the original dataset, the classifiers were evaluated on $n$ datapoints, out of which only $\beta * n$  points chosen at random were strategically modified. In this experiment, we tracked the classification accuracy and error types, false negatives and false positives, of the strategic and non-strategic model, while $\beta$ ranged from $[0,1]$ in steps of 0.1. The accuracy benchmark used is the performance of the non-strategic model on non-strategic data ($\beta = 0$), which is the same as in the original paper. The experiment was performed on the four datasets from the paper in a new Jupyter notebook.
 
 \subsection{Computational requirements}
-% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
-% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
-% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
-% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
 Experiments were able to be reproduced on laptops without a dedicated graphics card. Times per experiment differed, but individual experiments generally took 60 minutes. The exception to this rule was calculating the performance of the model for social burden, which took around 9 hours to run on a laptop with a GTX 1050.
 
 \section{Results}
@@ -227,9 +184,6 @@ Experiments were able to be reproduced on laptops without a dedicated graphics c
 The reproduction study reveals minimal differences between the reported and reproduced accuracies. The first claim for a novel learning framework for strategic classification is supported by our reproduced results. The framework performs better than the Hardt et al.\cite{hardt2016strategic} strategic classification baseline. Thus, it also supports the second claim of the original paper.
 
 \subsection{Results reproducing original paper}
-% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
-% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
-% Logically group related results into sections.\\ 
 \begin{figure}[h]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
@@ -270,36 +224,6 @@ To prove the second claim about social impact, the authors made plots similar to
     \label{fig:extention_results}
 \end{figure}
 
-
-% \begin{figure}[H]
-% \centering
-%     \begin{subfigure}[b]{0.45\textwidth}
-%     \centering
-%     \includegraphics[scale=0.4]{plots/burden.jpg}
-%     \caption{A graph showing model performance as the amount of social burden increases.}
-%     \label{fig:burden_result}
-%     \end{subfigure}
-%     %
-%     \hfill
-%     %
-%     \begin{subfigure}[b]{0.45\textwidth}
-%     \centering
-%     \includegraphics[scale=0.4]{plots/recourse.png}
-%     \caption{A graph showing model performance as the amount of recourse increases.}
-%     \label{fig:recourse_result}
-%     \end{subfigure}
-%     %
-%     % \hfill
-%     %
-%     \begin{subfigure}[b]{0.45\textwidth}
-%     \centering
-%     \includegraphics[scale=0.45]{plots/utility.jpg}
-%     \caption{A graph showing model performance as the amount of utility increases.}
-%     \label{fig:utility_result}
-%     \end{subfigure}
-    
-%     \caption{Results of social regularization experiments. While the model was being regularized base on utility, social burden and recourse, accuracy was monitored.}
-% \end{figure}
 \subsection{Results beyond original paper}
 % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
 
@@ -328,17 +252,8 @@ After comparing the results, we conclude that the experimental results support t
 \\
 The second claim is also supported by the results, they show that the model can be regularized without completely compromising the accuracy. This is an interesting result and it shows that their technique does work in practice. However since the strategic models show more false negatives for a mixed data set than non-strategic ones, it might have a more severe social burden than initially thought. An interesting followup experiment could be to check a regularized model on mixed data to see what the impact actually is.
 
-% After looking at our results, we can somewhat safely conclude that our experimental results supports the first claim. The second claim we did not have enough time to conclusively say if the claim was supported or not. The model is flexible and can be modified to take strategic classification into account. This can be seen in the results beyond the original paper section where we used a combined dataset of users who are gaming the system and not gaming the system.\\\\
-% However, a problem that was faced repeatedly while reproducing the original paper was the fact that the experiments that were done exist in such a controlled environment that it is difficult to say whether these experiments even prove the claims that are being made. A collection of assumptions are made: datapoints move according to a cost function, all users are strategically modifying their features, ..., such that results from this situation cannot be interpreted as real-life situations, simply a very specific simulation in a very controlled environment. Questions also arose about the definition of social good and the ability of this paper to meaningfully quantify social good in the context of real-life applications. The statement is made that the outcome of these models are "socially profitable", which is consequently tested on a dataset that has very little to do with social good.
-% % Nothing is a bit too harsh, simply not practical/applicable
-% Ultimately, the biggest critique was the fact that their proposed flexible, socially-aware framework was nothing more than a linear classifier that could move their decision boundary based on data it had seen before. Although the simplicity of the model is not a problem, the fact that it is being handled like something more, is a problem. We make the argument that due to the controlled environment and considerable amount of assumption, that with the exception of new techniques to tackle the problem, nothing new has been demonstrated. The paper feels hastily written at times and badly thought through. 
-% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
-
 \subsection{What was easy}
 Since we had not worked on the problem of strategic classification before, it would have been very difficult to implement it in the limited timeframe that was available. Luckily, the authors of the paper had created a codebase containing all experiments and results. Along with the code, the dataset sources were also mentioned in the original paper. Therefore, we were able to verify that the results from the original paper were valid as soon as we got the code working. 
-% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
-
-% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
 
 \subsection{What was difficult}
 Although the code was available, documentation of the code was quite sparse and unclear, and getting every part of the code to run took some trial and error due to the lack of comments. There were some short comments in the vanilla notebook, which we could consequently use to try to understand what was happening in the code. As well as a lack of documentation in the code, the counterpart of equations \ref{eq:resp_map} and \ref{eq:SERM} written in the original paper lacked sufficient explanation about what the variables/functions meant and what their purpose was in the equation. When taking all these factors into account, understanding the code was quite a challenge. 
@@ -351,13 +266,9 @@ Another problem was the fact that the results from the original paper were not s
 
 \subsection{Communication with original authors}
 The communication with the authors was minimal. We asked about a clarification point about their method that had to do with them not using a combined dataset where users where partially gaming the system.
-% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
 
 
-%\section*{References}
 
-% \bibliographystyle{abbrv}
-% \bibliography{references.bib}
 
 
 
