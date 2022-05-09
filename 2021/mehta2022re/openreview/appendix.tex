@@ -1,0 +1,148 @@
+\newpage
+\section*{Appendix}
+\section{Method Code-flow}
+We present the code-flows for each of the three training stages in the following sections. 
+\subsection{Stage 1: Training a classification network using BAP}
+\vspace{5mm}
+\begin{figure}[ht!]
+\centering
+\begin{center}
+\includegraphics[width=13cm]{../openreview/images/stage1.png}
+\caption{\label{fig:bap1}{Stage 1 Code flow}}
+\end{center}
+\end{figure}
+
+\newpage
+\subsection{Stage 2: Obtaining pseudo labels from the trained classification model}
+\begin{figure}[ht!]
+\centering
+\vspace{20mm}
+\begin{center}
+\includegraphics[width=13cm]{../openreview/images/stage2_mod.png}
+\caption{\label{fig:bap2}{Stage 2 Code flow}}
+\end{center}
+\end{figure}
+
+\newpage
+\subsection{Stage 3: Training segmentation network using the pseudo labels obtained and NAL loss}
+\begin{figure}[ht!]
+\vspace{20mm}
+\centering
+\includegraphics[width=13cm]{../openreview/images/stage3_codeflow.png}
+\caption{\label{fig:bap3}{Stage 3 Code flow}}
+\end{figure}
+
+\newpage
+\section{Class Agnostic Pseudo Label Generation using $u_0$}
+In our VOC to COCO experiment, mapping was done between the classes of VOC to the corresponding COCO classes to facilitate usage of CAMs. Here we further investigate the usage $1-u_0$ as a class agnostic foreground attention map for all classes instead of using CAMs. We perform this experiment on the VOC train set, wherein no CAMs have been used in label generation. The results in comparison with usage of CAMs for $u_c$ strongly exhibit the generic nature of pseudo label generator using the background attention map. Visual comparison of the images is shown in Fig. (\ref{fig:bgattmap}).
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Method} & \textbf{CAMS for $\mathbf{u_c}$} & \textbf{$\mathbf{1-u_0}$ in place of $u_c$} \\ \hline
+BAP Ycrf        & 78.7                  & 67.48                          \\
+BAP Yret        & 70.8                  & 68.66                          \\ \hline
+\end{tabular}
+\label{tab:my-table1}
+\end{table}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=12cm]{../openreview/images/comparison_supplementary.jpg}
+\caption{\label{fig:bgattmap}{Visual Comparison : class-agnostic label generation}}
+\end{figure}
+
+\newpage
+\section{Wandb Training Logs}
+\subsection{Experiments with NAL loss}
+Following are the training logs obtained during the Stage 3 training with cross-entropy loss on $Y_{crf}$ and $Y_{ret}$ individually, and with NAL using both. 
+\begin{figure}[!htb]
+\vspace{10mm}
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts/Section-2-Panel-0-xjizahq5x.png}
+\endminipage\hfill
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts/Section-2-Panel-1-hxzus535r.png}
+\endminipage
+\end{figure}
+
+\begin{figure}[!htb]
+\vspace{10mm}
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts/Section-2-Panel-2-daj6kfvo4.png}
+\endminipage\hfill
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts/Section-2-Panel-3-797f7rwgr.png}
+\endminipage
+\end{figure}
+
+
+\newpage
+\subsection{Experiments with NAL and it's counterpart loss}
+Shown below are the training logs of Stage 3 experiments using NAL and other contemporary losses. Mean IoU score and mean accuracy shown are obtained on training set.
+
+\begin{figure}[!htb]
+\vspace{10mm}
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts2/Section-2-Panel-0-xjizahq5x.png}
+
+\endminipage\hfill
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts2/Section-2-Panel-1-hxzus535r.png}
+
+\endminipage
+\end{figure}
+
+\begin{figure}[!htb]
+\vspace{10mm}
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts2/Section-2-Panel-2-daj6kfvo4.png}
+
+\endminipage\hfill
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts2/Section-2-Panel-3-797f7rwgr.png}
+
+\endminipage
+\end{figure}
+
+
+\newpage
+\subsection{Experiments with GAP and BAP}
+Here we present training logs from Stage 1 experiments using BAP and GAP on augmented dataset and non-augmented dataset.
+
+\begin{figure}[!htb]
+\vspace{10mm}
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts3/Section-2-Panel-0-797f7rwgr.png}
+\endminipage\hfill
+\minipage{0.49\textwidth}
+\includegraphics[width=\linewidth]{../openreview/images/charts3/Section-2-Panel-1-l1mor3i91.png}
+\endminipage
+\end{figure}
+
+\vspace{10mm}
+
+\section{Detailed study: BAP vs GAP}
+The complete results in our comparison of BAP and GAP are shown below. In both the methods, we notice a significant improvement in mean IoU upon using the augmented dataset. As seen from the results, BAP is  superior than GAP for the different experimental configurations.
+% Please add the following required packages to your document preamble:
+
+\vspace{5mm}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ccccccc}
+\toprule\toprule
+\multirow{2}{*}{Method} & \multicolumn{2}{c}{Author's Results} & \multicolumn{4}{c}{Our Results}                                   \\
+                        & \multicolumn{2}{c}{Augmented}        & \multicolumn{2}{c}{Augmented} & \multicolumn{2}{c}{Non-augmented} \\
+                        & train             & val              & train          & val          & train            & val            \\ \midrule
+GAP Ycrf w/o u0         & -                 & -                & 70.2           & 67.5         & 73.1             & 62.0             \\
+GAP Ycrf                & 75.5              & 76.1             & 76.6           & 75.5         & 77.2             & 75.7           \\
+GAP Yret                & -                 & -                & 73.6           & 72.7         & 72.5             & 70.5           \\ \midrule
+BAP Ycrf w/o u0         & 77.0                & 77.8             & 78.3           & 77.0           & 73.9             & 62.0             \\
+BAP Ycrf                & 78.7              & 79.2             & 80.1           & 78.8         & 79.5             & 75.4           \\
+BAP Yret                & 70.8              & 69.9             & 71.4           & 69.9         & 70.3             & 65.0             \\
+BAP Ycrf \& Yret        & 85.3              & 68.2             & 85.7           & 72.7         & 82.4             & 79.6           \\ \bottomrule
+\end{tabular}
+\vspace{1.2mm}
+\caption{Comparison of pseudo labels on the PASCAL VOC validation sets in terms of mIoU}
+\label{tab:my-table2}
+\end{table}
