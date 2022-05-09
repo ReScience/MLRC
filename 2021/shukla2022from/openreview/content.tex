@@ -189,22 +189,42 @@ Our reproduced model functions better than all previous baselines, and satisfact
 \begin{table}[H]
 \vspace*{-.1in}
 \begin{center}
-\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c| }
+\begin{tabular}{ |c|c|c|c|c|c|}
  \hline
- \multicolumn{6}{|c|}{K=20} & \multicolumn{4}{|c|}{K=5}  
+%  \multicolumn{6}{|c|}{K=20}   
  %\multicolumn{5}{|c|}{K=5}
- \\
- \hline
-  & P2TIRL\cite{deo2021trajectory}& SimAug\cite{liang2020simaug} & PECNet\cite{mangalam2020journey} & Y-net (Paper's)  & Ours' & TNT\cite{zhao2020tnt} & PECNet\cite{mangalam2020journey}  & Y-net (Paper's) & Ours'  \\ 
+  & P2TIRL\cite{deo2021trajectory}& SimAug\cite{liang2020simaug} & PECNet\cite{mangalam2020journey} & Y-net (Paper's)  & Ours' \\ 
   \hline
- ADE & 12.58 & 10.27 & 9.96 & 7.85 & \textbf{8.85}  & 12.23 & 12.79 & 11.49 & \textbf{12.36}  \\ 
+ ADE & 12.58 & 10.27 & 9.96 & 7.85 & \textbf{8.85}  \\ 
  \hline
- FDE & 22.07 & 19.71 & 15.88 & 11.85 & \textbf{12.23} & 21.16 & 29.58 & 20.23 & \textbf{20.18}\\ 
+ FDE & 22.07 & 19.71 & 15.88 & 11.85 & \textbf{12.23} \\ 
  \hline
 
 \end{tabular}
 \bigskip
-\caption{Short temporal horizon forecasting results on SDD}
+\caption{Short temporal horizon forecasting results on SDD for K = 20 }
+\label{eq:result_1}
+\end{center}
+\vspace*{-.1in}
+\end{table}
+
+\begin{table}[H]
+\vspace*{-.1in}
+\begin{center}
+\begin{tabular}{ |c|c|c|c|c| }
+ \hline
+%  \multicolumn{4}{|c|}{K=5}  
+ %\multicolumn{5}{|c|}{K=5}
+  & TNT\cite{zhao2020tnt} & PECNet\cite{mangalam2020journey}  & Y-net (Paper's) & Ours'  \\ 
+  \hline
+ ADE & 12.23 & 12.79 & 11.49 & \textbf{12.36}  \\ 
+ \hline
+ FDE & 21.16 & 29.58 & 20.23 & \textbf{20.18} \\ 
+ \hline
+
+\end{tabular}
+\bigskip
+\caption{Short temporal horizon forecasting results on SDD for K = 5}
 \label{eq:result_1}
 \end{center}
 \vspace*{-.1in}
