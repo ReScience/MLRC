@@ -156,6 +156,14 @@ StyleGAN2 trainings for our custom datasets have been conducted in our second ma
 
 We have conducted all experiments by following the descriptions given in the paper. We re-implemented the test scripts that enables us to run two different models on a single latent vector. In general, we were able to reproduce the quantitative and qualitative results on FFHQ and AFHQ Cat datasets. We extend the results of AFHQ Cat presented in the original work by conducting the lighting and viewpoint (\textit{i.e.} pitch) manipulation. Moreover, we extend the experiments given in the original work by training the LiftedGAN from scratch and testing it on CelebA.
 
+%\begin{figure}[h!]%
+%    \centering
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_faces.png} }}%
+%    \qquad
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_faces.png} }}%
+ %   \caption{FFHQ dataset face generation example.}%
+%    \label{fig:example}%
+%\end{figure}    
 
 \subsection{Results reproducing the original work}
 \subsubsection{Qualitative results}
@@ -164,8 +172,9 @@ As shown in Figure \ref{fig:original_vs_re_faces}, we have achieved visually on-
 
 \begin{figure}[t!]
     \centering
-    \subfloat{\includegraphics[width=\textwidth]{images/original_faces.png}} //
-    \subfloat{\includegraphics[width=\textwidth]{images/re_faces.png}} 
+    \includegraphics[width=\linewidth]{images/original_faces.png}
+    \includegraphics[width=\linewidth]{images/re_faces.png}
+    
     \caption{Face generation example on FFHQ. The first row is the results produced by the original weights, the second row is the results produced by our reproduced weights.}
     \label{fig:original_vs_re_faces}
 \end{figure}
@@ -188,13 +197,58 @@ In the original work, the examples of face generation results between interpolat
 
 Qualitative results of the ablation study for our reproduction are shown in Figure \ref{fig:ablation_qual}. We also provide more visual examples for all these additional experiments in our supplementary materials and the reproduction repository.
 
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/original_yaw.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_yaw.png}} 
+%    \caption{FFHQ dataset rotate (yaw) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
+%    \label{fig:original_vs_re_yaw}
+%\end{figure}
+
+%\begin{figure}[h!]%
+%    \centering
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_pitch.png} }}%
+%    \qquad
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_pitch.png} }}%
+%    \caption{FFHQ dataset rotate (pitch) example.}%
+%    \label{fig:example}%
+%\end{figure}
+
+
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/original_pitch.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_pitch.png}} 
+%    \caption{FFHQ dataset rotate (pitch) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
+%    \label{fig:original_vs_re_pitch}
+%\end{figure}
+
+
+%\begin{figure}[h!]%
+%    \centering
+%    \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/original_light.png} }}%
+%    \qquad
+%    \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/re_light.png} }}%
+%    \caption{FFHQ dataset light source example.}%
+%    \label{fig:example}%
+%\end{figure}
+
 \begin{figure}[t]
     \centering
-    \subfloat{\includegraphics[width=0.6\textwidth]{images/original_light.png}} //
-    \subfloat{\includegraphics[width=0.6\textwidth]{images/re_light.png}} 
+    \includegraphics[width=0.6\textwidth]{images/original_light.png}
+    \includegraphics[width=0.6\textwidth]{images/re_light.png}
     \caption{Changing the direction of the light source on FFHQ. The first row shows the results produced by the original weights, and the second row presents the results produced by our reproduced weights.}
     \label{fig:lighting}
 \end{figure}
+
+
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/orijinal_interpolation.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/re_interpolation.png}} 
+%    \caption{Example generation results between interpolated latent codes. First two rows are the results generated with original weights, third and fourth rows are the results generated with reproduced weights.}
+%    \label{fig:interpolation}
+%\end{figure}
 
 \begin{table}[b!]
 \centering
@@ -225,7 +279,6 @@ In this section, we present our quantitative results of this reproduction study 
 \begin{figure}[t!]%
     \centering
     \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{images/orijinal_interpolation.png} }}%
-    \qquad
     \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{images/re_interpolation.png} }}%
     \caption{Examples of using the interpolated latent codes for generating the rotated faces.}%
     \label{fig:interpolation}%
@@ -236,6 +289,33 @@ In this section, we present our quantitative results of this reproduction study 
 \subsubsection{Extended experiments on AFHQ}
 
 In the original work, a controlled generation strategy on cat heads has been followed in order to demonstrate that the framework is object-agnostic. However, this experiment is limited, and conducted on only the viewpoint manipulation on yaw axis. We present the visual results of our controlled generation on cat heads in Figure \ref{fig:afhq_view} (for the viewpoint manipulation in yaw and pitch axes) and in Figure \ref{fig:afhq_light} (for changing the light direction). At this point, we can validate that the framework is able to work well on different objects, not only human faces.
+
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_yaw_original.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_yaw_re.png}} 
+%    \caption{AFHQ Cat dataset rotate (yaw) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
+%    \label{fig:original_vs_re_cat_yaw}
+%\end{figure}
+
+% \begin{figure}[h!]%
+%     \centering
+%     \subfloat[\centering Original]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_original.png} }}%
+%     \qquad
+%     \subfloat[\centering Reproduced]{{\includegraphics[width=0.47\linewidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_re.png} }}%
+%     \caption{AFHQ Cat dataset rotate (pitch) example.}%
+%     \label{fig:example}%
+% \end{figure}
+
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_original.png}} 
+%    \subfigure{\includegraphics[width=\textwidth]{Reproducibility_Challenge_2020/afhq_cat_pitch_re.png}} 
+%    \caption{AFHQ Cat dataset rotate (pitch) example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
+%    \label{fig:original_vs_re_cat_pitch}
+%\end{figure}
+
+
 
 
 \subsubsection{The performance on CelebA}
@@ -268,14 +348,21 @@ To extend the scope of the experiments in the original work, and validate the ge
 
 \begin{figure}[t!]
     \centering
-    \subfloat[a]{\includegraphics[width=0.6\textwidth]{images/celeba_faces.png}} //
-    \subfloat[b]{\includegraphics[width=0.6\textwidth]{images/celeba_yaw.png}}   //
-    \subfloat[c]{\includegraphics[width=0.6\textwidth]{images/celeba_pitch.png}}  //
-    \subfloat[d]{\includegraphics[width=0.4\textwidth]{images/celeba_light.png}} //
-    \caption{The qualitative results on CelebA dataset. Rows: (a) face generation, (b) rotation on yaw axis, (c) rotation on pitch axis, (d) the light direction.}
+    \includegraphics[width=0.8\textwidth]{images/celeba_faces.png}
+    \includegraphics[width=0.8\textwidth]{images/celeba_yaw.png}
+    \includegraphics[width=0.8\textwidth]{images/celeba_pitch.png}
+    \includegraphics[width=0.6\textwidth]{images/celeba_light.png}
+    \caption{The qualitative results on CelebA dataset. Rows: (1) face generation, (2) rotation on yaw axis, (3) rotation on pitch axis, (4) the light direction.}
     \label{fig:celeba_results}
 \end{figure}
 
+%\begin{figure}[h!]
+%    \centering
+%    \subfigure{\includegraphics[width=0.75\textwidth]{Reproducibility_Challenge_2020/afhq_cat_light_original.png}} 
+%    \subfigure{\includegraphics[width=0.75\textwidth]{Reproducibility_Challenge_2020/afhq_cat_light_re.png}} 
+%    \caption{AFHQ Cat dataset light source example. First row is the results generated with original weights, second row is the results generated with reproduced weights.}
+%    \label{fig:original_vs_re_cat_light}
+%\end{figure}
 
 \section{Discussion}
 
