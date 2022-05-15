@@ -1,0 +1,439 @@
+\newpage
+\section*{Appendix}
+\label{appendix}
+\subsection{Hyperparameters}
+\label{app:hyperparameters}
+\begin{table}[htb!]
+    \centering
+    \begin{tabular}{c|c}
+        \hline
+        Stage & Iterations/step \\\hline \hline
+        1 & $[700,700,600]$ \\ \hline
+        2, 3, 4 & $[200,500,400]$\\ \hline 
+    \end{tabular}
+    \caption{Specification of the different stages for the single-image model.}
+    \label{tab:stages}
+\end{table}
+
+\begin{table}[htb!]
+    \centering
+    \begin{tabular}{c|c|c}
+        \hline
+        Stage & Iterations/step & $N_{p}$\\\hline \hline
+        0 & $[700,0,0]$ & 16\\ \hline
+        1-10 & $[1,1,1]$ & 128\\ \hline
+        11 & $[1,700,600]$ & 16\\ \hline
+        12, 13, 14 & $[200,500,400]$& 16\\ \hline 
+    \end{tabular}
+    \caption{Specification of the different stages for the single-image model with \textbf{initialization iterations}}
+    \label{tab:init_iter_single}
+\end{table}
+
+\begin{table}[htb!]
+    \centering
+    \begin{tabular}{c|c|c}
+        \hline
+        Epochs & Iterations/step & $N_{p}$\\\hline \hline
+        60 & $[13,22,18]$ & 16\\ \hline
+    \end{tabular}
+    \caption{Specification of the iterations/step for the generalized model.}
+    \label{tab:generalized}
+\end{table}
+
+\begin{table}[htb!]
+    \centering
+    \begin{tabular}{c|c|c}
+        \hline
+        Epochs & Iterations/step & $N_{p}$\\\hline \hline
+        10 & $[13,1,1]$ & 128\\ \hline
+        60 & $[13,22,18]$ & 16\\ \hline
+    \end{tabular}
+    \caption{Specification of the iterations/step for the generalized model with \textbf{initialization iterations}}
+    \label{tab:init_iter_generalized}
+\end{table}
+
+\csvreader[
+    longtable=c|c,
+    table head=\caption{Hyperparameters for the general model with initialization iterations on the LSUN Cat dataset.
+    }
+    \label{tab:params}
+    \\\hline 
+    Parameter & Value \\\hline\hline\endhead
+        \hline\endfoot,
+    late after line=\\,
+    respect underscore=true
+]{../openreview/config_cat_init.csv}{1=\param , 2= \val }{\param & \val}
+We refer to our GitHub repository for a complete declaration of all hyperparameters for all datasets.
+
+% \begin{figure}[!htb]
+%     \begin{subfigure}[t]{0.33\textwidth}
+
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_5__it_stage_.png}
+%         \end{subfigure}
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/plotly__im_5.png}
+%         \end{subfigure}
+%         \caption{LSUN Car}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.33\textwidth}
+
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/recon_3d_depth_2__it_stage_.png}
+%         \end{subfigure}
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/plotly__im_2.png}
+%         \end{subfigure}
+%         \caption{LSUN Cat}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.33\textwidth}
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/face/ellipsoid/recon_3d_depth_2__it_stage_.png}
+%         \end{subfigure}
+%         \begin{subfigure}{\textwidth}
+%             \centering
+%             \includegraphics[width=\textwidth]{../openreview/images/face/ellipsoid/plotly__im_1.png}
+%         \end{subfigure}
+%         \caption{Celeba}
+%     \end{subfigure}
+%     \caption{Reconstructed depth and textured projects for a few more image examples.}
+%     \label{fig:appendix-replication}
+% \end{figure}
+\subsection{Effects of shape priors}
+\label{app:priors}
+\autoref{fig:no_prior} shows the effects of random initialization of the depth network.
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}{0.30\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/priors/no_prior/plotly__im_0.png}
+    \caption{Textured shape}
+    
+\end{subfigure}
+\begin{subfigure}{0.30\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/priors/no_prior/recon_3d_depth_0__it_stage_.png}
+    \caption{3D depth map}
+    
+\end{subfigure}
+\begin{subfigure}{0.30\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/priors/no_prior/recon_im_number_0_5300_it_stage_3.png}
+    \caption{Reconstructed image}
+    
+\end{subfigure}
+    \caption{Results with no shape prior.}
+    \label{fig:no_prior}
+\end{figure}
+\autoref{fig:3d_depth_diff_priors} shows the results on the first car where it can be observed that our prior is even better the the ellipsoid at capturing fine details such as the side mirror.
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/car0_side.png}
+        \caption{Textured shape}
+        
+    \end{subfigure}
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_3d_depth_0__it_stage_.png}
+        \caption{3D depth}
+        
+    \end{subfigure}
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/ellipsoid/recon_im_depth_0__it_stage_.png}
+        \caption{2D depth colormap}
+        
+    \end{subfigure}
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/smoothed/car0_side.png}
+        \caption{Textured shape}
+        
+    \end{subfigure}
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/smoothed/recon_3d_depth_0__it_stage_.png}
+        \caption{3D depth}
+        
+    \end{subfigure}
+    \begin{subfigure}[t]{0.28\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/smoothed/recon_im_depth_0__it_stage_.png}
+        \caption{2D depth colormap}
+        
+    \end{subfigure}
+    \caption{Ellipsoid prior (top row) vs. the \textbf{smoothed masked box} (bottom row) prior.}
+    \label{fig:3d_depth_diff_priors}
+\end{figure}
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/ellipsoid/cat0_side.png}
+        \caption{Cat 1 (original prior)}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/cat0_side.png}
+        \caption{Cat 1 (our prior)}
+    \end{subfigure}
+    \caption{Results for a few other images from the LSUN Cat dataset, for the ellipsoid (left) and smoothed masked box (right) priors.}
+    \label{fig:appendix-ellips_vs_box}
+\end{figure}
+\subsection{Variability of identical runs}
+\label{app:variability}
+\autoref{fig:variability} shows several runs with the same configuration on the first car image ending up with different results.
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/car/identical runs/plotly__im_0_2022_01_31_16_44_crop.png}
+    \caption{}
+    
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/car/identical runs/plotly__im_0_2022_01_31_16_47_crop.png}
+    \caption{}
+    
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/car/identical runs/plotly__im_0_2022_01_31_16_49_crop.png}
+    \caption{}
+    
+\end{subfigure}
+    \caption{Several runs with identical configuration.}
+    \label{fig:variability}
+\end{figure}
+\newpage
+\subsection{Catastrophic forgetting}
+\label{app:forget}
+When the training process is complete for one image $\textbf{I}_t$ we have confirmed that the model $M_t = \{V, L, D, A\}_t$ is able to construct a believable depth map (\autoref{sec:replication}). However, when training continues to the next image $\textbf{I}_{t+1}$ and $M_{t+1}$ is obtained, we have observed that the ability  to predict the depth map of the previous image deteriorates, and the problem gets worse with an increasing time discrepancy between the model and image. %TODO: verify last part of this sentence
+In other words, the depth network $D_{t}$ at training step $t$ is only usable for predicting the depth map $\textbf{d}_t = D_t(\textbf{I}_t)$ and so suffers from catastrophic forgetting of the previous images. This is illustrated in \autoref{fig:forget_cat}.
+
+The training time for one $128 \times 128$ pixel RGB image using a Tesla K80 GPU was about 2.5 hours, which seems exceedingly costly for just one low-resolution depth map.
+
+\begin{figure}[!htb]
+\begin{subfigure}{0.33\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/forget/plotly__im_2.png}
+    \caption{$M_{3}(\textbf{I}_{3})$}
+    
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/forget/plotly__im_1.png}
+    \caption{$M_{3}(\textbf{I}_2)$}
+    
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/forget/plotly__im_0.png}
+    \caption{$M_{3}(\textbf{I}_1)$}
+    
+\end{subfigure}
+    \caption{Depth map predictions for a few image samples from the LSUN Car dataset, illustrating catastrophic forgetting for the model $M$. }
+    \label{fig:forget_cat}
+\end{figure}
+
+\newpage
+
+\subsection{Additional generalized training results}
+
+\begin{figure}[!htb]
+\begin{subfigure}{\textwidth}
+    \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/recon_3d_depth_3__it_stage_.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/recon_3d_depth_4__it_stage_.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/recon_3d_depth_7__it_stage_.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/recon_3d_depth_8__it_stage_.png}
+\end{subfigure}
+    \caption{Reconstructed depth}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+    \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/plotly__im_3_rev.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/plotly__im_4_rev.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/plotly__im_7_rev.png}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/train_set/plotly__im_8_rev.png}
+    
+\end{subfigure}
+\caption{Reconstruced 3D image}
+\end{subfigure}
+    \caption{Depth map predictions for a few image samples from the training set $\mathcal{D} \subset$ LSUN Cat dataset, all using one and the same  \textbf{general} model $M^*$.}
+    \label{fig:gen_LSUN_Cat_train}
+\end{figure}
+
+\begin{figure}[!htb]
+\begin{subfigure}{\textwidth}
+    
+
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/unseen_set/plotly__im_199_rev.png}
+    \caption*{$\textbf{I}_{199}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/unseen_set/plotly__im_201_rev.png}
+    \caption*{$\textbf{I}_{201}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/unseen_set/recon_3d_depth_199__it_stage_.png}
+    \caption*{$\textbf{I}_{199}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/generalized/unseen_set/recon_3d_depth_201__it_stage_.png}
+    \caption*{$\textbf{I}_{201}$}
+\end{subfigure}
+    \caption{Using the \textbf{general} model $M^*$.}
+\end{subfigure}
+
+\begin{subfigure}{\textwidth}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/unseen_set/plotly__im_199_rev.png}
+    \caption*{$\textbf{I}_{199}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/unseen_set/plotly__im_201_rev.png}
+    \caption*{$\textbf{I}_{201}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/unseen_set/recon_3d_depth_199__it_stage_.png}
+    \caption*{$\textbf{I}_{199}$}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/unseen_set/recon_3d_depth_201__it_stage_.png}
+    \caption*{$\textbf{I}_{201}$}
+\end{subfigure}
+\caption{Using the instance-specific model $M_{\textrm{last}}$}
+\end{subfigure}
+    \caption{Depth map predictions for \textbf{unseen} image samples $\{\textbf{I}_{199}, \textbf{I}_{201} \} \not\in \mathcal{D}$ from the LSUN Cat dataset.}
+    \label{fig:gen_LSUN_Cat_test}
+\end{figure}
+
+\newpage
+
+\subsection{Initialization iteration results}
+\label{app:init-iter}
+ The observations of sections \ref{sec:variability} and \ref{sec:hyperparams} can be condensed into two main points to form a hypothesis. Please note that our limited computational resources meant that we could not perform rigorous experimentation to confirm these observations with a large number of samples, and that this section should be viewed as a speculative experiment.
+
+\begin{itemize}
+    \item The initial few training iterations can be viewed as an \textit{initialization} of the weights, which depends on what projected samples are generated by the StyleGAN2 model.
+    
+    \item The ``features'' (i.e. peaks and valleys) of the depth map predictions do not qualitatively change with increasing iterations, but remain fixed except in size (i.e. the height of the peaks).
+\end{itemize}
+
+If one accepts these claims, then it is clear that the first few iterations determine the success of the shape reconstruction. That is why we experiment with drastically increasing the number of pseudo-samples during the first iterations. This reduces the bias of the initialization and reduces the relative impact that a poor projected sample generated by the GAN has on the model weights. Specifically, we increase the number of projected samples $N_{p}$ from 16 to 128 for 10 short epochs, in which each training step is performed only once. 
+
+Ideally, one would of course permanently increase $N_{p}$, but with extreme costs in terms of training time. This method only added $\sim4$ minutes of training time using a Tesla T4 GPU.
+
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/cat0_side.png}
+        \caption{Original initialization}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/smoothed/cat2_custom_smooth (3).png}
+        \caption{Original initialization}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/orig_init_iter/cat0_side.png}
+        \caption{With initialization iterations}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/cat/orig_init_iter/cat2_custom_init_iter (3).png}
+        \caption{With initialization iterations}
+    \end{subfigure}
+    \caption{Results for the worst performers for the \textbf{single-image} model using the smoothed box prior, from the LSUN Cat dataset. Original initialization (top row) and using \textbf{initialization iterations} (bottom row). The leftmost cat saw the most drastic changes. While the result is a ``spikey'' depth map, we argue that the general shape has a better resemblance to a cat, and less square box-like as with the original initialization. The rightmost cat saw some improvement in some details such as the ears and the mouth region.}
+    \label{fig:init_iter_single}
+\end{figure}
+
+
+
+
+\subsection{Hyperparameter tuning}
+\label{app:hyperparams-tuning}
+We found that $N_p$ correlates with the quality of the predicted shapes. The trend tends to be that more is better, but with diminishing returns. The biggest benefit that a large $N_p$ has, is that strange artefacts are less likely to persist. It is difficult to pinpoint an acceptable threshold for $N_p$, as it varies between datasets and even between images.  Therefore we believe a good compromise is to perform a few initialization iterations as described in section \ref{sec:init_iter} with a large $N_p$ (i.e. 128) and then continue training with a lower number according to the aforementioned thresholds.
+
+To illustrate the results when varying on the number of projected samples $N_{proj}$ we present the results on the LSUN car and Celeba dataset. In \autoref{fig:proj-car} the first two cars (corresponding to a low $N_p$) have more irregular surfaces and one has a large spike, while the third is more regular. The same is observed for the Celeba faces in \autoref{fig:proj-face}, where the first face (corresponding to a low $N_p$) has significant irregularities across the face. As described in \autoref{sec:variability}, we attribute this phenomenon to lower relative impact that sampling poor view-light projections has, the larger $N_p$ is. 
+\begin{figure}[htb!]
+    \centering
+    \begin{subfigure}{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/face/n proj sample sweep/plotly__im_0_2022_01_31_10_36.png}
+    \end{subfigure}
+    \begin{subfigure}{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/face/n proj sample sweep/plotly__im_0_2022_01_31_10_39.png}
+    \end{subfigure}
+    \begin{subfigure}{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/face/n proj sample sweep/plotly__im_0_2022_01_31_10_42.png}
+    \end{subfigure}
+    \begin{subfigure}{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/face/n proj sample sweep/plotly__im_0_2022_01_31_10_45.png}
+    \end{subfigure}
+    \caption{Face 1 when trained with 4, 8, 16 and 32 (from left to right) number of projected samples.}
+    \label{fig:proj-face}
+\end{figure}
+
+
+\begin{figure}[htb!]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/n proj sample sweep/plotly__im_0_2022_02_02_11_41.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/n proj sample sweep/plotly__im_0_2022_02_02_11_44.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../openreview/images/car/n proj sample sweep/plotly__im_0_2022_02_02_11_47.png}
+    \end{subfigure}
+    \caption{Car 1 when trained with 2, 4 and 8 (from left to right) number of projected samples.}
+    \label{fig:proj-car}
+\end{figure}
