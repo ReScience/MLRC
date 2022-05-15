@@ -1,0 +1,214 @@
+\section{Reproducibility Summary}
+
+\subsection{Scope of reproducibility}
+In this paper we attempt to reproduce the results found in "DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks" by Breugel et al \cite{DBLP:conf/nips/BreugelKBS21}. The goal of the original paper is to create a model that takes as input a biased dataset and outputs a debiased synthetic dataset that can be used to train downstream models to make unbiased predictions both on synthetic and real data.
+
+\subsection{Methodology}
+We built upon the (incomplete) code provided by the authors to repeat the first experiment of \cite{DBLP:conf/nips/BreugelKBS21} which involves removing existing bias from real data, and the second experiment where synthetically injected bias is added to real data and then removed.
+
+\subsection{Results}
+We reproduced most of the data utility results reported in the first experiment for the Adult dataset. However, while the fairness metrics generally match the original paper they are numerically not comparable in absolute or relative terms. For the second experiment, we were unsuccessful in reproducing results found by the authors. We note however that we made considerable changes to the experimental setup, which may make it difficult to perform a direct comparison of the results. 
+    
+\subsection{What was easy}
+The smaller size and tabular format of both datasets allowed for quick training and model modifications.
+
+\subsection{What was difficult}
+There are several possible interpretations of the paper on both a methodological and conceptual level. Reproducing the experiments required rewriting or adding large sections of code. Given these multiple interpretations it is difficult to be confident in the reproduction. In addition, several results found by the authors appear to be counterintuitive, such as algorithms debiasing without being designed to do so and sometimes outperforming debiasing algorithms on the same dataset.
+
+\subsection{Communication with original authors} 
+We sent two emails to the authors describing our issues. We received a reply with a few extra files, but no direct answer to content questions.
+
+% \subsection{Submission Checklist}
+
+% Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+
+% \begin{itemize}
+% \item Title should start with "\texttt{[Re]}"
+% \item Author information, along with ORCID id
+% \item Author affiliations
+% \item Code URL, Software Heritage Foundation link
+% \item Abstract
+% \item Review URL (the OpenReview URL of your report)
+% \end{itemize}
+
+% \subsection{Continuous Integration}
+
+% We use Github Actions CI to check your submission and compile the pdf file subsequently.
+% You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+
+\clearpage
+
+\section{Introduction}
+
+It is broadly acknowledged that real world data contains bias. Despite efforts to make data collection more equitable and representative, a myriad of challenges remain. The importance of addressing bias and fairness more broadly is gaining awareness \citep{DBLP:journals/csur/MehrabiMSLG21}, as biased data can lead to the under-representation of particular demographics, such as the case of political representation in the United States Census\citep{hare_2019}. As technology progressed to the emergence of machine learning (ML) models, the same challenges persist as ML models inherit the biases of the data and humans who created them. Models trained on biased data can pass bias downstream to various other applications, a phenomenon referred to as algorithmic bias\citep{johnson_2020}. Such models have potential to not only perpetuate but exacerbate social inequality. Hence, there is a clear and present need for methods that can utilize biased data to produce unbiased results. 
+
+\section{Background}
+The notion of using Generative Adversarial Networks (GAN) to increase fairness within artificial intelligence is broadly supported by the literature. Various models exists such as FairGAN\citep{xu_yuan_zhang_wu_2018}, GANSAN\citep{DBLP:journals/algorithms/AivodjiBGNT21}, and Fairness GAN \citep{sattigeri_hoffman_chenthamarakshan_varshney_2019} to name but a few. Notably, fairness efforts have typically recognized a fairness-accuracy trade-off assumption, where a fairer algorithm comes at the cost of accuracy. However, recent work has challenged these assumptions, finding that the accuracy cost of fairness is negligible in some circumstances\citep{rodolfa_lamba_ghani_2021}. Nonetheless, given the increased awareness of the nefarious effects of data bias, many research efforts have been directed towards the debiasing of data and other attempts to create fairer artificial intelligence\citep{DBLP:journals/csur/MehrabiMSLG21}.
+
+\subsection{DECAF premise}
+One such effort, and the subject of the present study, is DEbiasing CAusal Fairness (DECAF) \citep{DBLP:conf/nips/BreugelKBS21}. DECAF takes a distinct approach to debiasing data, explicitly approaching fairness from a causal standpoint with a goal of downstream model fairness. There are three broad approaches to fairness that may be identified, (1) the preprocessing approach, where the characteristics of the input data are changed to suppress undesirable biases \citep{DBLP:conf/nips/BreugelKBS21}, (2) the algorithmic modification approach, where the learning algorithm itself is adapted to reduce bias \citep{article}, and (3) the postprocessing approach, where the output of a model is manipulated to obtain the desired level of fairness\citep{kamishima_akaho_asoh_sakuma_2012}. The DECAF approach falls in the first category of preprocessing because it attempts to remove bias from the input data and subsequently from all downstream models.
+
+The DECAF model is a generative adversarial network (GAN) that utilizes the causal structure of directed acyclical graphs (DAGs) to remove bias from real data. The three critical assumptions of the DECAF method are (1) the data generating process is represented by a DAG, (2) the DAG is causally sufficient, and (3) the DAG is known for a given dataset. DAGs are central to the method, as it is through edge manipulation that debiasing is performed.
+
+The model may be separated into two stages. During the training phase, the model learns the causal conditionals of the dataset from its DAG. In the inference phase, the data is debiased through DAG modification. Each fairness level defines a unique set of edge removals from the original DAG, resulting in a new, intervened DAG. These intervened DAGs are given to the model to generate synthetic, fair datasets from the original data. The synthetic datasets have similar distributions to the original data, but avoid bias. Because the method debiases at inference time, retraining the model is not required when using different fairness measures, thus providing inference-time fairness.
+
+Once DECAF generates a synthetic and unbiased dataset, a simple multilayer perceptron (MLP) is trained on this synthetic data to create an unbiased classifier that can be used both on the original data and in other settings. Because the data used for training the MLP has already been debiased, the authors claim that the MLP or any chosen downstream model is guaranteed to be fair since it does not incorporate any of the bias from the original training data; this is a hallmark of the preprocessing approach to fairness.
+
+\subsection{Fairness standards}
+Three definitions of algorithmic fairness are used in the paper, each corresponding to a unique modified DAG. The most lenient standard is the commonly used Fairness Through Unawareness (FTU) definition, which entails that the protected variable, $A$, is not explicitly used by the model to predict the label, $\hat{Y}$. While widely used because of its conceptual simplicity and the fact it avoids direct discrimination, FTU nonetheless fails to eliminate indirect discrimination. 
+
+A more stringent definition of fairness is Demographic Parity (DP), which declares that classification probability must be independent of classes, i.e. if the protected attribute is gender, all gender classes have the same success rate. The DP definition is considered to be very strict because it potentially under-utilizes feature differences between groups in the process of blocking indirect discrimination. 
+
+Conditional Fairness (CF) lies in the middle ground between the first two definitions by presuming that the selection rate between groups segregated by the protected attribute must be the same when conditioned on some explanatory variable(s) determined by prior knowledge. Each of these standards corresponds to a variation of DECAF, respectively DECAF-ND (no debiasing), DECAF-FTU, DECAF-CF, and DECAF-DP. The fairness of each model is tested against FTU and DP metrics.
+
+\section{Scope of reproducibility and claims}
+
+The authors claim that DECAF allows for the generation of unbiased synthetic data from biased real data and that their method does so with minimal loss in data utility compared to other approaches. Furthermore, they identify five characteristics of fair synthetic data that their method achieves: (1) allows post-hoc distribution changes, (2) provides fairness, (3) supports causal notions of fairness, (4) allows inference-time fairness, and (5) requires minimal assumptions. Additionally, they claim that DECAF is the only method to achieve all of the five listed characteristics.
+
+The authors identify three main contributions of their work:
+\begin{enumerate}[label=(\roman*)]
+    \item DECAF, a causal GAN-based model that can use a biased dataset $X$ to generate an equivalent synthetic unbiased dataset $\mathcal{X}$ with minimal loss of data utility
+    \item A flexible causal approach for modifying DECAF to generate fair data
+    \item Guarantee that downstream models trained on the generated synthetic data will make unbiased predictions on both synthetic and real-life (biased) data
+\end{enumerate}
+
+We aim to evaluate claims (i) and (iii) by replicating the two experiments of \citep{DBLP:conf/nips/BreugelKBS21}. We will focus on the narrow interpretation of reproducibility, namely whether the experiment can be reproduced by independent researchers with the same setup rather than testing against the more general standard of replicatability on different datasets. Despite the availability of code, there were considerable problems with running the models even with instructions given, meaning that we limited our scope to direct reproducibility. As the authors have done, we will evaluate the data utility of the DECAF method with precision, recall, and area under the receiver operation characteristic (AUROC); fairness will be evaluated with Fairness Through Unawareness (FTU) and Demographic Parity (DP) measures.
+
+\section{Methodology}
+
+While code from the creators of the DECAF method is available \footnote{The DECAF code is available at: https://github.com/vanderschaarlab/DECAF}, the documentation leaves room for interpretation and the instructions given for running the code do not reproduce the results as presented. In addition, there are several possible discrepancies between the method described in the paper and the code provided. Thus, we made the assumption that the paper leads and adjusted the code accordingly to match.
+
+\subsection{Methodological Code Changes}
+\label{sec:changes}
+Though the DECAF class code was working, several components of the experimental setup code was either missing or not fully explained. Thus, we had to extrapolate heavily to produce results. The major code changes required are listed below:
+\begin{enumerate}[label=(\roman*)]
+
+    \item Preprocessing: the original paper mentions standardizing continuous variables, however, following the procedure given in the paper generates uninterpretable results. As a solution we standardize all variables, including categorical ones though we question the conceptual validity of this decision. After standardizing with StandardScaler, we still do not obtain results as high as the reported metrics, so we normalize with MinMaxScaler which  produces matching results in data utility. The DECAF class employs a final sigmoid layer that converts all generated data to a range between 0 and 1. We suspect this is the reason why the \texttt{run\_example.py} script will only predict labels of one class and why using a Scaler allows us to obtain meaningful predictions.
+    
+    \item DAGs: There appears to be a mismatch with the dags provided, as neither contain all of the variables in the datasets. In addition the code provided utilized a toy graph. The authors state that they used \texttt{Tetrad} to generate the DAG for the dataset, so we attempted to generate a full causal graph for the Adult dataset, but our generated graphs do not match Figure 6 and 7 of \citep{DBLP:conf/nips/BreugelKBS21}. Hence, we manually input the graphs from the paper. 
+
+    \item Label Generation: The paper instructs that the labels for synthetic data should be generated by the model as they are part of the causal dependencies graph. The original code does not generate the labels for the synthetic dataset, but instead generates only the x values and then predicts the labels from those generated x values using the baseline model. The code seems to omit the target variable from the GAN input, but we feel this would leave out valuable causal information contained in the edges from the explanatory variables to the target variable. Thus, we decided to include the target variable in the DAG, which improves our results. In the end, we were forced to generate labels for experiment 1, while predicting labels for experiment 2 in order to obtain interpretable results.
+    
+    \item Downstream Classifer: The paper mentions an MLP from \texttt{sklearn}, but the example code uses an XGBClassifier as the downstream classifier which caused installation issues. We followed the paper by using an MLP.
+
+\end{enumerate}
+
+\subsection{Dataset}
+
+For the first experiment, we use the Adult dataset \footnote{The Adult dataset is available at \url{http://archive.ics.uci.edu/ml/index.php}} \citep{Dua:2019} collected from the 1994 United States Census. The dataset contains about 45,000 data points, and 2,000 data points are set aside for the test set as specified by \citep{DBLP:conf/nips/BreugelKBS21}. The protected attribute is sex, and the target variable is income with roughly 75\% in the '<=50k' class and the remaining 25\% belonging to the '>50k' class. This makes sense considering the average earnings of Americans at the time, but does make our data skewed towards one class. We manually input the DAG from Figure 6 of \cite{DBLP:conf/nips/BreugelKBS21} and use the preprocessing steps described in the previous section. 
+
+For the second experiment, we use the Credit Approval dataset \citep{Dua:2019} of credit card applications. This dataset is considerably smaller than the first dataset with only 678 data points. The original paper does not specify how large the test set is, so we choose a typical 80\%/20\% split for training and testing. The protected attribute is ethnicity and the target variable is application approval. About 55\% of the applications were approved while the rest were rejected, so this dataset is considerably more balanced than the other. Again, we have to manually input the graph from Figure 7 of the original paper. Since the protected attribute here, ethnicity, is not binary, we first convert the variable to be binary with 0 corresponding to 'not discriminated against' and 1 to 'discriminated against'. Then we use the same preprocessing steps as in the first experiment. 
+
+\subsection{Hyperparameters}
+
+A hyperparameter search is not necessary for our experiments. We use the DECAF class as given with the parameters set by the authors' code. The only modification we make is changing the \texttt{dag\_seed} parameter from the provided toy graph to the respective graphs for each dataset presented on Page 28 of \citep{DBLP:conf/nips/BreugelKBS21}. The DECAF generator is instantiated with $d$, the number of features, sub-networks with shared hidden layers. The generator and discriminator both use 2 hidden layers with $2d$ neurons. The generator is updated once for every 10 discriminator updates. Adam is used as the optimizer with a learning rate of 0.001. The other GANs used for comparison are also given default parameters and settings from their respective packages because no settings are specified by the authors. 
+
+An MLP with default parameters from \texttt{sklearn} is used. The default settings are 100 neurons with ReLU activation functions and Adam with a learning rate of 0.001. A Softmax activation and binary cross entropy loss is used for the output layer.
+
+\subsection{Experimental setup and code}
+\label{sec:setup}
+
+In this study, we aim to replicate the experiments of the original paper, Debiasing Census Data (experiment 1) and Fair Credit Approval (experiment 2), to evaluate the performance of DECAF when generating unbiased synthetic data from real, biased data from the Adult dataset.
+
+We train each model listed in Table 2 of the original paper, four DECAF GANs and three other GANs for comparison for 50 epochs. A synthetic dataset is generated from each model that is then used to train an MLP to classify a test set of 2,000 unmodified data points from the original dataset. We compare these predictions with the ground truth labels from the original data to evaluate performance and fairness. This process is repeated ten times to obtain average metrics over multiple runs as specified by the authors.
+
+To mimic the DECAF paper, precision, recall, and AUROC are used to measure the performance of the models, while FTU and DP are used to measure the fairness of the models. Precision, recall, and AUROC are given by \texttt{sklearn.metrics}, and higher scores indicate better performance. Lower FTU and DP scores indicate less bias. To calculate FTU, we set all the labels of the protected attribute to one class and predict the labels; repeat with the remaining class (for binary variables), and compare the difference of the means of the two prediction sets, such that $|P_{A=0}(\hat{Y}|X)-P_{A=1}(\hat{Y}|X)|$. Then for DP, we segregate the dataset into datapoints with one class label and datapoints with the other label (for binary variables), and again predict the labels of each set and compare the difference of the means of the two prediction sets, such that $|P(\hat{Y}|A=0)-P(\hat{
+Y}|A=1)|$. To compare our replication against the original experiments of the authors, we compare both the absolute difference and the relative difference (as a ratio) with our findings.
+Our code and more details can be found on our Github repository\footnote{Our Github repository: \url{https://anonymous.4open.science/r/DECAF-CF0A/}}.
+
+\subsection{Computational requirements}
+
+Because the datasets used are small and tabular, the computational requirements are minimal. No GPU is necessary; all models were run on an Intel Core i7-8750h CPU. It takes six minutes to train DECAF models on the Adult dataset \citep{Dua:2019} for 50 epochs, and five seconds to generate synthetic data. The total runtime is approximately four hours for experiment 1 and approximately two hours for experiment 2.
+
+\section{Results}
+
+\begin{table}[t]\centering
+\small\addtolength{\tabcolsep}{-0.2pt}
+\caption{Reproduction results on bias removal experiment on the Adult dataset.}
+\label{tab:Adult}
+\begin{tabular}{l|ccccc}
+
+\hline
+                & \multicolumn{3}{c|}{Data Quality}      & \multicolumn{2}{c}{Fairness} \\ \cline{2-6} 
+Method          & Precision         & Recall            & \multicolumn{1}{c|}{AUROC}            & FTU               & DP \\ \hline
+Original data   & $\textbf{0.881$ \pm $0.006}$   & $0.917\pm0.009$   & \multicolumn{1}{c|}{$\textbf{0.772$\pm$0.008}$}  & $0.047\pm0.010$   & $0.207\pm0.013$ \\
+GAN             & $0.772\pm0.098$   & $0.344\pm0.249$   & \multicolumn{1}{c|}{$0.523\pm0.048$}  & $0.202\pm0.197$   & $0.202\pm0.182$ \\
+WGAN-GP         & $0.784\pm0.073$   & $0.467\pm0.195$   & \multicolumn{1}{c|}{$0.514\pm0.067$}  & $0.208\pm0.189$   & $0.231\pm0.166$ \\
+FairGAN         & $0.835\pm0.043$   & $0.911\pm0.081$   & \multicolumn{1}{c|}{$0.672\pm0.061$}  & $0.097\pm0.113$   & $0.157\pm0.155$ \\
+DECAF-ND        & $0.880\pm0.024$   & $0.774\pm0.047$   & \multicolumn{1}{c|}{$0.734\pm0.023$}  & $0.114\pm0.040$   & $0.353\pm0.023$ \\
+DECAF-FTU       & $0.866\pm0.027$   & $0.800\pm0.043$   & \multicolumn{1}{c|}{$0.708\pm0.043$}  & $0.041\pm0.020$   & $0.260\pm0.085$ \\
+DECAF-CF        & $0.769\pm0.012$   & $0.954\pm0.025$   & \multicolumn{1}{c|}{$0.541\pm0.028$}  & $0.022\pm0.018$   & $0.026\pm0.023$ \\
+DECAF-DP        & $0.753\pm0.003$   & $\textbf{0.978$\pm$0.022}$   & \multicolumn{1}{c|}{$0.502\pm0.009$}  & $\textbf{0.006$\pm$0.007}$   & $\textbf{0.012$\pm$0.009}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\small\addtolength{\tabcolsep}{-0.2pt}
+\caption{Original results of bias removal experiment on the Adult dataset.}
+\label{tab:paper_table}
+\begin{tabular}{l|ccccc}
+\hline
+                & \multicolumn{3}{c}{Data quality}                             & \multicolumn{2}{c}{Fairness} \\ \cline{2-6} 
+Method          & Precision   & Recall      & \multicolumn{1}{c|}{AUROC}       & FTU           & DP           \\ \hline
+Original data & $\textbf{0.920$\pm$0.006}$ & $\textbf{0.936$\pm$0.008}$ & \multicolumn{1}{c|}{$\textbf{0.807$\pm$0.004}$} & $0.116\pm0.028$   & $0.180\pm0.010$  \\
+GAN             & $0.607\pm0.080$ & $0.439\pm0.037$ & \multicolumn{1}{c|}{$0.567\pm0.132$} & $0.023\pm0.010$   & $0.089\pm0.008$  \\
+WGAN-GP         & $0.683\pm0.015$ & $0.914\pm0.005$ & \multicolumn{1}{c|}{$0.798\pm0.009$} & $0.120\pm0.014$   & $0.189\pm0.024$  \\
+FairGAN         & $0.681\pm0.023$ & $0.814\pm0.079$ & \multicolumn{1}{c|}{$0.766\pm0.029$} & $0.009\pm0.002$   & $0.097\pm0.018$  \\
+DECAF-ND        & $0.780\pm0.023$ & $0.920\pm0.045$ & \multicolumn{1}{c|}{$0.781\pm0.007$} & $0.152\pm0.013$   & $0.198\pm0.013$  \\
+DECAF-FTU       & $0.763\pm0.033$ & $0.925\pm0.040$ & \multicolumn{1}{c|}{$0.765\pm0.010$} & $0.004\pm0.004$   & $0.054\pm0.005$  \\
+DECAF-CF        & $0.743\pm0.022$ & $0.875\pm0.038$ & \multicolumn{1}{c|}{$0.769\pm0.004$} & $0.003\pm0.006$   & $0.039\pm0.011$  \\
+DECAF-DP        & $0.781\pm0.018$ & $0.881\pm0.050$ & \multicolumn{1}{c|}{$0.672\pm0.014$} & $\textbf{0.001$\pm$0.001}$   & $\textbf{0.001$\pm$0.001}$
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{../openreview/images/experiment_2.png}
+  \caption{Plot of precision, recall, AUROC, FTU, and DP over bias strength.}
+  \label{fig:exp2}
+\end{figure}
+
+\label{sec:results}
+
+We are able to reproduce some results in experiment 1, but we can not get similar results on the second experiment. Table \ref{tab:Adult} shows our result with synthetic data that is generated using each benchmark method, after which a separate MLP is trained on each dataset for computing the metrics, and Table.\ref{tab:paper_table} is the result from the original paper. Section \ref{sec:setup} details how we obtained the relevant metrics. We can see DECAF does have the effect of debiasing and there is improvement comparable with FairGAN. Like the original paper, DECAF-ND performs the best among all methods in terms of data quality. Methods DECAF-FTU, DECAF-CF, and DECAF-DP have relatively lower scores on data quality but perform better on fairness.
+
+Figure \ref{fig:exp2} shows DECAF results for experiment 2 in which we remove synthetically injected bias. These results do not match the Figure 3 of original paper. This mismatch is not surprising because the second experiment is based on the first experiment where we suspect our setup already significantly diverges from that of the authors.
+
+\section{Discussion}
+
+Overall, we have been able to produce the results found by the authors. That being said, there are multiple interpretations of the results and overall saliency is relatively low. For the purpose of this paper, we will focus primarily on the fairness metrics since the data utility metrics are closer to the findings of the authors and fairness is the primary goal of the method. Though the order of the fairness of various models of our results match with the original results from the paper, our numerical figures do not match the authors' results with a satisfactory level of precision. Several observations are further pursued as plausible explanations for this phenomenon. 
+
+\subsection{Interpretation of the results}
+
+As shown in Tables \ref{tab:Adult} and \ref{tab:paper_table}, we obtained interpretable results for all models tested in experiment 1. For the most part, we find effects similar to the authors, but they deviate significantly in numerical terms. More specifically, we do find that as the model variations move from least strict to most strict definition of fairness, the fairness increases and data utility decreases. However, there are notable deviations from the authors results, specifically concerning the fairness metrics of the GAN. In addition, we find that DECAF-ND increases the level of bias compared to the original dataset which matches the authors. However, we find a higher DP of 0.353 and a FTU of 0.114 compared to the authors DP of 0.198 and FTU of 0.152. These results run counter to our expectations. 
+
+The results found in the Credit dataset also show the directional correctness of DECAF in reducing bias. However, direct comparison is difficult because our results differ significantly from the authors' findings. In particular, we find the FTU and DP scores is maximized at, 0 and minimized at 1. In addition, the authors find relatively stable data utility metrics, whereas we find a significant decrease between bias 0.25 and 0.75. The results for bias 1 and 0 do reflect the average value found by the authors, with the exception of recall which is significantly lower.
+
+Furthermore, the authors did not directly interpret their chosen metrics. The original paper designated FTU and DP measures for fairness and reported figures, but does not explain the actual meaning of the numbers and magnitude of changes seen. For example, most of the reported fairness metrics are very small, but we do not have any guidance on the significance of a .001 decrease in the FTU metric. Thus, we feel the paper lacked explainability. Additionally, the fairness definitions themselves, the instructions for calculating the fairness measures, and the given FTU and DP code are somewhat contradictory. Calculating FTU and DP based on our interpretation of the authors' method does not reproduce their results. Using the FTU and DP calculations from an extra code file we received still does not produce matching results. One possibility is that the authors' final fairness metrics calculation code are not contained in the files we have access to and does not match any of the implementations we attempted. 
+
+\subsection{What was easy}
+One aspect that eased our investigation into the reproduceability of \citep{DBLP:conf/nips/BreugelKBS21} was the tabular format and small size of the datasets we used. Training and modifying the model was not computationally expensive or time consuming, thus we could test many different strategies to find the closest solution. 
+
+\subsection{What was difficult}
+
+We were originally under the impression that the DECAF code repository was fully functional as a basis for extension. Upon further examination, we found that it was not working and did not reproduce the published results. Thus, we had to pivot from extending their code to replicating the results with our own code which was challenging in itself. While attempting to reproduce the experiments, we found that the instructions given were incomplete and contradictory to the code provided.
+
+There are multiple obstacles to replicating the experiments as described, which can broadly be separated into conceptual and methodological issues. On the former, there are many important research decisions that are not fully articulated, as well as results that appear counterintuitive. For example, the authors found that their application of GAN, a method that does not do explicit debiasing, had significantly improved fairness metrics compared to the original dataset. One would expect that all the methods that do not debias, namely original data, GAN, WGAN-GP, and DECAF-ND would perform in the same order of magnitude in terms of fairness, but this is not the case in the author's initial findings. Moreover, while the DECAF models do reduce bias in line with the level of fairness required, DECAF-ND actually makes the dataset more biased compared to the original dataset. Our reproduction of GAN does match the expected results, with original data, GAN, and WGAN all returning roughly the same fairness metrics. As discussed, we successfully reproduced the overall impact of DECAF, namely higher fairness and lower data utility for more stringent definitions of fairness. However, DECAF-ND exhibits considerably higher bias than the original dataset and no clear intuition is given on why this may be the case. 
+
+In addition to the conceptual challenges, there are multiple methodological issues. Following the instructions provided by the authors results in numerous compatibility warnings and failed tests. As described in section \ref{sec:changes}, several substantial changes are needed to generate any interpretable results. Further compounding these issues, there are inconsistencies in the applied method, as the code utilized in the example explicitly deviates from the approach described in the experimental setup. We were forced to generate labels for experiment 1, while predicting labels for experiment 2. Attempts to use generated labels made experiment 2 uninterpretable, as all key performance indicators would become zero otherwise. This methodological inconsistency between experiments further problematizes the reproducibility of DECAF.
+
+\subsection{Overall reproducibilty}
+
+Due to the number of possible conceptual and methodological interpretations with the code, modifications were needed as described in section \ref{sec:changes}. While we were successful in producing results that could be interpreted, the numerical variations and methodological deviations are so substantial that further research would be needed to assess the overall accuracy of the authors claims. We found evidence that supports the narrow interpretation of the claims made by the author, namely that DECAF reduces bias in downstream models, and allows for the generation of debiased synthetic data. However, the authors claim that the approach allows for minimal data utility loss. Without a further explanation on what is considered minimal data utility loss, it is difficult to evaluate this claim, especially with amount of deviation found between the authors results and ours. While our findings on the first experiment are in line with the authors, the results of the second experiment are in direct contradiction to their findings. Since any fundamental issues in experiment 1 are likely to carry over to experiment 2 we focus our recommendations on experiment 1. 
+
+Overall, we find that the results are reproducible but difficult to interpret and compare. Fruitful avenues of further investigation would be to re-evaluate the fairness metrics. Another hypothesis is that there is a more functional issue with the DECAF model itself that would lend itself to further investigation.
+
+\subsection{Communication with original authors}
+
+We sent two emails to the authors of DECAF detailing the aforementioned code issues. One author did respond with a few extra code files, but unfortunately did not directly address our content questions. However, several of the interpretations we made were retroactively confirmed by the extra code files.
+
+\section{Conclusion}
+
+During our investigation, we faced multiple significant challenges in reproducing the results of the original paper. The biggest challenges stemmed from the number of possible interpretations of the code and method. While we were not able to reproduce the results in full, we believe methods like DECAF have great potential for extension. The relevance of unbiased downstream classifiers and the evident need for bias removal in real data will likely remain a societally relevant area of research. For instance, the Adult dataset\citep{Dua:2019} we studied is nearing 30 years old. Perhaps an intriguing next phase could be to pull this year's Census data to investigate how bias has changed over time and if DECAF is still applicable for removing likely more nuanced and hidden bias that persists through the increased awareness of bias and techniques for counteracting bias that exist today.
