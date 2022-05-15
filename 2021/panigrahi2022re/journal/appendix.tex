@@ -1,0 +1,571 @@
+\newpage
+\section{Sample Gridworld}
+
+We present a sample gridworld (Figure \ref{fig:gridworld}), a sample human agent's optimal policy (Figure \ref{fig:human_policy}), a sample robot's optimal policy (Figure \ref{fig:robot_policy}). In the gridworld, there are three different kinds of state (blue, yellow, and white, with state in green color denoting the terminal state). The bold arrows show the movements as per the optimal policy. Clearly, the robot is not aligned with the human agent. Further, we also depict the state queries (states marked with $\star$) asked by different testers as per the above human agent. Query states as per Critical States Tester in Figure \ref{fig:cst}, Set Cover Optimal Teaching Tester (SCOT Tester) in Figure \ref{fig:scot} and ARP Black Box Tester in Figure \ref{fig:arpbb}. Additionally, with the aid of arrows, we depict the corresponding (maximally informative) trajectory with the state queries for SCOT Tester.
+
+\begin{figure}[hbtp]
+     \centering
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/gridworld.png}
+         \caption{Sample gridworld}
+         \label{fig:gridworld}
+     \end{subfigure}
+    %  \hfill
+    \hspace{5mm}
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/human_policy.png}
+         \caption{Human policy}
+         \label{fig:human_policy}
+     \end{subfigure}
+    %  \hfill
+    \hspace{5mm}
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/robot_policy.png}
+         \caption{Robot policy}
+         \label{fig:robot_policy}
+     \end{subfigure}
+        \caption{Sample Gridworld and Policies}
+        \label{fig:policies}
+\end{figure}
+
+\begin{figure}[hbtp]
+     \centering
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cst_states.png}
+         \caption{Critical States Tester}
+         \label{fig:cst}
+     \end{subfigure}
+    %  \hfill
+    \hspace{5mm}
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/scott_states.png}
+         \caption{Set Cover Optimal Teaching Tester}
+         \label{fig:scot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[hbtp]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/arpbbt_states.png}
+         \caption{ARP Black Box Tester}
+         \label{fig:arpbb}
+     \end{subfigure}
+        \caption{Query states for different heuristic testers on a sample gridworld}
+        \label{fig:heuristics_states}
+\end{figure}
+
+\section{Additional Results}
+In the plots, tables, and following discussion, {\color{blue}{\texttt{rwt}}} indicates Reward Weight Queries Tester, {\color{blue}{\texttt{rt}}} indicates Reward Queries Tester, {\color{blue}{\texttt{vft}}} indicates Value Function Queries Tester, {\color{blue}{\texttt{ptt}}} indicates Preference Trajectory Queries Tester, {\color{blue}{\texttt{cst}}} indicates Critical States Tester, {\color{blue}{\texttt{scott}}} indicates SCOT Tester, and {\color{blue}{\texttt{arpbbt}}} indicates ARP Black Box Tester. Also note that, by performance metrics we refer accuracy, false positive rate, false negative rate, and number of test queries. \texttt{rwt}, \texttt{rt}, \texttt{rwt}, and \texttt{rt} are together referred to as algorithms. \texttt{cst}, \texttt{scott}, and \texttt{arpbbt} are together referred to as heuristics.
+
+\subsection{Algorithms and Heuristics}
+Table \ref{tab:diff_gwWidth_appendix} details the performance metrics for all algorithms and heuristics. We fixed the feature size at 5. The feature size (or the number of features) is equal to the dimension of state-feature $\phi$. Therefore, if $\phi: S \rightarrow \mathbb{R}^k \Rightarrow$ feature size $ = k$. 
+
+We observed that the varying width of a gridworld did not affect significantly the accuracy (Figure \ref{fig:acc_vs_gwWidth_plot_appendix_appendix}), false positive (Figure \ref{fig:fpr_vs_gwWidth_plot}), and false negative rates (Figure \ref{fig:fnr_vs_gwWidth_plot}), while the number of test queries (Figure \ref{fig:test_queries_vs_gwWidth_plot_appendix}) increased for heuristics except for \texttt{scott}, because the number of test queries for \texttt{scott} is equal to the maximum length of a trajectory (here, it is equal to 5). The accuracy for all the testers is extremely high, while the false positives and false negatives are exceedingly low, which indicates the ability of the algorithms and heuristics to identify alignment (or misalignment) between a robot and a human agent.
+
+In table \ref{tab:diff_featureSize}, we vary the feature size from 3 to 8. We fixed the gridworld width at 8. We observed no significant variation in accuracy (Figure \ref{fig:feats_acc_vs_features_plot_appendix}), false positive (Figure \ref{fig:feats_fpr_vs_features_plot}), and false negative rates (Figure \ref{fig:feats_fnr_vs_features_plot}). The trend for the number of test queries (Figure \ref{fig:feats_test_queries_vs_features_plot_appendix}) increases for \texttt{rt}, \texttt{vft}, and \texttt{arpbbt} while stays the same for \texttt{rwt} and \texttt{scott}. Unlike with different gridworld widths, the number of test queries stays similar with different feature sizes for \texttt{cst}. 
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/acc_vs_gwWidth_plot.png}
+         \caption{Accuracy}
+         \label{fig:acc_vs_gwWidth_plot_appendix_appendix}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/fpr_vs_gwWidth_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:fpr_vs_gwWidth_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/fnr_vs_gwWidth_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:fnr_vs_gwWidth_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/test_queries_vs_gwWidth_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:test_queries_vs_gwWidth_plot_appendix}
+     \end{subfigure}
+    \caption{Tester performance for different gridworld widths}
+    \label{fig:tester_perf_diff_gwWidth_appendix}
+\end{figure}
+
+\begin{table}[!ht]
+  \caption{0}
+  \label{tab:diff_gwWidth_appendix}
+  \centering
+  \begin{tabular}{cccccc}
+    \toprule
+    \textbf{Tester} & \textbf{Width}& \textbf{Accuracy} & \textbf{False} & \textbf{False} & \textbf{Number of} \\
+    & & & \textbf{positive rate} & \textbf{negative rate} & \textbf{queries} \\
+    \midrule
+      & 4 & 0.995$\pm$0.013 & 0.005$\pm$0.011 & 0.001$\pm$0.005	& 1  \\
+     & 5 & 0.997$\pm$0.008&	0.002$\pm$0.006&	0.006$\pm$0.004&	1\\
+     \textbf{\texttt{rwt}} & 6 & 0.997$\pm$0.007&	0.002$\pm$0.005&	0.001$\pm$0.005&	1\\
+     & 7 & 0.997$\pm$0.008&	0.002$\pm$0.005&	0.002$\pm$0.006&	1\\
+     & 8 & 0.999$\pm$0.004&	0.001$\pm$0.004&	0.000$\pm$0.002&	1\\
+     \midrule
+      & 4 & 0.992$\pm$0.015&	0.007$\pm$0.014&	0.001$\pm$0.004&	5\\
+     & 5 & 0.994$\pm$0.013&	0.005$\pm$0.012&	0.001$\pm$0.004&	5\\
+     \textbf{\texttt{rt}}& 6 & 0.994$\pm$0.012&	0.004$\pm$0.010&	0.002$\pm$0.007&	5\\
+     & 7 & 0.997$\pm$0.006&	0.002$\pm$0.005&	0.001$\pm$0.004&	5\\
+     & 8 & 0.998$\pm$0.005&	0.002$\pm$0.004&	0.000$\pm$0.002&	5\\ 
+     \midrule
+      & 4 & 0.990$\pm$0.019&	0.008$\pm$.017&	0.002$\pm$0.007&	25\\
+     & 5 & 0.996$\pm$0.008&	0.003$\pm$.007&	0.001$\pm$0.004&	25\\
+     \textbf{\texttt{vft}}& 6 & 0.995$\pm$0.011&	0.003$\pm$.007&	0.003$\pm$0.009&	25\\
+     & 7 & 0.995$\pm$0.021&	0.004$\pm$.017&	0.002$\pm$0.007&	25\\
+     & 8 & 0.998$\pm$0.005&	0.001$\pm$.005&	0.001$\pm$0.002&	25\\
+     \midrule
+      & 4 & 0.956$\pm$0.041&	0.013$\pm$0.028&	0.031$\pm$0.034&	4\\
+     & 5 & 0.969$\pm$0.035&	0.010$\pm$0.026&	0.021$\pm$0.027&	5\\
+     \textbf{\texttt{ptt}}& 6 & 0.970$\pm$0.039&	0.018$\pm$0.039&	0.011$\pm$0.019&	10\\
+     & 7 & 0.971$\pm$0.040&	0.023$\pm$0.041&	0.005$\pm$0.012&	8\\
+     & 8 & 0.957$\pm$0.054&	0.040$\pm$0.055&	0.003$\pm$0.006&	4\\
+     \midrule
+      & 4 & 0.973$\pm$	0.043&	0.000$\pm$0.000&	0.027$\pm$0.043&	13\\
+     & 5 & 0.978$\pm$0.048&	0.000$\pm$0.000&	0.022$\pm$0.048&	16\\
+     \textbf{\texttt{cst}}& 6 & 0.987$\pm$0.018&	0.000$\pm$0.000&	0.013$\pm$0.018&	24\\
+     & 7 & 0.980$\pm$0.100&	0.010$\pm$0.099&	0.009$\pm$0.019&	26\\
+     & 8 & 0.996$\pm$0.007&	0.000$\pm$0.001&	0.004$\pm$0.007&	29\\
+     \midrule
+      & 4 & 0.960$\pm$0.041&	0.002$\pm$0.005&	0.040$\pm$0.041&	5\\
+     & 5 & 0.979$\pm$0.024&	0.002$\pm$0.005&	0.019$\pm$0.023&	5\\
+     \textbf{\texttt{scott}}& 6 & 0.988$\pm$0.017&	0.001$\pm$0.004&	0.010$\pm$0.017&	5\\
+     & 7 & 0.993$\pm$0.010&	0.002$\pm$0.005&	0.005$\pm$0.009&	5\\
+     & 8 & 0.994$\pm$0.010&	0.002$\pm$0.005&	0.004$\pm$0.008&	5\\
+     \midrule
+      & 4 & 0.985$\pm$0.036&	0.015$\pm$0.036&	0.000$\pm$0.000&	7 \\
+     & 5 & 0.987$\pm$0.040&	0.013$\pm$0.040&	0.000$\pm$0.000&	6\\
+     \textbf{\texttt{arpbbt}}& 6 & 0.991$\pm$0.027&	0.009$\pm$0.027&	0.000$\pm$0.000&	7\\
+     & 7 & 0.996$\pm$0.016&	0.004$\pm$0.016&	0.000$\pm$0.000&	5\\
+     & 8 & 0.994$\pm$0.022&	0.006$\pm$0.022&	0.000$\pm$0.000&	9\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/feats_acc_vs_features_plot.png}
+         \caption{Accuracy}
+         \label{fig:feats_acc_vs_features_plot_appendix}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/feats_fpr_vs_features_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:feats_fpr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/feats_fnr_vs_features_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:feats_fnr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/feats_test_queries_vs_features_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:feats_test_queries_vs_features_plot_appendix}
+     \end{subfigure}
+    \caption{Tester performance for different number of features}
+    \label{fig:tester_perf_diff_feats_appendix}
+\end{figure}
+
+\begin{table}[!ht]
+    \caption{Different testers versus features sizes}
+
+  \label{tab:diff_featureSize}
+  \centering
+  \begin{tabular}{cccccc}
+  \\
+    \toprule
+    \textbf{Tester}& \textbf{Feature}& \textbf{Accuracy} & \textbf{False} & \textbf{False} & \textbf{Number of} \\
+    & \textbf{size}& & \textbf{positive rate} & \textbf{negative rate} & \textbf{queries} \\
+    \midrule
+     & 3 & 0.951$\pm$0.051&	0.037$\pm$0.045&	0.012$\pm$0.034&	1\\
+     & 4 & 0.991$\pm$0.015&	0.006$\pm$0.013&	0.003$\pm$0.007&	1\\
+     \textbf{\texttt{rwt}}& 5 & 0.999$\pm$0.004&	0.001$\pm$0.004&	0.000$\pm$0.002&	1\\
+     & 6 & 0.999$\pm$0.006&	0.000$\pm$0.002&	0.001$\pm$0.005&	1\\
+     & 7 & 1.000$\pm$0.001&	0.000$\pm$0.000&	0.000$\pm$0.001&	1\\
+     & 8 & 1.000$\pm$0.002&	0.000$\pm$0.001&	0.000$\pm$0.001&	1\\
+     \midrule
+     & 3 & 0.945$\pm$0.065&	0.040$\pm$0.056&	0.015$\pm$0.04&	3\\
+     & 4 & 0.989$\pm$0.017&	0.008$\pm$0.013&	0.003$\pm$0.010&	4\\
+     \textbf{\texttt{rt}}& 5 & 0.998$\pm$0.005&	0.002$\pm$0.004&	0.000$\pm$0.002&	5\\
+     & 6 & 0.998$\pm$0.007&	0.001$\pm$0.003&	0.001$\pm$0.006&	6\\
+     & 7 & 1.000$\pm$0.002&	0.000$\pm$0.001&	0.000$\pm$0.002&	7\\
+     & 8 & 1.000$\pm$0.004&	0.000$\pm$0.004&	0.000$\pm$0.000&	8\\
+     \midrule
+     & 3 & 0.940$\pm$0.069&	0.050$\pm$0.068&	0.010$\pm$0.030&	15\\
+     & 4 & 0.989$\pm$0.018&	0.006$\pm$0.012&	0.004$\pm$0.014&	20\\
+     \textbf{\texttt{vft}}& 5 & 0.998$\pm$0.005&	0.001$\pm$0.005&	0.001$\pm$0.002&	25\\
+     & 6 & 0.999$\pm$0.004&	0.000$\pm$0.002&	0.001$\pm$0.004&	30\\
+     & 7 & 1.000$\pm$0.002&	0.000$\pm$0.002&	0.000$\pm$0.001&	35\\
+     & 8 & 1.000$\pm$0.001&	0.000$\pm$0.001&	0.000$\pm$0.001&	40\\
+     \midrule
+     & 3 & 0.809$\pm$0.094&	0.091$\pm$0.109&	0.101$\pm$0.080&	3\\
+     & 4 & 0.923$\pm$0.075&	0.055$\pm$0.073&	0.022$\pm$0.040&	3\\
+     \textbf{\texttt{ptt}}& 5 & 0.957$\pm$0.054&	0.040$\pm$0.055&	0.003$\pm$0.006&	4\\
+     & 6 & 0.972$\pm$0.042&	0.027$\pm$0.042&	0.001$\pm$0.004&	12\\
+     & 7 & 0.986$\pm$0.030&	0.014$\pm$0.030&	0.000$\pm$0.001&	5\\
+     & 8 & 0.995$\pm$0.012&	0.005$\pm$0.012&	0.000$\pm$0.002&	8\\
+     \midrule
+     & 3 & 0.876$\pm$0.097&	0.000$\pm$0.002&	0.124$\pm$0.097&	31\\
+     & 4 & 0.970$\pm$0.101&	0.010$\pm$0.099&	0.020$\pm$0.025&	32\\
+     \textbf{\texttt{cst}}& 5 & 0.996$\pm$0.007&	0.000$\pm$0.001&	0.004$\pm$0.007&	29\\
+     & 6 & 0.997$\pm$0.008&	0.000$\pm$0.000&	0.003$\pm$0.008&	18\\
+     & 7 & 0.999$\pm$0.002&	0.000$\pm$0.000&	0.001$\pm$0.002&	28\\
+     & 8 & 1.000$\pm$0.001&	0.000$\pm$0.000&	0.000$\pm$0.001&	28\\
+     \midrule
+     & 3 & 0.883$\pm$0.090&	0.006$\pm$0.011&	0.112$\pm$0.089&	5\\
+     & 4 & 0.979$\pm$0.029&	0.004$\pm$0.008&	0.018$\pm$0.029&	5\\
+     \textbf{\texttt{scott}}& 5 & 0.994$\pm$0.010&	0.002$\pm$0.005&	0.004$\pm$0.008&	5\\
+     & 6 & 0.998$\pm$0.005&	0.001$\pm$0.003&	0.001$\pm$0.004&	5\\
+     & 7 & 0.998$\pm$0.004&	0.001$\pm$0.003&	0.001$\pm$0.003&	5\\
+     & 8 & 0.999$\pm$0.003&	0.001$\pm$0.002&	0.000$\pm$0.001&	5\\
+     \midrule
+     & 3 & 0.912$\pm$0.110&	0.088$\pm$0.110&	0.000$\pm$0.000&	3\\
+     & 4 & 0.973$\pm$0.063&	0.027$\pm$0.063&	0.000$\pm$0.000&	4\\
+     \textbf{\texttt{arpbbt}}& 5 & 0.994$\pm$0.022&	0.006$\pm$0.022&	0.000$\pm$0.000&	9\\
+     & 6 & 0.998$\pm$0.008&	0.002$\pm$0.008&	0.000$\pm$0.000&	13\\
+     & 7 & 0.999$\pm$0.003&	0.001$\pm$0.003&	0.000$\pm$0.000&	14\\
+     & 8 & 1.000$\pm$0.001&	0.000$\pm$0.001&	0.000$\pm$0.000&	17\\
+     \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+
+
+\subsection{Diagonal Actions}
+Table \ref{tab:diag_exp} details the performance metrics for \texttt{rwt} and all heuristics in a gridworld with diagonal movements allowed. Again, since we varied the width of a gridworld, we fixed the feature size at 5. We did not perform additional experiments with \texttt{rt}, \texttt{vft}, and \texttt{ptt}, since they are reducible to \texttt{rwt}. We concluded there is no observable difference from the results in gridworlds without the diagonal movements, i.e., the accuracy (Figure \ref{fig:diag_acc_vs_gwWidth_plot}) is extremely high, and the false positive (Figure \ref{fig:diag_fpr_vs_gwWidth_plot}), and false negative rates (Figure \ref{fig:diag_fnr_vs_gwWidth_plot}) are significantly low. Additionally, the number of test queries (Figure \ref{fig:diag_test_queries_vs_gwWidth_plot}) increases for \texttt{cst} with an increase in the width of a gridworld.
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/diag_acc_vs_gwWidth_plot.png}
+         \caption{Accuracy}
+         \label{fig:diag_acc_vs_gwWidth_plot}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/diag_fpr_vs_gwWidth_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:diag_fpr_vs_gwWidth_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/diag_fnr_vs_gwWidth_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:diag_fnr_vs_gwWidth_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/diag_test_queries_vs_gwWidth_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:diag_test_queries_vs_gwWidth_plot}
+     \end{subfigure}
+    \caption{Tester performance for different gridworld widths with an extended action space}
+    \label{fig:diag_experiments_appendix}
+\end{figure}
+
+
+\begin{table}[!ht]
+    
+    \caption{Different testers versus gridworld widths with extended action space}
+  \label{tab:diag_exp}
+  \centering
+  \begin{tabular}{cccccc}
+  \\
+    \toprule
+    \textbf{Tester}& \textbf{Width}& \textbf{Accuracy} & \textbf{False} & \textbf{False} & \textbf{Number of} \\
+    & & \& \textbf{positive rate} & \textbf{negative rate} & \textbf{queries} \\
+    \midrule
+     & 4 & 0.992$\pm$0.017&	0.006$\pm$0.015&	0.003$\pm$0.010&	1\\
+     & 5 & 0.994$\pm$0.013&	0.004$\pm$0.009&	0.002$\pm$0.007&	1\\
+     \textbf{\texttt{rwt}}& 6 & 0.994$\pm$0.013&	0.005$\pm$0.011&	0.001$\pm$0.004&	1\\
+     & 7 & 0.997$\pm$0.008&	0.002$\pm$0.006&	0.001$\pm$0.003&	1\\
+     & 8 & 0.996$\pm$0.008&	0.002$\pm$0.005&	0.002$\pm$0.005&	1\\
+     \midrule
+     & 4 & 0.945$\pm$0.055&	0.000$\pm$0.001&	0.055$\pm$0.055&	9\\
+     & 5 & 0.975$\pm$0.039&	0.000$\pm$0.000&	0.026$\pm$0.039&	14\\
+     \textbf{\texttt{cst}}& 6 & 0.984$\pm$0.017&	0.000$\pm$0.001&	0.016$\pm$0.017&	12\\
+     & 7 & 0.987$\pm$0.022&	0.000$\pm$0.000&	0.013$\pm$0.022&	21\\
+     & 8 & 0.992$\pm$0.011&	0.000$\pm$0.000&	0.008$\pm$0.011&	21\\
+     \midrule
+      & 4 & 0.945$\pm$0.049&	0.002$\pm$0.005&	0.054$\pm$0.049&	5\\
+     & 5 & 0.969$\pm$0.036&	0.003$\pm$0.009&	0.029$\pm$0.034&	5\\
+     \textbf{\texttt{scott}}& 6 & 0.983$\pm$0.023&	0.001$\pm$0.004&	0.016$\pm$0.023&	5\\
+     & 7 & 0.988$\pm$0.023&	0.001$\pm$0.003&	0.011$\pm$0.022&	5\\
+     & 8 & 0.989$\pm$0.017&	0.002$\pm$0.005&	0.010$\pm$0.017&	5\\
+     \midrule
+      & 4 & 0.974$\pm$0.068&	0.026$\pm$0.068&	0.000$\pm$0.000&	5\\
+     & 5 & 0.984$\pm$0.059&	0.016$\pm$0.059&	0.000$\pm$0.000&	6\\
+     \textbf{\texttt{arpbbt}}& 6 & 0.991$\pm$0.039&	0.009$\pm$0.039&	0.000$\pm$0.000&	8\\
+     & 7 & 0.993$\pm$0.029&	0.007$\pm$0.029&	0.000$\pm$0.000&	5\\
+     & 8 & 0.992$\pm$0.037&	0.008$\pm$0.037&	0.000$\pm$0.000&	6\\
+\bottomrule
+    \end{tabular}
+\end{table}
+
+
+\subsection{Non-linear reward and state-feature relationship}
+Table \ref{tab:nonlinear_reward} details the performance metrics for \texttt{rwt} and \texttt{cst} in gridworlds of different widths and non-linear relationship between reward and state-feature. The corresponding plot can be found in Figure \ref{fig:cubic_experiments} for \textit{cubic} and Figure \ref{fig:exp_experiments} for \textit{exponential} relationship. These plots and tables contain all the gridworld widths ranging from 4 to 8 (naturally, the feature size is fixed at 5), which are not present in the Results section of the paper. Note that, in \textit{cubic} we approximate the \textit{linear} relationship only when $w^{T}\phi(s) \approx 0$ while \textit{exponential} completely ignores the \textit{linear} relationship. We observed that since the accuracy is high for \textit{cubic} and low for \textit{exponential} relationships, the false positive rates are low and high respectively.
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cubic_acc_vs_gwWidth_plot.png}
+         \caption{Accuracy}
+         \label{fig:cubic_acc_vs_features_plot_appendix}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cubic_fpr_vs_gwWidth_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:cubic_fpr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cubic_fnr_vs_gwWidth_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:cubic_fnr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cubic_test_queries_vs_gwWidth_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:cubic_test_queries_vs_features_plot}
+     \end{subfigure}
+    \caption{Tester performance for cubic reward - state features relationship}
+    \label{fig:cubic_experiments}
+\end{figure}
+
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/exp_acc_vs_gwWidth_plot.png}
+         \caption{Accuracy}
+         \label{fig:exp_acc_vs_features_plot_appendix_appendix}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/exp_fpr_vs_gwWidth_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:exp_fpr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/exp_fnr_vs_gwWidth_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:exp_fnr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/exp_test_queries_vs_gwWidth_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:exp_test_queries_vs_features_plot}
+     \end{subfigure}
+    \caption{Tester performance for exponential reward - state features relationship}
+    \label{fig:exp_experiments}
+\end{figure}
+
+\begin{table}[!ht]
+    
+    \caption{Different testers versus gridworld widths with non-linear reward state-feature relationships}
+  \label{tab:nonlinear_reward}
+  \centering
+  \begin{tabular}{cccccc}
+  \\
+    \toprule
+    \textbf{Tester}& \textbf{Width}& \textbf{Accuracy} & \textbf{False} & \textbf{False} & \textbf{Number of} \\
+    & & & \textbf{positive rate} & \textbf{negative rate} & \textbf{queries} \\
+    \midrule
+     & 4 & 0.993$\pm$0.013&	0.004$\pm$0.007&	0.003$\pm$0.011&	1\\
+      & 5 & 0.995$\pm$0.011&	0.004$\pm$0.009&	0.001$\pm$0.005&	1\\
+     \textbf{\texttt{rwt}}& 6 & 0.995$\pm$0.008&	0.003$\pm$0.006&	0.002$\pm$0.005&	1\\
+     (cubic)& 7 & 0.995$\pm$0.008&	0.003$\pm$0.006&	0.002$\pm$0.005&	1\\
+     & 8 & 0.997$\pm$0.006&	0.001$\pm$0.005&	0.001$\pm$0.004&	1\\
+     \midrule
+      & 4 & 0.048$\pm$0.052&	0.953$\pm$0.052&	0.000$\pm$0.000&	1\\
+      & 5 & 0.027$\pm$0.037&	0.973$\pm$0.037&	0.000$\pm$0.000&	1\\
+     \textbf{\texttt{rwt}}& 6 & 0.017$\pm$0.021&	0.983$\pm$0.021&	0.000$\pm$0.000&	1\\
+     (exponential)& 7 & 0.012$\pm$	0.019&	0.988$\pm$0.019&	0.000$\pm$0.000&	1\\
+     & 8 & 0.006$\pm$0.012&	0.994$\pm$0.012&	0.000$\pm$0.000&	1\\
+     \midrule
+      & 4 & 0.968$\pm$0.040&	0.000$\pm$0.000&	0.032$\pm$0.040&	16\\
+      & 5 & 0.977$\pm$0.031&	0.000$\pm$0.000&	0.023$\pm$0.031&	20\\
+     \textbf{\texttt{cst}}& 6 & 0.991$\pm$0.015&	0.000$\pm$0.000&	0.010$\pm$0.015&	24\\
+     (cubic)& 7 & 0.988$\pm$0.019&	0.000$\pm$0.000&	0.012$\pm$0.019&	28\\
+     & 8 & 0.995$\pm$0.010&	0.000$\pm$0.000&	0.005$\pm$0.010&	32\\
+     \midrule
+      & 4 & 0.947$\pm$0.051&	0.000$\pm$0.001&	0.053$\pm$0.051&	16\\
+      & 5 & 0.976$\pm$0.023&	0.000$\pm$0.001&	0.024$\pm$0.023&	20\\
+     \textbf{\texttt{cst}}& 6 & 0.984$\pm$0.022&	0.000$\pm$0.001&	0.016$\pm$0.022&	16\\
+     (exponential)& 7 & 0.985$\pm$0.027&	0.000$\pm$0.001&	0.015$\pm$0.027&	28\\
+     & 8 & 0.983$\pm$0.099&	0.010$\pm$0.099&	0.007$\pm$0.010&	31\\
+\bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+\subsection{Critical States Tester with different thresholds}
+Table \ref{tab:cst_thresholds_appendix} details the performance metrics for \texttt{cst} in different gridworld widths and different threshold values (0.0001, 0.2, and 0.8). As noted earlier, we observed that the number of queries decreases with strict threshold values such as 0.8, which results in reduced verification abilities. The corresponding plots for performance metrics are present in Figure \ref{fig:cst_threshold_experiments}.
+
+\begin{figure}[!ht]
+     \centering
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cst_thresh_acc_vs_gwWidth_plot.png}
+         \caption{Accuracy}
+         \label{fig:cst_threshold_acc_vs_features_plot}
+     \end{subfigure}
+    \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cst_thresh_fpr_vs_gwWidth_plot.png}
+         \caption{False Positive Rate}
+         \label{fig:cst_threshold_fpr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+     \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cst_thresh_fnr_vs_gwWidth_plot.png}
+         \caption{False Negative Rate}
+         \label{fig:cst_threshold_fnr_vs_features_plot}
+     \end{subfigure}
+     \hspace{5mm}
+    \begin{subfigure}[!ht]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{./images/cst_thresh_test_queries_vs_gwWidth_plot.png}
+         \caption{Number of Test Queries}
+         \label{fig:cst_threshold_test_queries_vs_features_plot}
+     \end{subfigure}
+    \caption{Critical states tester with different thresholds}
+    \label{fig:cst_threshold_experiments}
+\end{figure}
+
+
+\begin{table}[!ht]
+    
+    \caption{Critical states tester with different thresholds}
+  \label{tab:cst_thresholds_appendix}
+  \centering
+  \begin{tabular}{cccccc}
+  \\
+    \toprule
+    \textbf{Tester}& \textbf{Width}& \textbf{Accuracy} & \textbf{False} & \textbf{False} & \textbf{Number of} \\
+    & & & \textbf{positive rate} & \textbf{negative rate} & \textbf{queries} \\
+    \midrule
+    & 4 & 0.971$\pm$0.036&	0.000$\pm$0.000&0.029$\pm$0.036&16\\
+    \textbf{\texttt{cst}}& 5 & 0.985$\pm$0.023&0.000$\pm$0.000&0.015$\pm$0.023&20\\
+    (threshold & 6 & 0.987$\pm$0.018&0.000$\pm$0.000&0.013$\pm$0.018&24\\
+    = 0.0001)& 7 & 0.992$\pm$0.016&	0.000$\pm$0.000&0.008$\pm$0.016&28\\
+    & 8 & 0.997$\pm$0.007&	0.000$\pm$0.000&0.003$\pm$0.007&32\\
+    \midrule
+    & 4 & 0.973$\pm$0.043&0.000$\pm$0.000&0.027$\pm$0.043&13\\
+    \textbf{\texttt{cst}} & 5 & 0.978$\pm$0.048&0.000$\pm$0.000&0.022$\pm$0.048&16\\
+    (threshold& 6 & 0.987$\pm$0.018&0.000$\pm$0.000&0.013$\pm$0.018&24\\
+    = 0.2)& 7 & 0.980$\pm$0.100&0.010$\pm$0.099&0.009$\pm$0.019&26\\
+    & 8 & 0.996$\pm$0.007&	0.000$\pm$0.001&0.004$\pm$0.007&29\\
+    \midrule
+    & 4 & 0.616$\pm$0.447&0.362$\pm$0.463&0.022$\pm$0.032&1\\
+    \textbf{\texttt{cst}}& 5 & 0.557$\pm$0.469&0.426$\pm$0.483&0.017$\pm$0.031&4\\
+    (threshold& 6 & 0.563$\pm$0.482&0.431$\pm$0.488&0.007$\pm$0.013&4\\
+    = 0.8)& 7 & 0.575$\pm$0.485&0.421$\pm$0.488&0.004$\pm$0.009&0\\
+    & 8 & 0.644$\pm$0.468&	0.354$\pm$0.470&0.003$\pm$0.008&3\\
+
+\bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Time profile for algorithms and heuristics}
+Table \ref{tab:time_profile} details the time taken by all algorithms and heuristics to verify 100 different robots for a single human agent. We observed that due to the complexity of Set Cover Optimal Teaching Heuristic, \texttt{scott} takes the maximum time to complete the verification while \texttt{rwt} takes minimum time. Also, as expected, with the increase in the width of a gridworld, the time taken to verify increases. For most of the algorithms and heuristics, the time taken increases 2X when width of a gridworld increases from 4 to 8 while for \texttt{scott}, the time taken increases by at least 3X.
+
+\begin{table}[!ht]
+    
+    \caption{Different testers versus time taken}
+  \label{tab:time_profile}
+  \centering
+  \begin{tabular}{cccccc}
+  \\
+    \toprule
+    \textbf{Tester} & \textbf{Width} & \textbf{Time (in sec)} \\
+    \midrule
+    & 4 & 15.980\\
+    & 5 & 21.966\\
+    \textbf{\texttt{rwt}}& 6 & 30.335\\
+    & 7 & 31.186\\
+    & 8 & 35.093\\
+    \midrule
+    & 4 & 34.399\\
+    & 5 & 53.089\\
+    \textbf{\texttt{rt}}& 6 & 54.039\\
+    & 7 & 66.959\\
+    & 8 & 73.450\\
+    \midrule
+    & 4 & 39.110\\
+    & 5 & 55.968\\
+    \textbf{\texttt{vft}}& 6 & 41.702\\
+    & 7 & 69.879\\
+    & 8 & 70.993\\
+    \midrule
+    & 4 & 21.164\\
+    & 5 & 23.315\\
+    \textbf{\texttt{ptt}}& 6 & 29.121\\
+    & 7 & 33.048\\
+    & 8 & 40.644\\
+    \midrule
+    & 4 & 18.714\\
+    & 5 & 24.487\\
+    \textbf{\texttt{cst}}& 6 & 30.871\\
+    & 7 & 32.206\\
+    & 8 & 36.563\\
+    \midrule
+    & 4 & 95.301\\
+    & 5 & 143.555\\
+    \textbf{\texttt{scott}}& 6 & 195.014\\
+    & 7 & 257.184\\
+    & 8 & 322.146\\
+    \midrule
+    & 4 & 20.763\\
+    & 5 & 25.800\\
+    \textbf{\texttt{arpbbt}}& 6 & 28.041\\
+    & 7 & 34.407\\
+    & 8 & 38.532\\
+\bottomrule
+    \end{tabular}
+\end{table}
+
