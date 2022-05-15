@@ -1,0 +1,177 @@
+\newpage
+\appendix
+\section{Appendix}
+\setcounter{figure}{0}
+\renewcommand\thefigure{\thesection.\arabic{figure}}
+\renewcommand\thetable{\thesection.\arabic{table}}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale = 0.5]{../openreview/images/fig_1.pdf}
+  \caption{\label{fig:repro_fig1} Replication of Fig. 1 from the original paper, illustrating basic statistics of the gathered seeds.}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Comparing corpora summary statistics after preprocessing (original paper statistics obtained from Table 2). \label{tab:tab_2_repl}\newline}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+\textbf{Dataset} &
+  \multicolumn{2}{l}{\textbf{\begin{tabular}[c]{@{}l@{}}Total\\ Documents\end{tabular}}} &
+  \multicolumn{2}{l}{\textbf{Total Words}} &
+  \multicolumn{2}{l}{\textbf{Vocabulary Size}} &
+  \multicolumn{2}{l}{\textbf{\begin{tabular}[c]{@{}l@{}}Mean Document\\ Length\end{tabular}}} \\ \midrule
+\textbf{}                      & \textbf{original} & \textbf{ours} & \textbf{original} & \textbf{ours} & \textbf{original} & \textbf{ours} & \textbf{original} & \textbf{ours} \\
+\textbf{NYT} & 8,888 & 8,888 & 7,244,457 & 7,217,851 & 162,998 & 109,713 & 815 & 812 \\
+\textbf{WikiText} & 28,472 & 28,472 & 99,197,146 & 87,077,718 & 546,828 & 228,318 & 3,484 & 3,058 \\
+\textbf{Goodreads (Romance)} & 197,000 & 194,500 & 24,856,924 & 24,695,141 & 214,572 & 249,114 & 126 & 127 \\
+\textbf{Goodreads (History/Biog)} & 136,000 & 135,000 & 14,324,947 & 14,168,742 & 163,171 & 193,012 & 105 & 105 \\ 
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[ht]
+\caption{\label{tab:coherence} Replication of Table 4 from the original paper. Seeds that are more
+semantically similar have lower coherence scores. We use the WEAT metric (the difference between the
+mean vectors of the seed sets) to generate the subspace and the NYT dataset embeddings for this
+data. We average coherence scores across the $n$ models (out of $20$) that contain the paired seed
+sets and round to 3 decimal places. Unfortunately, while we tried to limit generated sets to only
+common nouns, proper nouns and, more rarely, verbs appeared in the sets due to issues with the spaCy
+POS tagger.\newline}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrl}
+\toprule
+\textbf{Coherence} & \textbf{Generated Set A} & \textbf{Generated Set B} \\
+\midrule
+1.000 & know, believe, think, guess, mean & governor, mayor, legislature, senator, democrat \\
+1.000 & foot-8, foot-7, foot-3, foot-5, to-4 & rousteing, atkins, cornejo, ehrenreich, yorke \\
+0.999 & associate, assistant, economist, engineer, accountant & heels, shoes, pants, legs, fingers \\
+... & ... & ... \\
+0.062 & hertl, agnieszka, goran, brouwer, koivu & bases, wings, outs, scoreless, rockies \\
+0.059 & molina, glasser, pitney, darren, mackenzie & carver, mina, boyce, curator, deputy \\
+0.053 & lime, juice, lemon, potato, garlic & combo, bodysuit, raisin, koji, mango \\
+\\
+\textbf{Coherence} & \textbf{Gathered Set A} & \textbf{Gathered Set B} \\
+\midrule
+0.999 &  CAREER: executive, management, professio... &  FAMILY: home, parents, children, famil... \\
+0.968 &  MALE: brother, father, uncle, grandfat... &  FEMALE: sister, mother, aunt, grandmot... \\
+0.942 &  TERRORISM: terror, terrorism, violence,... &  OCCUPATIONS: banker, carpenter, doctor,... \\
+... & ... & ... \\
+0.093 &  MALE NAMES: john, paul, mike, kevin, ... &  FEMALE NAMES: amy, joan, lisa, sarah,... \\
+0.053 &  NAMES BLACK: harris, robinson, howard, ... &  NAMES WHITE: harris, nelson, robinson, ... \\
+0.026 &  NAMES ASIAN: cho, wong, tang, huang, ... &  NAMES CHINESE: chung, liu, wong, huang... \\
+% \\ 
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \caption{Computing power needed for each action in the replication process.}
+    \begin{tabular}{c|c|c}
+      Action & Time (s) & RAM (MB) \\ 
+      \hline
+      Downloading the data & 293 & 427 \\
+      Preprocessing the data & 3054 & 19018 \\
+      Training all models & 7806 & 21054 \\
+      Table \ref{tab:tab_2_repl} & 4274 & 661 \\
+      Fig. \ref{fig:repro_4} & 22 & 4363 \\
+      Fig. \ref{fig:repro_3} & 19 & 4370 \\
+      Fig. \ref{fig:repro_2} & 4 & 1510 \\
+      Fig. \ref{fig:repro_5} & 500 & 1610 \\
+    \end{tabular}
+    \label{tab:compute}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.8]{../openreview/images/fig_4_3.pdf}
+    \caption{Extension on Fig. 4 from the original paper. Ranks words from the NYT corpus by cosine
+    similarity against different bias subspaces (2nd principal component), with NYT frequency
+  threshold 100. }
+     \label{fig:repro_4_3}
+\end{figure}
+
+\begin{longtable}[ht]{p{0.1\linewidth}p{0.3\linewidth}p{0.6\linewidth}}
+\caption{Seeds used in various Figures\label{tab:seeds}}\\
+\toprule
+Figures &
+  Seed ID &
+  Seeds \\ \midrule
+\multirow{6}{*}{Fig. \ref{fig:repro_2}} &
+  female-Kozlowski\_et\_al\_2019 &
+  {[}``woman", ``women", ``she", ``her", ``her", ``hers", ``girl", ``girls", ``female", ``feminine"{]} \\
+ &
+  female\_1-Caliskan\_et\_al\_2017 &
+  {[}``sister", ``female", ``woman", ``girl", ``daughter", ``she", ``hers", ``her"{]} \\
+ &
+  definitional\_female-Bolukbasi\_et\_al\_2016 &
+  {[}``woman", ``girl", ``she", ``mother", ``daughter", ``gal", ``female", ``her", ``herself", ``mary"{]} \\
+ &
+  female\_singular-Hoyle\_et\_al\_2019 &
+  {[}``woman", ``girl", ``mother", ``daughter", ``sister", ``wife", ``aunt", ``niece", ``empress", ``queen", ``princess", ``duchess", ``lady", ``dame", ``waitress", ``actress", ``goddess", ``policewoman", ``postwoman", ``heroine", ``witch", ``stewardess", ``she"{]} \\
+ &
+  female\_definition\_words\_2-Zhao\_et\_al\_2018 &
+  {[}``lady", ``saleswoman", ``noblewoman", ``hostess", ``coquette", ``nun", ``heroine", ``actress", ``chairwoman", ``businesswoman", ``spokeswoman", ``waitress", ``councilwoman", ``stateswoman", ``policewoman", ``countrywomen", ``horsewoman", ``headmistress", ``governess", ``widow", ``witch", ``fiancee"{]} \\
+ &
+  female\_stereotype\_words-Zhao\_et\_al\_2018 &
+  {[}``baker", ``counselor", ``nanny", ``librarians", ``socialite", ``assistant", ``tailor", ``dancer", ``hairdresser", ``cashier", ``secretary", ``clerk", ``stenographer", ``optometrist", ``housekeeper", ``bookkeeper", ``homemaker", ``nurse", ``stylist", ``receptionist"{]} \\ \midrule
+\multirow{12}{*}{Fig. \ref{fig:repro_3}} &
+  definitional\_female-Bolukbasi\_et\_al\_2016 &
+  {[}``woman", ``girl", ``she", ``mother", ``daughter", ``gal", ``female", ``her", ``herself", ``mary"{]} \\
+ &
+  definitional\_male-Bolukbasi\_et\_al\_2016 &
+  {[}``man", ``boy", ``he", ``father", ``son", ``guy", ``male", ``his", ``himself", ``john"{]} \\
+ &
+  definitional\_female-Bolukbasi\_et\_al\_2016 shuffled &
+  {[}"herself", "woman", "daughter", "mary", "her", "girl", "mother", "she", "female", "gal"{]} \\
+ &
+  definitional\_male-Bolukbasi\_et\_al\_2016 shuffled &
+  {[} "man", "his", "he", "son", "guy", "himself", "father", "boy", "male", "john"{]} \\
+ &
+  upperclass-Kozlowski\_et\_al\_2019 &
+  {[}``rich", ``richer", ``richest", ``affluence", ``affluent", ``expensive", ``luxury", ``opulent"{]} \\
+ &
+  lowerclass-Kozlowski\_et\_al\_2019 &
+  {[}``poor", ``poorer", ``poorest", ``poverty", ``impoverished", ``inexpensive", ``cheap", ``needy"{]} \\
+ &
+  upperclass-Kozlowski\_et\_al\_2019 shuffled &
+  {[}"richer", "opulent", "luxury", "affluent", "rich", "affluence", "richest", "expensive" {]} \\
+ &
+  lowerclass-Kozlowski\_et\_al\_2019 shuffled &
+  {[} "poorer", "impoverished", "poorest", "cheap", "needy", "poverty", "inexpensive", "poor"{]} \\
+ &
+  names\_chinese-Garg\_et\_al\_2018 &
+  {[}``chung", ``liu", ``wong", ``huang", ``ng", ``hu", ``chu", ``chen", ``lin", ``liang", ``wang", ``wu", ``yang", ``tang", ``chang", ``hong", ``li"{]} \\
+ &
+  names\_hispanic-Garg\_et\_al\_2018 &
+  {[}``ruiz", ``alvarez", ``vargas", ``castillo", ``gomez", ``soto", ``gonzalez", ``sanchez", ``rivera", ``mendoza", ``martinez", ``torres", ``rodriguez", ``perez", ``lopez", ``medina", ``diaz", ``garcia", ``castro", ``cruz"{]} \\
+ &
+  names\_chinese-Garg\_et\_al\_2018 shuffled &
+  {[}"tang", "chang", "chu", "yang", "wu","hong", "huang", "wong", "hu", "liu", "lin", "chen", "liang", "chung", "li", "ng", "wang"{]} \\
+ &
+  names\_hispanic-Garg\_et\_al\_2018 shuffled &
+  {[}"ruiz", "rodriguez", "diaz", "perez", "lopez", "vargas", "alvarez", "garcia","cruz", "torres", "gonzalez", "soto", "martinez", "medina", "rivera", "castillo", "castro", "mendoza", "sanchez", "gomez"{]} \\ \midrule
+\multirow{6}{*}{Fig. \ref{fig:repro_4}} &
+  definitional\_female-Bolukbasi\_et\_al\_2016 &
+  {[}``woman", ``girl", ``she", ``mother", ``daughter", ``gal", ``female", ``her", ``herself", ``mary"{]} \\
+ &
+  definitional\_male-Bolukbasi\_et\_al\_2016 &
+  {[}``man", ``boy", ``he", ``father", ``son", ``guy", ``male", ``his", ``himself", ``john"{]} \\
+ {Fig. \ref{fig:repro_4_3}} &
+  definitional\_female-Bolukbasi\_et\_al\_2016 shuffled &
+  {[}"female", "she", "woman", "gal", "her", "daughter", "girl", "herself", "mother", "mary"{]} \\
+ &
+  definitional\_male-Bolukbasi\_et\_al\_2016 shuffled &
+  {[}"john","man", "son","father", "male","himself", "guy","he", "his","boy"{]} \\
+ &
+  random seeds 1 &
+  {[}``essential", ``want", ``suspension", ``talked", ``competitive", ``information", ``hero", ``bat", ``seconds", ``black"{]} \\
+ &
+  random seeds 2 &
+  {[}``derby", ``passed", ``achieve",, ``discussed", ``providing", ``resulted", ``inmates", ``wearing", ``bid", ``rose"{]} \\ \bottomrule
+% \end{tabular}
+\end{longtable}
