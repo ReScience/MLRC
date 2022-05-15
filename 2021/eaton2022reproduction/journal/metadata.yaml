@@ -1,0 +1,131 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Reproduction and Extension of \"Queens are Powerful too: Mitigating Gender Bias in Dialogue Generation\""
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Erica Eaton
+    orcid: 0000-0002-4074-9740
+    email: eatone3@uw.edu
+    affiliations: 1,*
+
+  - name: Pirouz Naghavi
+    orcid: 0000-0001-5080-9498
+    email: pnaghavi@uw.edu
+    affiliations: 1      # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Washington
+    address: 185 E Stevens Way NE, Seattle, WA 98195
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, machine learning, natural language processing, deep learning, python, bias mitigation
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/Pnaghavi/Mitigating-Gender-Bias-in-Generated-Text
+  - doi:
+  - swh: swh:1:dir:320f7080ccd0edd611da07e9dbd9dbe4bbd18758
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "E. Dinan, A. Fan, A. Williams, J. Urbanek, D. Kiela, and J. Weston. Queens are powerful too: Mitigating gender bias in dialogue generation. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 8173–8188, Online, Nov. 2020. Association for Computational Linguistics."
+ - bib:  dinan2020
+ - url:  https://arxiv.org/pdf/1911.03842.pdf
+ - doi:  https://doi.org/10.48550/arXiv.1911.03842
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility:
+The main claims we are trying to reproduce are that bias controlled training or combining counterfactual data augmentation, the positively biased data collected by Dinan et al. [5], and bias controlled training for the LIGHT dataset yields generated dialogue in which the percent of gendered words and male bias closely match the ground truth.
+
+Methodology:
+We fine-tuned a transformer model, pre-trained on Reddit data [1], using the ParlAI API [8] with counterfactual data augmentation, positively biased data collection, bias controlled training, and all three bias mitigation techniques combined, as discussed in the original paper [5]. We implemented counterfactual data augmentation and bias controlled training ourselves. All models were trained and evaluated using a single NVIDIA Tesla P100 PCIe GPU, which took between 1.3 and 4.6 GPU hours approximately.
+
+Results:
+Overall, our results support the main claims of the original paper [5]. Although the percent gendered words and male bias in our results are not exactly the same as those in the original paper [5], the main trends are the same. The main difference is lower male bias for the baseline model in our results. However, our findings and the trend similarities between our results and those obtained by Dinan et al. [5] demonstrate that bias controlled training or combining all three bias mitigation techniques can effectively control the amount of gender bias present in the model generated responses, supporting Dinan et al.'s claims [5].
+
+What was easy:
+When reproducing the original paper [5], implementing counterfactual data augmentation and bias controlled training was easy since these techniques were well-described in the original paper [5]. Also, combining all three bias mitigation techniques was simple, as we applied the same techniques used to implement each bias mitigation method individually.
+
+What was difficult:
+The only difficulty we encountered, albeit minor, was learning how to use ParlAI, which was necessary to use the same model as in the original paper [5]. However, after reading through the ParlAI documentation and experimenting with the ParlAI Google Colaboratory tutorial [10], we understood how to use ParlAI to fine-tune the model, pre-trained on Reddit conversations [1], for the datasets we create.
+
+Communication with original authors:
+We communicated with Emily Dinan, an author of the original paper [5], who clarified what model was used in the original paper [5] and provided us with the command to download the model as well as the hyperparameter settings used when fine-tuning."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=StblE2MQ3AY
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1
