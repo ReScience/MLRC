@@ -1,0 +1,152 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[¬Re] Reproducing 'Fair Selective Classification via Sufficiency'"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Nils Peters
+    orcid: 0000-0001-7916-9762
+    email: nils.peters@kpnmail.nl
+    affiliations: 1,2,*
+    
+  - name: Joy Crosbie
+    orcid: 0000-0002-2631-0344
+    email: joy.crosbie@student.uva.nl
+    affiliations: 1,2
+    
+  - name: Rachel van 't Hull
+    orcid: 0000-0003-3268-6855
+    email: rachelvthull@gmail.com
+    affiliations: 1,2
+    
+  - name: Marius Strampel
+    orcid: 0000-0002-5139-4551
+    email: marius.strampel@student.uva.nl
+    affiliations: 1,2
+
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, Netherlands
+  - code: 2
+    name: Equal contributions
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, classification, selective classification, sufficiency, machine learning, Python 3
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/MLRC2022FSCS/FSCS
+  - doi: 10.5281/zenodo.6479342
+  - swh: swh:1:dir:effcbb5800e91db9053cb59c68bbc097a10da7cf
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Lee, J. K., Bu, Y., Rajan, D., Sattigeri, P., Panda, R., Das, S., & Wornell, G. W. (2021, July). Fair Selective Classification via Sufficiency. In International Conference on Machine Learning (pp. 6076-6086). PMLR."
+ - bib:  lee2021fair
+ - url:  http://proceedings.mlr.press/v139/lee21b.html
+ - doi:  # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+Scope of Reproducibility
+
+In this reproducibility study we focus on the paper 'Fair Selective Classification via Sufficiency'. Our experiments focus on the following claims: 1. Sufficiency is able to mitigate disparities in precision across the entire coverage scale and in margin distributions, and will not increase these disparities compared to a baseline selective classification model in any case. 2. Using sufficiency may decrease overall accuracy in some cases, but still mitigates the disparity between groups when looking at individual classification scores. 3. The sufficiency-regularised classifier exhibits better fairness performance on traditional fairness datasets.
+
+Methodology
+
+As the authors have not made their code publicly available, all code was written from scratch, based on the instructions and pseudocode given in the original paper. Our code reconstruction contains code for training both the sufficiency model and a baseline model performing standard selective classification.
+
+Results
+
+We were not able to fully reproduce the results of the original paper in this setting. The numbers (accuracies, precisions and margin distributions) obtained in our experiments differ significantly from those reported in the original paper. Though differences between the baseline model and the sufficiency model are not as significant as in the original paper, our results do support the main claims about sufficiency being able to increase the worst-group precision and thus causing disparities between groups to decrease. 
+
+What was easy
+
+The authors made the importance of implementing fair selective classification with sufficiency very clear. Moreover, the authors provided an in-depth mathematical background to sufficiency and selective classification, making their reasoning explicit. Finally, the authors presented their results in such a manner that allowed for straightforward comparison once we had trained the model.
+
+What was difficult
+
+Many technical details and model parameters were not specified in the original paper, and as no code was provided by the authors, these initially had to be determined by experimentation. Furthermore, some of the figures in the paper caused confusion about the exact implementation of the model.
+
+
+Communication with original authors
+
+As soon as we noticed we needed clarification on the hyperparameters, datasets and models, we contacted the authors via email. Initially we did not receive a reply, and eventually the authors were only able to answer some of our questions on the Tuesday before the deadline. While we re-implemented our model based on the newly supplied information, time was too short to fix the new issues that became apparent with the new model."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python 3
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=r9Leh2M7hCt
+
+contributors:
+  - name:
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:
+  - accepted:
+  - published:
+
+
+# This information will be provided by the editor
+article:
+  - number:
+  - doi:
+  - url:
+
+# This information will be provided by the editor
+journal:
+  - name:
+  - issn:
+  - volume:
+  - issue:
