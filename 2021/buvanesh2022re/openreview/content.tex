@@ -1,0 +1,976 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2020}{ML Reproducibility Challenge 2020}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+The proposed optimizer: AdaBelief, claims to achieve three goals: fast convergence as in adaptive methods, good generalization as in SGD, and training stability. We perform experiments to validate the claims of the paper \cite{zhuang_adabelief_2020}.
+
+\subsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+To validate these claims, we reproduce experiments on \textbf{Image Classification} with CIFAR-10, CIFAR-100 and ImageNet datasets, on \textbf{Language Modeling} with Penn Treebank, and on \textbf{Generative Modeling} with WGAN, WGAN-GP and SN-GAN architectures. We use the code provided by the author\footnote{\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}. All experiments were performed on 8 NVIDIA V100 GPUs and took about 1096 GPU hours in total.
+
+
+\subsection*{Results}
+% Cifar10, 100 -> +0.79 to -0.88
+% ImageNet -> -0.3 percent of Author
+% LSTM -> +0.56
+% GAN -> Padam + 3.5 to -5.34 (- means better, FID low)
+
+% cifar10	cifar100	imagenet	PTB	   WGAN	 WGAN-GP	SNGAN	
+% 0.295	0.18	    0.25	   0.228 	2.2	   1.8  	0.33	
+							
+The image classification experiments on CIFAR-10, CIFAR-100 and ImageNet are reproduced to within 0.29\%, 0.18\% and 0.25\% of reported values respectively. The language modeling experiments produce an average deviation of 0.22\%, while the generative modeling experiments on WGAN, WGAN-GP and SN-GAN are replicated to within 2.2\%, 1.8\% and 0.33\% of value reported in the original paper.
+\par
+We perform ablation studies for change of dataset in language modeling and for effect of weight decay on ImageNet. We also perform analysis of generalization ability of optimizers and of training stability of GANs. All of the results largely support the claims made in the paper \cite{zhuang_adabelief_2020}.
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+
+\subsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The  authors  provide  implementation  for  most  of  the  experiments  presented  in  the  paper.   Well documented code and lucid paper helped understand the experiments clearly.
+
+\subsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+The challenging aspects in our study were: (1) Grid search for optimal hyperparameters (HP) in cases where HP were not provided or results did not match, (2) time and resource intensive experiments like ImageNet ( $\sim22$ hrs.) and SN-GAN ($\sim15$ hrs.), (3) writing code to evaluate claims of the AdaBelief paper.
+
+
+\subsection*{Communication with original authors}
+% + Clarification on range of hyperparameters in SN-GAN experiments, optimizer specific parameters for certain experiments like Fromage \\
+% + Blacklisting in ImageNet dataset
+% +
+We communicated with the author of the original paper, Juntang Zhuang, on multiple occasions for doubts related to hyperparameters and code, to which he promptly replied and helped us.
+
+
+\newpage
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.}}
+\section{Introduction}
+\label{intro}
+Optimization is at the heart of machine learning. Training of neural networks aims to find the optimal solution (deepest valley on the loss surface) using gradient descent. The variation in method to traverse the loss landscape gives rise to different optimizers. Discovering different optimizers is an active area of research in machine learning.
+In this report, we reproduce and add on to the experimental analysis of an optimizer, AdaBelief \cite{zhuang_adabelief_2020}, introduced in 2020 at NeurIPS conference.
+
+\par
+The proposed optimizer, AdaBelief, claims to outperform its counterparts on various real world deep learning tasks. As a part of the ML Reproducibility Challenge, we replicate all the experiments mentioned in the AdaBelief paper \cite{zhuang_adabelief_2020}, comparing it with other optimizers, and also perform additional experiments to investigate the efficacy of AdaBelief.
+
+\par
+
+
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+\section{Details of Optimizers}
+% + have subsections for different optimizers if necessary \\
+% + talk about the difference between the accelerated and adaptive gradient methods (use words like "SGD family", "Adam"). \\
+% + talk about the USP of each of the optimizers that will be coming in the report \\
+Optimizers are of two types: \textbf{(1) accelerated Stochastic Gradient Descent (SGD) family} \cite{SGD} that includes SGD with momentum \cite{Momentum} \& Nestrov Accelerated Gradient (NAG) \cite{NAG}, and \textbf{(2) adaptive methods} like Adam \cite{Adam}, RAdam \cite{liu_variance_2020}, AdamW \cite{AdamW}, RMSProp \cite{RMSProp}, Yogi \cite{Yogi}, AdaBound \cite{AdaBound}, AdaBelief \cite{zhuang_adabelief_2020}, MSVAG \cite{MSVAG}, Fromage \cite{Fromage}, Apollo \cite{Apollo}.
+
+SGD \cite{SGD} family uses the same learning rate for all parameters, whereas, adaptive methods update their parameters as a function of gradients. While this has shown success in faster convergence due to a more streamlined trajectory, it has raised questions regarding the generalization ability of adaptive methods. RMSProp \cite{RMSProp} builds over SGD by penalizing updates in directions that have high gradients. The intuition behind this is to prevent drastic updates in particular directions. It does so by damping the magnitude of update by factor of exponential moving average (EMA) computed for squares of gradients. Adam \cite{Adam} improves over RMSProp by introducing a momentum term that helps prevent over-damping of step size as in case of RMSProp. RAdam \cite{liu_variance_2020} seeks to tackle the convergence problem of Adam by proposing to use a small learning rate during initial stages of training when variance is high, while AdamW \cite{AdamW} and MSVAG \cite{MSVAG} address the generalization problem in Adam. AdamW does this by introducing a weight decay regularization term and MSVAG decomposes Adam as a sign update and magnitude scaling. Yogi \cite{Yogi} considers the effect of mini-batch size and proposes an update equation that has shown to outperform Adam with very little hyperparameter tuning. AdaBelief \cite{zhuang_adabelief_2020} amplifies (or dampens) its updates by a factor proportional to the 'belief' in observed gradient i.e. square of difference between the observed gradient and EMA of the gradient. AdaBound \cite{AdaBound} bridges the gap between SGD family and Adaptive methods by making use of an update that smoothly transitions from Adam to SGD. Fromage \cite{Fromage} takes a different path to optimization - it accounts for the network structure by looping in weight matrices into the update equation. Apollo \cite{Apollo} takes a step forward from the aforementioned first order optimizers by approximating the Hessian via a diagonal matrix, keeping computations in-line with first-order schemes.
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+% + claims \\ \\ 
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \\ 
+
+AdaBelief \cite{zhuang_adabelief_2020} claims to performs better than existing optimizers. To evaluate the  validity of its claims, we investigate the following target questions:
+
+\begin{itemize}
+    \item Does AdaBelief perform better in comparison to other optimizers on real world tasks of image classification, language modeling, generative modeling and reinforcement learning?
+    \item Does AdaBelief show fast convergence like adaptive methods, e.g. Adam?
+    \item Does AdaBelief generalize well like the accelerated gradient methods, e.g. SGD?
+    \item Adaptive methods like Adam are stable in complex settings like training of Generative Adversarial Networks (GANs) \cite{GAN}. How does AdaBelief compare with them?
+\end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+% + actual me andar kya chal rha hai \\
+% + the mathematical details of all experiments (exclusing hyperparams) \\
+% + one section per experiment (paper and beyond paper both) \\ \\
+% \lipsum[4]\footnote{Foo}\par
+\subsection{Experimental setup and model description}
+We perform experiments on many real world tasks: \textbf{(a) Image Classification}: CIFAR-10, CIFAR-100 \& ImageNet datasets are used. On  CIFAR-10 \& CIFAR-100, we train using VGG11 \cite{VGG}, ResNet34 \cite{Resnet} and DenseNet121 \cite{Densenet}. In the case of ImageNet we use a ResNet18 \cite{Resnet} architecture.  \textbf{(b) Language Modeling}: Penn Treebank \cite{PTB} and WikiText-2 \cite{WikiText_2} datasets are used. Both are used to train 1, 2, 3-layer LSTM \cite{LSTM}. The HP of the LSTM model were taken from here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}. \textbf{(c) Generative Modeling}: CIFAR-10 dataset is used with Wasserstein-GAN (WGAN) \cite{WGAN}, with the improved gradient penalty version WGAN-GP \cite{WGAN-GP} \& with spectral normalization GAN (SN-GAN) \cite{SN-GAN} architectures, where generator and discriminator use same HP. WGAN is a smaller model with a vanilla CNN generator, whereas the SN-GAN is a bigger model with spectral normalization in the discriminator. For SN-GAN we make use of this repository\footnote{\href{https://github.com/juntang-zhuang/SNGAN-AdaBelief}{https://github.com/juntang-zhuang/SNGAN-AdaBelief}} \textbf{(d) Reinforcement Learning}: An agent is trained by Adam and AdaBelief optimizers to play Space Invaders (Atari Game) using Deep Q-Network (DQN) \cite{DQN_RL} architecture. Implementation was taken from here\footnote{\label{fnote:juntang_RL_repo}\href{https://github.com/juntang-zhuang/rainbow-adabelief}{https://github.com/juntang-zhuang/rainbow-adabelief}}. The code for experiments on image classification, language modeling, WGAN, WGAN-GP was taken from here\footnote{\label{fnote:juntang_repo}\href{https://github.com/juntang-zhuang/Adabelief-Optimizer}{https://github.com/juntang-zhuang/Adabelief-Optimizer}}.
+	
+% 	\item Spk Dzn
+    
+% \end{itemize}
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+% our contribution table
+\begin{table}[t]
+\centering
+    \resizebox{\linewidth}{!}{%
+% 		\begin{tabular}{c | c | L | c | L | L | c | L | L}
+% 		\begin{tabular}{c | p{0.12\linewidth} | p{0.08\linewidth} | p{0.13\linewidth} | c | l | c | c | c}
+		\begin{tabular}{c  p{0.15\linewidth}  p{0.1\linewidth}  p{0.12\linewidth}  c  l  c  c  c}
+		\hline
+		\textbf{S. No.} & \textbf{Task} & \textbf{Dataset} & \textbf{Setup} & \textbf{Rep. Status} & \multicolumn{1}{c}{\textbf{Our Contribution}} & \textbf{No. of Exp.} & \textbf{GPU HPR} & \textbf{Total GPU hours} \\
+
+		\hline
+		1. & \multirow{3}{0.12\linewidth}{Image Classification} \rule{0pt}{9pt} & CIFAR-10 & VGG, RN, DN & \textcolor{green}{\checkmark} & Exp. on Apollo \cite{Apollo}; bias-variance anal. & 30 & 2.5 & 75 \\
+
+		\cline{3-9}
+		2. \rule{0pt}{9pt} & & CIFAR-100 & VGG, RN, DN & \textcolor{green}{\checkmark} & Exp. on Apollo \cite{Apollo}; bias-variance anal.  & 30 & 2.5 & 75 \\
+
+		\cline{3-9}
+		3. \rule{0pt}{9pt} & & ImageNet & ResNet18 & \textcolor{green}{\checkmark} & Analysis of weight decay & 3 & 22 & 66 \\
+
+		\hline
+		4. & \multirow{3}{0.12\linewidth}{Language Modeling} & \multirow{3}{0.08\linewidth}{PTB, WT2} \rule{0pt}{9pt} & LSTM (1 layer) & \textcolor{green}{\checkmark} & Fromage LRS; WT2 & 11 & 1.33 & 14.63 \\
+
+		\cline{4-9}
+		5. \rule{0pt}{9pt} & &   & LSTM (2 layer) & \textcolor{green}{\checkmark} & AdamW \& RAdam LRS; WT2 & 11 & 2.5 & 27.5 \\
+
+		\cline{4-9}
+		6. \rule{0pt}{9pt} & &   & LSTM (3 layer) & \textcolor{green}{\checkmark} & AdamW \& RAdam LRS; WT2 & 11 & 3.75 & 41.25 \\
+
+		\hline
+		7. & \multirow{3}{0.12\linewidth}{Generative Modeling} & \multirow{3}{0.08\linewidth}{CIFAR-10} \rule{0pt}{9pt} & WGAN & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 0.89 & 53.55 \\
+
+		\cline{4-9}
+		8. \rule{0pt}{9pt} & &   & WGAN-GP & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 1 & 66.5 \\
+
+		\cline{4-9}
+		9. \rule{0pt}{9pt} & &   & SN-GAN & \textcolor{green}{\checkmark} & HP search; training stablity anal. & 45 & 15 & 675 \\
+
+		\hline
+		10. & Reinforcement Learning & N/A & Space Invaders (Atari) & \textcolor{green}{\checkmark} & Beyond AdaBelief paper \cite{zhuang_adabelief_2020} & 2 & 1 & 2 \\
+
+		\hline
+		\end{tabular}
+		}
+
+		\vspace{2mm}
+		\caption{Summary of our contributions and reproducibilty details of performed experiments. Exp. 1 to 9 are mentioned in the AdaBelief paper \cite{zhuang_adabelief_2020} and have been reproduced successfully along with some additional contribution to each experiment. We also perform exp. 10 which is not a part of AdaBelief paper.\hspace{\textwidth} [\textbf{Legend} - \textbf{Rep.}: Reproducibility, \textbf{Exp.}: "Experiment(s)", \textbf{HPR}: "hours per run", \textbf{RPO}: "runs per optimizer", \textbf{anal.}: "analysis", \textbf{HP}: "hyperparameter", \textbf{LRS}: "Learning Rate Search", \textbf{WT2}: "WikiText-2", \textbf{DN}: "DenseNet121", \textbf{RN}: "ResNet34", \textbf{VGG}: "VGG11", \textbf{PTB}: "Penn Treebank"]}
+		\label{table:our_contribution}
+\end{table}
+
+
+
+\subsection{Datasets}
+The following datasets were used in the experiments - \textbf{(a) CIFAR-10}: It consists of $60,000$ images of size $32\times32$, grouped into $10$ classes ($6000$ images per class). We use the default train-test split of $50,000:10,000$. \textbf{(b) CIFAR-100}: It is same as CIFAR-10 but the images are grouped into $100$ classes ($600$ images per class).
+\textbf{(c) ImageNet} \cite{Imagenet}: We use ILSVRC 2012 dataset\footnote{\href{https://www.kaggle.com/c/imagenet-object-localization-challenge/data}{ImageNet dataset (Kaggle)}} which consists of $\sim 1.35M$ images of size $256 \times 256$ split into $1000$ classes. Train-val-test split is  $1,281,167:50,000:100,000$. As part of pre-processing we remove mis-labelled data\footnote{\href{https://github.com/fastai/imagenet-fast/blob/master/imagenet\_nv/blacklist.sh}{Blacklisted images (GitHub)}} \textbf{(d) Penn Treebank\footnote{\href{http://www.fit.vutbr.cz/\~imikolov/rnnlm/simple-examples.tgz}{Penn Treebank Dataset}}} (PTB) \cite{PTB}: The train-val-test split of tokens is $887,521:70,390:78,669$. \textbf{(e) WikiText-2} (WT2) \cite{WikiText_2}: It is a subset of WikiText-103, features a larger vocabulary and retains the punctuation, original case and numbers which are omitted in PTB dataset. We ran experiments on WT2\footnote{\href{https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip}{WikiText-2 dataset}} using the train-val-test token split of $2,045,059:213,119:240,498$. 
+
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+\subsection{Hyperparameters}
+% + we use optimal hyperparam from AdaB paper and perform a hyperparam search for some exp (details mentioned in table <hyperparam-table>) \\ \\
+In this section we mention the HP used by optimizers in our experiments. Optimal values of commonly used HP are listed in Table \ref{table:hyperparam}. Below we mention the source of these values and details of HP search. 
+
+For most experiments, we use the optimizer-specific HP as mentioned in the original repository\footnoteref{fnote:juntang_repo} since searching the HP for all experiments is computationally infeasible. However, the repository does not mention the HP for SN-GAN \& Fromage, and the mentioned HP for 2- and 3-layer LSTM models for AdamW \& RAdam resulted in large deviation. So, we perform learning rate (LR) search for \textbf{Fromage} and 2- \& 3-layer \textbf{AdamW} and \textbf{RAdam} over the interval [$10^{-3}, 10^{-2}$] (5 values). For \textbf{SN-GAN}, we search $\beta_1$ (3 values in $[0.4, 0.9]$) and $\epsilon$ (3 values in $[10^{-12}, 10^{-6}]$). For \textbf{Reinforcement Learning}, we use LR of $10^{-4}$ and $\epsilon = 10^{-10}$ for AdaBelief and Adam, as mentioned on the RL repository\footnoteref{fnote:juntang_RL_repo}.
+
+Now we list the HP which are specific to each optimizer. The LR decays to ${1/10}^{th}$ of its value at $150^{th}$ epoch for image classification on CIFAR-10 and CIFAR-100, and at epoch $70$ \& $80$ on ImageNet. \textbf{AdaBelief} uses \texttt{weight\_decouple=False, fixed\_decay=False, rectify=False} for all the experiments and \texttt{weight\_decouple=True} on ImageNet. \textbf{SGD} uses \texttt{momentum=0.9}, and \textbf{Apollo} uses \texttt{warmup=200, weight\_decay\_type='L2'} for image classification on CIFAR-10 and CIFAR-100. \textbf{AdaBound} uses \texttt{final\_lr=30} on PTB and \texttt{final\_lr=0.01} with GAN experiments.
+
+    % \item Also note that for language modeling on WT2 as well, we use the same HP as PTB, which are listed in Table \ref{table:hyperparam}.
+    
+    % \item Also, note that the learning rates in \ref{table:hyperparam} for SN-GAN apply to both generator and discriminator.
+
+
+
+
+
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+\begin{table}[t]
+\centering
+%     \begin{adjustbox}{width=\textwidth,center}
+    % \begin{adjustbox}{center}
+    \resizebox{\linewidth}{!}{%
+        \begin{tabular}{cccccccc}
+        \hline
+            \textbf{Task} &  \textbf{Setup} & \textbf{Learning Rate} &  \textbf{$\beta_1$} &  \textbf{$\beta_2$} &  \textbf{$\epsilon$} & \textbf{Weight Decay} & \textbf{Epochs} \\  
+            % \hline
+            % \multirow{4}{*}{XXX} & \multicolumn{1}{l}{XXX} & \multicolumn{1}{l}{XXX} \\\cline{2-3}
+            %                      & \multicolumn{1}{l}{XXX} & \multicolumn{1}{l}{XXX} \\\cline{2-3}
+            %                      & \multicolumn{1}{l}{XXX} & \multicolumn{1}{l}{XXX} \\\cline{2-3}
+            %                      & \multicolumn{1}{l}{XXX} & \multicolumn{1}{l}{XXX} \\
+            % \hline
+            % \ttfamily xxx & \ttfamily xxx & \ttfamily xxx \\                
+            % \hline
+            \hline
+            % S:0.1,M:0.1,P:1,Z:0.001
+            % Z:1e-8, Y:1e-3, P:1e-4
+            % Z:5e-4, W:1e-2, P:2.5e-4
+            \multirow{2}{*}{Image Classification} 
+                                                    \rule{0pt}{12pt} &  CIFAR &  $10^{-3}$ $(10^{-1}_{S, M}, 1_{L})$ 
+                                                    & 0.9 & 0.999 & $10^{-8}$  $(10^{-3}_{Y}, 10^{-4}_{L})$ & $ 5\times10^{-4}$ $(10^{-2}_{W}, 2.5\times10^{-4}_{L})$ & 200 \\\cline{2-8}
+            
+           
+            % 0.001	0.9	0.999	1.00E-08	0.01	90                       
+                                                 \rule{0pt}{12pt} & ImageNet & $10^{-3}$ & 0.9 & 0.999 & $10^{-8}$ & $10^{-2}$ & 90 \\ 
+                                                 
+                                           
+            \hline
+            \multirow{3}{*}{Language Modeling} 
+            % Z:0.001, [S,M]:30, [Y,D,F]:0.01	0.9	0.999	Z:0.00000001, B:1e-16, Y:0.001	Z:1.2e-6	200
+                                                    \rule{0pt}{12pt} &  1 layer &  $ 10^{-3}$ $(30_{S, M}, 10^{-2}_{Y, D, F})$ 
+                                                    & 0.9 & 0.999 & $10^{-8}$ $ (10^{-16}_{B}, 10^{-3}_{Y})$ & $1.2 \times 10^{-6}$ & 200 \\\cline{2-8}
+            
+           
+            % Z:0.01, [S,M]:30, [W,R]:0.001	0.9	0.999	Z:0.00000001, B:1e-12, Y:0.001	Z:1.2e-6	200                       
+                                                 \rule{0pt}{12pt} &  2 layer &  $ 10^{-2}$ $(30_{S, M}, 10^{-3}_{W, R})$ 
+                                                    & 0.9 & 0.999 & $10^{-8}$ $ (10^{-12}_{B}, 10^{-3}_{Y})$ & $1.2 \times 10^{-6}$ & 200 \\\cline{2-8} 
+            % Z:0.01, [S,M]:30, [W,R]:0.001	0.9	0.999	Z:0.00000001, B:1e-12, Y:0.001	Z:1.2e-6	200                                     
+                                                \rule{0pt}{12pt} &  3 layer &  $10^{-2}$  $(30_{S, M}, 10^{-3}_{W, R})$ 
+                                                    & 0.9 & 0.999 & $10^{-8}$ $ (10^{-12}_{B}, 10^{-3}_{Y})$ & $1.2 \times 10^{-6}$ & 200 \\
+            \hline
+            \multirow{3}{*}{Generative Modeling}
+            % Z: 2e-4	0.5	0.999	B:1e-12, Z: 1e-8	P: 3e-4, Z:0	100
+                                                \rule{0pt}{12pt} &  WGAN &  $2\times10^{-4}$ 
+                                                    & 0.5 & 0.999 & $10^{-8}$ $ (10^{-12}_{B})$ & $0$ $(5 \times 10^{-4}_{P})$ & 100 \\\cline{2-8} 
+            % Z: 2e-4	0.5	0.999	B:1e-12, Z:1e-8	P: 5e-4, Z:0	100                                    
+                                                \rule{0pt}{12pt} &  WGAN-GP &  $2\times10^{-4}$ 
+                                                    & 0.5 & 0.999 & $10^{-8}$ $(10^{-12}_{B})$ & $0$ $(5 \times 10^{-4}_{P})$ & 100 \\\cline{2-8} 
+            % Z: 2e-4	Z: 0.5	Z: 0.999	A: 1e-6,  B:1e-12, Z: 1e-8	0	100000 steps *
+                                                \rule{0pt}{12pt} &  SN-GAN &  $2\times10^{-4}$ 
+                                                    & 0.5 & 0.999 & $10^{-8}$ $ (10^{-6}_{A}, 10^{-12}_{B})$ & $0$ & 100000 \\
+            
+            \hline
+
+        \end{tabular}}
+%     \end{adjustbox}
+    \vspace{2mm}
+    \caption{Optimizer specific hyperparameter (HP) values and epochs for experiments performed. Each cell follows a format $X (Y)$ where $X$ is the optimal value of the HP unless stated otherwise and $Y$ contains elements of the form $v_o$ where $v$ is the value of HP for optimizer $o$. The abbreviations used for optimizers are (\textbf{S})GD,
+(\textbf{A})dam, Adam\textbf{(W)}, Ada(\textbf{B})elief, (\textbf{Y})ogi,
+(\textbf{M})SVAG, (\textbf{R})Adam, (\textbf{F})romage, AdaBoun(\textbf{D}), Apo(\textbf{L})lo, (\textbf{P})adam}
+\label{table:hyperparam}
+\end{table}
+
+
+% \subsection{Experimental setup and code}
+
+% + code taken from... - added SNGAN from here, cifar100 setup using cifar10, shaded mean+sd plotting code (supplied in code) \\
+% + all the details corresponding to the each experiments are mentioned in the next section \\
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+\subsection{Computational requirements}
+We run experiments on a Portable Batch System (PBS) managed cluster. We used 8 NVIDIA V100 GPUs and 384\ GB RAM. All experiments except ImageNet use a single GPU. GPU runtime of all experiments are listed in table \ref{table:our_contribution}.
+
+% + PBS batch scheduler, computate details, refer table... for GPU hours...use distrvuted training in imagenet (2 GPUs)... \\ \\
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\section{Experiments and Results}
+% + one section per experiment \\
+% + reproducing the paper's results \\
+% + hyperparam table \\ \\
+% \textbf{Order to follow while writing each experiment:}\\
+% + experiment me kya kiya - details of how we got the values (how many runs, what hyperparamters, tuning details, mention if single value of hyperparam used) \\
+% + mention the metric being reported (acc, ppl, FID, etc.) and if a lower/higher value is good for it \\
+% + refer the relevant result table/figure (refer any figure in supplementary also), refer the relevant hyperparam table \\
+% + cite corresponding paper for each model/optimizer being used in this section (WGAN, ResNet, Padam, ...) \\
+% + infer the results (how did AdaBelief perform) \\
+% + Compare the results with those of Juntang \\
+
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+\subsection{Experiments reproducing original paper}
+\label{lab:Results}
+To evaluate the performance of AdaBelief and to validate the aforesaid claims, we perform experiments on various tasks like Image Classification, Language Modeling, Generative Modeling, Reinforcement Learning and compare our results with those stated in the paper \cite{zhuang_adabelief_2020}. HP details can be found in Table \ref{table:hyperparam}.
+% \begin{itemize}
+
+% refer same footnote multiple times on a page
+% Text with first footnote\footnote{\label{note1}This is the labeled footnote}
+% and more text with a second footnote\footnote{here}.
+
+% In this new paragraph we have a reference to the first
+% footnote\footnotemark[\ref{note1}].
+
+\subsubsection{Image classification}
+\label{lab:Image_classification}
+We run experiments on CIFAR-10 and CIFAR-100 using VGG11 \cite{VGG}, Resnet34 \cite{Resnet} and DenseNet121 \cite{Densenet} architectures, performimg 3 independent runs on 9 optimizers\footnote{\label{fnote:optim_list}SGD, Adam, AdamW, AdaBelief, Yogi, MSVAG, RAdam, Fromage, AdaBound}. Additionally, we perform experiments using Apollo optimizer \cite{Apollo}, that has claimed to outperform AdaBelief on CIFAR datasets with ResNet110 architecture. Fig. \ref{table:CIFAR10_100} plots test accuracy results. Plots for train accuracies are reported in Fig. \ref{table:CIFAR10_100_train}. All the obtained results agree with those reported in the AdaBelief paper \cite{zhuang_adabelief_2020}. 
+% We can see that AdaBelief outperforms all the optimizers in all configurations barring DenseNet121 on Cifar100 where Apollo achieves a marginally better accuracy. 
+
+To assess the performance on large scale datasets, we ran experiments on ImageNet \cite{Imagenet}. We follow a similar setting as the author and run experiments on AdaBelief \cite{zhuang_adabelief_2020} and MSVAG \cite{MSVAG} and report results for remaining optimizers from literature (Table \ref{table:Imagenet Resnet-18 results}). The top-1 accuracy lags by 0.32$\%$ and 0.18$\%$ respectively in case of AdaBelief and MSVAG. 
+Other optimizers from literature use weight decay of ~$10^{-4}$ while the author performs experiments on AdaBelief using a value of $10^{-2}$. We analyse the effect of weight decay in section \ref{lab:wd_effect}.
+
+
+
+
+% AdaBelief SGD AdaBound Yogi Adam MSVAG RAdam AdamW
+% 70.08 70.23† 68.13† 68.23† 63.79† (66.54‡ ) 65.99 67.62‡ 67.93†
+\begin{table}[h]
+    \begin{center}
+\resizebox{\linewidth}{!}{%
+    \begin{tabular}{c | c | c | c | c | c | c| c}
+    \hline
+    Adabelief & SGD  & Adabound & Yogi & Adam & MSVAG & RAdam & AdamW \\
+    \hline
+    69.76 & \textbf{70.23\textsuperscript{\textdagger}} & 68.13\textsuperscript{\textdagger} & 68.23\textsuperscript{\textdagger} &  63.79\textsuperscript{\textdagger}\ (66.54\textsuperscript{\textdaggerdbl} ) & 65.81 & 67.62\textsuperscript{\textdaggerdbl} &  67.93\textsuperscript{\textdagger} \\
+    \hline
+    \end{tabular}}
+ %    
+    \vspace{2mm}
+    \caption{Top-1 accuracy of ResNet18 on ImageNet. \textdagger\  is reported in \cite{chen_closing_2020}, and  \textdaggerdbl\  is reported in \cite{liu_variance_2020}} 
+    \label{table:Imagenet Resnet-18 results}
+    \end{center}
+\end{table}
+
+
+
+
+
+
+
+
+
+\subsubsection{Language Modeling}
+\label{lab:Language_modling}
+We ran experiments on Penn Treebank (PTB) dataset \cite{PTB} using 1,2,3-layer LSTM models. We report test perplexities (ppl) (Fig. \ref{table:LSTM_test}) for 3 independent runs on 9 optimizers\footnoteref{fnote:optim_list}. Plots for train ppl are reported in Fig. \ref{table:LSTM_train}. For Fromage, the author does not provide HP, hence we use grid search to find the optimal $LR=10^{-2}$. In case of 2 layer LSTM using AdamW \& RAdam, we find that an $LR=10^{-3}$ gives a ppl of 73.78 \& 74.05, while $LR=10^{-2}$ gives a ppl of 93.61 \& 90.49 respectively. The author reports a ppl $\sim 73$, $\sim 73.5$ at $LR=10^{-2}$. Similarly, in 3-layer LSTM, $LR=10^{-3}$ for AdamW and RAdam works better than $LR=10^{-2}$. PTB is a small dataset, so, we additionally experiment on WikiText-2 (section \ref{lab:WT2_LSTM}) for Adam and AdaBelief (top performers in case of PTB) on the setting reported here\footnote{\href{https://github.com/salesforce/awd-lstm-lm}{https://github.com/salesforce/awd-lstm-lm}}.
+
+\begin{table}[t]
+    \begin{center}
+    \begin{tabular}{c c c}
+    
+    \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4atest.png} & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4btest.png}  & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4ctest.png} \\
+    (a) VGG11 on CIFAR-10 & (b) Resnet34 on CIFAR-10 & (c) Densenet121 on CIFAR-10 \\
+    \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4dtest.png} & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4etest.png}  & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/CIFAR_plots/Figure_4ftest.png} \\
+    (d) VGG11 on CIFAR-100 & (e) Resnet34 on CIFAR-100 & (f) Densenet121 on CIFAR-100 \\
+    \end{tabular}
+    \vspace{2mm}
+    \captionof{figure}{Test accuracy $([\mu \pm \sigma])$ on CIFAR-10 and CIFAR-100} \label{table:CIFAR10_100}
+    \end{center}
+\end{table}
+
+
+
+\begin{table}[t]
+    \begin{center}
+\resizebox{\linewidth}{!}{%
+    \begin{tabular}{c | c | c | c | c | c | c| c | c}
+    \hline
+    Adabelief & RAdam  & RMSProp & Adam & Fromage & Yogi & SGD & MSVAG & AdaBound \\
+    \hline
+    12.98 $\pm$ 0.22 & 13.10 $\pm$ 0.20 & \textbf{12.86 $\pm$ 0.08} & 13.01 $\pm$ 0.15 & 46.31 $\pm$ 0.86 & 14.16 $\pm$ 0.05 & 48.94 $\pm$ 2.88 & 56.89 $\pm$ 2.61 & 16.84 $\pm$ 0.10 \\
+    \hline
+    \end{tabular}}
+   
+    \vspace{2mm}
+    \caption{FID ([$\mu \pm \sigma$]) of a SN-GAN with ResNet generator on CIFAR-10.} 
+    \label{table:sngan_fid}
+    \end{center}
+\end{table}
+
+
+
+\subsubsection{Generative Modeling}
+\label{lab:Generative_modeling}
+ We run experiments on WGAN \cite{WGAN}, WGAN-GP \cite{WGAN-GP} \& SN-GAN \cite{SN-GAN}. SN-GAN makes use of a ResNet generator with spectral normalization in the discriminator and is trained for 100,000 steps. Five independent runs on 9 optimizers\footnote{\label{fnote:optim_list_gan}SGD, Adam, RMSProp, AdaBelief, Yogi, MSVAG, RAdam, Fromage, AdaBound} are performed. We also perform these experiments using the Padam \cite{padam} optimizer on WGAN and WGAN-GP.  FID values for SN-GAN and Padam (Table \ref{table:sngan_fid}, \ref{table:padam_fid}). Fig. \ref{fig:sngan_fid_imagenet_wd} shows the variation in FID during training, giving an idea of stability and convergence of different optimizers. Boxplots of FID values corresponding to multiple runs on WGAN and WGAN-GP are shown in Fig. \ref{fig:wgan_wgan_gp_fid}. Collages of generated images for all optimizers are reported in Fig. \ref{table:WGAN_fake_all}, \ref{table:WGAN-GP_fake_all}, \ref{table:WGAN-GP_fake_all_partials}.
+ 
+% \begin{itemize}
+% \item 
+\textbf{(a) SN-GAN}: In case of Fromage \cite{Fromage} and MSVAG \cite{MSVAG}, we obtain $\sim$4 and $\sim$8 worse FID than what is reported, while for AdaBound \cite{AdaBound} we obtain a $\sim$40 better FID. We suspect the reason for this large deviation to be a difference in HP value being used. Since we performed a HP search for SN-GAN, our HP (Table \ref{table:hyperparam}) are optimal. The results of remaining optimizers were comparable to what was reported in the paper. \textbf{(b) WGAN:} We observe that AdaBelief outperforms other optimizers with a median FID of $\sim$80 which agrees with reported value. We observe a significantly worse FID with Fromage. \textbf{(c) WGAN-GP:} AdaBelief and AdaBound achieve comparable results $\sim$67 FID which are better than the other optimizers. Fromage shows similar deviation like in WGAN. With Padam, we find that for both WGAN and WGAN-GP, increasing the partial ($p$) i.e. moving from SGD towards Adam, decreases the FID. The FIDs obtained are found to agree with or are marginally better than what was stated in the paper.
+
+
+
+\begin{table}[h]
+    \begin{center}
+    \begin{tabular}{c c c}
+    
+    \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5atest.png} & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5btest.png}  & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5ctest.png} \\
+    \end{tabular}
+    \vspace{2mm}
+    \captionof{figure}{Left to right: Test perplexity  $([\mu \pm \sigma])$ on Penn Treebank for 1,2,3-layer LSTM} \label{table:LSTM_test}
+    \end{center}
+\end{table}
+
+
+
+
+% Padan WGAN FIDs
+% multirow usage learnt from here: https://www.youtube.com/watch?v=qdCtXe3hxFA&ab_channel=PracticalNinjas
+\begin{table}[h]
+    \begin{center}
+\resizebox{\linewidth}{!}{%
+  \begin{tabular}{c|c|c|c|c|c|c|c|c}
+            \hline
+            & \multirow{2}{*}{AdaBelief} &              \multicolumn{7}{c}{Padam} \\
+                 \cline{3-9}
+                 & & p=1/2 (Adam) & p=2/5 & p=1/4 & p=1/5 & p=1/8 & p=1/16 & p=0 (SGD)\\
+            \hline
+            FID (WGAN) & \textbf{82.85 $\pm$ 2.21} & 106.38 $\pm$ 9.76 & 95.66 $\pm$ 3.76 & 422.62 $\pm$ 35.68 & 396.69 $\pm$ 24.91 & 330.44 $\pm$ 26.62 & 357.26 $\pm$ 32.39 & 459.01 $\pm$ 14.62 \\
+            \hline
+            FID (WGAN-GP) & 75.37 $\pm$ 7.37 & \textbf{71.87 $\pm$ 0.83} & 85.42 $\pm$ 5.15 & 152.34 $\pm$ 17.49 & 170.80 $\pm$ 20.43 & 205.57 $\pm$ 13.79 & 228.40 $\pm$ 18.24 & 236.99 $\pm$ 7.26 \\
+            \hline
+    \end{tabular}}
+    \vspace{2mm}
+    \caption{FID values ([$\mu \pm \sigma$]) using AdaBelief and Padam on WGAN and WGAN-GP, Lower FID is better.} 
+    \label{table:padam_fid}
+    \end{center}
+\end{table}
+
+
+
+
+
+% \end{itemize}
+% SNGAN FID table
+
+% WGAN boxplots
+\begin{table}[h]
+    \begin{center}
+    \begin{tabular}{c c}
+    
+    \includegraphics[width=0.455\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/wgan_boxplots/wgan_fid.png} & \includegraphics[width=0.455\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/wgan_boxplots/wgan_gp_fid.png}  \\ 
+    (a) FID scores using WGAN & (b) FID scores using WGAN-GP \\
+    \end{tabular}
+    \vspace{2mm}
+    \captionof{figure}{FID score of WGAN and WGAN-GP using a vanilla CNN generator on CIFAR-10. Lower is
+better. For each model, successful and failed optimizers (i.e. ones with higher FID values) are shown in the left and right respectively,
+with different y-axis ranges.} 
+\label{fig:wgan_wgan_gp_fid}
+    \end{center}
+\end{table}
+
+% \end{itemize}
+
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+% \subsubsection{Result 1}
+
+% \subsubsection{Result 2}
+
+\subsection{Experiments beyond original paper}
+\label{lab:results_beyond}
+
+
+\subsubsection{RL toy} 
+To investigate the efficacy of AdaBelief in use cases beyond text and images we train an agent to  play Space Invaders (Atari Game). We report $Q$ value and reward function for Adam and AdaBelief in Fig. \ref{table:Q_value}, \ref{table:Reward_value}. We compare our results with author's results from here\footnote{\href{https://github.com/juntang-zhuang/rainbow-adabelief}{https://github.com/juntang-zhuang/rainbow-adabelief}} and find that both results agree.
+
+\subsubsection{Image Classification on CIFAR-10 and CIFAR-100 using Apollo}
+Apollo \cite{Apollo} is another optimizer that claims to achieve better convergence speed and generalization than SGD and variants of Adam. To investigate this, we experiment with Apollo on CIFAR-10 and CIFAR-100. Fig. \ref{table:CIFAR10_100_train}, \ref{table:CIFAR10_100_test} show the train, test accuracies on VGG11, ResNet34 and DenseNet121 for the 3 independent runs. AdaBelief outperforms Apollo in all settings except DenseNet121 on CIFAR-100. It can also be seen that as we move from a simpler (VGG11) to a complex architecture (DenseNet121) the gap between Apollo and AdaBelief reduces. We made use of official implementation of Apollo in our experiments\footnote{\href{https://github.com/XuezheMax/apollo}{https://github.com/XuezheMax/apollo}}.
+
+
+
+\subsubsection{ Evaluating GAN training stability} 
+\label{lab:training_stability}
+To assess stability of AdaBelief while training GANs, we look into difference between SN-GAN's generator and discriminator training losses on CIFAR-10. We do this for AdaBelief, Adam and RMSProp (since they have top-2 FID scores on SN-GAN) in the adaptive family, and with SGD for a comparison. Fig. \ref{table:gen_disc_loss_gap} plots the generator and discriminator training losses. We observe that the adaptive methods are more stable than SGD and within the adaptive family the order of stability from most stable to least stable varies as RMSProp, AdaBelief, Adam.
+
+\subsubsection{ Evaluating generalization ability}
+\label{lab:generalization_ability}
+% \href{https://towardsdatascience.com/generalization-regularization-overfitting-bias-and-variance-in-machine-learning-aa942886b870}{(LINK)}: plot train and test losses vs epoch curves for some tasks except GANs (e.g. LSTM - available in curves folder: math.log(ppl), imagenet - extract loss from the logs. Value in parenthesis in the last line of test evaluation).\\
+To evaluate AdaBelief's ability to generalize, we analyze the bias and variance of image classification models trained using SGD, Adam, AdaBelief and Apollo optimizers on CIFAR-10 and CIFAR-100. We use the method outlined here \cite{ng_deep_nodate} for bias-variance analysis. For each optimizer, we note its train and test accuracy (Fig. \ref{table:CIFAR10_100}) corresponding to the epoch with best test accuracy (acc), and compute their difference. This data is stated as 3-tuples in Table \ref{table:bias_variance_cifar}. Lower training acc denotes high bias and vice-versa. The difference between the train and test acc is a measure of variance. Based on Table \ref{table:bias_variance_cifar}, we observe that AdaBelief models have the least bias on all configurations, while they have $2^{nd}$, $3^{rd}$ or $4^{th}$ lowest variance. SGD has the least variance on most configurations (highlighted in red), but their bias is high (mostly ranked $3^{rd}$ or $4^{th}$ in low bias). 
+    
+\begin{table}[htbp]
+    \begin{center}
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{ c| c  c  c | c  c  c }
+    \hline
+    \multirow{2}{*}{\textbf{Optimizer}} & \multicolumn{3}{c|}{\textbf{CIFAR-10}}  & \multicolumn{3}{c}{\textbf{CIFAR-100}} \\
+    \cline{2-7}
+    & VGG11 & ResNet34 & DenseNet121 & VGG11 & ResNet34 & DenseNet121\\
+    \hline
+    SGD & 95.88, 89.95, \textcolor{red}{5.93} & 98.77, 94.72, \textcolor{red}{4.05} & 98.72, 94.61, \textcolor{red}{4.11} & 78.87, 63.09, 15.78 & 98.94, 76.35, 22.59 & 94.67, 78.67, \textcolor{red}{16.00} \\
+    \hline
+    Adam & 94.68, 88.54, 6.14 & 98.36, 93.38, 4.98 & 99.23, 93.43, 5.80 & 67.63, 59.08, \textcolor{red}{8.55} & 92.73, 73.20, \textcolor{red}{19.53} & 96.69, 74.28, 22.41 \\
+    \hline
+    AdaBelief & \textcolor{blue}{99.36}, 91.57, 7.79 & \textcolor{blue}{99.96}, 95.26, 4.70 & \textcolor{blue}{99.97}, 95.67, 4.30 & \textcolor{blue}{98.84}, 68.29, 30.55 & \textcolor{blue}{99.97}, 77.48, 22.49 & \textcolor{blue}{99.96}, 78.66, 21.30 \\
+    \hline
+    Apollo & 98.79, 90.91, 7.88 & 99.74, 95.01, 4.73 & 99.82, 95.23, 4.59 & 74.80, 64.42, 10.38 & 99.54, 76.72, 22.82 & 99.68, 79.06, 20.62 \\
+    \hline
+    \end{tabular}}
+    \vspace{2mm}
+    \caption{Analysis of generalization capability of AdaBelief on CIFAR-10 and CIFAR-100 for VGG11, ResNet34 and DenseNet121 architectures using \textbf{bias} and \textbf{variance}. Each cell denotes a 3-tuple of the form (train acc, test acc, difference b/w train and test acc) corresponding to the model which achieves best test acc (out of 3 runs) for each configuration. For each column, the value in \textcolor{red}{red} denotes the optimizer with least \textbf{variance} (i.e. the least train-test acc difference) and the value in \textcolor{blue}{blue} denotes the optimizer with least \textbf{bias} (i.e. with most training acc). AdaBelief models achieve the least bias on all configurations, while they lag behind in terms of variance.}
+    \label{table:bias_variance_cifar}
+    \end{center}
+\end{table}
+
+\subsubsection{Evaluating convergence speed}
+\label{lab:convergence_speed}
+\begin{definition}[Epoch of Convergence (EC)]
+Let $m_k$ denote the metric (acc or ppl) at $k^{th}$ epoch. \textit{EC} is then defined as the smallest epoch $x$ such that $|m_y - m_x| < \delta$ $ \forall\ y \in [x,\ x + w]$, where $w$ and $\delta$ are chosen as $15$ and $0.05$ respectively. In other words, \textit{EC} is the smallest epoch for which there exists at least $w(=15)$ epochs to its right with accuracies (or perplexities) within a fixed tolerance $\delta(=0.05)$. If such $x$ cannot be found, the said optimizer is said to have \textit{failed to converge (FTC)}.
+\label{def:epoch_convergence}
+\end{definition}
+To address the claim on convergence ability different optimizers (section \ref{sec:claims}) we make use of Def. \ref{def:epoch_convergence}. We perform the analysis for Image Classification and Language Modeling (section \ref{lab:Results}) experiments. We smoothen the accuracy (or perplexity) curves for all optimizers by finding the exponential moving average (EMA) with a smoothing factor $\beta=0.7$. Analyzing the computed \textit{ECs} yield that the convergence speed of AdaBelief is comparable to other members of Adaptive family for experiments performed on CIFAR datasets (Fig. \ref{table:CIFAR10_100}). For Language Modeling experiments, we find that Adam and AdaBelief show similar convergence trends but considerably lag behind in comparison to RAdam, AdamW and Fromage (Fig. \ref{table:LSTM_test}) that are unaffected by learning rate decay which takes place at $100^{th}$ epoch. For exact $EC$ values refer Table \ref{table:convergence_epoch}.
+
+    
+
+	
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+% \subsubsection{Additional Result 1}
+% \subsubsection{Additional Result 2}
+
+\section{Ablation studies}
+\label{lab:ablation}
+\subsection{WikiText-2 on LSTM}
+\label{lab:WT2_LSTM}
+To study the performance change due to a larger dataset, we ran Language Modeling experiments on WikiText-2 \cite{WikiText_2} using AdaBelief and Adam optimizers with 1, 2, 3 layer LSTM models. Fig. \ref{table:LSTM_train_WT2}, \ref{table:LSTM_test_WT2} show train and test perplexity for 3 independent runs. It can be seen that the performance of Adam and AdaBelief is comparable on 1 and 2 layer LSTM models, while in the 3 layer case AdaBelief outperforms Adam by $\sim$ 5 ppl.
+% 	+ Spk Dzn \\
+
+\subsection{Effect of weight decay on ImageNet}
+\label{lab:wd_effect}
+% + Effect of wd on imagenet (plus AdamW experiment copy value from github issue) \\
+The paper \cite{zhuang_adabelief_2020} uses a weight decay of $10^{-2}$ while experimenting with AdaBelief on ImageNet. However, the results for other optimizers are from the literature that typically use a (smaller) weight decay of $10^{-4}$. To evaluate the effect of weight decay, we experiment with AdaBelief using weight decay = $10^{-4}$ and find $\sim 2\%$ drop in top-1 accuracy. So, it may be interesting to see the effect of weight decay on other optimizers.
+
+
+% In the paper \cite{zhuang_adabelief_2020}, the experiment for AdaBelief on ImageNet was run using (larger) weight decay $10^{-2}$, while the results for other optimizers were picked from the literature. These values correspond to a (smaller) weight decay of $10^{-4}$ (check these weight decay values). Weight decay has shown to have an impact \cite{Weight_decay_Reg} on test set accuracy. To evaluate the effect of weight decay, we ran experiments on AdaBelief using wd = $10^{-4}$ and found $\sim 2\%$ drop in top-1 accuracy. 
+% [see all the imagenet papers cited in AdaBelief imagenet table and report here the range of weight decay that they use] \\ \\
+% + Optimization path traverse videos denoting adabelief being faster - each experiment under this tests different type of functions to be optimized. \\
+
+% sngan fid with steps; adabelief and small wd adabelief acc over epochs
+\begin{table}[htbp]
+    \begin{center}
+    \begin{tabular}{c c}
+    
+    \includegraphics[width=0.450\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/SNGAN_FID.png} & \includegraphics[width=0.450\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/imagenet_wd_effect.png}  \\ 
+    (a) FID scores of SN-GAN on CIFAR-10 & (b) Effect of weight decay on AdaBelief \\
+    \end{tabular}
+    \vspace{2mm}
+    \captionof{figure}{(a) FID values of SN-GAN over training steps for different optimizers (best run plotted out of 5). AdaBelief fares second after RMSProp. (b) AdaBelief performs better when run on larger weight decay of $10^{-2}$.} 
+\label{fig:sngan_fid_imagenet_wd}
+    \end{center}
+\end{table}
+
+% % our contribution table
+% \begin{table}[htbp]
+% \centering
+%     \resizebox{\linewidth}{!}{%
+% % 		\begin{tabular}{c | c | L | c | L | L | c | L | L}
+% % 		\begin{tabular}{c | p{0.12\linewidth} | p{0.08\linewidth} | p{0.13\linewidth} | c | l | c | c | c}
+% 		\begin{tabular}{c  p{0.12\linewidth}  p{0.08\linewidth}  p{0.13\linewidth}  c  l  c  c  c}
+% 		\hline
+% 		\textbf{S. No.} & \textbf{Task} & \textbf{Dataset} & \textbf{Setup} & \textbf{Rep. Status} & \multicolumn{1}{c}{\textbf{Our Contribution}} & \textbf{No. of Exp.} & \textbf{GPU HPR} & \textbf{Total GPU hours} \\
+
+% 		\hline
+% 		1. & \multirow{3}{0.12\linewidth}{Image Classification} \rule{0pt}{9pt} & CIFAR-10 & VGG, RN, DN & \textcolor{green}{\checkmark} & Exp. on Apollo; bias-variance anal. & 30 & 2.5 & 75 \\
+
+% 		\cline{3-9}
+% 		2. \rule{0pt}{9pt} & & CIFAR-100 & VGG, RN, DN & \textcolor{green}{\checkmark} & Exp. on Apollo; bias-variance anal.  & 30 & 2.5 & 75 \\
+
+% 		\cline{3-9}
+% 		3. \rule{0pt}{9pt} & & ImageNet & ResNet18 & \textcolor{green}{\checkmark} & Analysis of weight decay & 5 & 22 & 110 \\
+
+% 		\hline
+% 		4. & \multirow{3}{0.12\linewidth}{Language Modeling} & \multirow{3}{0.08\linewidth}{PTB, WT2} \rule{0pt}{9pt} & LSTM (1 layer) & \textcolor{green}{\checkmark} & Fromage LRS; WT2 & 12 & 1.33 & 15.96 \\
+
+% 		\cline{4-9}
+% 		5. \rule{0pt}{9pt} & &   & LSTM (2 layer) & \textcolor{green}{\checkmark} & AdamW \& RAdam LRS; WT2 & 13 & 2.5 & 32.5 \\
+
+% 		\cline{4-9}
+% 		6. \rule{0pt}{9pt} & &   & LSTM (3 layer) & \textcolor{green}{\checkmark} & AdamW \& RAdam LRS; WT2 & 13 & 3.75 & 48.75 \\
+
+% 		\hline
+% 		7. & \multirow{3}{0.12\linewidth}{Generative Modeling} & \multirow{3}{0.08\linewidth}{CIFAR-10} \rule{0pt}{9pt} & WGAN \cite{WGAN} & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 0.89 & 53.55 \\
+
+% 		\cline{4-9}
+% 		8. \rule{0pt}{9pt} & &   & WGAN-GP \cite{WGAN-GP} & \textcolor{green}{\checkmark} & N/A (only reproduced paper's \cite{zhuang_adabelief_2020} exp.) & 70 & 1 & 66.5 \\
+
+% 		\cline{4-9}
+% 		9. \rule{0pt}{9pt} & &   & SN-GAN \cite{SN-GAN} & \textcolor{green}{\checkmark} & HP search; training stablity anal. & 45 & 15 & 675 \\
+
+% 		\hline
+% 		10. & Reinforcement Learning & N/A & Space Invaders (Atari) & \textcolor{green}{\checkmark} & Beyond AdaBelief paper \cite{zhuang_adabelief_2020} & 2 & 1 & 2 \\
+
+% 		\hline
+% 		\end{tabular}
+% 		}
+
+% 		\vspace{2mm}
+% 		\caption{Summary of our contributions and reproducibilty details of performed experiments. Exp. 1 to 9 are mentioned in the AdaBelief paper \cite{zhuang_adabelief_2020} and have been reproduced successfully along with some additional contribution to each experiment. We also perform exp. 10 which is not a part of AdaBelief paper.\hspace{\textwidth} [\textbf{Legend} - \textbf{Rep.}: Reproducibility, \textbf{Exp.}: "Experiment(s)", \textbf{HPR}: "hours per run", \textbf{RPO}: "runs per optimizer", \textbf{anal.}: "analysis", \textbf{HP}: "hyperparameter", \textbf{LRS}: "Learning Rate Search", \textbf{WT2}: "WikiText-2", \textbf{DN}: "DenseNet121", \textbf{RN}: "ResNet34", \textbf{VGG}: "VGG11", \textbf{PTB}: "Penn Treebank"]}
+% 		\label{table:our_contribution}
+% \end{table}
+
+
+
+
+\section{Discussion}
+\label{sec:discussion}
+% + how far were we able to verify each claim \\
+% + as many points as claims made above \\ \\
+
+We now summarize the validity of claims from section \ref{sec:claims}: (a) Results in section \ref{lab:Results} show that \textbf{AdaBelief outperforms other optimizers in most use cases}. (b) From section \ref{lab:convergence_speed}, we find that \textbf{the convergence speed of AdaBelief is largely in line with adaptive methods}. (c) Based on the analysis in section \ref{lab:generalization_ability}, we infer that AdaBelief generalizes well, which is evident by its models having lowest bias and relatively low variance. However, it does not uniformly outperform SGD. Therefore, \textbf{we fail to completely validate the ability of AdaBelief generalizing as well as SGD}. (d) Even though in section \ref{lab:training_stability}, the least difference between generator and discriminator loss is in case of RMSProp , AdaBelief does outperform other members of the adaptive family. It defeats SGD by a significant margin. Thus, we find that \textbf{AdaBelief has stability comparable to adaptive methods in complex settings like GANs}.
+
+%  (from the experiments performed above, mention if AdaBelief achieves its best results at a lower epoch compared to other optimizers; discuss the loss curve traversal diagrams denoting optimization speed)\\ 
+% \textbf{Does AdaBelief converge faster like the Adaptive gradient methods?}
+% We find the \textit{epoch of convergence (EC)} (definition \ref{def:epoch_convergence}) for different optimizers for image classification and language modeling experiments stated above in section <>.
+% To measure the convergence of different optimizers, we employ the following strategy: We choose a window size ($ws$) as $15$ and $\delta$ as 0.1, then we define the convergence epoch as the leftmost epoch at which we can find a window covering ws elements all having values within $\delta$ range of the present epoch. 
+
+% To analyze the training stability we look into difference between discriminator and generator losses. Based on the discussion in <Section x> we find RMSProp to be most stable followed by AdaBelief then Adam and SGD is most unstable. This is also evident from the standard deviation of FIDs for SNGAN experiments (0.08 for RMSProp, 0.22 for AdaBelief, 0.15 for Adam and 2.88 for SGD)
+    % + GANs generator discriminator test loss vs epoch curves \href{https://stackoverflow.com/questions/42690721/how-to-interpret-the-discriminators-loss-and-the-generators-loss-in-generative}{LINK} See the curve of GAN generator - discriminator loss. \\
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\textbf{What was easy} The authors provide implementation for most of the experiments presented in the paper. Well documented code and lucid paper helped understand the experiments clearly.
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\textbf{What was difficult} While hyperparameters (HP) of some experiments were absent (section \ref{lab:Generative_modeling}), some had discrepancies (section \ref{lab:Language_modling}). We had to perform grid search for these cases. Training SN-GAN and ImageNet was a resource intensive process which increased the computational burden (Table \ref{table:our_contribution}). Formulating the analysis to evaluate the claims of the paper was also challenging \ref{lab:results_beyond}.
+
+
+% The authors did not provide hyperparameters (HP) in some experiments (SN-GANs), while in few cases we found deviations in results using the HP values provided (2, 3 layer LSTM RAdam and AdamW), in both cases we carried out grid search and report the optimal HP (Table. \ref{table:hyperparam}) for which we get results in line with what was reported in the paper. Many experiments were performed on different tasks (Table. \ref{table:our_contribution}) using different optimizers, which was a time consuming process. Specifically training on ImageNet ($\sim 22 hrs.$) and SN-GAN ($\sim 15 hrs.$) were the most time and resource intensive experiments. Coming up with mechanisms (Sec. \ref{lab:convergence_speed}, \ref{lab:training_stability}, \ref{lab:generalization_ability}) to evaluate the claims of the paper was also challenging
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. % Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\textbf{Communication with original authors} We are thankful to the author Juntang Zhuang. He helped us with the implementation and HP details for various experiments. We confirmed the HP for WGAN, SN-GAN, and LSTM experiments. We also clarified the source of Penn Treebank dataset and blacklisting of images in ImageNet.
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+\textbf{Recommendations for reproducibility} Given the time and resource constraints, we performed only a basic analysis of bias-variance trade-off to evaluate the generalization ability of AdaBelief. A more advanced analysis might help in revealing the exact weakness of AdaBelief models in terms of ability to generalize.
+
+Based on our experiments, ablation studies and analysis, we find that AdaBelief is a promising optimizer combining the best of both worlds - accelerated and adaptive gradient methods.
+
+
+% \section{Conclusion}
+% We test AdaBelief on a wide range of modalities like Image classification, Language modeling, generative modeling and reinforcement learning. In addition to experiments performed by the author we  perform additional experiments (Sec. \ref{lab:results_beyond}) to evaluate claims of the author pertaining to stability, convergence and generalization of AdaBelief. Based on our analysis (Sec. \ref{sec:discussion})) we find AdaBelief to be a promising optimizer [end in a better way maybe?]
+% + repeat our contributions \\
+% + adabelief is a promising optimizer \\
+% + repeat the brief results: stable for GAN, best for LSTM..... \\ \\
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{c c}
+%     \includegraphics[width=0.45\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_AdaBelief.png} & \includegraphics[width=0.45\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_SGD.png} \\
+%     (a) AdaBelief & (b) SGD \\
+%     \includegraphics[width=0.45\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_Adam.png} &
+%     \includegraphics[width=0.45\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/Gen_Dis_Loss/SNGAN_Gen_Dis_loss_RMSProp.png} \\ 
+%     (c) Adam & (d) RMSProp \\
+%     \end{tabular}
+%     \vspace{2mm}
+%     \captionof{figure}{SN-GAN Generator Discriminator loss after smoothing the curves with $\beta$ = 0.95} 
+%     \label{table:gen_disc_loss_gap}
+%     \end{center}
+% % \end{sidewaystable}
+% \end{table}
+
+
+
+
+
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ccc}
+    
+%     \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
+    
+    
+%     \end{tabular}
+%  %                 
+%     \caption{\label{tab:LSTM_PTB_Plots} Left to right: perplexity ([$\mu \pm \sigma$]) on Penn Treebank for 1,2,3-layer LSTM. Lower is better}
+%     \end{center}
+% \end{table}
+
+
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[width=\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/fig_lstm.png}
+% 	\caption[Mask color palette]{Mask color palette}
+% 	\label{fig:Color_palette}
+% \end{figure}
+
+
+
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ccc}
+    
+%     \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
+    
+    
+%     \end{tabular}
+%  %                 
+%     \captionof{figure}{I don't want a table: My way} \label{table:mul}
+%     \end{center}
+% \end{table}
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ccc}
+    
+%     \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5a.png} & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5b.png}  & \includegraphics[width=0.31\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_trimmed_plot/Figure_5c.png} \\
+    
+    
+%     \end{tabular}
+%  %                 
+%     \captionof{figure}{I don't want a table: My way} \label{table:mul}
+%     \end{center}
+% \end{table}
+
+
+% \begin{table}[tbp]
+% \begin{tabular}{ c  c }
+% % \hline
+% \includegraphics[scale=0.380]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5a.png} &
+% \includegraphics[scale=0.380]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5a.png} \\
+% % \hline
+% (a) & (b) \\
+% % \hline
+% \multicolumn{2}{ c }{\includegraphics[scale=0.50]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/LSTM_plots/Figure_5a.png}} \\
+% % \hline
+% \multicolumn{2}{ c }{(c)} \\
+% % \hline
+% \end{tabular}
+% \caption[Visualization of x-vectors from CALLHOME recordings]{\textbf{Experiment 3(b)}: Visualization of x-vectors from CALLHOME's recordings extracted using the PyTDNN fine-tuned on a subset of telephony data. (a) Recording \textbf{iaaa}, 2 speakers with 70\%-30\% speech duration. (b) Recording \textbf{iamo}, 2 speakers, 50\%-50\% speech duration. (c) Recording \textbf{iaqs}, 3 speakers, 20\%-30\%-50\% speech duration.}
+% \label{table:callhome_viz}
+% \end{table}
+
+
+
+
+% AdaBelief RAdam RMSProp Adam Fromage Yogi SGD MSVAG AdaBound
+% 12.52 ± 0.16 12.70 ± 0.12 13.13 ± 0.12 13.05 ± 0.19 42.75 ± 0.15 14.25 ± 0.15 49.70 ± 0.41 48.35 ± 5.44 55.65 ± 2.15
+
+% vertical table
+% \begin{table}[htbp]
+%     \begin{center}
+    
+%     \begin{tabular}{ | c | c | c | }
+%     \hline
+%     Optimizer & top-1 acc Imagenet & SN-GAN FID \\
+%     \hline
+%     Adabelief & 0.00 & 48.94$\pm$2.88 \\
+%     \hline
+%     RAdam & 67.62\textsuperscript{\textdaggerdbl} & 13.01$\pm$0.15 \\
+%     \hline
+%     RMSProp & - & 12.86$\pm$0.08 \\
+% \hline
+% Adam & 63.79\textsuperscript{\textdagger} (66.54\textsuperscript{\textdaggerdbl}) & 12.98$\pm$0.22 \\
+% \hline
+% Fromage & - & 14.16$\pm$0.05 \\
+% \hline
+% Yogi & 68.23\textsuperscript{\textdagger} & 56.89$\pm$2.61 \\
+% \hline
+% SGD  & 70.23\textsuperscript{\textdagger} & 13.1$\pm$0.2 \\
+% \hline
+% MSVAG & 63.28 & 46.31$\pm$0.86 \\
+% \hline
+% Adabound & 68.13\textsuperscript{\textdagger} & 16.84$\pm$0.1\\
+% \hline
+% AdamW & 67.93\textsuperscript{\textdagger} & -\\
+% \hline
+%     \end{tabular}
+%  %    
+%     \vspace{2mm}
+%     \caption{verti tab} 
+%     \label{table:vertical table}
+%     \end{center}
+% \end{table}
+
+
+
+
+
+
+
+
+% % vertical sngan
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ | c | c |}
+%     \hline
+%     \textbf{Optimizer} & \textbf{FID} \\
+%     \hline
+%     Adabelief & 48.94$\pm$2.88 \\
+%     \hline
+%     RAdam  & 13.01$\pm$0.15 \\
+%     \hline
+%     RMSprop & 12.86$\pm$0.08 \\
+%     \hline
+%     Adam & 12.98$\pm$0.22 \\
+%     \hline
+%     Fromage & 14.16$\pm$0.05 \\
+%     \hline
+%     Yogi & 56.89$\pm$2.61 \\
+%     \hline
+%     SGD & 13.10$\pm$0.20 \\
+%     \hline
+%     MSVAG & 46.31$\pm$0.86 \\
+%     \hline
+%     Adabound & 16.84$\pm$0.10 \\
+%     \hline
+%     \end{tabular}
+%     \vspace{2mm}
+%     \caption{verti tab} 
+%     \label{table:vertical_table_1}
+%     \end{center}
+% \end{table}
+
+% % vertical padam
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{ | c | c | c | }
+%     \hline
+%     \textbf{Optimizer} & \textbf{FID (WGAN)} & \textbf{FID (WGAN-GP)}\\
+%     \hline
+%     Adabelief & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=1/2 (Adam) & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=2/5 & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=1/4 & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=1/5 & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=1/8 & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=1/16 & a$\pm$b & a$\pm$b \\
+%     \hline
+%     p=0 (SGD) & a$\pm$b & a$\pm$b \\
+%     \hline
+%     \end{tabular}
+%     \vspace{2mm}
+%     \caption{verti tab} 
+%     \label{table:vertical_table_2}
+%     \end{center}
+% \end{table}
+
+
+% minipage sngan side-to-side padam
+% \begin{table}[t]
+%     \begin{minipage}{0.35\textwidth}
+%     \centering
+%      \begin{tabular}{ | c | c | }
+%         \hline
+%         \textbf{Optimizer} & \textbf{FID} \\
+%         \hline
+%         AdaBelief & 12.98 $\pm$ 0.22 \\
+%         \hline
+%         RAdam & 13.10 $\pm$ 0.20 \\
+%         \hline
+%         RMSprop & 12.86 $\pm$ 0.08 \\
+%         \hline
+%         Adam  & 13.01 $\pm$ 0.15 \\
+%         \hline
+%         Fromage & 46.31 $\pm$ 0.86 \\
+%         \hline
+%         Yogi & 14.16 $\pm$ 0.05 \\
+%         \hline
+%         SGD & 48.94 $\pm$ 2.88 \\
+%         \hline
+%         MSVAG & 56.89 $\pm$ 2.61 \\
+%         \hline
+%         AdaBound & 16.84 $\pm$ 0.10 \\
+%         \hline
+
+%     \end{tabular}
+%     \vspace{2mm}
+%     \caption*{(a)}
+%     \end{minipage}
+%     % \hfillx
+%     \begin{minipage}{0.65\textwidth}
+%     \centering
+%     \begin{tabular}{ | c | c | c | c | }
+%         \hline
+%         \textbf{S. No.} & \textbf{Optimizer} & \textbf{FID (WGAN)} & \textbf{FID (WGAN-GP)}\\
+%         \hline
+%         1. & AdaBelief & 82.85 $\pm$ 2.21 & 75.37 $\pm$ 7.37 \\
+%         \hline
+%         2. & p=1/2 (Adam) & 106.38 $\pm$ 9.76 & 71.87 $\pm$ 0.83 \\
+%         \hline
+%         3. & p=2/5 & 95.66 $\pm$ 3.76 & 85.42 $\pm$ 5.15 \\
+%         \hline
+%         4. & p=1/4 & 422.62 $\pm$ 35.68 & 152.34 $\pm$ 17.49 \\
+%         \hline
+%         5. & p=1/5 & 396.69 $\pm$ 24.91 & 170.80 $\pm$ 20.43 \\
+%         \hline
+%         6. & p=1/8 & 330.44 $\pm$ 26.62 & 205.57 $\pm$ 13.79 \\
+%         \hline
+%         7. & p=1/16 & 357.26 $\pm$ 32.39 & 228.40 $\pm$ 18.24 \\
+%         \hline
+%         8. & p=0 (SGD) & 459.01 $\pm$ 14.62 & 236.99 $\pm$ 7.26 \\
+%         \hline
+%     \end{tabular}
+%     \vspace{2mm}
+%     \caption*{(b)}
+%     \end{minipage}
+%     \caption{(a) FID ([$\mu \pm \sigma$]) of a SN-GAN with ResNet generator on Cifar10. (b) FID values ([$\mu \pm \sigma$]) using AdaBelief and Padam (rows 2 to 8) on WGAN and WGAN-GP. Lower FID is better.}
+%     \label{table:sngan_padam_fid}
+% \end{table}
+
+
+
+
+% Snippet to resize a table to linewidth
+% \noindent\hrulefill
+
+% \smallskip\noindent
+% \resizebox{\linewidth}{!}{%
+% \begin{tabular}{r|lll}
+% \multicolumn{1}{r}{}
+% & \multicolumn{1}{l}{Heading 1}
+% & \multicolumn{1}{l}{Heading 2}
+% & \multicolumn{1}{l}{Heading 3} \\ \cline{2-4}
+% Row 1 & Cell 1,1 & Cell 1,2 & Cell 1,3 \\
+% Row 2 & Cell 2,1 & Cell 2,2 & Cell 2,3
+% \end{tabular}}
+
+
+
+
+
+
+
+
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[scale=0.5]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/GAN_plots/SNGAN_FID.png}
+% 	\caption[SN-GAN FID]{SN-GAN FID v/s Steps}
+% 	\label{fig:SN-GAN FID}
+% \end{figure}
+
+
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{c c c}
+    
+%     \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/real_samples.png} & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_adabelief.png}  & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_adabelief.png} \\
+%     \end{tabular}
+%     \vspace{2mm}
+%     \captionof{figure}{Left to right: real images, samples from WGAN, WGAN-GP (both trained by AdaBelief)} \label{table:WGAN_and_GP_fake}
+%     \end{center}
+% \end{table}
+
+% \begin{table}[htbp]
+%     \begin{center}
+%     \begin{tabular}{c c c}
+    
+%     \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/real_samples.png} & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/WGAN_Fake_Images/Figure_7_adabelief.png}  & \includegraphics[width=0.305\textwidth]{../openreview/Reproducibility_Challenge_2020/Reproduced_figures/WGAN-GP_Fake_Images/Figure_7_adabelief.png} \\
+%     \end{tabular}
+%     \vspace{2mm}
+%     \captionof{figure}{Left to right: real images, samples from WGAN, WGAN-GP (both trained by AdaBelief)} \label{table:WGAN_and_GP_fake}
+%     \end{center}
+% \end{table}
+
+
+
+
+% \label{Bibliography}
+
+% \lhead{\emph{Bibliography}} % Change the page header to say "Bibliography"
+% \section*{References}
+% \printbibliography
+% \bibliographystyle{plain}
+% \bibliography{Bibliography}
