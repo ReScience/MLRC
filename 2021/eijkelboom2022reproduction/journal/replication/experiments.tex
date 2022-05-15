@@ -1,0 +1,45 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+\usepackage{todonotes}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\begin{document}
+
+{\Large \textbf{Ideas for replication}}
+
+\bigskip
+
+\textbf{Experiments}
+
+\begin{enumerate}
+    \item Reproduction, do we get the same results as the authors? Moreover, provide confidence intervals to interpret the results better.
+    \item Perform similar experiments on different datasets. Compare if they work, and if they are significantly better than previous SotA. Datasets we will consider:
+    \begin{itemize}
+        \item Dutch census dataset \url{https://www.cbs.nl/nl-nl/achtergrond/2005/45/the-dutch-national-census-2001--40-excel-tables--} Checken!!!
+        \item Student-Mathematics dataset: \url{https://www.kaggle.com/janiobachmann/math-students}
+    \end{itemize}
+    \item Consider different cluster algorithms. Algorithms we will consider:
+    \begin{itemize}
+        \item K-center 
+        \item PAM (partition clustering)
+        \item Clara (partition clustering)
+        \item DBSCAN (density based)
+    \end{itemize}
+    \item Alter $J$ values, compare Bank dataset but with $J = 2$ (instead of $J=3$ martial status) as used in Bera et al. 2019 and Backurs et al. 2019 and see if Variational Fair clustering still performs better. 
+    \item Extra: Experiment with different $K$/$U$. What if $U$ is not accurate/biased itself. 
+    \item Andere divergence.
+\end{enumerate}
+
+
+
+\end{document}

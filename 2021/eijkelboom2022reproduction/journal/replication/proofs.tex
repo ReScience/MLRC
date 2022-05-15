@@ -1,0 +1,82 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+\usepackage{amsthm}
+
+\usepackage{parskip}
+
+\usepackage{todonotes}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{prop}{Proposition}
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\begin{document}
+
+{\Large \textbf{Proofs}}
+
+\bigskip
+
+\begin{prop}
+Given current clustering solution $\mathbf{S}^i$ at iteration $i$, the auxiliary function for Kernel-Based Clustering can be written as the following general form:
+$$\mathcal{H}_i(\mathbf{S}) = \sum_p \textbf{s}_p^t  \textbf{a}_p^t.$$
+\end{prop}
+\begin{proof}
+Let $\kappa: X \times X \to \mathbb{R}$ be an arbitrary kernel function. We can alter $K$-means by incorporating a kernel function is our distance metric, i.e. we still minimise
+$$\min \sum_k \sum_p s_{p,k} d(\textbf{x}_p, \textbf{c}_k),$$
+where now the distance metric is given by\footnote{Hall, L. O. (2012). Objective function‐based clustering. Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 2(4), 326-339.}
+\begin{equation}
+\label{KBC_metric}
+  d(\textbf{x}_p, \textbf{c}_k) = \kappa(\textbf{x}_p, \textbf{x}_p) - 2 \frac{\sum_{l=1}^n s_{l, k} \kappa(\textbf{x}_l, \textbf{x}_p)}{\sum_{l=1}^n s_{l, k}} + \frac{\sum_{q=1}^n \sum_{l=1}^n s_{q, k} s_{l, k} \kappa(\textbf{x}_q, \textbf{x}_l)}{(\sum_{q=1}^n s_{q, k})^2}.
+\end{equation}
+
+By a similar argument as given by the authors, we see that
+$$\sum_p s_{p, k}(\textbf{x}_p - \textbf{c}_k)^2 \leq \sum_p s_{p, k}d(\textbf{x}_p - \textbf{c}^i_k),$$
+and hence we can write
+\begin{equation*}
+    \mathcal{H}_i(\mathbf{S}) = \sum_p \textbf{s}_p^t  \textbf{a}_p^t,
+\end{equation*}
+where $a_{p, k}^i$ is given by $d(\textbf{x}_p, \textbf{c}_k^i)$ as given in \ref{KBC_metric}.\end{proof}
+
+% \begin{prop}
+% Given current clustering solution $\mathbf{S}^i$ at iteration $i$, the auxiliary function for $K$-medoids takes an equivalent general form as $K$-medians under an arbitrary distance metric.
+% \end{prop}
+% \begin{proof}
+% For distance function $d$, we define the medoid of dataset $X$ as
+% $$\textbf{x}_{\text{medoid}} := \argmin_{\textbf{y} \in X} \sum_{p=1}^N d(\textbf{x}_p, \textbf{y}).$$
+% For $K$-medoids, we see that the minimum loss for some cluster $S_k$ is found by
+% $$\textbf{c}_k = \argmin_{\textbf{y}} \sum_p s_{p, k}d(\textbf{x}_p, \textbf{y}),$$
+% and hence by a similar argument we have that
+% $$\sum_p s_{p, k}d(\textbf{x}_p, \textbf{c}_k) \leq  \sum_p s_{p, k}d(\textbf{x}_p, \textbf{c}_k^i).$$
+% When considering all clusters we therefore find the bound
+% $$\mathcal{H}_i(\mathbf{S}) = \sum_{p=1}^N \textbf{s}_p^t d(\textbf{x}_p, \textbf{c}_k^i),$$
+% which is equivalent to the formulation of $K$-medians.\footnote{Typo in paper? Says argmin $y$ over expression without $y$, should $c_k$ be changed to $y$?}\end{proof}
+
+% \newpage
+
+% \textbf{Problem: } We want to take relationships between different data points into account. Commonly, we use the underlying graph of some data set to define this relationship, where the relationship is given by the adjacency matrix of the (directed) graph. However, graph clustering algorithms usually are not expressed using an objective function, which makes is incompatible with the method proposed by the authors.\footnote{Src: Schaeffer SE. Graph clustering. Comput Sci Rev 2007, 1:27–64.} 
+
+% \textbf{Solution: }We can alter $K$-means to work with graphs, as described by \footnote{WIREs Data Mining Knowl Discov 2012, 2: 326–339 doi: 10.1002/widm.1059}. Let $\rho(\textbf{x}_i, \textbf{x}_j) = r_{ij} \in [0, 1]$ denote a binary relation between $\textbf{x}_i$ and $\textbf{x}_j$. Then, our objective function for $K$-means taking into account the graph structure of the data is given by\footnote{Ignoring the $m$ for now.}
+% $$\sum_{i=1}^k (\sum_{j=1}^p \sum_{l=1}^p \frac{s_{j, i} s_{l, i} r_{jl}}{2 \sum_{t=1}^n s_{ij}}).$$
+% Hence, for each cluster $S_k$, the sample mean of the cluster is again give by the closed-form global optimum of summation $\sum_{j=1}^p \sum_{l=1}^p \frac{s_{i, j} s_{i, l} r_{jl}}{2 \sum_{t=1}^n s_{j. i}}$, that is\footnote{I still think that the second equation of the proof of proposition $2$ (i.e. the one starting with $c_k$) has an incorrect argmin over $y$.}
+% $$\textbf{c}_k = \argmin_y \sum_{j=1}^p \sum_{l=1}^p \frac{s_{j, y} s_{l, y} r_{jl}}{2 \sum_{t=1}^n s_{ij}}.$$
+% Using a similar argument, we have that for any $\textbf{y}$ it holds that
+
+
+% \newpage
+
+
+
+
+
+
+
+\end{document}

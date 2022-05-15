@@ -1,0 +1,368 @@
+\section*{Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+Variational Fair Clustering (VFC) is a general variational fair clustering framework that is compatible with a large class of clustering algorithms, both prototype-based and graph-based \cite{ziko2021variational}. VFC is capable of handling large datasets and offers a mechanism that allows for a trade-off between fairness and clustering quality. We run a series of experiments to evaluate the major claims made by the authors. Specifically, that VFC is on par with SOTA clustering objectives, that it is scalable, that it has a trade-off control, and that it is compatible with both prototype-based and graph-based clustering algorithms.
+
+\subsection*{Methodology}
+To reproduce the results from Ziko et al., the original code is altered by removing bugs. This code is used to perform reproduction experiments to test the four claims made by the authors, as described above. Furthermore, three replication experiments have been implemented as well: different values for the trade-off parameter and Lipschitz constants have been investigated, an alternative dataset is used, and a kernel-based VFC framework has been derived and implemented.
+
+\subsection*{Results}
+
+We found that that three of the four claims made by Ziko et al. are supported, and that one claim is partially supported. VFC is mostly on par with SOTA clustering objectives, if the trade-off parameter and Lipschitz constant are tuned. Additionally, we verified that VFC is scalable on large-scale datasets and found that the trade-off control works as stated by the authors. Moreover, we conclude that VFC is capable of handling both prototype-based and graph-based datasets. Regarding the replicability of VFC, the experiment on the alternative dataset did not indicate that VFC is worse than SOTA baselines. The proposed kernel-based VFC performs on par with the original framework.
+
+
+\subsection*{What was easy and difficult}
+
+The original paper provides extensive theoretical derivations and explanations of the VFC approach, both through derviations and text. Moreover, the code of the original paper was publicly available. The original authors responded quickly to our mails and were very willing to discuss our results.
+Although the VFC code was publicly available, it was undocumented and contained some bugs that were hard to find given the lack of documentation. Moreover, there were vast differences between the implementation of the original authors and the baseline models. This required conversions between the models for the comparisons. Lastly, running the VFC code took many hours, which resulted in us not being able to run all algorithm-dataset combinations we wanted to.
+
+\subsection*{Communication with original authors}
+The original authors have been approached twice. The mail contact helped clarify implementation details, particularly regarding the Ncut algorithm. The authors explained and specified the usage of the trade-off parameter and the Lipschitz constant. Additionally, they explained how they obtained the $K$-means baseline results. The authors have been informed about our proposed kernel-based VFC framework and replied with enthusiasm.
+
+\newpage
+
+\section{Introduction}
+Fairness in machine learning (ML) has received significant interest as ML algorithms are used in, for example, financial, marketing, and educational decision purposes, thereby directly influencing human lives. However, achieving fairness is still a challenge due to neglected or unaware biases in the data and ambiguity of the definition \cite{mehrabi2021survey}.
+
+One of the notions of fairness is \textit{fair clustering} \cite{chierichetti2018fair, bera2019fair,backurs2019scalable, huang2019coresets, rosner2018privacy, schmidt2018fair, kleindessner2019guarantees}. Fair clustering is a clustering approach where the resulting cluster assignment should not be disproportionately different for individuals with different protected attributes (e.g. gender). This is achieved by balancing the distribution of protected subgroups in each cluster. A limitation of state-of-the-art (SOTA) fair clustering algorithms is that they can only be used for either prototype-based or graph-based objectives. For large datasets, graph-based clustering algorithms pose additional difficulties since they are not computationally scalable.
+
+In the paper \textit{Variational Fair Clustering} (VFC), \cite{ziko2021variational} address these problems. They propose the VFC framework that provides a general fair formulation for both prototype-based and graph-based clustering objectives by incorporating an original fairness term. This framework is implemented using three well-known clustering objectives ($K$-medians, $K$-means, and Ncut), and are compared to their respective SOTA versions from \cite{backurs2019scalable}, \cite{bera2019fair}, and \cite{kleindessner2019guarantees}.
+
+
+
+\section{Scope of reproducibility}
+\label{sec:scope}
+In this reproducibility study, we focus on the main claims of Ziko et al. (original authors, OA) stated in their paper (original paper, OP). The SOTA fair clustering algorithms are referred to as baselines. The main claims of the OP are:
+
+\begin{enumerate}[start=1, noitemsep, label={Claim \arabic*}]
+	\item\label{claim:1} VFC is on par with state-of-the-art clustering objectives on the Synthetic, Synthetic-unequal, Adult, Bank, and Census II datasets:
+	\begin{enumerate}[noitemsep, label=\alph*]
+		\item VFC using $K$-medians has lower objective energies, lower fairness errors, and higher balances than the baseline \cite{backurs2019scalable}. \label{claim:1a}
+		\item VFC using $K$-means has lower objective energies than the baseline \cite{bera2019fair}, but will achieve similar fairness errors and balances. \label{claim:1b}
+		\item VFC using Ncut has slightly higher objective energies than the baseline \cite{kleindessner2019guarantees}, but achieves similar fairness errors and balances\footnote{The OA do not specify what is considered `slightly' worse. If we consider the maximum relative deviation considered as `slight' in the OP, we come to a relatively high figure of $100\%$. We decided to not formalise this idea for this was not needed interpreting our results.}. \label{claim:1c}
+	\end{enumerate}
+	\item\label{claim:2} It is computationally feasible to run VFC using the Ncut algorithm on large-scale datasets that have 2.5 million records.
+	\item\label{claim:3} VFC provides the best clustering objective with the smallest $\lambda$ that satisfies a pre-defined fairness level $\sum_k \mathcal{D}_{KL}(U||P_k)\leq \epsilon$.
+	\item\label{claim:4} VFC is capable of performing both prototype-based and graph-based clustering objectives.
+\end{enumerate}
+
+
+
+
+\section{Methodology}
+We test the validity of the claims using the provided VFC framework. In the following sections we cover the description of this architecture, the used datasets and hyperparameters. We include an experimental setup and code section which covers three reproduction experiments and three replication exerpiments. The former is performed to evaluate the reported results, and the latter is conducted to further analyse the claims and improve on the proposed framework. This work includes tuning hyperparameters, testing alternative datasets, and introducing a kernel-based clustering approach.
+
+\subsection{Model description}
+
+The VFC objective is described by a variational trade-off between a clustering objective and an original fairness objective. The fairness objective is given by the KL-divergences between the demographic proportions in the data and the distributions of each cluster. The trade-off is regulated by the hyperparameter $\lambda$. The OA derive a general convex-concave formulation for the VFC objective, which is optimised using auxiliary functions (for the formal details, see the OP). The VFC requires a predefined number of clusters ($K$), a trade-off parameter ($\lambda$), and a sensitive attribute (e.g. gender).
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of
+% parameters, and other relevant info (e.g. if it’s pretrained).
+
+
+
+
+
+\subsection{Datasets}
+The VFC algorithm has been tested on five datasets, two of which were synthetically created by the OA. Both synthetic datasets have two demographic groups and 400 numeric data points. The \textit{Synthetic} (SB) dataset is balanced, as both demographic groups contain 200 data points. The \textit{Synthetic-unequal} (SU) dataset has 300 and 100 data points in the groups respectively. The OA also used three real datasets from the UCI machine learning repository\footnote{\url{https://archive.ics.uci.edu/ml/index.php}}: \textit{Bank}\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Bank+Marketing}}, \textit{Adult}\footnote{\url{https://archive.ics.uci.edu/ml/datasets/adult}}, and \textit{Census II}\footnote{\url{https://archive.ics.uci.edu/ml/datasets/US+Census+Data+(1990)}}. We use the same sensitive attributes and remove the same values within the datasets as the OP. 
+
+Our replicability research uses the VFC algorithm on two datasets: \textit{Student}\footnote{\url{https://archive.ics.uci.edu/ml/datasets/student+performance}} and \textit{Drugnet}\footnote{\url{https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/drugnet}}. We use the sex or gender as sensitive attribute. An overview of the characteristics of the real datasets can be found in the appendix.
+
+
+\subsection{Hyperparameters}
+In the reproduction experiments, the hyperparameters are set to have the same value as in the OP. An overview of the hyperparameters can be found in the appendix. Note that different Lipschitz constants are used for different parts of reproduction, as is explained in more detail in \autoref{sec:difficult}. The OP conducted a hyperparameter search on the $\lambda$ and $K$ parameters as two of their experiments, but did not draw any conclusions with regard to the value of $K$. 
+
+For our additional experiments, we perform hyperparameter searches for the $\lambda$ parameter and Lipschitz constant on all datasets but the Census II dataset to improve the OP's results. We considered seven different Lipschitz constants, as shown in \autoref{fig:Lipschitz_experiments}, with 10 different seeds each. We conducted another manual search for the $\lambda$ parameter after fixing the Lipschitz constants. Here we tested the integer values $1$ up to $10$, in addition to $0.5$ and $1.2$ for Ncut. For $K$-means and $K$-medians 20 different values between $3000$ and $10000$ were tested. The tuned hyperparameters are reported in the appendix. For the kernel approach, a small manual search has been conducted over the integers $1$ up to $10$ for every parameter in the kernel.
+
+
+
+
+
+
+\subsection{Experimental setup and code}
+The code provided by the OA\footnote{\url{https://github.com/imtiazziko/Variational-Fair-Clustering}} was used to reproduce the experiments. This code contained some bugs, hence we created an updated codebase\footnote{\url{https://github.com/MarkiemarkF/FACT}} for our experiments. The code for the $K$-means baseline\footnote{\label{bera_note}\url{https://github.com/nicolasjulioflores/fair_algorithms_for_clustering}} \cite{bera2019fair} is used to create replication results. Due to limited time and resources, we have not implemented the baselines for $K$-medians \cite{backurs2019scalable} and Ncut \cite{kleindessner2019guarantees}. Lastly, the results on the Drugnet dataset obtained by Kleindessner et al. are used as baseline in one of the replication experiments.
+
+% The $K$-means baseline results mentioned in the OP are used in the replication as well \cite{bera2019fair}. Due to limited time and resources, we have not implemented the baselines for $K$-medians \cite{backurs2019scalable} and Ncut \cite{kleindessner2019guarantees}.
+
+We conduct a total of three reproduction experiments and three replication experiments. The reproduction experiments consist of comparing the baseline models to VFC, testing the scalability of the Ncut algorithm, and recreating the $\lambda$ plots from the OP. The replication experiments include tuning the Lipschitz constant, exploring the generalisability of VFC on other datasets, and introducing a kernel-based VFC. 
+
+
+
+
+
+\paragraph{Reproduction experiments}
+For the comparison experiments defined in \ref{claim:1}, the clustering algorithms $K$-medians, $K$-means, and Ncut are applied to all five datasets used in the OP.
+% Every algorithm-dataset combination is run with different seeds to obtain a mean and a standard deviation.
+% All combinations are run with 30 different seeds except the Census II dataset and the Ncut algorithm, as these combinations take infeasibly long. Hence, these are run with only five different seeds.
+The performance of the algorithms is measured with three metrics as defined in the OP: clustering energy (objective), fairness error, and balance. Every algorithm-dataset combination is run with different seeds to obtain a mean and a standard deviation. All combinations are run with 30 different seeds except the Census II dataset and the Ncut algorithm, as these combinations take infeasibly long. These are run with only five different seeds. To prevent the metrics from taking outliers into account, Chauvenet's criterion \cite{lin2007cleaning} is used (see appendix).
+We consider a statistic reproducible if is at least as good as the one reported results in the OP. Moreover, a result is unreproducible if the reproduction attempt is at least one standard deviation worse. All values in between are labelled inconsistent.
+
+Scalability, as defined in \ref{claim:2}, is evident from the results of the fair Ncut algorithm on the largest dataset, Census II. If the OP's results of this combination are successfully reproduced in a reasonable time frame, this implies scalability.
+
+To test \ref{claim:3}, the $\lambda$ plots in the OP's Figure 2 are reproduced by running the Fair $K$-means and Ncut algorithms on the Adult and Bank datasets with varying $\lambda$ values. The Ncut plots are generated with both a Lipschitz constant of 2.0 and 0.001.
+
+Albeit the OA discuss Figure 3 in the OP, no claim has been made on the impact of the value of $K$ for the algorithms. Therefore, this figure is not reproduced in this research.
+
+After failing to reproduce some reported results, it was established in communication with the OA that some reported $\lambda$ values are incorrect and therefore unknown. A manual search is executed to test 10 $\lambda$ values ranging from $100$ to $1500$ for the $K$-medians and $K$-means algorithms on the SB dataset. The search is not feasible for Ncut algorithm on Census II, given the limited time and resources of this research. Note that the results for $\lambda = 0$ can be interpreted as the performance of the algorithm not taking into account fairness at all. 
+
+\paragraph{Tuning the Lipschitz constant}
+The effect of the unreported Lipschitz constant is investigated by running the Adult and Bank datasets with seven different Lipschitz constants ranging from $10^{-5}$ to $2.0$, with 10 different seeds for all three algorithms. Afterwards, 30 different seeds are tested for the tuned Lipschitz and $\lambda$ values for the Adult and Bank datasets. Lastly,  we run the Ncut algorithm on Census II three times with Lipschitz $10^{-5}$ to retest scalability.
+
+%studies the performance of an AI system by removing certain components, to understand the contribution of the component to the overall system
+\paragraph{Exploring other datasets} To evaluate the performance of the VFC framework, the experiment performed by the OA has been replicated. The implementation\footref{bera_note} of the $K$-means baseline paper \cite{bera2019fair} used IBM's \texttt{Cplex Optimiser}\footnote{\url{https://www.ibm.com/products/ilog-cplex-optimization-studio/resources}}, which we were not able to get full access to. Given that we were therefore limited to using smaller datasets, only the Student dataset was used. This baseline uses a fairness trade-off parameter $\delta$ describing how loose the fairness condition is, with $0 \leq \delta \leq 1$. The fairness condition is met exactly when $\delta = 0$, and is ignored when $\delta = 1$. No $\delta$ has been specified in the work of the OA; we opted for a relatively high value of $\delta = 0.9$ as a result of a small manual search: due to the small size of the dataset, all $\delta$ values up to $0.9$ yielded an equal fairness error. We therefore opted to use the highest value to yield the best fairness error to favour the baseline. 
+
+Furthermore, to verify whether the VFC-algorithm can be applied to graph-based structures, as stated in \ref{claim:4}, the Fair Ncut algorithm is run on the Drugnet dataset. In the OP, the Ncut algorithm was only used on non-graphical datasets that were converted to graphical data using pair-wise affinities. In the derivation of the respective auxiliary function, the OA assume the adjacency matrix to be positive semi-definite. Hence, we evaluate if the graph-based framework also works on non-synthetic adjacencies. This is evaluated by using the Drugnet dataset and comparing it to the Ncut baseline \cite{kleindessner2019guarantees}.
+
+
+\paragraph{Kernel-based clustering} \label{par:kbc} 
+To derive a kernel-based VFC framework, a reformulated objective and corresponding auxiliary function have to be derived. Kernel-based clustering can be seen as a generalisation of $K$-means clustering. Rather than minimising the Euclidean distance between the individual points and their corresponding cluster centres, a kernel-based distance metric is minimised, i.e. the objective is given by:
+\begin{equation}
+	\label{eq:KBC_objective}
+	\min_{\mathbf{S}} \sum_k \sum_p s_{p, k} d(\textbf{x}_p, \textbf{c}_k) ~\text{ s.t. }~ \textbf{s}_p \in \nabla_K \forall p,
+\end{equation}
+for some kernel-based distance metric $d$. This definition provides a general formulation which combined with the VFC fairness term is refereed to as kernel-based VFC. We make use of the following fact:
+\begin{prop}\label{prop:kernel}
+	Given current clustering solution $\mathbf{S}^i$ at iteration $i$, the auxiliary function for kernel-based clustering can be written in the following general form:
+	$$\mathcal{H}_i(\mathbf{S}) = \sum_p \textbf{s}_p^t  \textbf{a}_p^i,$$
+	where $\bm{a}_p^i$ is given by a kernel-based distance metric $d(\bm{x}_p, \bm{c}_k^i)$ (proof in \autoref{appendix:proof_prop_1}).
+\end{prop}
+We conduct a third experiment to evaluate the effect of using a kernel in VFC. The kernel-based approach is implemented and evaluated with the polynomial kernel, the Gaussian kernel, and the hyperbolic tangent kernel. These decisions are motivated in the appendix.
+Given that no cluster labels are available, a measure of consistency within clusters, called silhouette coefficient (SC), is used as a measure, c.f. \cite{dinh2019estimating}. The fairness error and balance metric are used as well. To ensure that SC is not biased to any of the two algorithms, the cosine similarity is used for comparison. The use of a kernel implies a computational complexity of $\mathcal{O}(N^2KM)$ and hence only the smaller datasets such as SB, SU, and 2,500 random entries from the Bank dataset are considered (more information on the complexity is given in the appendix). Due to time constraints, only a single run has been done for each dataset and kernel combination. 
+
+\subsection{Computational requirements}
+All results were obtained on Windows 10 with an Intel i7-10875H CPU. The GPU is not used as the algorithms are optimised for CPU multiprocessing. In total, the runtime of all reported results in this paper was 107 hours. Including explorative experiments, the total runtime was 160 hours. Of this total, 135 hours were for conducting the experiments on the Census II dataset. Specific runtimes per algorithm-dataset combination are given in the appendix.
+
+
+
+\section{Results}\label{sec:results}
+We have conducted the aforementioned experiments and gathered the results together in the following two subsections. The first subsection focuses on the findings of the reproduction experiments. The second subsection covers the findings of the replication experiments.
+
+\subsection{Results reproducing original paper}
+\begin{table}[]
+	\small
+	\centering
+	% \begin{tabular}{|c|l|c|c|c|c|}
+	\begin{tabular}{|m{.3cm}|m{1.4cm}|m{1.5cm}|m{2.2cm}|m{1.4cm}|m{4.3cm}|}
+		\hline
+		& \multirow{2}{*}{\textbf{Datasets}} & \multicolumn{2}{c|}{Objective} 		& \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{3-6}
+		&  			& \multicolumn{1}{c|}{Baseline} & \multicolumn{1}{c|}{VFC} 		& \multicolumn{1}{c|}{Baseline} & \multicolumn{1}{c|}{VFC} \\ \hline
+		\multirow{5}{*}{\STAB{\rotatebox[origin=c]{90}{F $K$-medians}}}
+		& SB        & 299.86       			& \textbf{289.08 ($\pm 2.03$)}          & \textbf{0.0} / \textbf{1.0} 	& 0.82 ($\pm 1.05$) / 0.34 ($\pm 0.21$) \\
+		& SU 		& 185.47       			& \textbf{174.82 ($\pm 0.00$)}          & 0.77 / 0.21 					& \textbf{0.0 ($\pm 0.00$)} / \textbf{0.33 ($\pm 0.00$)} \\
+		& Adult     & 19330.93     			& \textbf{17887.87 ($\pm 307.59$)}      & 0.27 / 0.31 					& \textbf{0.01 ($\pm 0.00$)} / \textbf{0.42 ($\pm 0.01$)} \\
+		& Bank      & N/A          			& \textbf{20242.38 ($\pm 403.62$)}      & N/A / N/A 					& \textbf{0.04 ($\pm 0.00$)} / \textbf{0.17 ($\pm 0.00$)} \\
+		& Census II & 2385997.92   			& \textbf{1746911.27 ($\pm 10270.47$)}  & 0.41 / 0.38 					& \textbf{0.02 ($\pm 0.00$)} / \textbf{0.75 ($\pm 0.04$)} \\\hline
+		\multirow{5}{*}{\STAB{\rotatebox[origin=c]{90}{F $K$-means}}}
+		& SB        & 758.43    			& \textbf{203.66 ($\pm 2.55$)}          & \textbf{0.0} / \textbf{1.0} 	& 2.43 ($\pm 1.47$) / 0.27 ($\pm 0.44$) \\
+		& SU		& 180.0     			& \textbf{159.75 ($\pm 0.00$)}          & \textbf{0.0} / \textbf{0.33} 	& \textbf{0.0 ($\pm 0.00$)} / \textbf{0.33 ($\pm 0.00$)} \\
+		& Adult     & 10913.84  			& \textbf{10355.98 ($\pm 328.43$)}      & 0.02 / \textbf{0.41} 			& \textbf{0.01 ($\pm 0.00$)} / 0.4 ($\pm 0.01$) \\
+		& Bank      & 11331.51  			& \textbf{9907.19 ($\pm 550.52$)}       & \textbf{0.03} / 0.16 			& 0.08 ($\pm 0.00$) / \textbf{0.17 ($\pm 0.00$)} \\
+		& Census II & \textbf{1355457.02} 	& 2279984.75 ($\pm 1548556.61$)    		& \textbf{0.07} / \textbf{0.77} & 41.86 ($\pm 51.83$) / 0.42 ($\pm 0.34$) \\\hline
+		\multirow{5}{*}{\STAB{\rotatebox[origin=c]{90}{F Ncut}}}
+		& SB        & \textbf{0.0} 			& 0.2 ($\pm 0.10$) 						& \textbf{0.0} / \textbf{1.0} 	& \textbf{0.0 ($\pm 0.00$)} / 0.98 ($\pm 0.02$) \\
+		& SU 		& 0.03 					& \textbf{0.02 ($\pm 0.03$)} 			& \textbf{0.0} / \textbf{0.33} 	& \textbf{0.0 ($\pm 0.00$)} / 0.32 ($\pm 0.01$) \\
+		& Adult     & \textbf{0.47} 		& 0.78 ($\pm 0.02$) 					& \textbf{0.06} / 0.32 			& 0.08 ($\pm 0.02$) / \textbf{0.36 ($\pm 0.03$)} \\
+		& Bank      & N/A 					& \textbf{0.65 ($\pm 0.01$)} 			& N/A / N/A 					& \textbf{0.25 ($\pm 0.03$)} / \textbf{0.14 ($\pm 0.01$)} \\
+		& Census II & N/A 					& \textbf{1.74 ($\pm 0.14$)} 			& N/A / N/A 					& \textbf{21.84 ($\pm 10.02$)} / \textbf{0.0 ($\pm 0.00$)} \\\hline
+	\end{tabular}
+	\caption{Comparison of the proposed Fair algorithms to baseline models}
+	\label{tab:comparisontab}
+\end{table} 
+
+
+
+
+The results of the reproduction experiments are reported in their respective columns in
+\autoref{tab:comparisontab}. The mean is reported, and the standard deviation is given between parentheses. The bold numbers indicate the best values for a given dataset.
+\autoref{tab:comparison_originalVSreproduction_kmedian}, \autoref{tab:comparison_originalVSreproduction_kmeans}, and \autoref{tab:comparison_originalVSreproduction_ncut} in \autoref{appendix:figsandtabs} visualise the comparison of the OP's results to ours using the parameters listed in \autoref{tab:hyperparamreprod}. The red entries indicate results that were unreproducible with the original hyperparameters, and the orange entries correspond to those that were inconsistent.
+
+\paragraph{Comparison between Backurs et al. and Fair $\mathbf{K}$-medians} In total,
+10 out of 12 results support Claim 1\ref{claim:1a} with the initial hyperparameters. The fairness of the SB dataset is labelled as an inconsistent reproduction, and the balance is labelled as an unreproducible result. Tuning the $\lambda$ improved the fairness, but the balance did still not reach baseline performance (\autoref{tab:comparison_baselineVSlmbda-tuned}). Given that the vast majority of results lie well within reproduction range, and that the only deviating result is on a small synthetic dataset, Claim 1\ref{claim:1a} is almost completely supported. 
+
+\paragraph{Comparison between Bera et al. and Fair $\mathbf{K}$-means}\label{ssec:comparisonkmeans} The fairness error and balance for the SB dataset could only be reproduced after tuning $\lambda$ (\autoref{tab:comparison_baselineVSlmbda-tuned}). Furthermore, reproduction of the fairness error and balance on the SU dataset was only achieved after the exclusion of bad seeds using Chauvenet's criterion (\autoref{sec:outlierdet}). The seeds for all excluded outliers are shown in appendix.
+All metrics for the Census II dataset deviated from the OP and were worse than the baseline results. However, three out of five runs achieved similar results to the OP. In this case, the two bad seeds were not flagged as outliers.
+Claim 1\ref{claim:1b} is therefore also mostly supported, but less so than in the OP.
+
+\paragraph{Comparison between Kleindessner et al. and Fair Ncut} 
+The reproduction results of the Ncut algorithm show similar performance compared to the baseline model. Note that, in our results, the Ncut algorithm performed better than the baseline in terms of the objective on the SU dataset. Regarding fairness, the reproduced VFC is on par with the baseline for both synthetic datasets, but worse for the Adult dataset. Moreover, the reproduced balance is only better for the Adult dataset. Thus, Claim 1\ref{claim:1c} is also mostly supported.
+
+\paragraph{Scalability}
+The results for the Fair Ncut algorithm were not successfully reproduced for the Census II dataset using the reported hyperparameters in the OP. Adjusting the Lipschitz constant to 1.0, as suggested by the authors, did not solve this issue. Lowering the Lipschitz constant to $10^{-5}$ did enable convergence, taking 34 hours per run on average. This achieved reasonable results, despite not reaching the reported performance in the OP. Thus, \ref{claim:2} is supported, but less so than in the OP.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.24\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{reproduction/Adult/Fair_kmeans_fairness_vs_clusterEdiscrete_Lip2.0_Adult.png}
+        \caption{Adult $K$-means}
+        \label{fig:Adult_kmeans_reprod}
+    \end{subfigure}
+    \begin{subfigure}{0.24\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{reproduction/Adult/Fair_ncut_fairness_vs_clusterEdiscrete_Lip2.0_Adult.png}
+        \caption{Adult Ncut}
+        \label{fig:Adult_ncut_reprod}
+    \end{subfigure}
+    \begin{subfigure}{0.24\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{reproduction/Bank/Fair_kmeans_fairness_vs_clusterEdiscrete_Lip2.0_Bank.png}
+        \caption{Bank $K$-means}
+        \label{fig:Bank_kmeans_reprod}
+    \end{subfigure}
+    \begin{subfigure}{0.24\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{reproduction/Bank/Fair_ncut_fairness_vs_clusterEdiscrete_Lip2.0_Bank.png}
+        \caption{Bank Ncut}
+        \label{fig:Bank_ncut_reprod}
+    \end{subfigure}
+    
+    \begin{subfigure}{0.48\linewidth}
+        \centering
+        \includegraphics[width=.50\linewidth]{reproduction/Adult/Fair_ncut_fairness_vs_clusterEdiscrete_Lip0.001_Adult.png}
+        \caption{Adult Ncut with Lipschitz=0.001}
+        \label{fig:Adult_ncut_reprod_Lipschitz}
+    \end{subfigure}
+    \begin{subfigure}{0.48\linewidth}
+        \centering
+        \includegraphics[width=.50\linewidth]{reproduction/Bank/Fair_ncut_fairness_vs_clusterEdiscrete_Lip0.001_Bank.png}
+        \caption{Bank Ncut with Lipschitz=0.001}
+        \label{fig:Bank_ncut_reprod_Lipschitz}
+    \end{subfigure}    
+    \caption{Reproduction of fairness error across different $\lambda$ values and datasets}
+    \label{fig:lambda_reprod_plots}
+\end{figure}
+
+
+\paragraph{$\lambda$ plots}
+In \autoref{fig:lambda_reprod_plots}, the blue curve depicts the discrete-valued clustering objective ($K$-means or Ncut) obtained at convergence as a function of $\lambda$. The fairness error is denoted in red. As shown, increasing the $\lambda$ parameter lowers the fairness error. Unlike the OP's reported result of the $K$-means objective for the Adult dataset, \autoref{fig:Adult_kmeans_reprod} does not show the oscillating behaviour. Different from Figure 2 of the OP, the Lipschitz constant was set to 0.001 for the Ncut plots in \autoref{fig:Adult_ncut_reprod_Lipschitz} and \autoref{fig:Bank_ncut_reprod_Lipschitz} to improve convergence. This is reflected in the lower fairness errors. By choosing a $\lambda$ arbitrarily large, an arbitrarily small fairness error will be found as seen in \ref{fig:lambda_reprod_plots}. Hence, \ref{claim:3} is supported.
+
+
+
+
+
+
+\subsection{Results beyond original paper}
+% Some results deviated from those reported in the OP. Communication with the OA suggested that some hyperparameters are mistakenly misreported, therefore additional experiments are performed for this paper to test whether their results could be reproduced using different $\lambda$ values and Lipschitz constants. Furthermore, the algorithms were also tested on new datasets, and a kernel function is implemented to possibly improve the overall performance of the VFC algorithm.
+
+\paragraph{Tuning the Lipschitz constant}\label{ssec:tunelambdalipschitz}
+\begin{table}[]
+	\small
+	\centering
+	\begin{tabular}{|l|c|c|c|c|}
+		\hline
+		& \multicolumn{4}{c|}{\textbf{SB dataset}} \\
+		\cline{2-5}
+		\textbf{Algorithms} & \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+		& baseline & $\lambda$ tuned & baseline & $\lambda$ tuned \\
+		\hline
+		$K$-medians & \textbf{299.86} & 314.98($\pm 43.23$) & \textbf{0.0} / \textbf{1.0} & \textbf{0.0($\pm 0.00$)} / 0.93($\pm 0.05$) \\
+		$K$-means & 758.43 & \textbf{207.8($\pm 0.00$)} & \textbf{0.0} / \textbf{1.0} & \textbf{0.0($\pm 0.00$)} / \textbf{1.0($\pm 0.00$)} \\
+		\hline
+	\end{tabular}
+	\caption{Comparison of the proposed Fair $K$-medians and $K$-means to the baselines (\cite{backurs2019scalable} and \cite{bera2019fair}, respectively) on the SB dataset with tuned $\lambda$ values.}
+	\label{tab:comparison_baselineVSlmbda-tuned}
+\end{table}
+
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.25\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{replication/Lipschitz/kmeans_conv-iter_Lipschitz_plot.png}
+		\label{fig:Bank_kmeans_Lipschitz_bar}
+	\end{subfigure}
+	\begin{subfigure}{0.25\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{replication/Lipschitz/ncut_conv-iter_Lipschitz_plot.png}
+		\label{fig:Bank_ncut_Lipschitz_bar}
+	\end{subfigure}
+	\begin{subfigure}{0.25\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{replication/Lipschitz/ncut_Lipschitz_plot.png}
+		\label{fig:Bank_ncut_Lipschitz}
+	\end{subfigure}    
+	\caption{Convergence iterations of a VFC bound update with different Lipschitz constants on the Bank dataset. On the left the convergence of a $K$-means bound update is displayed. The middle and right plots display convergence of Ncut, where the right plot shows the fair objective by iteration.}
+	\label{fig:Lipschitz_experiments}
+\end{figure}
+
+
+\begin{table}[]
+	\small
+	\centering
+	% \begin{tabular}{|l|c|c|c|c|}
+	\begin{tabular}{|m{1.4cm}|m{1.8cm}|m{2cm}|m{1.9cm}|m{4.1cm}|}
+		\hline
+		& \multicolumn{2}{c|}{Objective} &   \multicolumn{2}{c|}{Fairness error / Balance} \\ \cline{2-5}
+		\textbf{Dataset} & VFC & VFC lower Lipschitz & VFC & VFC lower Lipschitz \\ \cline{2-5}
+		& \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-medians}} \\
+		\hline
+		Adult 		& 17887.87 ($\pm 307.59$) 	& \textbf{17513.1 ($\pm 182.47$)} 	& \textbf{0.01($\pm 0.00$)} /\;\textbf{0.42($\pm 0.01$)} & \textbf{0.01($\pm 0.00$)} / 0.4($\pm 0.00$) \\
+		Bank 		& 20242.38 ($\pm 403.62$) 	& \textbf{19743.99 ($\pm 341.91$)} 	& \textbf{0.04($\pm 0.00$)} /\;\textbf{0.17($\pm 0.00$)} & 0.05($\pm 0.01$) / \textbf{0.17($\pm 0.00$)} \\
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Fair $\boldsymbol{K}$-means}} \\
+		\cline{2-5}
+		\hline
+		Adult 		& 10355.98 ($\pm 328.43$) 	& \textbf{10103.2 ($\pm 130.60$)} 	& \textbf{0.01($\pm 0.00$)} /\;\textbf{0.4($\pm 0.01$)} 	& \textbf{0.01($\pm 0.00$)} / \textbf{0.4($\pm 0.00$)} \\
+		Bank 		& 9907.19 ($\pm 550.52$) 	& \textbf{9533.59 ($\pm 188.53$)} 	& 0.08($\pm 0.00$) /\;\textbf{0.17($\pm 0.00$)} 			& \textbf{0.06($\pm 0.00$)} / \textbf{0.17($\pm 0.00$)} \\
+		\hline
+		& \multicolumn{4}{c|}{\textbf{Fair Ncut}} \\
+		\cline{2-5}
+		\hline
+		Adult 		& 0.78 ($\pm 0.02$) 		& \textbf{0.77 ($\pm 0.04$)} 		& 0.08($\pm 0.02$) /\;0.36($\pm 0.03$) 					& \textbf{0.05($\pm 0.01$)} / \textbf{0.37($\pm 0.01$)} \\
+		Bank 		& 0.65 ($\pm 0.01$) 		& \textbf{0.56 ($\pm 0.06$)} 		& 0.25($\pm 0.03$) /\;\textbf{0.14($\pm 0.01$)} 			& \textbf{0.14($\pm 0.02$)} / \textbf{0.14($\pm 0.01$)} \\
+		Census II 	& 1.74 ($\pm 0.14$) 		& \textbf{1.33 ($\pm 0.00$)} 		& 21.84($\pm 10.02$) /\;0.0($\pm 0.00$) 					& \textbf{0.4($\pm 0.00$)} / \textbf{0.47($\pm 0.00$)} \\
+		\hline        
+	\end{tabular}
+	\caption{Comparison of the reproduced VFC results to the experiments with lower Lipschitz constants}
+	\label{tab:comparison_lmbda-tuned-allVSLipschitz-test}
+\end{table}
+
+\autoref{fig:Lipschitz_experiments} shows that Lipschitz constants down to $10^{-5}$ speed up convergence for $K$-means and Ncut on the Bank dataset. These results are reflected for all three algorithms in both Synthetic datasets and the Adult dataset. This is also shown in the runtimes in \autoref{tab:runtime}, \autoref{appendix:figsandtabs}. Further decreasing the Lipschitz constant leads to invalid results; \verb+NaN+ values impede convergence. 
+
+In all cases, the reproduced results with the original hyperparameters were equal to, or improved by, lower Lipschitz constants aside from the balance of $K$-medians on the Adult dataset, and the fairness error of $K$-medians on the Bank dataset (\autoref{tab:comparison_lmbda-tuned-allVSLipschitz-test}). However, the main improvement lies in the convergence.
+
+\paragraph{Other datasets}
+For the Student dataset, the baseline algorithm resulted in a clustering objective of $128.012$, a fairness error of $0.0056$, and a balance of $0.8327$. Additionally, the VFC using $K$-means and $\lambda = 50$ gave an objective of $341.892$, a fairness error of $0.0032$, and a balance of $0.8982$, therefore having a higher objective, lower fairness error, and higher balance.
+
+Furthermore, running the VFC Fair Ncut algorithm on the Drugnet dataset resulted in an objective score of 0, a fairness error of 0.06, and a balance of 0.24. The baseline results are not exactly reported in \cite{kleindessner2019guarantees}. However, the objective and balance can be interpreted from their Figure 5, which approximately equals an objective of 0.01, and a balance of 0.26. Thus, VFC obtains a lower objective and lower balance. Interestingly, the obtained objective score of 0 indicates that the optimal Ncut solution has been found. Hence, we can conclude that \ref{claim:4} is supported.
+
+\paragraph{Kernel-based VFC}
+The kernel-based VFC obtains the same silhouette coefficients, fairness error, and balance as the standard VFC. The results are summarised in \autoref{Tab:KBresSC} in \autoref{appendix:kernel}.
+
+\section{Discussion}
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+Given the results shown in \autoref{sec:results} and the varying outcomes contrasting the results in the OP, we conclude that not all claims presented in \autoref{sec:scope} are supported. 
+%claim 1 
+\paragraph{Reproduction} Based on our results using the original hyperparameters, \ref{claim:1} cannot be supported. We therefore discuss the validity of \ref{claim:1} based on the tuned $\lambda$ values. Running $K$-medians on the SB dataset yielded a similar objective, but a dissimilar fairness error and balance. As expected, increasing the $\lambda$ parameter did improve the fairness error and balance, but did so at the cost of the clustering quality as suggested in \autoref{fig:lambda_reprod_plots} and \autoref{tab:comparison_baselineVSlmbda-tuned}. For the other datasets, we were able to find hyperparameters that made the VFC framework compatible with the baseline, and hence Claim 1\ref{claim:1a} is mostly supported.
+
+Surprisingly, the results for $K$-means on the SB dataset did improve with a tuned $\lambda$ parameter. The similarity between the results on the SU dataset was achieved after the removal of bad seeds. The $K$-means algorithm performed differently on the Census II dataset than reported by the OA. Due to time constraints, we were not able to explore this further. Given these judgements, we conclude that Claim 1\ref{claim:1b} is also mostly supported.
+
+The reproduction results of the Ncut algorithm show that the SU dataset had a better clustering objective. The algorithm also performed better on the Adult dataset as the balance was higher. As mentioned in the OP, there are no baseline results that can be compared to our results for the Bank and Census II datasets. Hence, we compare these reproduced results only to the results obtained in the OP. For the Bank dataset, the objective worsened, but the fairness and balance were improved. The results on the Census II dataset are not as reliable, since we ran the experiment a total of five times. All in all, Claim 1\ref{claim:1c} is therefore partially supported.
+
+%claim 2 large scale dataset 
+We have tuned the Lipschitz constant such that it did not return \verb+NaN+ values on the Census II dataset while using the Ncut algorithm. It was not feasible to run many experiments, as a Lipschitz constant of $10^{-5}$ took an average of 34 hours to converge. Thus, we observe that VFC using the Ncut algorithm scales to large datasets. Although our results did not exactly reflect those of the OP, the performance was still reasonable. Hence, \ref{claim:2} is verified.
+
+% claim 3 best clustering objective with the smallest lambda 
+As mentioned earlier, there is a trade-off between the clustering objective and the fairness. \autoref{fig:lambda_reprod_plots} shows that, when the $\lambda$ increases, the clustering objective increases and the fairness decreases. Observe that we do not have the oscillating behaviour as in the OP for the $K$-means algorithm on the Adult dataset, whichmay be caused by the seed that was used to run this experiment. Unfortunately, we have not explored this further due to limited time. Thus, \ref{claim:3} is supported. 
+
+\paragraph{Replication}
+We found that decreasing the Lipschitz-constant to $10^{-5}$ improved the convergence speed, and in some instances performance. The proposed VFC algorithm does not perform worse than the $K$-means baseline. The $K$-means and $K$-medians experiments have shown that VFC is capable of performing prototype-based clustering objectives. The Drugnet dataset, combined with the Ncut algorithm, has shown that VFC can perform graph-based clustering objectives as well, and that it is on par with its baseline. Hence, \ref{claim:4} is supported.
+
+The results obtained with the kernel-based VFC were in-line with those found using the formulation of the OP, suggesting that the kernel-based approach finds the same solutions. Due to limited time, no extensive parameter search has been done. Better parameters could improve the expressiveness of the kernels, potentially leading to better results.
+
+\paragraph{What was easy and difficult}\label{sec:difficult}
+The original paper is well-structured and contains elaborate theoretical derivations and explanations, which made the concept of the VFC easier to understand. During the reproduction of the experiments, the provided code from the original paper was greatly beneficial. The OA responded quickly and were very willing to help.
+% However, most of the challenges were encountered during the replication experiments of this research. The discrepancy between the baseline codes and the original code constituted most issues 
+Despite the access to the original code, it was initially challenging to use as it was undocumented. Another problem was that the OA used a different Lipschitz constant than was used in the code. This issue was found later, after communicating with the OA. However, it is still unknown which Lipschitz constant the OA used for their experiments. Next to that, the code to obtain the results for the baseline models was missing as well. This was necessary for the replication experiment of the Student dataset. The implementation of the $K$-means baseline model was publicly available, but the metric used for clustering differed from those the OA used, which made comparison difficult. Hence, the results of the baseline needed to be converted into the measures that were used by the OA. Moreover, the $K$-means baseline could not be implemented on large datasets, as there was no access to IBM's premium \texttt{Cplex Optimiser}.
+
+\paragraph{Shortcomings of the original paper}
+
+The shortcomings found in the OP are: correctness of the reported $\lambda$ parameters, not stating the correct Lipschitz value, and the errors in the provided code.
+
+\paragraph{Conclusion} This report shows both a reproducation and a replication of \textit{Variational Fair Clustering}. We conclude that solely the OP and the provided code do not suffice to validate the claims stated by the OA. Investigating more large-scale datasets and the effects of other Lipschitz constants are suggested for future research. Potentially, a Lipschitz constant can be found that provides rigidness and fast convergence. This paper introduced the notion of a flexible kernel-based approach. As its results are already on par with the VFC framework proposed by the OA, this approach looks promising. Further investigation by using different kernels, or improving parameters, may be beneficial.
+
+Unfortunately, due to limited time and resources, other aspects of the VFC framework were not examined. Investigating different fairness metrics and studying the influence of larger $K$ values on the clustering energy, fairness and balance, may improve the VFC performance.
+
+% Considering different fairness metrics and studying the influence of larger $K$ values on the clustering energy, fairness and balance may be beneficial for the VFC performance.
+
+All in all, the VFC framework allows for a large class of clustering algorithms to be used in fair clustering. The framework is capable of handling large datasets and offers a mechanism that allows for a trade-off between fairness and clustering quality. Moreover, the resulting algorithms are competitive with SOTA fair clustering algorithms.

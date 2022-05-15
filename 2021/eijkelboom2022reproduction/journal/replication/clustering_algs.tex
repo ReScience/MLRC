@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+\usepackage{todonotes}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\begin{document}
+
+{\Large \textbf{Clustering Algorithms}}
+
+\bigskip
+
+\textbf{Pam and Clara (partitional clustering)}
+
+\begin{itemize}
+    \item Instead of using the mean for clustering we use medoids: an object within a cluster for which average dissimilarity between it and all the other members of the cluster is minimal. 
+    \item PAM: Partition around medoids works very similar to $K$-means:
+    \begin{enumerate}
+        \item Select $K$ objects to become the medoids
+        \item Calculate the dissimilarity
+        \item Assign every object to its closest medoid
+        \item Select the new medoid
+        \item If at least one medoid has changed, go to $3$, else terminate. 
+    \end{enumerate}
+    \item Clara: similar to PAM, but using subsampling to reduce computational cost. 
+\end{itemize}
+
+\textbf{DBSCAN (desity based clustering)}
+\begin{itemize}
+    \item Considers the number of points in some ball of radius $\epsilon$ round any point (i.e. density of the points). 
+\end{itemize}
+
+\end{document}

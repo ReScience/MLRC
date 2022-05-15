@@ -1,0 +1,150 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Reproduction Study of Variational Fair Clustering"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Floor Eijkelboom
+    orcid: 0000-0002-8937-4353
+    email: eijkelboomfloor@gmail.com
+    affiliations: 1,2,* # * is for contact author
+
+  - name: Mark Fokkema
+    orcid: 0000-0002-3143-3410
+    email: Mark.fokkema@gmail.com
+    affiliations: 1,2
+
+  - name: Anna Lau
+    orcid: 0000-0001-8533-9801
+    email: anna.cm.lau@gmail.com 
+    affiliations: 1,2
+
+  - name: Luuk Verheijen
+    orcid: 0000-0003-3921-9408
+    email: lml.verheijen@gmail.com
+    affiliations: 1,2
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, the Netherlands
+  - code: 2
+    name: Equal contributions
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, machine learning, python, pytorch, clustering, fairness
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/MarkiemarkF/FACT
+  - doi: 10.5281/zenodo.6508390
+  - swh: swh:1:dir:016245babcdc02c28ac98547de32f7270c79f81f
+
+# Data URL and DOI (optional if no data)
+data:
+  - url: https://archive.ics.uci.edu/ml/datasets/Bank+Marketing
+  - doi:
+data:
+  - url: https://archive.ics.uci.edu/ml/datasets/adult
+  - doi:
+data:
+  - url: https://archive.ics.uci.edu/ml/datasets/US+Census+Data+(1990)
+  - doi:
+data:
+  - url: https://archive.ics.uci.edu/ml/datasets/student+performance
+  - doi:
+data:
+  - url: https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/drugnet
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Imtiaz Masud Ziko, Jing Yuan, Eric Granger, Ismail Ben Ayed. Variational Fair Clustering (AAAI 2021)."
+ - bib:  ziko2021variational
+ - url:  https://arxiv.org/pdf/1906.08207.pdf
+ - doi:  10.48550/arXiv.1906.08207 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility
+Variational Fair Clustering (VFC) is a general variational fair clustering framework that is compatible with a large class of clustering algorithms, both prototype-based and graph-based (Ziko et al., 2021). VFC is capable of handling large datasets and offers a mechanism that allows for a trade-off between fairness and clustering quality. We run a series of experiments to evaluate the major claims made by the authors. Specifically, that VFC is on par with SOTA clustering objectives, that it is scalable, that it has a trade-off control, and that it is compatible with both prototype-based and graph-based clustering algorithms.
+
+Methodology
+To reproduce the results from Ziko et al., the original code is altered by removing bugs. This code is used to perform reproduction experiments to test the four claims made by the authors, as described above. Furthermore, three replication experiments have been implemented as well: different values for the trade-off parameter and Lipschitz constants have been investigated, an alternative dataset is used, and a kernel-based VFC framework has been derived and implemented.
+
+Results
+We found that that three of the four claims made by Ziko et al. are supported, and that one claim is partially supported. VFC is mostly on par with SOTA clustering objectives, if the trade-off parameter and Lipschitz constant are tuned. Additionally, we verified that VFC is scalable on large-scale datasets and found that the trade-off control works as stated by the authors. Moreover, we conclude that VFC is capable of handling both prototype-based and graph-based datasets. Regarding the replicability of VFC, the experiment on the alternative dataset did not indicate that VFC is worse than SOTA baselines. The proposed kernel-based VFC performs on par with the original framework.
+
+
+What was easy and difficult
+The original paper provides extensive theoretical derivations and explanations of the VFC approach, both through derviations and text. Moreover, the code of the original paper was publicly available. The original authors responded quickly to our mails and were very willing to discuss our results. Although the VFC code was publicly available, it was undocumented and contained some bugs that were hard to find given the lack of documentation. Moreover, there were vast differences between the implementation of the original authors and the baseline models. This required conversions between the models for the comparisons. Lastly, running the VFC code took many hours, which resulted in us not being able to run all algorithm-dataset combinations we wanted to.
+
+Communication with original authors
+The original authors have been approached twice. The mail contact helped clarify implementation details, particularly regarding the Ncut algorithm. The authors explained and specified the usage of the trade-off parameter and the Lipschitz constant. Additionally, they explained how they obtained the K-means baseline results. The authors have been informed about our proposed kernel-based VFC framework and replied with enthusiasm."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=rq8fRhMm20F
+
+contributors: # leave blank
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates: # leave blank
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+# This information will be provided by the editor
+article: # leave blank
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal: # leave blank
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1
