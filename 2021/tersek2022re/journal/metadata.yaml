@@ -1,0 +1,140 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Learning to count everything"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Maša Kljun
+    orcid: 0000-0002-0893-8795
+    email: mk2700@student.uni-lj.si
+    affiliations: 1,2
+
+  - name: Matija Teršek
+    orcid: 0000-0002-3743-4895
+    email: mt2421@student.uni-lj.si
+    affiliations: 1,2
+
+  - name: Domen Vreš
+    orcid: 0000-0002-9225-2699
+    email: dv6968@student.uni-lj.si
+    affiliations: 1,2,*
+    # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Ljubljana, Faculty of Computer and Information Science
+    address: Večna pot 113, 1000 Ljubljana
+
+  - code: 2
+    name: Equal contributions
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: few-shot learning, few-shot counting, CNN, counting data set, rescience c, machine learning, python
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/tersekmatija/re-LearningToCountEverything
+  - doi: 10.5281/zenodo.6508260
+  - swh: swh:1:dir:cf19f5a717c777cd1097e938ef4e6bdb735f71c7
+
+# Data URL and DOI (optional if no data)
+data:
+  - url: https://drive.google.com/file/d/1ymDYrGs9DSRicfZbSCDiOu0ikGDh5k6S/view?usp=sharing
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Viresh Ranjan, Udbhav Sharma, Thu Nguyen, Minh Hoai. Learning To Count Everything (CVPR 2021)."
+ - bib:  ranjan2021learning
+ - url:  https://arxiv.org/pdf/2104.08391.pdf
+ - doi:  10.48550/ARXIV.2104.08391
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility
+The core finding of the paper is a novel architecture FamNet for handling the few-shot counting task. We examine its implementation in the provided code on GitHub and compare it to the theory in the original paper. The authors also introduce a data set with 147 visual categories FSC-147, which we analyze. We try to reproduce the authors’ results on it and on CARPK data set. Additionally, we test FamNet on a category specific data set JHU-CROWD++. Furthermore, we try to reproduce the ground truth density maps, the code for which is not provided by the authors.
+
+Methodology
+We use the combination of the authors’ and our own code, for parts where the code is not provided (e.g., generating ground truth density maps, CARPK data set preprocessing). We also modify some parts of the authors’ code so that we can evaluate the model on various data sets. For running the code we used the Quadro RTX 5000 GPU and had a total computation time of approximately 50 GPU hours.
+
+Results
+We could not reproduce the density maps, but we produced similar density maps by modifying some of the parameters. We exactly reproduced the results on the paper’s data set. We did not get the same results on the CARPK data set and in experiments where implementation details were not provided. However, the differences are within standard error and our results support the claim that the model outperforms the baselines.
+
+What was easy
+Running the pretrained models and the demo app was quite easy, as the authors provided instructions. It was also easy to reproduce the results on a given data set with a pretrained model.
+
+What was difficult
+It was difficult to verify the ground truth density map generation as the code was not provided and the process was incorrectly described. Obtaining a performant GPU was also quite a challenge and it took quite many emails to finally get one. This also meant that we were unable to reproduce the training of the model.
+
+Communication with original authors
+We contacted the authors three times through issues on GitHub. They were helpful and responsive, but we have not resolved all of the issues."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=HKbgd3zmh0t
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1
