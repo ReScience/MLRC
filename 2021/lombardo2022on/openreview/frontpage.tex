@@ -1,0 +1,25 @@
+\section*{\centering Reproducibility Summary}
+
+\textit{The presented study evaluates "Exacerbating Algorithmic Bias through Fairness Attacks" by \citewithauthor{originalpaper} within the scope of the ML Reproducibility Challenge 2021. We find it not possible to reproduce the original results from sole use of the paper, and difficult even in possession of the provided codebase. Yet, we managed to obtain similar findings that supported three out of the five main claims of the publication, albeit using partial re-implementations and numerous assumptions. On top of the reproducibility study, we also extend the work of the authors by implementing a different stopping method, which changes the effectiveness of the proposed attacks.}
+
+\subsection*{Scope of Reproducibility}
+
+The paper presents two novel kinds of adversarial attacks against fairness: the IAF attack and the anchoring attacks. Our goal is to reproduce the five main claims of the paper. The first claim states that using the novel IAF attack we can directly control the trade-off between the test error and fairness bias metrics when attacking. Claims two to five suggest a superior performance of the novel IAF and anchoring attacks over the two baseline models. We also extend the work of the authors by implementing a different stopping method, which changes the effectiveness of some attacks. 
+
+\subsection*{Methodology}
+
+To reproduce the results, we use the open-source implementation provided by the authors as the main resource, although many modifications were necessary. Additionally, we implement the two baseline attacks which we compare to the novel proposed attacks. Since the assumed classifier model is a support vector machine, it is not computationally expensive to train. Therefore, we used a modern local machine and performed all of the attacks on the CPU. 
+
+\subsection*{Results}
+
+Due to many missing implementation details, it is not possible to reproduce the original results using the paper alone. However, in a specific setting motivated by the authors' code (more details in section \ref{sec:methodology}), we managed to obtain results that support 3 out of 5 claims. Even though the IAF and anchoring attacks outperform the baselines in certain scenarios, our findings suggest that the superiority of the proposed attacks is not as strong as presented in the original paper. 
+
+\subsection*{What was easy}
+
+The novel attacks proposed in the paper are presented intuitively, so even with the lack of background in topics such as fairness, we managed to easily grasp the core ideas of the paper. 
+\subsection*{What was difficult}
+
+The reproduction of the results requires much more details than presented in the paper. Thus, we were forced to make many educated guesses regarding classifier details, defense mechanisms, and many hyperparameters. The authors also provide an open-source implementation of the code, but the code uses outdated dependencies and has many implementation faults, which made it hard to use as given. 
+\subsection*{Communication with original authors}
+
+Contact was made with the authors on two occasions. First, we asked for some clarifications regarding the provided environment. They promptly replied with lengthy answers, which allowed us to correctly run their code. Then, we requested additional details concerning the pre-processing of the datasets. The authors pointed at some of their previous projects, where we could find further information on the processing pipeline.
