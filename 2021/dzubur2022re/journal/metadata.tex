@@ -1,0 +1,47 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/Benidzu/isotropy_reproduction}
+\def \codeDOI{}
+\def \codeSWH{swh:1:dir:407d517fb5299301bcfc7f8aa461a4c3bf7c36b0}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha}
+\def \editorORCID{}
+\def \reviewerINAME{Anonymous Reviewers}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{04 February 2022}
+\def \dateACCEPTED{11 April 2022}
+\def \datePUBLISHED{15 May 2022}
+\def \articleTITLE{[Re] A Cluster-based Approach for Improving Isotropy in Contextual Embedding Space}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2021}
+\def \articleBIBLIOGRAPHY{bibliography.bib}
+\def \articleYEAR{2022}
+\def \reviewURL{https://openreview.net/forum?id=rxWeB3zQ2CY}
+\def \articleABSTRACT{ Scope of Reproducibility The authors of the paper, which we reproduced, introduce a method that is claimed to improve the isotropy (a measure of uniformity) of the space of Contextual Word Representations (CWRs), outputted by models such as BERT or GPT-2. As a result, the method would mitigate the problem of very high correlation between arbitrary embeddings of such models. Additionally, the method is claimed to remove some syntactic information embedded in CWRs, resulting in better performance on semantic NLP tasks. To verify these claims, we reproduce all  experiments described in the paper.
+Methodology We used the authors' Python implementation  of the proposed cluster-based method, which we verified against our own implementation based on the description in the paper. We re-implemented the global method based on the paper from Mu and Viswanath, which the cluster-based method was primarily compared with. Additionally, we re-implemented all of the experiments based on descriptions in the paper and our communication with the authors.
+Results We found that the cluster-based method does indeed consistently noticeably increase the isotropy of a set of CWRs over the global method. However, when it comes to semantic tasks, we found that the cluster-based method performs better than the global method in some and worse in other tasks, or that the improvements are within margin of error. Additionally, the results of one side experiment, which analyzes the structural information of CWRs, also contradict the authors' findings for the GPT-2 model.
+What was easy The described methods were easy to understand and implement, as they rely on PCA and K-Means clustering.
+What was difficult There were many ambiguities in the paper: which splits of data were used, the procedures of the experiments were not described in detail, some hyperparameters values were not disclosed. Additionally, running the approach on big datasets was too computationally expensive. There was an unhandled edge case in the authors' code, causing the method to fail in rare cases. Some results had to be submitted online, where there is a monthly limit of submissions, causing delays.
+Communication with original authors We exchanged many e-mails with the authors, which were very responsive and helpful in describing the missing information required for reproduction. In the end, we still could not completely identify the sources of some remaining discrepancies in the results, even after ensuring the data, preprocessing and some other implementation details were the same.}
+\def \replicationCITE{Sara Rajaee, Mohammad Taher Pilehvar. A Cluster-based Approach for Improving Isotropy in Contextual Embedding Space (ACL 2021).}
+\def \replicationBIB{local}
+\def \replicationURL{https://arxiv.org/pdf/2106.01183.pdf}
+\def \replicationDOI{10.18653/v1/2021.acl-short.73}
+\def \contactNAME{Benjamin Džubur}
+\def \contactEMAIL{bd5830@student.uni-lj.si}
+\def \articleKEYWORDS{rescience c, machine learning, natural language processing, python}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{9}
+\def \journalISSUE{1}
+\def \articleNUMBER{}
+\def \articleDOI{10.0000/zenodo.0000000}
+\def \authorsFULL{Benjamin Džubur}
+\def \authorsABBRV{B. Džubur}
+\def \authorsSHORT{Džubur}
+\title{\articleTITLE}
+\date{}
+\author[1,\orcid{0000-0002-1143-4897}]{Benjamin Džubur}
+\affil[1]{University of Ljubljana, Ljubljana, Slovenia}

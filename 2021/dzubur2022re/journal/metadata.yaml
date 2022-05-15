@@ -1,0 +1,128 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] A Cluster-based Approach for Improving Isotropy in Contextual Embedding Space"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: "Benjamin Džubur"
+    orcid: 0000-0002-1143-4897
+    email: bd5830@student.uni-lj.si
+    affiliations: 1,*
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    "University of Ljubljana"
+    address: "Ljubljana, Slovenia"
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, machine learning, natural language processing, python
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/Benidzu/isotropy_reproduction
+  - doi: 
+  - swh: swh:1:dir:407d517fb5299301bcfc7f8aa461a4c3bf7c36b0
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Sara Rajaee, Mohammad Taher Pilehvar. A Cluster-based Approach for Improving Isotropy in Contextual Embedding Space (ACL 2021)."
+ - bib:  local
+ - url:  https://arxiv.org/pdf/2106.01183.pdf
+ - doi:  10.18653/v1/2021.acl-short.73 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+Scope of Reproducibility
+The authors of the paper, which we reproduced, introduce a method that is claimed to improve the isotropy (a measure of uniformity) of the space of Contextual Word Representations (CWRs), outputted by models such as BERT or GPT-2. As a result, the method would mitigate the problem of very high correlation between arbitrary embeddings of such models. Additionally, the method is claimed to remove some syntactic information embedded in CWRs, resulting in better performance on semantic NLP tasks. To verify these claims, we reproduce all  experiments described in the paper.
+
+Methodology
+We used the authors' Python implementation  of the proposed cluster-based method, which we verified against our own implementation based on the description in the paper. We re-implemented the global method based on the paper from Mu and Viswanath, which the cluster-based method was primarily compared with. Additionally, we re-implemented all of the experiments based on descriptions in the paper and our communication with the authors. 
+
+Results
+We found that the cluster-based method does indeed consistently noticeably increase the isotropy of a set of CWRs over the global method. However, when it comes to semantic tasks, we found that the cluster-based method performs better than the global method in some and worse in other tasks, or that the improvements are within margin of error. Additionally, the results of one side experiment, which analyzes the structural information of CWRs, also contradict the authors' findings for the GPT-2 model. 
+
+What was easy
+The described methods were easy to understand and implement, as they rely on PCA and K-Means clustering.
+
+What was difficult
+There were many ambiguities in the paper: which splits of data were used, the procedures of the experiments were not described in detail, some hyperparameters values were not disclosed. Additionally, running the approach on big datasets was too computationally expensive. There was an unhandled edge case in the authors' code, causing the method to fail in rare cases. Some results had to be submitted online, where there is a monthly limit of submissions, causing delays.
+
+Communication with original authors
+We exchanged many e-mails with the authors, which were very responsive and helpful in describing the missing information required for reproduction. In the end, we still could not completely identify the sources of some remaining discrepancies in the results, even after ensuring the data, preprocessing and some other implementation details were the same."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=rxWeB3zQ2CY
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1
+  
