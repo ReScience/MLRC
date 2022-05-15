@@ -1,0 +1,272 @@
+\section*{Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+
+The authors in \cite{tian2021understanding} claim that with the underlying learning dynamics of \emph{BYOL} \cite{grill2020bootstrap} and \emph{SimSiam} \cite{chen2020exploring}, a new method \emph{DirectPred} can be derived. We investigate the assumptions made for this derivation and also compare the quality of the produced encoder representations through linear probing of these networks.
+
+\subsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+
+We reimplemented \emph{BYOL}, \emph{SimSiam} and \emph{DirectPred} from scratch as well as their ablations in TensorFlow. We checked original repository in written PyTorch for some implementation details. In all experiments we used the CIFAR-10 train set for training and the test set for evaluation. We were running our experiments for more than 100 hours on GCP's V100 GPU. 
+
+\subsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+We show that the theoretical assumption regarding eigenspace alignment and symmetry hold also for a different dataset other than the one used in the original paper. In addition, we reproduce ablations regarding learning rate, weight decay and Exponential Moving Average. 
+
+Since we used CIFAR-10 in all experiments we can not directly compare accuracies. However, we show the same relative behaviour of different networks given hyperparameter changes. We can directly compare performance for one of the experiments (Table 8. in \cite{tian2021understanding} bottom left part). Our models, namely \emph{SGD Baseline}, \emph{DirectPred} (with and without frequency=5), achieve comparable accuracy which differ by at most 1\%. We also confirm the claim that \emph{DirectPred} outperforms its one-layer SGD alternative. Our code can be accessed under the following link: \url{https://anonymous.4open.science/r/SelfSupervisedLearning-FD0F}. 
+
+\subsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The architecture of the Siamese network and training schemes were both straightforward to implement and easy to understand. 
+
+\subsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+ 
+We could not run our code on STL-10 dataset due to time and resource constraints.
+Due to differences between PyTorch and TensorFlow libraries, we had to implement some parts by hand to keep our code as close to the original work as possible. Also, original repository is not easy to read and does not cover all the experiments (e.g. eigenspace alignment experiment). Correctly applying data-augmentation was also a hard task due to assumptions of how the individual data augmentations functions actually work.
+
+\subsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+
+We did not contact authors of the paper since we did not encounter any major issues during the reproducibility study. 
+
+\clearpage
+
+\section{Introduction}
+\label{sec:intro}
+Self-Supervised learning has become an important task in many domains, since labeled data is often rare and expensive to get. Many modern methods of Self-Supervised learning are based on Siamese-networks \cite{Bromley_93} which are weight sharing Neural networks for two or more inputs which representations then will be compared in latent space. The representation created by this approach can then be used for classification by fine-tuning on fewer labelled data-points. Traditionally, during pre-training positive pairs (same image, or two images from the same class) and negative pairs (different images or two images from a different class) are used. The distance of the representation of positive pairs is minimized while the distance of the representation of negative pairs is maximized, which prevents the networks from collapse (i.e mapping all inputs to the same representation). These methods have shown quite some success in the past \cite{chen2020simple}, \cite{chen2020big}, \cite{he2020momentum}, \cite{oord2019representation}. However, these methods rely on negative pairs, and large batch sizes which makes the training less feasible. 
+
+Recently, new methods have been proposed which rely only on positive pairs and yet don't collapse \cite{grill2020bootstrap}, \cite{chen2020exploring}. In the paper "Understanding Self-Supervised Learning Dynamics without Contrastive Pairs" by Tian et.al. \cite{tian2021understanding} the underlying dynamics are explored and based on the theoretical results, a new method, \emph{DirectPred}, was proposed which does not need an update of the predictor via gradient descent but instead is set directly each iteration. 
+
+% These method has then been simplified with \emph{DirectCopy} in \cite{wang2021demystifying} achieving similar performance.
+
+The focus of this work is to test several assumptions made in \cite{tian2021understanding} for the theoretical analysis and see if they hold. For this, we will concentrate especially on the eigenvalues of the predictor network and the eigenspace alignment with its input. Also, we will reproduce the results from \cite{tian2021understanding}, \cite{grill2020bootstrap} and \cite{chen2020exploring} on CIFAR-10 to compare their learned representation using linear probing. 
+
+\section{Related work}
+\label{sec:rel_work}
+A common approach to representation learning without Siamese networks is generative modelling. Typically these methods model a distribution over the data and a latent space, from which then embeddings can be drawn as data representations. Usually these approaches rely on Auto-encoding \cite{kingma2014autoencoding, vincent2008denoising} or Adversarial networks \cite{donahue2017adversarial, donahue2019large}. However, generative models are often computationaly heavy and hard to train.
+
+Discriminative methods using Siamese networks like \emph{\emph{SimCLR}} \cite{chen2020simple, chen2020big} and Moco \cite{he2020momentum} outperform generative models and have lower computational cost. However, these methods rely on very large batch sizes since they use contrastive pairs. Most recent methods, replicated in this work, like \emph{BYOL} \cite{grill2020bootstrap} and \emph{SimSiam} \cite{chen2020exploring}, only rely on positive pairs and therefore can make use of smaller batch sizes. To understand why these methods do not collapse, the dynamics of these networks are analysed with linear models in \cite{tian2021understanding, wang2021demystifying}. From this analysis, the authors could derive ablations of \emph{BYOL} where part of the network is directly set to its optimal solution instead of being trained by gradient descent. 
+
+\section{Method}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plots/network.png}
+    \caption{Network architecture for all presented methods}
+    \label{fig:network}
+\end{figure}
+
+\label{sec:method}
+In this section we will describe the methods of \emph{BYOL} and \emph{SimSiam} as well as their successor \emph{DirectPred}.
+
+\subsection{BYOL \& SimSiam}
+\label{sec:BYOL}
+The network architecture of the models is shown in Figure \ref{fig:network}. First, two augmented views $X^{\prime}_1$ and $X^{\prime}_2$ of an image $X$ are created and fed into the online network $W$ and target network $W_a$ respectively. Both of these networks have the same architecture, a ResNet-18 ($W^{x}_{enc}$) as encoder \cite{he2015deep}, which is supposed to create hidden features and a projector head $W^{x}_{pro}$, which is a two layer MLP, with purpose to map the feature space into a lower dimensional hidden space. The online network also has an additional predictor head, again consisting of a two layer MLP. The target network has a \emph{StopGrad} function instead of a predictor head. Therefore during back propagation, only the weights of the online network are updated via gradient decent. The loss between the output of the online and target network is equal to the cosine-similarity loss function.
+\begin{equation}
+    \mathcal{L}(\hat{Z}^{(O)}_1, \hat{Z}^{(T)}_2) = -\frac{\langle Z^{\prime}_1, Z^{\prime}_2 \rangle}{||Z^{\prime}_1 ||_2 ||Z^{\prime}_2 ||_2}
+\end{equation}
+Note, that the final loss of one image is the symmetric loss $\mathcal{L}(\hat{Z}^{(O)}_1, \hat{Z}^{(T)}_2) + \mathcal{L}(\hat{Z}^{(O)}_2, \hat{Z}^{(T)}_1)$, since each augmentation is given to both networks. As mentioned, the target network is not updated with gradient descent, but with an exponential moving average (EMA). After each batch the target network will be set to $W_a = W_a + (1-\tau)(W - W_a)$. In \emph{SimSiam} the target network is set directly to the online network after each update, i.e $\tau = 0$.
+
+\subsection{DirectPred} % \& DirectCopy}
+\label{sec:DirectPred}
+\cite{tian2021understanding} derives a one layer predictor head analytically with the analysis of the underlying learning dynamics of the models presented in Section \ref{sec:BYOL} with an approximation of the actual network as a purely linear model. The learning dynamics of the networks are
+\begin{align}
+    \dot{W}_p &= \alpha_p (-W_p W ( X + X^{\prime}) + W_a X) W^{\top} - \eta W_p \\
+    \dot{W} &= W_p^T (-W_p W (X + X^{\prime}) + W_a X) - \eta W \\
+    \dot{W}_a &= \beta (-W_a + W)
+\end{align}
+With $X = \mathbb{E}[\hat{x}\hat{x}^{\top}]$, where $\hat{x}$ is the average augmented view of a datapoint and $X^{\prime}$ is the covariance matrix of the augmented views. $\alpha_p$ and $\beta$ are multiplicative learning rate ratios, i.e $\alpha_p = \frac{\alpha_{\text{pred}}}{\alpha}$ and $\beta = \frac{1 - \tau}{\alpha}$ (here $\alpha$ and $\alpha_{\text{pred}}$ are the learning rates for $W$ and $W_p$ respetively).
+In addition to the linearity of the network, three simplifying assumptions where made: 
+\begin{itemize}
+    \item The target network is always in a linear relationship with the online network (e.g. $W_a(t) = \tau(t) W(t)$
+    \item The original data distribution $p(X)$ is Isotropic and its augmentation $\hat{p}(X^{\prime}|X)$ has mean $X$ and covariance $\sigma \mathbf{I}$
+    \item The predictor $W_p$ is symmetric
+\end{itemize}
+
+Based on these assumptions, one can show, that the eigenspaces of the output of the online network and the predictor $W_p$ align. Let $F = WXW^{\top}$ (i.e. the output of the online network when it is approximated as a linear model), then it follows with the three assumptions, that the eigenspaces of these two matrices align over time (e.g. for all non-zero eigenvalues $\lambda_{W_p}, \lambda_F$ of $W_p$ and $F$, the corresponding normalized eigenvectors $v_{W_p}, v_F$ are parallel, $v^{\top}_{W_p}v_F = 1$). With this alignment one can derive decoupled dynamics for the eigenvalues of $W$ and $W_p$. By analysing this system, it can be shown that it has, depending on the weight decay parameter, several fixpoints, from which some are stable and some not. The trivial solution (the collapse) is one of them and the basin of attraction of these fixpoints varies with the relative learning rate of the predictor $\frac{\alpha_{\text{pred}}}{\alpha}$. With this analysis, \cite{tian2021understanding} derives conditions under which the trivial fixpoint can be avoided. For a thorough mathematical analysis, we refer to \cite{tian2021understanding}. 
+In Section \ref{sec:eig_alignment} we will present empirical evidence, that the symmetry assumption holds, and that the eignenspaces align. Furthermore, in Section \ref{sec:eta_and_lr} we will investigate the role of weight decay and the learning rate. 
+
+From the decoupled dynamics of the eigenvalues, we can also derive an analytical expression for the predictor $W_p$. Let $F = U \Omega U^{\top}$ be the eigen-decomposition of $F$ with $\Omega = \text{diag}(\lambda^{(1)}_F, ..., \lambda^{(d)}_F)$  the diagonal matrix with the eigenvalues of $F$, then we can approximate the eigenvalues of $W_p$ with
+\begin{equation}
+    \lambda^{(j)}_{W_p} = \sqrt{\lambda^{(j)}_F} + \epsilon \max_j \lambda^{(j)}_F
+\end{equation}
+and therefore set $W_p$ to 
+\begin{equation}
+\label{eq:update}
+    W_p = U \text{diag}(\lambda^{(1)}_{W_p}, ..., \lambda^{(d)}_{W_p}) U^{\top}
+\end{equation}
+Note, that we cannot compute $F$ directly, which is why we use a running average $\hat{F}$ as approximation in practice
+\begin{equation}
+    \hat{F} = \rho \hat{F} + (1-\rho) \hat{Z}
+\end{equation}
+where $\hat{Z} = \hat{Z}^{(O)}_1 \hat{Z}^{(O) \top}_2$.
+
+We denote this method \emph{DirectPred} and in Section \ref{sec:performance} we show, that \emph{DirectPred} can perform similar to \emph{BYOL} and \emph{SimSiam}
+
+\section{Data \& Configurations}
+\label{sec:data}
+
+We ran our experiments on Google Cloud Platform using Virtual Machine with a V100 GPU.
+
+All experiments are conducted on CIFAR-10 \cite{cifar10}, which contains 60 000 RGB images uniformly distributed over 10 classes. The pre-training and the linear evaluation are done on the entire training set, which consists of 50 000 images. For the linear evaluation, only a linear layer is used on top of the encoder, where the weights of the encoder are frozen (i.e. we test how linearly separable the encoders output is). The reported accuracy results are produced from a test set containing 10 000 images. Also, to account for the small dimension of the CIFAR-10 images (32 $\times$ 32 $\times$ 3) we use 3 $\times$ 3 convolutions and stride 1 without maximum pooling in the first block of the encoder. 
+
+To augment each image, we first do a random flip, take a random crop (up to 8\% of the original size) of the image. Then we randomly adjust brightness, saturation, contrast and hue of the RGB image by a random factor \footnote{for brightness, saturation and contrast we chose a value uniformly at random between 0.6 and 1.4. For adjusting the hue, we set the maximal value to 0.1}. Finally with a 20\% chance we convert the image to grey scale.
+
+\paragraph{Self-supervised pretraining}
+
+In the basic setting, the online network use ResNet-18 as encoder, two layer projector MLP, two layer predictor MLP, where the first layer consists of 512 nodes, followed by BatchNorm and ReLU, and then a linear output layer with 128 nodes. For \emph{BYOL} we use EMA to update target network and for \emph{SimSiam} we directly set encoder and projector of target network to the weights of the online one ($\tau = 0$). We use SGD optimizer with learning rate 0.03, momentum 0.9 and weight decay (L2 penalty) of 0.0004. The predictor of \emph{DirectPred} is set directly and are not trained with gradient descent and consist of one linear layer with 128 nodes. By SGD baseline for those methods we mean a network pre-trained with a one linear layer predictor with or without EMA. In all experiments, we use batch size of 128. For updating the target network we used the EMA parameter $\tau = 0.996$. For \emph{DirectPred} we use $\epsilon = 0.1$ and $\rho = 0.3$.
+
+\paragraph{Linear evaluation}
+In order to test the performance of the different models, we use linear evaluation, i.e. we train a linear layer on top of the ResNet-18 encoder with frozen weights for 100 epochs. This measures how linearly separable the learned representations of the encoder are. We use Adam optimizer \cite{kingma2014adam} with polynomial decay of learning rate from 5e-2 to 5e-4. Images are normalized but we do not use augmentation for this part of training just as in the original repository for \emph{DirectPred}.  
+
+
+\section{Experiments and findings}
+\label{sec:findings}
+
+In this section, we will first show that the assumptions and theoretical findings from Section \ref{sec:DirectPred} hold in practice. Finally, we will pre-train and use linear evaluation on the different models presented in Section \ref{sec:method} in order to test their performances.
+
+\subsection{Eigenspace alignment}
+\label{sec:eig_alignment}
+First, we pre-train \emph{BYOL} and \emph{SimSiam} keep track of the predictor heads symmetry and eigenspace alignment. In Figure \ref{fig:BYOL_eig} we can see, that the assumption of an symmetric predictor $W_p$ holds. Even without symmetry regularisation, $W_p$ approaches symmetry during training. Also, we can see that for all non-zero eigenvalues of $W_p$ the eigenspaces between $F$ and $W_p$ align as the training progresses.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plots/byol.png}
+    \caption{Pre-training \emph{BYOL} for 100 epochs of CIFAR-10. \textbf{Top row:} \emph{BYOL} without symmetry regularisation on $W_p$. \textbf{Bottom row:} \emph{BYOL} with symmetry regularisation on $W_p$. The eigenvalues of $F$ are plotted on the log scale, since the eigenvalues vary a lot. The assymmetry is measured by $\frac{||W_p - W_p^{\top}||}{||W_p||}$}
+    \label{fig:BYOL_eig}
+\end{figure}
+
+We ran the same Experiment for \emph{SimSiam}, and can also see the same effect on the predictor and the alignment (Figure \ref{fig:SimSiam_eig}). If we don't use a symmetric predictor, we also see that the eigenspaces for the non-zero eigenvalues align. However, once we use symmetry regularisation on $W_p$, all eigenvalues become zero, which shows that the network collapses. We will see later in Section \ref{sec:eta_and_lr} that we can prevent this collapse by using different learning rates $\alpha, \alpha_{\text{pred}}$ and weight decay $\eta, \eta_{\text{pred}}$ for $W$ and $W_p$ respectively.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plots/simsiam.png}
+    \caption{Pre-training \emph{SimSiam} for 100 epochs of CIFAR-10. \textbf{Top row:} \emph{SimSiam} without symmetry regularisation on $W_p$. \textbf{Bottom row:} \emph{SimSiam} with symmetry regularisation on $W_p$. Note that the eigenvalues of $F$ are not plotted on the log scale here, since we get 0 values.}
+    \label{fig:SimSiam_eig}
+\end{figure}
+
+\subsection{Performance}
+\label{sec:performance}
+\paragraph{Byol \& SimSiam}
+In table \ref{tab:two_layer} we can see that the performance of \emph{BYOL} increases slightly when using symmetry regularisation on the predictor. However, as already seen in Figure \ref{fig:SimSiam_eig}, when using no EMA, we observe that the network collapses. We observe in general better performance for models trained with EMA, given the same hyperarameters. However, we did not use extensive hyperparameter tuning, as performance is not the focus of our work. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c||c|c}
+         &  symmetric $W_p$ & non symmetric $W_p$\\
+         \hline
+         EMA &  \textbf{85.7} & 84.2\\
+         \hline
+         No EMA & 20.3 & \textbf{79.4}  
+    \end{tabular}
+    \caption{Comparision of a two layer predictor with and without symmetry regularisation as well as with and without EMA (i.e first row is \emph{BYOL} and second row is \emph{SimSiam}). }
+    \label{tab:two_layer}
+\end{table}
+
+\paragraph{DirectPred}
+As we can see in Figure \ref{fig:BYOL_eig} \& \ref{fig:SimSiam_eig}, the eigenspaces for both 
+models align and therefore the theoretical assumptions of \cite{tian2021understanding} hold. 
+As we can see in Table \ref{tab:results}, all models perform reasonably well, and can achieve 
+almost the same performance as \emph{BYOL} or \emph{SimSiam}. However, as already mentioned earlier, 
+we can see that models with EMA outperform models without EMA. I addition, we run an experiments 
+where the predictor is only updated every 5th step according to Equation \ref{eq:update} and 
+otherwise is updated with gradient decent, we call this method $\text{\emph{DirectPred}}_5$.
+ We can see that the hybrid method $\text{\emph{DirectPred}}_5$ does not increase performance, 
+ however, according to \cite{tian2021understanding} when training for 500 epochs, 
+ $\text{\emph{DirectPred}}_5$ can outperform \emph{DirectPred}. Due to computational constraints 
+ we cannot reproduce this experiment. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c||c|c|c}
+         &  SGD Baseline & DirectPred & DirectPred 5 \\
+         \hline
+         EMA & 83.3\% & \textbf{84.7}\% & 84.1\%\\
+         \hline
+         No EMA & 77.8\% & 78.6\% & - 
+    \end{tabular}
+    \caption{The accuracies of SGD baselines, DirectPred and DirectPred with Frequency 5 with and without EMA }
+    \label{tab:results}
+\end{table}
+
+\subsection{Influence of weight decay and learning rate}
+\label{sec:eta_and_lr}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plots/simsiam_stable2.png}
+    \caption{\emph{SimSiam} with symmetric predictor but learning rates $\alpha = 0.2$, $\alpha_{\text{pred}} = 2$ and weight decay $\eta = 0$, $\eta_{\text{pred}} = 4e-4$}
+    \label{fig:simsiam_stable}
+\end{figure}
+
+As we can see in Figure \ref{fig:SimSiam_eig}, \emph{SimSiam} with symmetric predictor does collapse. However, we can prevent this by adjusting the weight decay and learning rate. To make sure the network does converge to a stable non-collapsing fix-point, the weight decay of the predictor should be set higher than the rest of the network ($\eta_{\text{pred}} > \eta$, for mathematical analysis see \cite{tian2021understanding}). By omitting weight decay, we are not able to stabilize the training of \emph{SimSiam} with symmetric predictor and we can also see, that methods without weight decay perform worse, than with weight decay (Table \ref{tab:eta_and_lr}). Also, to decrease the basin of attraction, of the trivial fixpoints, the learning rate of the predictor should be rather large compared to the learning rate of the rest of the network, i.e $\frac{\alpha_{\text{pred}}}{\alpha} >> 1$ (see Section 3.2 in \cite{tian2021understanding}). 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|c|c}
+         & symmetric $W_p$ & regular $W_p$ \\
+         \hline
+         \multicolumn{3}{|c|}{$\eta = 0$ \& $\eta_{\text{pred}} = 0.0004$} \\
+         \hline
+         Byol & 81.34 \% & 81.69 \% \\
+         SimSiam & 79.1 \% & 81.39 \% \\
+         \hline
+         \multicolumn{3}{|c|}{$\eta = \eta_{\text{pred}} = 0$} \\
+         \hline
+         Byol & 80.78 \% & 80.42 \% \\
+         SimSiam & 20.27 \% & 79.22 \% \\
+    \end{tabular}
+    \caption{Byol and SimSiam trained with different values for the weight decay parameters. For all experiments in this Table, we set the learning rates $\alpha_{\text{pred}} = 2$ and $\alpha = 0.2$. Note, that the important condition is $\frac{\alpha_{\text{pred}}}{\alpha} >> 1$, i.e. we got only slightly worse results with $\alpha_{\text{pred}} = 0.2$ and $\alpha = 0.02$}
+    \label{tab:eta_and_lr}
+\end{table}
+
+\section{Challenges}
+\label{sec:challenges}
+
+The original paper describes the methods and mathematical derivations well. Authors also share which hyperparameters they used in most of the experiments. Since the authors provided the open-source repository for the paper, we could check some of the details of the experiments there. However, as the code is not well-structured it was at times challenging to analyse. Furthermore, not all of the experiments are shared in the repository, for example there is no code which produces eigenspace experiments results or config for weight decay experiment. 
+
+The reproduced paper did not outlined self-contained description on the methods it used as it built upon previous works. Thanks to the detailed description of \emph{BYOL} by Grill et. al. \cite{grill2020bootstrap}  we were able to reproduce the paper achieving similar results as the authors. 
+
+Due to time constraints we decided to use CIFAR-10 instead of STL-10 which was used in most of the experiments in the reproduced paper. However, claims tested by us in this work are not restricted to one dataset and we shown that they indeed hold in a different setting. One of the main challenges was the large amount of computations required for all the experiments, it took around 4 hours and 30 minutes to pre-train and fine tune a single model, and in total we trained for around 100+ hours.
+
+Our work is implemented in TensorFlow and one of the challenges was differences between TensorFlow and PyTorch libraries. For instance, in PyTorch one of the parameters of the SGD optimizer is weight decay (L2 penalty), in TensorFlow we had to implement it by hand as TensorTlow's SGDW implements only Decoupled Weight Decay Regularization \cite{loshchilov2017decoupled}. Furthermore, image augmentation methods such as ColorJitter from PyTorch do not have exact corresponding methods in Tensroflow. We used a custom way to do it so that augmentations are as close as possible to the original version. 
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this work we study and reimplement three architectures used to give insight into self-supervised representation learning without contrastive pairs namely \emph{BYOL}, \emph{SimSiam}, \emph{DirectPred} and their ablations. Our experimental results aligned well with both the theoretical analysis about the eigenspaces and the symmetric assumptions made in \cite{tian2021understanding} and translate to other dataset than used in the paper. Lastly, we confirmed that SimSiam can be prevented from collapsing with the use of weight decay and adjusting a learning rate of predictor. 
+
+Furthermore, we confirm the claim that \emph{DirectPred} outperforms its one-layer SGD alternative. However, we cannot report that \emph{DirectPred} could outperform \emph{Byol}. This may be due to the fact that we used CIFAR-10 as opposed to STL-10 in the original paper. This leaves us with the conclusion, that \emph{DirectPred} gives valuable insights into the dynamics of unsupervised representation learning without contrastive pairs, but do not necessarily build new state of the art models themselves. 
+
+\section{Ethical considerations}
+\label{sec:ethics}
+
+Self-supervised learning circumvents label scarcity which is one of the most common problems when applying ML to new scenarios. This can have both positive and negative consequences. On one hand, it can accelerate important developments for example in medical diagnosis. However, it can also be used in unethical ways such as in surveillance or military equipment. Furthermore, there will be less need for people labelling datasets which will result in reduction of job positions in this area. 
+
+
+% \subsection{Submission Checklist}
+
+% Double check the file \texttt{journal/metadata.yaml} to contain the following information:
+
+% \begin{itemize}
+% \item Title should start with "\texttt{[Re]}"
+% \item Author information, along with ORCID id
+% \item Author affiliations
+% \item Code URL, Software Heritage Foundation link
+% \item Abstract
+% \item Review URL (the OpenReview URL of your report)
+% \end{itemize}
+
+% \subsection{Continuous Integration}
+
+% We use Github Actions CI to check your submission and compile the pdf file subsequently.
+% You can also run the tests locally by running \texttt{python check\_yaml.py}, and then running \texttt{./build.sh} to compile Latex.
+
