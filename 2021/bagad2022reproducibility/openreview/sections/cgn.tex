@@ -1,0 +1,32 @@
+\section{COUNTERFACTUAL GENERATIVE NETWORK} \label{sec:cgn}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained).
+
+% Two different CGN network architectures are used for MNIST and ImageNet
+The counterfactual generative network is a manifestation of a structural causal model (SCM) for the task of image classification \cite{Sauer2021ICLR}. It decomposes the image generation process into four IMs whose losses are jointly optimized in an end-to-end matter. An overview of the CGN architecture is shown in \cref{sec:cgn-architecture}.
+
+\paragraph{Shape mechanism:} The shape mechanism $f_{shape}$ captures the shape as a binary mask $\v m$, where 1 corresponds to the object and 0 to the background. For this purpose, it first samples a pre-mask $\tilde{\v m}$ with exaggerated features from a fine-tuned BigGAN \cite{brock2018large}, and extracts the binary mask using a pretrained U2-Net \cite{qin2020u2}.
+The shape loss $\mathcal{L}_{shape}$ comprises
+(1) the \emph{pixelwise binary entropy} of the mask, and (2) the mask loss:
+% \begin{enumerate*}[(1)]
+%     \item the \emph{pixelwise binary entropy} of the mask, and
+%     \item the mask loss:
+% \end{enumerate*}
+\begin{equation} \label{eq:MASK-loss}
+    \mathcal{L}_{mask}(\v m) = \mathbb{E}_{p(\v u, y)} \left[\max \left(0, \tau - \frac{1}{N} \sum_{i=1}^N m_i \right) + \max \left(0, \frac{1}{N} \sum_{i=1}^N m_i - \tau \right) \right].
+\end{equation}
+The pixelwise binary entropy forces the output to be close to either 0 or 1, whereas the mask loss discourages trivial solutions that are outside the interval defined by $\tau$.
+
+\paragraph{Texture mechanism:} The texture mechanism $f_{text}$ generates the texture of the object. For MNIST, \citeauthor{Sauer2021ICLR} use an additional layer that divides its input into patches and randomly rearranges them.
+% In contrast, for ImageNet, they sample patches from the composite image and concatenate them into a patch grid $\v{pg}$, such that patches are more likely to be sampled in regions where the mask values are the highest.
+In contrast, for ImageNet, they sample patches from the regions where the mask values are the highest and concatenate them into a patch grid $\v{pg}$.
+This mechanism is optimized by minimizing the perceptual loss between the foreground $\v f$ and the patch grid $\v{pg}$. As such, the background gradually transforms into object texture during training.
+\paragraph{Background mechanism:} The background mechanism $f_{bg}$ models the background $\v b$ of the image. It removes the object from the output of the BigGAN backbone and inpaints it using U2-Net by \emph{minimizing} the predicted saliency. Because there is no need for a globally coherent background in the MNIST setting, the MNIST variant of the CGN includes a second texture mechanism rather than a dedicated background mechanism.
+\paragraph{Composer:} The composer $C$ combines the output of the aforementioned mechanisms into a single composite image
+\begin{equation} \label{eq:composer}
+    \v x_{gen} = C(\v m, \v f, \v b) = \v m \odot \v f + (1 - \v m) \odot \v b,
+\end{equation}
+where $\v m$ is the mask, $\v f$ is the foreground, $\v b$ is the background, and $\odot$ is the Hadamard product. To optimize this mechanism, \citeauthor{Sauer2021ICLR} use an external conditional GAN (cGAN) that generates pseudo-ground-truth images $\v x_{gt}$ from the same noise $\v u$ and label $y$ that is fed into the aforementioned mechanisms of the CGN. Using this, they minimize the reconstruction loss $\mathcal{L}_{rec}$ between the composite image $\v x_{gen}$ and the pseudo-ground-truth image $\v x_{gt}$.
+
+During training, each independent mechanism learns a class-conditional distribution over shapes, textures, or backgrounds. It can then generate counterfactual images by randomizing the noise $\v u$ and label input $y$ for each mechanism. A more detailed explanation regarding the purpose of these counterfactual images and the connection with explainable artificial intelligence (XAI) can be found in \cref{sec:counterfactuals}.
+
+In order to encode invariance to spurious correlations, \citeauthor{Sauer2021ICLR} train classifiers on generated counterfactual data that retain the label from the shape with randomized texture and backgrounds. For MNISTs, they use a standard CNN feature extractor followed by a single classification head. For ImageNet on the other hand, they use a CNN backbone with three classifier heads: shape, texture, and background; each invariant to all but one factor of variation. The final prediction is obtained by averaging the individual head predictions.

@@ -1,0 +1,78 @@
+\section{METHODOLOGY} \label{sec:methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+The original implementation of the CGN is publicly available \cite{cgn-github}, but most of the experiments conducted in the original paper to support their claims are not. Consequently, we use the authors' code for the implementation of the CGN, and re-implement the experiments and relevant evaluation metrics based on the descriptions provided in the paper. Furthermore, we both improve and extend upon the work of \citeauthor{Sauer2021ICLR} by providing additional experiments and results. Because a description of the GAN used in the original paper was not provided, we use a DCGAN \cite{dcgan-tutorial}.
+% \footnote{\url{https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html}}. 
+
+% The main model and training code was released publicly\footnote{\href{https://github.com/autonomousvision/counterfactual\_generative\_networks}{https://github.com/autonomousvision/counterfactual\_generative\_networks}}. For certain baselines, the code was not part of the released repository. We used code openly available from the original papers and adapted it to a setting as required by this paper \cite{Sauer2021ICLR}. For specific cases, (e.g. training a vanilla GAN on MNIST variants), we implemented these using specific resources (e.g. \href{https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html}{PyTorch's DCGAN tutorial}). Further, we implemented all experiments using their provided code as an API and the details provided in the paper. As compute resources, we primarily used a single-node GPU equipped with a 1080Ti for all our experiments with some exceptions (e.g. classifiers on MNISTs) trained on local CPU machines.
+
+% The two key tasks central to the paper are: (i) generating counterfactual examples, (ii) training classifiers to be invariant to spurious correlations. For (i), \citewithauthor{Sauer2021ICLR} propose a deep generative model disentangled into \textit{independent mechanisms} (e.g. shape, texture, background). This enables us to change one factor-of-variation (FoV) at-a-time to obtain counterfactual examples. Once such examples are generated, we can train classifiers invariant to spurious correlations. In the remainder of section, we provide details regarding models (\cref{subsec:model}), datasets (\cref{subsec:datasets}) and the experimental setup (\cref{subsec:expt}).
+
+\subsection{Datasets} \label{subsec:datasets}
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+The experiments conducted in the original paper involve two tasks, namely generating counterfactual examples and training a classifier to be invariant to spurious correlations. We follow the paper and reproduce their evaluations on multiple datasets for each task. For both tasks, we present the relevant datasets and their main purpose in \cref{tab:datasets}. Due to resource constraints, running all experiments on full ImageNet (IN-1k) is infeasible. As a compromise, we use ImageNet-mini (IN-Mini) \cite{in-mini}, a small-scale variant of ImageNet. Although this dataset contains fewer samples, we found it to be sufficient to reproduce the main findings of the original paper and verify their claims. Moreover, this dataset includes the same classes as IN-1k and hence does not induce any decrease in difficulty of the classification task.
+
+%%%%%%%% Dataset table: V1 %%%%%%%%%%%%%
+\begin{table}[H]
+\centering
+\setlength{\aboverulesep}{1.2pt}
+\setlength{\belowrulesep}{1.2pt}
+\scriptsize
+\caption{\textbf{Datasets overview.} The datasets used for empirical evaluations across two tasks.}
+\label{tab:datasets}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrll}
+\toprule
+\textbf{Task} & \textbf{Datasets} & \multicolumn{3}{c}{\textbf{Number of samples}} & \textbf{Classes} & \textbf{Description} & \textbf{URL} \\ \cmidrule{3-5}
+ &  & Train & Test & Total &  &  &  \\
+ \midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Generating\\ counterfactual\\ samples\end{tabular}} & C-MNIST \cite{IRM} & 50k & 10k & 60k & 10 & Foreground colour as a spurious correlation & \href{https://github.com/autonomousvision/counterfactual_generative_networks/blob/main/scripts/download_data.sh}{Link} \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & DC-MNIST & 50k & 10k & 60k & 10 & Fore/background colour as spurious correlations & NA\footnotemark[1]
+ \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & W-MNIST & 50k & 10k & 60k & 10 & In-the-wild background with texture colour & NA\footnotemark[1] \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & IN-1k \cite{imagenet-1m} & 1M & 100k & 1.2M & 1000 & Large-scale evaluation & \href{https://www.kaggle.com/c/imagenet-object-localization-challenge/data}{Link} \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & IN-mini \cite{in-mini} & ~35k & ~4k & ~39k & 1000 & Small-scale evaluation & \href{https://www.kaggle.com/ifigotin/imagenetmini-1000}{Link} \\
+\arrayrulecolor{black}\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Training\\ invariant\\ classifiers\end{tabular}} & MNISTs & 50k & 10k & 60k & 10 & Test different granularities of invariance &  \href{https://github.com/autonomousvision/counterfactual_generative_networks/blob/main/scripts/download_data.sh}{Link} \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & Cue-conflict \cite{cue_conflict} & NA & 1280 & 1280 & 16 & Tests shape-texture disentanglement & \href{https://github.com/rgeirhos/texture-vs-shape}{Link}  \\
+\arrayrulecolor{lightgray}\cmidrule{2-8}
+ & IN-9 variants \cite{imagenet9} & $\sim$45k & $\sim$4k & $\sim$50k & 9 & Tests background-invariance &  \href{https://github.com/MadryLab/backgrounds_challenge}{Link} \\
+\arrayrulecolor{black}\bottomrule
+\end{tabular}%
+}
+\end{table}
+\footnotetext[1]{This variant of MNIST is generated by the authors themselves and can be generated using their repository.}
+%%%%%%%%%%%%% %%%%%%%%%%%%% %%%%%%%%%%%%%
+
+\subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+In order to match the original experiments as closely as possible, we used the same hyperparameters as the authors of the original paper whenever they were specified in the article. If the required hyperparameters for the experiments were not mentioned in the original paper, we relied on the default parameters given in the configuration files of the original implementation. In this case, we assume that these default parameters correspond to the parameters used for the described experiments.
+
+\subsection{Experimental setup and evaluation metrics}
+\label{subsec:expt}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+Our experimental setup is largely based on the description provided by \citewithauthor{Sauer2021ICLR}. To that end, we will address claim HQC by performing a qualitative analysis on both MNIST and ImageNet. 
+To verify claim IBR, we perform a loss ablation study in which we disable one loss at a time. Lastly, to address the main claim of the paper, namely ODR, we conduct a number of experiments on both MNIST and ImageNet to evaluate both out-of-distribution performance and spurious signal invariance of the invariant classifiers. 
+
+To provide further evidence to support claim ODR, we conduct additional experiments to visually explain the decisions made by the invariant classifiers based on gradient-based localization. For this purpose, we use a PyTorch implementation of GradCAM \cite{torchcam, gradcam}, a class activation map method that weighs the 2D activations by the average gradient \cite{gradcam}. This method allows us to visualize the salient features on which the invariant classifiers base their predictions.
+
+
+\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+We perform all experiments on a cluster whose nodes are equipped with Nvidia GeForce GTX 1080 Ti GPUs. 
+% % TODO: Running time of experiments (I am not sure about this).
+Due to constraints in resources, we run most experiments once. As such, our experiments are indicative and not conclusive. Our reproducibility study comes at a total computational cost of 112 GPU hours (see \cref{sec:cost-taxonomy} for more details).
+
+% We perform all experiments on GPU nodes of Lisa Cluster, which is a system maintained by SURFsara \cite{Lisa}. These nodes are equipped with Nvidia GeForce GTX 1080 Ti GPUs and Intel Xeon Bronze 3104 CPUs. 
+% % TODO: Running time of experiments (I am not sure about this).
+% Due to constraints in resources, we run most experiments once. As such, our experiments are merely indicative and not conclusive. Our reproducibility study comes at a total computational cost of 112 GPU hours (see \cref{sec:cost-taxonomy} for our calculations).

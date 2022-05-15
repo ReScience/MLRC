@@ -1,0 +1,51 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/danilodegoede/fact-team3/}
+\def \codeDOI{00.0000/zenodo.0000000}
+\def \codeSWH{swh:1:dir:410075522df668dfae4742564f10b62de0cb8dc6}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha}
+\def \editorORCID{}
+\def \reviewerINAME{Anonymous Reviewers}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{04 February 2022}
+\def \dateACCEPTED{11 April 2022}
+\def \datePUBLISHED{15 May 2022}
+\def \articleTITLE{[Re] Reproducibility Study of “Counterfactual Generative Networks”}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2021}
+\def \articleBIBLIOGRAPHY{bibliography.bib}
+\def \articleYEAR{2022}
+\def \reviewURL{https://openreview.net/forum?id=HNlzT3G720t}
+\def \articleABSTRACT{Scope of Reproducibility In this work, we study the reproducibility of the paper Counterfactual Generative Networks (CGN) by Sauer and Geiger to verify their main claims, which state that (i) their proposed model can reliably generate high-quality counterfactual images by disentangling the shape, texture and background of the image into independent mechanisms, (ii) each independent mechanism has to be considered, and jointly optimizing all of them end-to-end is needed for high-quality images, and (iii) despite being synthetic, these counterfactual images can improve out-of-distribution performance of classifiers by making them invariant to spurious signals.
+Methodology The authors of the paper provide the implementation of CGN training in PyTorch. However, they did not provide code for all experiments. Consequently, we re-implemented the code for most experiments, and run each experiment on 1080 Ti GPUs. Our reproducibility study comes at a total computational cost of 112 GPU hours.
+Results We find that the main claims of the paper of (i) generating high-quality counterfactuals, (ii) utilizing appropriate inductive biases, and (iii) using them to instil invariance in classifiers, do largely hold. However, we found certain experiments that were not directly reproducible due to either inconsistency between the paper and code, or incomplete specification of the necessary hyperparameters. Further, we were unable to reproduce a subset of experiments on a large-scale dataset due to resource constraints, for which we compensate by performing those on a smaller version of the same dataset with our results supporting the general performance trend.
+What was easy The original paper provides an extensive appendix with implementation details and hyperparameters. Beyond that, the original code implementation was publicly accessible and well structured. As such, getting started with the experiments proved to be quite straightforward. The implementation included configuration files, download scripts for the pretrained weights and datasets, and clear instructions on how to get started with the framework.
+What was difficult Some of the experiments required severe modifications to the provided code. Additionally, some details required for the implementation are not specified in the paper or inconsistent with the specifications in the code. Lastly, in evaluating out-of-distribution robustness, getting the baseline model to work and obtaining numbers similar to those reported in the respective papers was challenging, partly due to baseline model inconsistencies within the literature.
+Communication with original authors We have reached out to the original authors to get clarifications regarding the setup of some of the experiments, but unfortunately, we received a late response and only a subset of our questions was answered. }
+\def \replicationCITE{Axel Sauer and Andreas Geiger}
+\def \replicationBIB{sauer2021counterfactual}
+\def \replicationURL{https://openreview.net/pdf?id=BXewfAYMmJw}
+\def \replicationDOI{}
+\def \contactNAME{Piyush Bagad}
+\def \contactEMAIL{piyush.bagad@student.uva.nl}
+\def \articleKEYWORDS{rescience c, machine learning, python, pytorch, deep generative models, counterfactuals}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{9}
+\def \journalISSUE{1}
+\def \articleNUMBER{}
+\def \articleDOI{10.0000/zenodo.0000000}
+\def \authorsFULL{Piyush Bagad et al.}
+\def \authorsABBRV{P. Bagad et al.}
+\def \authorsSHORT{Bagad et al.}
+\title{\articleTITLE}
+\date{}
+\author[1,\orcid{0000-0002-7533-5337}]{Piyush Bagad}
+\author[1,\orcid{0000-0003-1345-0433}]{Paul Hilders}
+\author[1,\orcid{0000-0003-3631-8128}]{Jesse Maas}
+\author[1,\orcid{0000-0001-6163-4021}]{Danilo de Goede}
+\affil[1]{University of Amsterdam, Amsterdam, The Netherlands}
+\affil[1]{Equal contribution}
