@@ -1,0 +1,21 @@
+%%% SCOPE OF REPRODUCIBILITY %%%
+\section{Scope of reproducibility}
+\label{sec:scope}
+
+In this study, we aimed to verify the central claim of the original paper, which stated that the proposed algorithm outperforms other state-of-the-art approaches at calculating the truncated SVD of evolving matrices.
+In particular, they claimed that the method had especially high accuracy for the singular triplets with the largest modulus singular values.
+We sought to verify this claim by evaluating two metrics using our implementation of the method as well as with \verb|FrequentDirections|, a state-of-the-art matrix sketching and streaming algorithm \cite{Ghashami2016}:
+\begin{enumerate}
+    \item Relative approximation error \verb|rel_err| of leading $k$ singular values of $A$ (\Eqref{eq:rel_error}) is smaller when using the proposed algorithm compared to previous methods.
+    \begin{equation}
+        \verb|rel_err| = \abs{\dfrac{\hsigj{i}-\sigj{i}}{\sigj{i}}}
+        \label{eq:rel_error}
+    \end{equation}
+    
+    \item Scaled residual norm \verb|res_norm| of leading $k$ singular triplets $\{ \huj{i}, \hvj{i}, \hsigj{i} \}$ (\Eqref{eq:res_norm}) is smaller when using the proposed algorithm compared to previous methods.
+    \begin{equation}
+        \verb|res_norm| = \dfrac{\norm{A \hvj{i} - \hsigj{i} \huj{i}}_2}{\hsigj{i}}
+        \label{eq:res_norm}
+    \end{equation}
+\end{enumerate}
+Additionally, we also sought to verify the original paper's claims about the runtime performance of the proposed algorithm.

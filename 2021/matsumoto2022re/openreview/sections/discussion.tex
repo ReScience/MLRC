@@ -1,0 +1,25 @@
+%%% DISCUSSION %%%
+\section{Discussion} \label{sec:discussion}
+
+Ultimately, the reproduced results confirm the original results.
+Specifically, Table \ref{tab:err_res_50} verifies that Algorithm 2.2 outperforms Algorithm 2.1 in terms of accuracy.
+Furthermore, Figure \ref{fig:cran_runtime} clearly demonstrates that Algorithm 2.1 far outperforms Algorithm 2.2 with respects to wall clock speed.
+However, as there were no benchmarks, we viewed the comparison with \verb|FrequentDirections| as a much stronger barometer.
+At first glance, Table \ref{tab:err_res_50} and Figures \ref{fig:cran_rel_err_fd} and \ref{fig:cran_res_norm_fd} suggest that both Algorithm 2.1 and 2.2 outperform \verb|FrequentDirections| in terms of accuracy.
+However, upon considering the steps involved in \verb|FrequentDirections| (namely the step involving the thresholding of the singular values), we realize that the relative error and residual norm of singular triplets may not be an applicable metric for \verb|FrequentDirections|.
+This is further demonstrated by the irregular profile of the residual norm as a function of the singular value index (Figure \ref{fig:cran_res_norm_fd})).
+Thus it cannot conclusively be said that \verb|FrequentDirections| is significantly under-performing the paper's proposed algorithms.
+Consequently, the overall conclusion becomes that while the results presented in the paper are sound, there is still need for further benchmarking to determine where the proposed algorithms stand relative to the state-of-the-art in the field.
+
+\subsection{Future Work}
+We believe a weakness of the paper to be the lack of benchmarking - and as discussed above, our results do not conclusively resolve this.
+However, they do motivate the need for metrics that will allow for a fair comparison between the proposed algorithm and state-of-the-art algorithms such as \verb|FrequentDirections|.
+
+\subsection{What was easy}
+
+Algorithm 1.1 was quite simple to understand and implement, and was exactly reproduced quite early on.
+Once we received code, implementation of Algorithm 2.2 and the evaluation metrics was  simplified. 
+
+\subsection{What was difficult}
+
+In addition to the challenges constructing $X_{\lambda,r}$ for Algorithm 2.2, another challenging/time-consuming aspect was designing the experiments as sweeping through various combinations of the parameters required thorough planning for data management.

@@ -1,0 +1,35 @@
+%%% REPRODUCIBILITY SUMMARY %%%
+\section*{Reproducibility Summary}
+\label{sec:summary}
+
+\section*{Scope of Reproducibility}
+
+Kalantzis et al. \cite{Kalantzis2021} present a method to update the rank-$k$ truncated SVD of matrices where the matrices are subject to periodic additions of rows or columns.
+The main claim of the original paper states that the presented algorithms outperform other state-of-the-art approaches in terms of accuracy and speed.
+However, no results were given comparing the proposed methods to other state-of-the-art methods.
+Accordingly, we reproduce their results and compare it to the state-of-the-art \verb|FrequentDirections| streaming algorithm \cite{Ghashami2016}.
+
+\section*{Methodology}
+
+We re-implemented the algorithm in Python and evaluated the performance on five datasets.
+All experiments were run on a MacBook Pro and the code is available on GitHub\footnote{https://github.com/andyzfchen/truncatedSVD}.
+The accuracy of the methods were evaluated using the same metrics as in the paper.
+
+\section*{Results}
+
+We successfuly reproduced the task-agnostic experiments of the original paper, finding our results to strongly match with the original results.
+We also carried out a comparison with \verb|FrequentDirections| but found the evaluation metrics of the original paper to be ill-suited to compare - setting up for further work on developing fair comparisons. 
+
+\section*{What was easy}
+
+The benchmark algorithm was fairly simple to implement.
+Furthermore, running the experiments did not place any computational resource burden as all experiments could be run on a laptop.
+
+\section*{What was difficult}
+
+The most difficult part of the reproduction study was understanding the justification underlying the construction of the algorithm as it involved several complex proofs from numerical linear algebra to provide bounds on the accuracy.
+Demystifying the specifics of constructing the projection matrix for the main algorithm the author's propose was also initially difficult until we gained access to their code.
+
+\section*{Communication with original authors}
+
+We contacted one of the authors by email and received their data and MATLAB implementation of the algorithm and experiments.

@@ -1,0 +1,135 @@
+%%% PROJECTION-BASED UPDATE ALGORITHM %%%
+\section{Projection-based update algorithm}
+\label{sec:alg}
+
+In the following sections, we first introduce the original \verb|zha-simon| algorithm, then introduce the proposed projection-based update algorithm.
+Note that there are two implementations to the proposed algorithm: one which uses the same projection matrix as the \verb|zha-simon| algorithm (Algorithm 2.1) and another that uses an enhanced projection matrix (Algorithm 2.2).
+
+%% ZHA-SIMON ALGORITHM %%
+\subsection{Zha-Simon algorithm}
+\label{alg:zha-simon}
+
+As motivated in the introduction, an update algorithm that uses prior knowledge regarding the SVD of the matrix is crucial for it to be useful in practice.
+The algorithm proposed in \cite{Kalantzis2021} is based on an algorithm proposed in \cite{Zha1999}, the latter of which we will refer to as the \verb+zha-simon+ algorithm (Algorithm \ref{alg:orig_zha-simon}).
+Using \verb+zha-simon+ in the row-update case $A=\begin{pmatrix} B \\ E \end{pmatrix}$, the QR decomposition of the row space of $E$ that is not captured by the range of the right singular vectors $V_k$ can be expressed as $(I-V_k V_k^H)E^H = QR$.
+Using this result and the previously known rank-$k$ SVD $B_k=U_k \Sigma_k V_k^H$, the updated matrix $A$ can be decomposed approximately as follows:
+\begin{equation}
+  A = \begin{pmatrix} B \\ E \end{pmatrix} \approx
+  \begin{pmatrix} U_k \Sigma_k V_k^H \\ E \end{pmatrix} = 
+  \begin{pmatrix} U_k & \\ & I_s \end{pmatrix} \begin{pmatrix} \Sigma_k & \\ EV_k & R^H \end{pmatrix} \begin{pmatrix} V_k^H \\ Q^H \end{pmatrix}
+  \label{eq:zhasimon_partial}
+\end{equation}
+If we let $F\Theta G^H$ be the compact SVD of $\begin{pmatrix} \Sigma_k & \\ EV_k & R^H \end{pmatrix}$, then \Eqref{eq:zhasimon_partial} can be further decomposed as follows:
+\begin{equation}
+  A \approx 
+  \begin{pmatrix} U_k & \\ & I_s \end{pmatrix} \left(F\Theta G^H\right) \begin{pmatrix} V_k^H \\ Q^H \end{pmatrix}
+  = \left( \begin{pmatrix} U_k & \\ & I_s \end{pmatrix} F \right) \Theta \left( \begin{pmatrix} V_k & Q \end{pmatrix} G \right) ^H
+  \label{eq:zhasimon_full}
+\end{equation}
+The key here is to notice that the approximation of the rank-$k$ truncated SVD of $A$ using the \verb+zha-simon+ algorithm does not require access to the previous matrix $B$ -- only the rank-$k$ SVD $B_k=U_k \Sigma_k V_k^H$ of the matrix from the previous iteration is needed.
+We can further simplify \Eqref{eq:zhasimon_full} and see that it approximates the SVD of $A$ as $A \approx (ZF)\Theta(WG)^H$ where $Z=\begin{pmatrix} U_k & \\ & I_s \end{pmatrix}$ and $W^H=\begin{pmatrix} V_k & Q \end{pmatrix}^H$ are orthonormal matrices with ranges that approximately capture \verb+range+$(\hU_k)$ and \verb+range+$(\hV_k^H)$, respectively.
+
+\begin{minipage}[t]{0.48\textwidth}
+\begin{algorithm}[H]
+    \centering
+    \cprotect\caption{\verb|zha-simon| algorithm}\label{alg:orig_zha-simon}
+    \begin{algorithmic}[1]
+      \Require $A,E,U_k,\Sigma_k,V_k,k$
+      \State $Z \gets \begin{pmatrix} U_k & \\ & I_s \end{pmatrix}$
+      \State $[Q,R] \gets \verb|qr|(I-V_k V_k^H)E^H$ \label{op:zha-simon_qr}
+      \State $W \gets \begin{pmatrix} V_k & Q \end{pmatrix}$
+      \State $[F_k,\Theta_k,G_k] \gets \verb|svd|(Z^H AW,k)$ \label{op:zha-simon_svd}
+      \State $\barU_k \gets Z F_k$
+      \State $\barSigma_k \gets \Theta_k$
+      \State $\barV_k \gets WG_k$
+      \Ensure $\barU_k\approx\hU_k,\barSigma_k\approx\hSigma_k,\barV_k\approx\hV_k$
+    \end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{algorithm}[H]
+    \centering
+    \caption{Proposed row-update algorithm} \label{alg:row-update}
+    \begin{algorithmic}[1]
+      \Require $B,E,k$
+      \State $[U_k,\Sigma_k,V_k] \gets \verb|svd|(B,k)$
+      \State Construct projection matrix $Z$
+      \State $[F_k,\Theta_k] \gets \verb|svd|(Z^H A,k)$ where $A=\begin{pmatrix}B\\E\end{pmatrix}$ \label{op:row-update_svd}
+      \State $\barU_k \gets Z F_k$
+      \State $\barSigma_k \gets \Theta_k$
+      \State $\barV_k \gets A^H \barU_k \barSigma_k^{-1}$
+      \Ensure $\barU_k\approx\hU_k,\barSigma_k\approx\hSigma_k,\barV_k\approx\hV_k$
+    \end{algorithmic}
+\end{algorithm}
+\end{minipage}
+
+%% PROPOSED ALGORITHM %%
+\subsection{Proposed row-update algorithm}
+
+In practice, computing the rank-$k$ truncated SVD of $A$ using Algorithm \ref{alg:orig_zha-simon} is expensive due to the QR (Step \ref{op:zha-simon_qr}) and SVD (Step \ref{op:zha-simon_svd}) steps and possibly inaccurate based on the structure of $A$ \cite{Kalantzis2021}.
+The cost of the QR decomposition can be mitigated by setting $W=I_n$ by observing that $\hv^{(i)}\subseteq\verb+range+(I_n)$ for $i=1,\dots,n$.
+Therefore, $Z^H AW$ in Step \ref{op:zha-simon_svd} can be replaced with $Z^H A$ and the QR decomposition in Step \ref{op:zha-simon_qr} can be eliminated.
+With these modifications, we have the new proposed row-update algorithm (Algorithm \ref{alg:row-update}).
+Note that Step 2 has intentionally not been specified as the authors proposed two options for the construction of the projection matrix $Z$. 
+
+The first option (Algorithm 2.1) uses the same $Z$ matrix as in Algorithm. Although the construction of $Z$ and $Z^H A$ are presented in two separate steps in Algorithm \ref{alg:row-update}, $Z^H A$ for Step \ref{op:row-update_svd} is directly computed as  \ref{alg:orig_zha-simon}. Below are the expressions for $Z$ and $Z^H A$ for Algorithm 2.1.
+\begin{subequations}\label{eq:zha-simon_matrices}
+\begin{equation}
+  Z=\begin{pmatrix} U_k & \\ & I_s \end{pmatrix}
+  \label{eq:zha-simon_Z}
+\end{equation}
+\begin{equation}
+  Z^H A =
+  \begin{pmatrix}
+  \Sigma_k V_k^H \\
+  E
+  \end{pmatrix}
+  \label{eq:zha-simon_ZHA}
+\end{equation}
+\end{subequations}
+
+
+In the case where the rank of $B$ is larger than $k$ and the singular values $\sigma_{k+1},\dots,\sigma_{\text{min}(m,n)}$ are not small, the approximation returned by Algorithm 2.1 can be of poor accuracy.
+Algorithm 2.2 addresses this by using an enhanced version of the projection matrix by adding a term $-B(\lambda) B E^H$ in the $Z$ matrix such that
+\begin{equation}
+  Z = \begin{pmatrix}
+    U_k & -B(\lambda) B E^H & \\
+    & & I_s
+  \end{pmatrix}
+\end{equation}
+Setting $X = -B(\lambda) B E^H$, the additional term is equal to the matrix $X$ that satisfies the equation
+\begin{equation}
+    -(B B^H - \lambda I_m) X = (I_m - U_k U_k^H) B E^H,
+    \label{eq:bcg}
+\end{equation}
+which can be computed using the block conjugate gradient (BCG) method \cite{OLeary1980}.
+To ensure that the matrix $-(B B^H - \lambda I_m)$ is positive definite for BCG, a lower bound of $\lambda > \sigma_1^2$ is imposed.
+The leading singular value can be estimated using a few iterations of truncated SVD.
+However, to reduce the number of columns in $X$ and keep $Z$ manageable, the randomized rank-$r$ SVD of $X$ can be taken so that
+\begin{equation}
+    -B(\lambda) B E^H R \approx X_{\lambda,r} S_{\lambda,r} Y_{\lambda,r}^H
+    \label{eq:bcg_rsvd}
+\end{equation}
+where $R$ is a matrix with at least $r$ columns whose entries are i.i.d.\ Gaussian random variables with zero mean and unit variance.
+With $X_{\lambda,r}$, the $Z$ and $Z^H A$ matrices can be calculated as
+\begin{subequations}
+\begin{equation}
+  Z = \begin{pmatrix}
+    U_k & X_{\lambda,r} & \\
+    & & I_s
+  \end{pmatrix}
+  \label{eq:enhanced_Z}
+\end{equation}
+\begin{equation}
+  Z^H A =
+  \begin{pmatrix}
+    \Sigma_k V_k^H \\
+    X_{\lambda,r}^H B \\
+    E
+  \end{pmatrix}
+  \label{eq:enhanced_ZHA}
+\end{equation}
+\label{eq:enhanced_matrices}
+\end{subequations}
+For more detailed explanations and derivations of the algorithms and their associated proofs, we refer readers to \cite{Kalantzis2021}.
