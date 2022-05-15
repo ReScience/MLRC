@@ -1,0 +1,332 @@
+\section*{Reproducibility Summary}
+
+\subsection*{Scope of reproducibility}
+
+
+
+Our work attempts to verify two methods to mitigate forms of inequality in ride-pooling platforms proposed in the paper \textit{Data-Driven Methods for Balancing Fairness and Efficiency in Ride-Pooling} \cite{raman21}: (1) integrating fairness constraints into the objective functions and (2) redistributing income of drivers. We extend this paper by testing for robustness to a change in the neighbourhood selection process by using actual Manhattan neighbourhoods and we use corresponding demographic data to examine differences in service based on ethnicity.
+
+\subsection*{Methodology}
+
+
+
+The authors of the paper provide preprocessed data and code implemented in TensorFlow, which we transform into PyTorch. Experiments in this reproducibility study can be divided into 3 parts: (1-2) we reproduce the results regarding objective functions and income redistribution using data and settings provided in the paper and code; (3) we apply this approach to the same data grouped into Manhattan neighbourhoods. Further, we examine discrepancies between service rates of different ethnicities using neighbourhood-specific demographic data as a proxy for this protected information.
+
+
+\subsection*{Results}
+
+
+
+The results in the original paper regarding different objective functions were reproduced within a margin of error. Also, income redistribution is able to reduce wage inequality, albeit to a lesser degree. The objective functions appear to be sensitive to the neighbourhood selection mechanism. While the results of the rider-fairness objective functions are maintained, performance of the driver-fairness objective functions declines. There appear to be only small differences in service rates between ethnicities, while rider-side fairness seems to mitigate inequalities the most. However, this is only achieved by worsening the service for well-served neighbourhoods instead of improving it for underserved ones.
+
+
+
+
+
+
+\subsection*{What was easy}
+
+The simulation logic as well as the training and testing procedures in the provided code were straightforward to execute. 
+
+
+
+\subsection*{What was difficult}
+
+
+
+To be able to run the authors' code we needed to make several changes to it. Moreover, specific parts of the original research were not explicitly mentioned in the paper. Another point of difficulty was the absence of preprocessing code which was not detailed properly and could not be fully reproduced. The reproducibility of the paper relied on the provided code, communication with the authors as well as previous works.
+
+
+
+\subsection*{Communication with original authors}
+
+We contacted the authors about the preprocessed data that was not hosted online due to licensing issues. They supplied it as well as responded very quickly and provided clarifications on the parameters and their values in the code.
+
+
+\section{Introduction}
+Ride-pooling, where drivers can service multiple requests from riders simultaneously, is becoming increasingly popular \cite{sharing_attention}. Since resources are shared, ride-pooling has the potential to reduce the aggregate VKT ("vehicle kilometres travelled") and with that reduce petroleum usage and carbon dioxide emissions \cite{zhu22}. To efficiently perform the matching of riders and drivers, machine learning algorithms are used \cite{turakhia17}, which optimise for income maximisation. However, with respect to ride pooling, previous works have observed a gender wage gap \cite{cook18} as well as majority Asian and Hispanic neighbourhoods being associated with less service compared to white neighbourhoods \cite{brown18}. Therefore, alternative fairness notions could also be useful.
+
+\citet{shah20} introduce an algorithm to solve the ride-pooling matching problem, which maximises the number of rider requests serviced based on a Markov decision process (MDP) in combination with deep learning. The authors of the paper \textit{Data-Driven Methods for Balancing Fairness and Efficiency in Ride-Pooling} \cite{raman21} extend this work to compare multiple objective functions, defined on different fairness metrics. Next to that, they investigate the use of income redistribution. In this reproducibility study, we attempt to verify their results and extend their experiments.
+
+
+
+
+
+
+
+\section{Scope of reproducibility}
+\label{sec:Scope of reproducibility}
+
+The main contribution of the paper is introducing and evaluating measures to deal with the fairness issues arising in ride-pooling. In our reproducibility study, we first focus on reimplementing their code (implemented in TensorFlow \cite{tensorflow}) in PyTorch \cite{pytorch} and compare the results we achieve to their findings. The main claims made in the original paper are:
+\begin{itemize}
+    \item The authors claim that they extend the MDP-based framework (introduced in \citet{shah20}) by incorporating different definitions of fairness to perform non-myopic optimisation. By incorporating fairness measures into the objective function, driver and rider inequality can be reduced while maintaining or even improving profitability.
+    \item The state-of-the-art objective function \cite{shah20} can outperform the fairness objective functions in certain settings in terms of rider-fairness and increase the average income of drivers at the cost of a higher variance.
+    \item Income redistribution can be used to reduce wage inequality while avoiding the free-rider problem and guaranteeing a minimum wage for drivers.
+\end{itemize}
+The mathematical proof guaranteeing the minimum wage is not verified in our study. In addition to testing for reproducibility, we examine the robustness of the approach to changes in the neighbourhood selection method using actual tabulation areas. Using demographic data, we investigate whether the fairness objective functions are fair to all ethnicities. To investigate these aspects of the paper, we followed these steps:
+\begin{enumerate}
+    \item We inspect the provided codebase and identify, analyse and solve any barriers to running the code.
+    \item Next, we transform the code to the PyTorch framework, matching the functionality as well as possible.
+    \item With the PyTorch version we attempt to reproduce the results using the dataset preprocessed by the authors. To investigate potential differences, we use different seeds to examine the effect of randomness.
+    \item To test the method's robustness we utilise the authors' approach on actual neighbourhoods in Manhattan and, using the neighbourhood demographic compositions (since individual protected data is confidential), we explore whether the introduced objective functions mitigate potential inequalities between ethnic groups.
+
+\end{enumerate}
+
+
+
+\section{Theoretical background} \label{sec:Theoretical Background}
+
+The paper we are reproducing extends the method proposed in \citet{shah20}. The latter presents Neural Approximate Dynamic Programming (NeurADP), which uses offline-online learning and approximates dynamic programming to match drivers and riders non-myopically. The following subsections explain NeurADP and the two extensions proposed in \citet{raman21}, fairness-based objective functions and income redistribution.
+
+\subsection{NeurADP: Neural Approximate Dynamic Programming}
+NeurADP uses neural network-based value function approximation and updates it using the Bellman equation \cite{mnih2015}. To break temporal dependencies between samples, mini-batch experience replay is used \citep{lin1992self}.
+
+The neural network is used to rank feasible actions for each agent. To receive the optimal choices, an integer linear program (ILP) is solved considering the top 150 feasible actions. To update the neural network, the authors use a target network and Double Q-learning \cite{van2016deep}. The value function over individual vehicles is learned offline. When the approach is running online, the model computes the driver-rider assignment that maximises the value function computed in the offline phase. Further details regarding the neural network inputs and its architecture are in Appendix \ref{appendix:network}.
+
+\subsection{Fairness-based objective functions}
+Prior work used profitability metrics as objective functions. The authors introduce two new objective functions to improve both driver-side and rider-side fairness \cite{raman21} and compare them using different evaluation strategies.
+
+
+\paragraph{Profitability objectives}
+There are two profitability measures used: the number of riders serviced ($o_1$) and the total income ($o_2$).
+\begin{gather}
+    o_{1}(R, W) = \sum_{i=1} ^{n} |p_{i}| + |s_{i}|, \qquad o_{2}(R, W) = \sum_{i=1} ^{n} \underbrace{\sum_{u\in p_{i} \cup s_{i}} E_{g,e} + \delta}_{\pi_{i}}.
+\end{gather}
+The total number of rides serviced by driver $i$ consists of the number of ongoing requests $|p_{i}|$ and completed requests $|s_{i}|$. The total income is calculated by adding the incomes $\pi_{i}$ of the individual drivers $i$. The income for any request $u$ is the sum of the variable cost $E_{g,e}$ (depending on the start and end locations $g$ and $e$) and the fixed part of ride-pooling pricing, represented by the constant $\delta$.
+
+\paragraph{Fairness objectives}
+The authors define two fairness metrics for rider-side ($o_3$) and driver-side ($o_4$) fairness.
+    \begin{gather}
+    o_{3}(R, W) = -\lambda \textrm{Var}\left(\frac{h_{j}}{k_{j}}\right) + \sum_{i=1} ^{n} \pi_{i}, \qquad  o_{4}(R, W) = -\lambda \textrm{Var}(\pi_{i}) + \sum_{i=1} ^{n} \pi_{i}.
+    \end{gather}
+The former is quantified by the variance of the success rates which is computed by the ratio between serviced and total requests $\left(\frac{h_{j}}{k_{j}}\right)$ originating in neighbourhood $j$. Each crossing is mapped to one of $H$ neighbourhoods. $o_4$ is based on the spread of incomes $\pi_i$. Both objective functions incorporate the total income $o_2$ into the equation, $\lambda$ controls the importance of the variance term.
+
+\paragraph{Evaluation strategy} 
+To measure the effect of different objective functions, the authors introduce two fairness metrics. They evaluate rider-fairness by comparing the overall and minimum success rates across neighbourhoods. They then utilise the income distributions to assess driver-fairness.
+
+\subsection{Income redistribution} \label{sec:income_redistribution}
+The authors also introduce an income redistribution scheme to mitigate income fluctuation and inequality in driver wages. To help estimate the true contribution of each driver, Shapley values \cite{shapley} are used. In this ride-pooling setting, a Shapley value can be intuitively interpreted as the average profit lost when a specific driver does not contribute. 
+
+To reduce the difference between a driver's pre-redistribution income $\pi_{i}$, and Shapley value $v_{i}$, the authors use a risk parameter, $0\leq r\leq 1$, which designates what fraction of a driver's income is kept. The model collects $\sum_{=1}^{n} (1-r)\pi_{i}$ from all drivers and redistributes it proportional to the difference between their value and earnings, which is $max(0, v_{i}-r\pi_{i})$. The driver's income after redistribution, $q_{i}$,  is 
+\begin{align}\label{eq:q_i}
+    q_{i} = rv_{i} +  \frac{\max(0, v_{i}-r\pi_{i})}{\sum_{j=1}^{n}\max(0, v_{j}-r\pi_{j})}\sum_{j=1}^{n}(1-r)v_{j}
+\end{align}
+
+\paragraph{Evaluation strategy}
+To measure the correlation between the Shapley value and income after redistribution, the gain metric $g_{i}$ is defined as the ratio of change in $q_{i}$ to $v_{i}$ when $v_{i}$ is doubled. The gain $g$ is calculated as the average over $g_i$. To test the effect of income redistribution, the authors determine gain and the standard deviation of the ratio of $q_{i}$ to $v_{i}$ for varying values of $r$. The most desirable outcome is that the driver's redistribution value is as close as possible to their Shapley value, i.e. $std=0$ and that if they double their contribution, they double their earnings after redistribution, i.e. $g=1$.
+
+\section{Methodology}\label{sec:Experimental setup}
+In this section, the approaches used in our reproducibility study are outlined.
+
+\subsection{Datasets}\label{sec:Datasets}
+
+The following shows the original dataset and the demographic data to the Manhattan neighbourhoods.
+
+\subsubsection{NYC yellow taxi data Manhattan} \label{sec:NYC yellow taxi data}
+Similar to \citet{raman21}, we use the dataset 'Yellow taxi trip records' from New York City \cite{ny16} for training and evaluation. The original dataset contains pick-up and drop-off coordinates for taxi passengers. We follow the assumption of the original paper that the spatial and temporal distribution of rider requests between ride-pooling and taxi rides are similar. The preprocessing done in \citet{raman21} consists of the following steps. First, the dataset of New York City is filtered to only comprise trips starting and ending in Manhattan. Next, the coordinates are discretised into $|L|$ locations, which are identified by taking the street network of the city from openstreetmap \cite{OpenStreetMap} using osmnx with 'drive' as network type. We take the largest strongly connected component of the network discarding nodes that do not have outgoing edges. 
+
+The resulting network has 4373 locations (street intersections) and 9540 edges. The pick-up time is converted to batches of requests corresponding to the minutes. Furthermore, the locations are grouped into 10 neighbourhoods using K-means clustering \citep{lloyd1982least}. The dataset contains on average 322714 requests in a day (on weekdays) and 19820 requests during the peak hour. The preproccessed dataset was not publicly available, although mentioned otherwise in the paper. The authors confirmed that this was due to licensing issues and provided us with the preprocessed data. The model is trained using the data from March 26th - 28th 2016. The fairness objective functions are tested on the data from April 4th. 
+
+
+
+
+
+\subsubsection{Demographics by Neighborhood Tabulation Area}\label{sec:demographic_data}
+The dataset "Demographics by Neighborhood Tabulation Area" for New York City \citep{demographics_data} allows us to investigate whether the ride demand of racial or ethnic minorities is indeed satisfied in the same way. It contains demographic data for each neighborhood tabulation area (NTA) in New York City. A NTA is an area for which census data is gathered. The demographic data relevant to this report are the race/ethnicity percentages per neighbourhood, namely Hispanic/Latino, White, Black/African-American, Asian, Other. Instead of running K-means clustering to obtain the neighbourhoods, we take the neighbourhoods corresponding to these NTA areas in Manhattan. This results in 29 instead of 10 neighbourhoods for Manhattan. To be able to determine which nodes in the graph are situated in which NTA, we made use of the "2010 Neighborhood Tabulation Areas" dataset \citep{nta_polygon_coords} which contains coordinates specifying an approximation of the polygon shape of each neighbourhood. 
+
+\subsection{Code}
+
+Our implementation is based on the code of the paper which is publicly available at GitHub \footnote{https://github.com/naveenr414/ijcai-rideshare/tree/78d81d0f417ad4fd54ea2e967010bb221fc4e177}. The repository was updated after we started reproducing the paper, but we refer to the commit specified above unless stated otherwise. The published code is not functioning and does not include the preprocessing steps. However, the main framework for testing and training is provided and hyperparameters can be configured using setting files. We re-implemented the model in the PyTorch framework \cite{pytorch}, ensuring that the default behaviour of TensorFlow which was implicitly used in the authors' implementation is replicated. This includes weight initialisation and hyperparameters of the optimiser. To transfer the masking mechanism used to pad the sequences, we employed PyTorch's packed sequence implementation. Since the new framework does not support backwards LSTM, we used a bidirectional LSTM and ignored the forward pass to achieve the same functionality. In accordance with the original code, we used the CPLEX optimiser \cite{ibm_cplex} to solve the ILP. To support the number of drivers and, therefore, bigger linear systems, the academic or commercial version is necessary. There were some rare situations in which the ILP failed to satisfy the constraints (one or two agents were not assigned any actions) which led to an error. This was fixed by assigning the "take no action" action to those agents. In addition, we implemented the preprocessing steps on the original dataset \citep{ny16}, as this code was not available. For this, we perform the same steps indicated in Section \ref{sec:NYC yellow taxi data}, but we simplified the estimation of the travel times as this was not clear from the paper. Our code is available at GitHub. \footnote{https://github.com/reproducibilityaccount/reproducing-ridesharing}
+
+\subsection{Hyperparameters}\label{sec:Hyperparameters}
+
+Focusing on reproducing the original paper \cite{raman21}, we tried to stay close to the original paper's approach and did not perform hyperparameter optimisation. Hyperparameter values missing in the paper (e.g. minimum number of experiences and samples) were retrieved from the authors' code. Additionally, there were inconsistencies, when some hyperparameters had different values in different parts of code (e.g. embedding dimension). In this case, we reached out to the authors for clarification. More details on hyperparameters are in Appendix \ref{appendix:hyperparameters}. 
+
+
+
+
+
+\subsection{Computational requirements}
+
+To increase the available computational resources, we used multiple computers with different hardware (see Table \ref{tabl:hw_conf} in the Appendix). In general, the training time is dominated by the simulation of the environment and solving the ILP. The training of the neural network plays only a minor role. Hence, GPUs are not crucial for training, the training time is mostly determined by the single-core performance of the CPU. A run consisting of training on three days and testing on one typically takes about 2.5 to 3 hours. In total, running all experiments took 202 hours.
+
+\subsection{Experimental setup} \label{sec:process}
+
+
+
+
+
+
+\begin{wraptable}{r}{0.6\textwidth}
+    \small
+    \centering
+    \begin{tabular}{| c | c |}
+    \hline 
+        \textbf{Setting} & \textbf{Value} \\
+        \hline 
+        % \hline
+        Number of drivers & 50 , 200 \\
+        % \hline 
+        Objective function & Driver, rider, requests, income \\ 
+        % \hline 
+        Lambda & Driver: $0, \frac{1}{6} , \frac{2}{6} , \frac{3}{6} , \frac{4}{6} , \frac{5}{6} , \frac{6}{6}$  \\
+         & Rider : {$10^8, 10^9, 10^{10}$}  \\
+        %  \hline 
+        Training days & 3 \\
+        % \hline 
+        Testing days & 1 \\
+        \hline 
+    \end{tabular}
+    \caption{Settings used for the experiments}
+    \label{tabl:settings}
+\end{wraptable}
+
+\paragraph{Experiment 1 (Objective Functions)} To reproduce the results regarding claims 1 and 2, different settings are needed, presented in Table~\ref{tabl:settings}. All combinations of these settings are used. The requests and income objective functions do not have lambda values. Furthermore, the embeddings are trained (further details are in Appendix \ref{sec:Embeddings_training}). We use the same training/testing split as in the paper (described in Section~\ref{sec:Datasets}), and evaluate the results based on overall and minimum success rates as well as income distribution.
+
+To test if the differences between our findings and the original results are caused by randomness, we rerun the experiments using different seeds. Due to limited resources, we rerun only a subset of setting combinations. Further details can be found in Appendix \ref{sec:Seeds}.
+
+\paragraph{Experiment 2 (Income Redistribution)} In accordance with the original paper, the results of the Objective Functions experiments are reused to evaluate the income redistribution for claim 3. The analysis is focused on the 200 drivers with the requests objective function using gain and standard deviation (see Section \ref{sec:income_redistribution}).
+
+\paragraph{Experiment 3 (Neighbourhood Demographics)} To test robustness we use the 29 predefined neighbourhoods and train the models using the configurations of  for only 200 drivers. To incorporate the demographic data for the analysis presented in step 4 (see Section \ref{sec:Scope of reproducibility}), we map the results per neighbourhood to the five different ethnicities, under the assumption that the distribution of ethnicities living in a neighbourhood corresponds to the distributions of riders' ethnicities. For each group, we calculate the mean across all neighbourhoods weighted by the percentage of this group living in that area. This results in five different values per objective function. The higher this value is, the more requests of the corresponding group are serviced. Since we are interested in the difference across groups, we subtract the average of this rate. Values above zero indicate a group that is serviced above average and, hence, could be interpreted as advantaged. In addition, we evaluate the overall, minimum and per neighbourhood success rates.
+
+
+
+
+
+\section{Results} \label{sec:Results}
+
+In the following, we will present the results of the three different experiments.
+
+
+
+\subsection{Reproducibility result 1 - Fairness objective functions}
+
+\begin{wrapfigure}{r}{0.65\textwidth}%[ht]
+    \centering
+    \includegraphics[width=\linewidth]{../openreview/plots/fig2_final.pdf}
+    \caption{Comparison of income distributions ($\lambda=\frac{4}{6}$ for driver-side fairness and $\lambda=10^9$ for rider-side fairness). Income in dollars for the drivers when the four objective functions are optimized.}
+    \label{fig:incomedistrcomp}
+\end{wrapfigure}
+
+Looking at our findings in Figure \ref{fig:drivernrcomp}, we conclude that for 50 drivers the results for the rider-fairness metric can be reproduced, the success rates for the different objective functions match. Using the driver-fairness objective function improves both the success rate and the rider equality.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../openreview/plots/fig1_50_final.pdf}
+      \caption{50 drivers}
+      \label{fig:drivernrcomp}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../openreview/plots/fig1_200_final.pdf}
+      \caption{200 drivers}
+      \label{fig:incomedistrcomp}
+    \end{subfigure}
+    \caption{Comparison of the objective functions for different number of drivers, $\lambda$ not included, reflecting the original paper. The minimum request success rate is compared to the overall success rate for all objective functions with the different values of the $\lambda$ parameter. This comparison is made for the 50 driver setting (a) as well as the 200 driver setting (b). }
+    \label{fig:test}
+\end{figure}
+
+
+For 200 drivers, there are minor discrepancies between our results and the original. They can, however, be explained by stochasticity introduced by different seeds. However, for rider-fairness with $\lambda=10^{10}$, the difference can not be explained by randomness. The requests objective function often results in more profit and better rider equality.
+
+
+
+For each objective function, the payment distribution for 200 drivers is shown in Figure \ref{fig:incomedistrcomp}. The variance of the distributions are similar in magnitude, the means however are slightly shifted. Looking at the differences between the results for different seeds, this could be explained by randomness. The driver-fairness objective function is able to reduce the variance in income between drivers, but the profitability is also decreased. Appendix \ref{sec:Results of the original paper}  shows the results presented in the original paper, the results of the different seeded runs are visualised in Figure \ref{fig:incomedistrcomp_seeds}.
+
+
+
+
+
+\subsection{Reproducibility result 2 - Income redistribution}
+
+The authors' findings regarding the effect that varying the risk parameter $r$ has on the gain and the standard deviation of the ratio $\frac{q_{i}}{v_{i}}$ were not reproducible on the basis of the information in the paper alone, nor were they immediately reproducible from the code itself. Upon further communication with the authors, they updated their code. There was also a typo in the formula given in Equation \ref{eq:q_i} (Equation 12 in \citet{raman21}). The correct equation is:
+\begin{align}
+    q_{i} = r\pi_{i} +  \frac{max(0, v_{i}-r\pi_{i})}{\sum_{j=1}^{n}max(0, v_{j}-r\pi_{j})}\sum_{j=1}^{n}(1-r)\pi_{j},
+\end{align}
+where it can be seen that the use of Shapley values in the first term and last factor have been replaced by the amounts before redistribution. With these corrections in place, our Income Redistribution experiments yielded the results seen in Figure \ref{fig:redist}.
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../openreview/plots/fig3_gain_final.pdf}
+      \caption{Gain vs. r}
+      \label{fig:redist_gain}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../openreview/plots/fig3_std_final.pdf}
+      \caption{Standard deviation vs. r}
+      \label{fig:redist_std}
+    \end{subfigure}
+    \caption{Comparison of the gain metric and the standard deviation of the income to value ratio for different values of risk parameter r. }
+    \label{fig:redist}
+\end{figure}
+For values of $0.4 \leq r \leq 0.6$ the gain is non-zero whilst maintaining a spread close to zero for the redistribution income to Shapley value ratio. In the original paper, this condition held for values of $0.5 \leq r \leq 0.9$.  Furthermore, the magnitude of the gain is far smaller at the point at which the spread begins to increase. This indicates that when $r=0.6$, drivers only receive a $40\%$ increase in their wages whilst still earning close to their true contribution. This is in contrast with the original, where, for $r=0.9$, drivers receive an $80\%$ increase in their wages while minimising the free-rider problem. This leads us to conclude that the results of this redistribution scheme were not reproducible in this setting. The original results are shown in Figure \ref{fig:redist-orig} in the Appendix.
+
+\subsection{Results for Manhattan neighbourhoods and incorporating demographic data}
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../openreview/plots/demographic_success_rates_final.pdf}
+      \caption{Success rates}
+      \label{fig:demographic_1_success_rates}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../openreview/plots/demographic_avg_success_rates_final.pdf}
+      \caption{Average success rates}
+      \label{fig:demographic_1_avg_success_rates}
+    \end{subfigure}
+    \caption{Analysis of results incorporating demographic data. Plot (a) shows the same comparison as was made in the original paper (shown in Figure~\ref{fig:drivernrcomp}), the minimum request success rate is compared to the overall success rate for all objective functions. Plot (b) shows the difference in servicing average success rate for different demographic groups for four objective functions. }
+    \label{fig:demographic_1}
+\end{figure}
+
+
+
+We retrained the model (see Section \ref{sec:process}). Comparing the resulting Figure \ref{fig:demographic_1} to previous findings in Figure \ref{fig:drivernrcomp}, we observe that by changing the neighbourhoods the performance of the driver-fairness objective functions deteriorates the most. The rider-fairness objective functions share some similarities between the two experiments but the latter now performs best in terms of fairness across neighbourhoods (minimum request success rate). 
+
+\begin{wrapfigure}{r}{0.65\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../openreview/plots/violin_demographic_final.pdf}
+    \caption{Distribution of success rates per neighbourhood for four objective functions ($\lambda=0.5$ for driver-fairness, $\lambda=10^{10}$ for rider-fairness).  }
+    \label{fig:violin_demographic}
+\end{wrapfigure}
+
+
+
+Figure \ref{fig:demographic_1_avg_success_rates} shows that there are small differences in the percentage of requests serviced per ethnicity. The rider-fairness objective function for $\lambda=10^{10}$ seems to be best at mitigating inequality. However, as seen in Figure \ref{fig:demographic_1_success_rates}, rider-fairness results in low success rates. This might indicate that the objective function merely lowers success rates for otherwise well-serviced neighbourhoods rather than improving under-serviced ones.
+
+
+
+To confirm this, we visualised the success rate per neighbourhood and objective function (see Figure \ref{fig:violin_demographic}). It can be seen that rider-fairness indeed exhibits notably reduced variance but also a lower mean when compared to the other objective functions which tend to have an upward skew. This shows that rather than benefiting under-serviced neighbourhoods, applying rider-fairness only lessens the success rate of well-served ones.
+
+\section{Discussion}\label{sec:Discussion}
+Combining the results from the reproducibility experiments (Objective Functions experiment and Income Redistribution experiment in Section \ref{sec:process}), we find that the first claim mentioned in Section \ref{sec:Scope of reproducibility} is supported by our results for 50 drivers. Furthermore, our results substantiate the second claim. The `requests' objective function can improve the rider-fairness for 200 drivers. Additionally, it results in the highest average income per driver but exhibits a higher variance than the driver-fairness objective function. These observations are in accordance with the ones of the original paper.
+
+
+
+For the 200 drivers setting, specific results were more sensitive to sources of stochasticity than for 50 drivers. After inspecting the code, we found that the minimum number of experiences needed to start the training of the neural network is never exceeded for the 50 drivers setup. In the 200 drivers configuration, it is reached and hence the neural network is trained. Since the weights of the model are randomly initialised, it might converge to a different local minimum which yields a different value function. This could explain the variance in the corresponding results. For 50 drivers, in contrast, no learning is involved. Hence, the result goes through a randomly initialised model. Weights are typically initialised to preserve the mean and variance of the input, which should be unaffected by the specific seed used. This could explain the strong similarity between our results and the original results for the 50 drivers setup. 
+
+Differences found in reproducing the income redistribution scheme may also be accounted for by the above. However, while our results are not exactly the same, the third claim still holds, although to a considerably lesser degree than in the original paper.
+
+When employing the actual Manhattan neighbourhoods, the relative standing of the various objective functions was different compared to the ones determined by K-Means. This indicates that the proposed method is sensitive to the neighbourhood selection mechanism. Looking at the demographic data, it can be seen that all objective functions exhibit small differences between ethnicities. These, however, could be attributed to stochasticity.
+
+In any case, rider-fairness results in the least variance across ethnicities at the price of mean success rate. However, this result does not imply that rider-fairness achieves this low variance by better servicing neighbourhoods with a lower percentage of accepted requests, but rather by servicing better-served neighbourhoods less well. Importantly, the ethnicity-based analyses are built on the assumption that the distribution of the ethnicities of residents and riders in a neighbourhood is similar. However, ride pooling might be used by other people like commuters or tourists. Furthermore, there could be differences between the ethnic populations regarding the percentage of ride-sharing users.
+
+\subsection{What was easy}
+Part of the code, namely the simulation logic, did not need any modifications. This logic is responsible for telling drivers of possible rides to accept as well as executing the drivers' choices and keeping the simulation consistent with respect to the existing constraints. The training and testing procedure was also straightforward to execute. 
+
+\subsection{What was difficult}
+The codebase was not originally executable and required modifications. In addition to that, several aspects of the original research were not explicitly mentioned in the paper. Although, in the end, we were able to reproduce most results, this would not have been possible without consulting either the code, the authors or the paper about NeurADP \cite{shah20}. Another challenge was the absence of preprocessing code which together with the lack of a detailed description in the paper (specifically for travel time estimates) made its implementation difficult. With the limited time resources we had, we did not succeed in testing if our preprocessing implementation affected the results. 
+
+\subsection{Communication with original authors}
+
+The authors were very helpful, kind and responded very quickly, often within the same day. This was a very important factor in the production of this reproducibility report as the preprocessed data could not be hosted online due to licensing issues. Furthermore, they also provided useful clarifications with respect to the parameters used in the code and discrepancies between different parameter values in different places. The authors also updated the codebase following our discussions.
+
+%\bibliographystyle{IEEEtranN}
+%\bibliography{reference}
+
+
