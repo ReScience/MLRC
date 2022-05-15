@@ -1,0 +1,17 @@
+\section{Reproducibility Summary}
+
+\subsection*{Scope of Reproducibility}
+In the article, the authors of the Transparent Object Tracking Benchmark compare the performance of 25 state-of-the-art tracking algorithms, evaluated on the TOTB dataset, with a new proposed algorithm for tracking transparent objects called TransATOM. Authors claim that it outperforms all other state-of-the-art algorithms. They highlight the effectiveness and advantage of transparency feature for transparent object tracking. They also do a qualitative evaluation of each tracking algorithm on various typical challenges such as rotation, scale variation etc.
+
+\subsection*{Methodology}
+In addition to the TransAtom tracker, we chose ten, best performing on TOTB dataset, state-of-the-art tracking algorithms to evaluate on the TOTB dataset using a set of standard evaluation tools. On different sequences, we performed a qualitative evaluation of each tracking algorithm and thoroughly compared the ATOM tracker to the TransATOM tracker. We did not implement the trackers from scratch, but instead used GitHub implementations. TOTB dataset had to be integrated into some of the standard evaluation tools. We used an internal server with an Ubuntu 18.04 operating system and a TITAN X graphics card to reproduce the results.
+\subsection*{Results}
+\noindent
+The tracking performance was reproduced in terms of success, precision, and normalized precision, and the reported value is in the 95 percent confidence interval, which supports the paper's conclusion that TransATOM significantly outperforms other state-of-the-art algorithms on TOTB database. Also, it supports a claim that including a transparency feature in the tracker improves performance when tracking transparent objects. However, we refuted the claim that TransATOM well handles all challenges for robust target localization.
+
+\subsection*{What was easy}
+The evaluation of the tracking results and comparison of different trackers with each other was a simple part of the reproduction because the implementation in Matlab is very robust and works for different formats of tracker results.
+\subsection*{What was difficult}
+The most difficult aspect of the replication was integrating the TOTB dataset into various standard evaluation tools and running all trackers on this dataset. The reason for this is that each tool requires its own dataset format, and it was also difficult to set up so many different tracker environments. It also took a long time to run all of the trackers because some of them are quite slow and the TOTB dataset is quite large. The deprecation of different packages was also a problem for some trackers, necessitating extensive debugging.
+\subsection*{Communication with original authors}
+We communicated with the author via email. The author provided us with feedback that helped us reproduce the results more accurately.

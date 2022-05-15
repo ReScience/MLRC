@@ -1,0 +1,127 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Transparent Object Tracking Benchmark"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Žiga Trojer
+    orcid: 0000-0003-1698-879X
+    email: ziga.trojer20@gmail.com
+    affiliations: 1,*
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Ljubljana, Faculty of Computer and Information Science
+    address: Večna pot 113, 1000 Ljubljana
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, machine learning, deep learning, tracking, computer vision, python, pytorch, matlab
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/trojerz/TOTB-reproducability
+  - doi: 10.5281/zenodo.6475970 
+  - swh: swh:1:dir:b80fa866c01389a46dde8b6f419d893d127f1025
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Fan, Heng & Miththanthaya, Halady & Harshit, & Rajan, Siranjiv & Liu, Xiaoqiong & Zou, Zhilin & Lin, Yuewei & Ling, Haibin. (2020). Transparent Object Tracking Benchmark."
+ - bib:  fan2021transparent
+ - url:  https://openreview.net/pdf?id=HxZZV3MQ20Y
+ - doi:  # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+Scope of Reproducibility
+In the article, the authors of the Transparent Object Tracking Benchmark compare the performance of 25 state-of-the-art tracking algorithms, evaluated on the TOTB dataset, with a new proposed algorithm for tracking transparent objects called TransATOM. Authors claim that it outperforms all other state-of-the-art algorithms. They highlight the effectiveness and advantage of transparency feature for transparent object tracking. They also do a qualitative evaluation of each tracking algorithm on various typical challenges such as rotation, scale variation etc.
+
+Methodology
+In addition to the TransAtom tracker, we chose ten, best performing on TOTB dataset, state-of-the-art tracking algorithms to evaluate on the TOTB dataset using a set of standard evaluation tools. On different sequences, we performed a qualitative evaluation of each tracking algorithm and thoroughly compared the ATOM tracker to the TransATOM tracker. We did not implement the trackers from scratch, but instead used GitHub implementations. TOTB dataset had to be integrated into some of the standard evaluation tools. We used an internal server with an Ubuntu 18.04 operating system and a TITAN X graphics card to reproduce the results.
+
+Results
+The tracking performance was reproduced in terms of success, precision, and normalized precision, and the reported value is in the 95 percent confidence interval, which supports the paper's conclusion that TransATOM significantly outperforms other state-of-the-art algorithms on TOTB database. Also, it supports a claim that including a transparency feature in the tracker improves performance when tracking transparent objects. However, we refuted the claim that TransATOM well handles all challenges for robust target localization.
+
+What was easy
+The evaluation of the tracking results and comparison of different trackers with each other was a simple part of the reproduction because the implementation in Matlab is very robust and works for different formats of tracker results.
+
+What was difficult
+The most difficult aspect of the replication was integrating the TOTB dataset into various standard evaluation tools and running all trackers on this dataset. The reason for this is that each tool requires its own dataset format, and it was also difficult to set up so many different tracker environments. It also took a long time to run all of the trackers because some of them are quite slow and the TOTB dataset is quite large. The deprecation of different packages was also a problem for some trackers, necessitating extensive debugging.
+
+Communication with original authors
+We communicated with the author via email. The author provided us with feedback that helped us reproduce the results more accurately."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python, Matlab
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=HxZZV3MQ20Y
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1

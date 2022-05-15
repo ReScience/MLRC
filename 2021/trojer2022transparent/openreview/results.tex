@@ -1,0 +1,113 @@
+\section{Results}
+\label{sec:results}
+There are two parts to this section. In section  ~\ref{sec:result1}, we examine tracker performance in terms of precision, normalized precision and success and compare it with each other. The results presented there are to support the first two claims in Section ~\ref{sec:claims}. The results of the qualitative evaluation are presented in section ~\ref{sec:result2}, where the results contradicts the claim that TransATOM effectively handles all challenges for robust target localization.
+
+\subsection{Performance results}
+\label{sec:result1}
+We compare the performance of the trackers we chose by taking only the trackers with the best evaluation results on the TOTB dataset reported in the original article. Besides that, we evaluated the current state-of-the-art transformer-based tracker Stark. Figure \ref{fig:fig1} shows the precision plot, normalized precision plot, and success plot of one pass evaluation (OPE) on the TOTB dataset. The average performance measures with standard error are shown in Table \ref{tab:my-table4}. When we compare the precision for the TransATOM and SiamRPN++ tracker, we see that the TransATOM has a higher average score. Tracker Stark is unquestionably the best.
+
+The first two positions do not change when we compare normalized precision. SiamMask is the third best tracker in terms of normalized precision, with an average normalized precision of 72.4 percent. The average normalized precision of TransATOM is higher here as well. The average score for Stark is indeed the highest, and the confidence interval does not overlap with any of the other tracker intervals.
+
+When we observe success, the situation change (recall that the success score is calculated as the percentage of tracking results with IoU greater than 0.5). TransATOM has a confidence interval of $[73, 74.6]$, while PrDiMP\_50 has a 95\% confidence interval of $[72.9, 74.5]$. It is worth noting that the intervals overlap substantially, where TransATOM has a higher lower and higher bound. Because the success score is determined by the threshold, this comparison is less important than the normalized precision score comparison, because the IoU for a particular tracker may be slightly lower than the 0.5 threshold, resulting in a significantly lower success score.
+
+\begin{figure}[h]
+\caption{Tracking performance of 10 state-of-the-art trackers and TransAtom in terms of precision, normalized precision and success.}
+\label{fig:fig1}
+\centering
+\includegraphics[width=\textwidth]{images/performance12.png}
+\end{figure}
+
+
+\begin{table}[h]
+\centering
+\caption{For each tracker, the average precision, normalized precision, and success with a standard error are specified.}
+\label{tab:my-table4}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Tracker           & Precision  & Normalized Precision & Success    \\ \midrule
+TransATOM      & $65.3 \pm 0.4$      & $73.5 \pm 0.5$               & $73.8\pm 0.4$      \\
+ATOM           & $63.9 \pm 0.3$       & $71.2   \pm 0.4$             & $71.8 \pm 0.4$     \\
+DiMP18         & $55.9 \pm 0.6$      & $64.4  \pm 0.8$              & $65.1\pm 0.7$      \\
+DiMP50         & $60.1 \pm 0.5$      & $67.9   \pm 0.8$             & $68.5 \pm 0.7$     \\
+prDiMP18       & $58.9 \pm 0.3$      & $66.3\pm 0.4$                & $67.8\pm 0.3$      \\
+prDiMP50       & $64.3 \pm 0.3$       & $72.3 \pm 0.4$               & $73.7\pm 0.4$      \\
+SiamRPN        & $62.9 \pm 0.2$      & $70.1 \pm 0.4$               & $72.2 \pm 0.4$     \\
+SiamMASK       & $64.1 \pm 0.3$      & $72.4\pm 0.4$                & $73.0\pm 0.3$      \\
+SiamRPN++   & $64.7 \pm 0.2$      & $71.9 \pm 0.5$               & $72.8\pm 0.5$      \\
+Stark          & $76.2 \pm 0.4$      & $81.7 \pm 0.5$               & $83.5 \pm 0.4$   \\
+MDNet          & $59.6  \pm 1.8$     & $69.3 \pm 2.9$               & $69.7\pm 2.2$      \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+TransATOM and ATOM tracker performance can now be compared. The only distinction between these two trackers is that TransATOM includes a transparency feature. We can confirm the second claim, that including a transparency feature in the tracker improves performance when tracking transparent objects, because TransATOM outperforms ATOM by 1.4 percent in precision, 2.3 percent in normalized precision, and 2.0 percent in success, while confidence intervals do not overlap (see Table \ref{tab:my-table4} and Figure \ref{fig:fig1}).
+
+
+\subsection{Qualitative evaluation}
+\label{sec:result2}
+In this section we present the results of qualitative evaluation of different trackers. We compared the performance of all trackers on the three most common challenges in the TOTB dataset: \textit{rotation}, \textit{partial occlusion}, and \textit{scale variation}, as authors did in the original article. TransATOM is clearly not the best algorithm for certain challenges, as shown in Figure \ref{fig:2}. For rotation, the SiamRPN++ tracker is superior, while PrDiMP\_50 is superior for partial occlusion and TransATOM is superior for scale variation.
+
+Figure \ref{fig:2} shows the qualitative results of 11 different trackers in six typical difficult challenges. TransATOM has some issues following the entire \textit{rotating} object in (\textit{WineGlass-7}), as it only follows the lower part of the wine glass. TransATOM tracks the wrong object in the \textit{Bulb-5} sequence. It is also unable to track an object on \textit{GlassSlab-15} sequence with \textit{aspect ratio change}, as well as \textit{JuggleBubble-1} with \textit{partial occlusion}. It works well on the \textit{ShotGlass-10} with \textit{motion blur}, as well as in the \textit{TransparentAnimal-11} with \textit{scale variation}.
+
+Our findings refute the third claim, which states that TransAtom well handles all challenges for robust target localization owing to the transparency feature.
+
+\begin{figure}[h]
+\caption{Tracking performance different tracking algorithms on the three most common attributes in TOTB dataset including \textit{rotation}, \textit{partial occlusion} and \textit{scale variation} using success.}
+\label{fig:2}
+\centering
+\includegraphics[width=\textwidth]{images/performance22.png}
+\end{figure}
+
+\begin{figure}[h]
+     \centering
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/wine.png}
+         \caption{Sequence \textit{WineGlass-7} - rotation}
+         \label{fig:y equals x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/bulb.png}
+          \caption{Sequence \textit{Bulb-5} - background clutter}
+         \label{fig:three sin x}
+     \end{subfigure}
+     \hfill
+          \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/slab.png}
+          \caption{Sequence \textit{GlassSlab-15} - aspect ratio change}
+         \label{fig:y equals x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/bubble.png}
+         \caption{Sequence \textit{JuggleBubble-1} - partial occlusion}
+         \label{fig:three sin x}
+     \end{subfigure}
+     \hfill
+          \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/shot.png}
+         \caption{Sequence \textit{ShotGlass-10} - motion blur \hphantom{phantom text}}
+         \label{fig:y equals x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/animal.png}
+         \caption{Sequence \textit{TransparentAnimal-11} - scale variation}
+         \label{fig:three sin x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/names.png}
+         \label{fig:five over x}
+     \end{subfigure}
+        \caption{Qualitative results of eleven trackers in six typical difficult challenges.}
+        \label{fig:three graphs}
+\end{figure}
+We evaluated the current state-of-the-art tracker Stark in addition to the best trackers from the original article. We can see from the above results that it outperforms all other tracking algorithms and handles all challenges for robust target localization much better.
