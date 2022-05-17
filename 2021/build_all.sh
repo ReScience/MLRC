@@ -2,7 +2,7 @@
 # Build all folders
 # Should be run by the CI
 for key in */; do
-    if [ $key == "template/" ]; then
+	if [ $key == "template/" ]; then
         continue
     fi
     echo "Building ${key}"
