@@ -1,0 +1,49 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision/}
+\def \codeDOI{10.5281/zenodo.6508499}
+\def \codeSWH{swh:1:dir:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha}
+\def \editorORCID{}
+\def \reviewerINAME{Anonymous Reviewers}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{}
+\def \dateACCEPTED{}
+\def \datePUBLISHED{}
+\def \articleTITLE{[Re] Does Self-Supervision Always Improve Few-Shot Learning?}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2021}
+\def \articleBIBLIOGRAPHY{bibliography.bib}
+\def \articleYEAR{2022}
+\def \reviewURL{https://openreview.net/forum?id=ScfP3G73CY}
+\def \articleABSTRACT{ Scope of Reproducibility: This report covers our reproduction and extension of the paper ‘When Does Self-Supervision Improve Few-shot Learning?’ published in ECCV 2020. The paper investigates the effectiveness of applying self-supervised learning (SSL) as a regularizer to meta-learning based few-shot learners. The authors of the original paper claim that SSL tasks reduce the relative error of few-shot learners by 4% - 27% on both small-scale and large-scale datasets, and the improvements are greater when the amount of supervision is lesser, or when the data is noisy or of low resolution. Further, they observe that incorporating unlabelled images from other domains for SSL can hurt the performance of FSL, and propose a simple algorithm to select unlabelled images for SSL from other domains to provide improvements.
+Methodology: We conduct our experiments on an extended version of the authors codebase. We implement the domain selection algorithm from scratch. We add datasets and methods to evaluate few-shot learners on a cross-domain inference setup. Finally, we open-source pre-processed versions of 3 few-shot learning datasets, to facilitate their off-the-shelf usage. We conduct experiments involving combinations of supervised and self-supervised learning on multiple datasets, on 2 different architectures and perform extensive hyperparameter sweeps to test the claim. We used 4 GTX 1080Ti GPUs throughout, and all our experiments including the sweeps took a total compute time of 980 GPU hours. Our codebase is at https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision.
+Results: On the ResNet-18 architecture and a high input resolution that the paper uses throughout, our results on 6 datasets overall verify the claim that SSL regularizes few-shot learners and provides higher gains with difficult tasks. Further, our results also verify that out-of-distribution images for SSL hurt the accuracy, and the domain selection algorithm that we implement from scratch also verifies the paper’s claim that the algorithm can choose images from a large pool of unlabelled images from other domains, and improve the performance. Going beyond the original paper, we also conduct SSL experiments on 5 datasets with the Conv-4-64 architecture with a lower image resolution. Here, we find that self-supervision does not help boost the accuracy of few-shot learners in this setup. Further, we also show results on a practical real-world benchmark on cross-domain few-shot learning, and show that using self-supervision when training the base models degrades performance when evaluated on these tasks.
+What was easy: The paper was well written and easy to follow, and provided clear descriptions of the experiments, including the hyperparameters. The authors’ code implementation in PyTorch was relatively easy to understand.
+What was difficult: Since the codebase was incomplete, it took us a lot of time to solve bugs, and reimplement algorithms not present in the code. Further, the datasets needed a lot of preprocessing to be used. The number of hyperparameters being too many but each proving to be important, and evaluating all the claims of the paper on 5 datasets and 2 architectures was difficult to the number of experiment configurations, resulting in a very high computational cost of 980 GPU hours.
+Communication with original authors: We maintained contact with the authors throughout the challenge to clarify implementation details and questions regarding the domain selection algorithm. The authors were responsive and replied promptly with detailed explanations. }
+\def \replicationCITE{Su, Jong-Chyi, Subhransu Maji, and Bharath Hariharan. When does self-supervision improve few-shot learning?. European Conference on Computer Vision. Springer, Cham, 2020.}
+\def \replicationBIB{su2020}
+\def \replicationURL{https://arxiv.org/pdf/1910.03560.pdf}
+\def \replicationDOI{10.1007/978-3-030-58571-6_38}
+\def \contactNAME{Arjun Ashok}
+\def \contactEMAIL{arjun.ashok.psg@gmail.com}
+\def \articleKEYWORDS{rescience c, machine learning, deep learning, python, pytorch, few-shot learning, self-supervised learning}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{9}
+\def \journalISSUE{1}
+\def \articleNUMBER{}
+\def \articleDOI{10.0000/zenodo.0000000}
+\def \authorsFULL{Arjun Ashok and Haswanth Aekula}
+\def \authorsABBRV{A. Ashok and H. Aekula}
+\def \authorsSHORT{Ashok and Aekula}
+\title{\articleTITLE}
+\date{}
+\author[1,\orcid{0000-0002-2752-2509}]{Arjun Ashok}
+\author[2,\orcid{0000-0001-8058-3602}]{Haswanth Aekula}
+\affil[1]{PSG College of Technology, India}
+\affil[2]{DTICI, India}

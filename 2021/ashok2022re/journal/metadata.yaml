@@ -1,0 +1,162 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Does Self-Supervision Always Improve Few-Shot Learning?"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Arjun Ashok
+    orcid: 0000-0002-2752-2509 
+    email: arjun.ashok.psg@gmail.com
+    affiliations: 1,*
+
+  - name: Haswanth Aekula
+    orcid: 0000-0001-8058-3602
+    email: haswanth.kumar.39@gmail.com
+    affiliations: 2      # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    PSG College of Technology, India
+    # address: Avinashi Rd, Peelamedu, Coimbatore, Tamil Nadu 641004
+  - code:    2
+    name:    DTICI, India
+    # address: Plot No. 9 & 10, 1, Whitefield Main Rd, near Satya Sai Baba Hospital, EPIP Zone, Whitefield, Bengaluru, Karnataka 560066
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, machine learning, deep learning, python, pytorch, few-shot learning, self-supervised learning 
+
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision/
+  - doi: 10.5281/zenodo.6508499
+  - swh: swh:1:dir:90d1c4d52eec769a1a18df5bd1f8bd0955f0ac24
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Su, Jong-Chyi, Subhransu Maji, and Bharath Hariharan. When does self-supervision improve few-shot learning?. European Conference on Computer Vision. Springer, Cham, 2020."
+ - bib:  su2020
+ - url:  https://arxiv.org/pdf/1910.03560.pdf
+ - doi:  10.1007/978-3-030-58571-6_38
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+Scope of Reproducibility:
+This report covers our reproduction and extension of the paper ‘When Does Self-Supervision Improve Few-shot
+Learning?’ published in ECCV 2020. The paper investigates the effectiveness of applying self-supervised learning
+(SSL) as a regularizer to meta-learning based few-shot learners. The authors of the original paper claim that SSL
+tasks reduce the relative error of few-shot learners by 4% - 27% on both small-scale and large-scale datasets, and the
+improvements are greater when the amount of supervision is lesser, or when the data is noisy or of low resolution.
+Further, they observe that incorporating unlabelled images from other domains for SSL can hurt the performance of
+FSL, and propose a simple algorithm to select unlabelled images for SSL from other domains to provide improvements.
+
+Methodology:
+We conduct our experiments on an extended version of the authors codebase. We implement the domain selection
+algorithm from scratch. We add datasets and methods to evaluate few-shot learners on a cross-domain inference setup.
+Finally, we open-source pre-processed versions of 3 few-shot learning datasets, to facilitate their off-the-shelf usage.
+We conduct experiments involving combinations of supervised and self-supervised learning on multiple datasets, on 2
+different architectures and perform extensive hyperparameter sweeps to test the claim. We used 4 GTX 1080Ti GPUs
+throughout, and all our experiments including the sweeps took a total compute time of 980 GPU hours. Our codebase is
+at https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision.
+
+Results:
+On the ResNet-18 architecture and a high input resolution that the paper uses throughout, our results on 6 datasets
+overall verify the claim that SSL regularizes few-shot learners and provides higher gains with difficult tasks. Further,
+our results also verify that out-of-distribution images for SSL hurt the accuracy, and the domain selection algorithm that
+we implement from scratch also verifies the paper’s claim that the algorithm can choose images from a large pool of
+unlabelled images from other domains, and improve the performance.
+Going beyond the original paper, we also conduct SSL experiments on 5 datasets with the Conv-4-64 architecture with
+a lower image resolution. Here, we find that self-supervision does not help boost the accuracy of few-shot learners in
+this setup. Further, we also show results on a practical real-world benchmark on cross-domain few-shot learning, and
+show that using self-supervision when training the base models degrades performance when evaluated on these tasks.
+
+What was easy:
+The paper was well written and easy to follow, and provided clear descriptions of the experiments, including the
+hyperparameters. The authors’ code implementation in PyTorch was relatively easy to understand.
+
+What was difficult:
+Since the codebase was incomplete, it took us a lot of time to solve bugs, and reimplement algorithms not present in
+the code. Further, the datasets needed a lot of preprocessing to be used. The number of hyperparameters being too
+many but each proving to be important, and evaluating all the claims of the paper on 5 datasets and 2 architectures was
+difficult to the number of experiment configurations, resulting in a very high computational cost of 980 GPU hours.
+
+Communication with original authors:
+We maintained contact with the authors throughout the challenge to clarify implementation details and questions
+regarding the domain selection algorithm. The authors were responsive and replied promptly with detailed explanations.
+"
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2021
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=ScfP3G73CY
+
+contributors:
+  - name: Koustuv Sinha
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published: May 15, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 0 # Article number will be automatically assigned during publication
+  - doi: 10.0000/zenodo.0000000   # DOI from Zenodo
+  - url: https://zenodo.org/record/0000000/files/article.pdf   # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  1
