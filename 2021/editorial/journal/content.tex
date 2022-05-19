@@ -1,104 +1,177 @@
 
-Three years, we launched ReScience, a new scientific journal aimed at publishing the
-replication of existing computational research. Since ReScience published its first
-article\supercite{Topalidou:2015}, things have been
-going steadily. We are still alive, independent and without a budget. In the
-meantime, we have published around 24 articles (mostly in computational
-neuroscience \& computational ecology) and the initial
-\href{https://rescience-c.github.io/board/}{editorial board} has grown from
-around 10 to roughly 100 members (editors and reviewers), we have advertised
-ReScience at several conferences worldwide, gave some
-interviews\supercite{Science:2018}, and published an article introducing
-ReScience in PeerJ~CS\supercite{Rougier:2017}. Based on our
-experience\supercite{Rougier:2018} at managing the journal during these three
-years, we think that time is ripe for some changes.
+\section{Introduction}
 
-\subsubsection{ReScience C \& ReScience X}
+The importance of reproducibility in science cannot be overstated. It is one of the key mechanisms in place to enforce the high standards of scientific discoveries, and a key ingredient for an impactful scientific discovery, allowing future practitioners to build on the shoulders of prior work. Reproducible science also promotes open and accessible research, allowing the scientific community to quickly integrate new findings and convert ideas to practice more seamlessly. In the spirit of promoting a culture of reproducible science in the Machine Learning community, we have hosted the fifth iteration of the ML Reproducibility Challenge in 2021.
+Following the trend of inclusivity and breadth, this iteration involves a challenge to reproduce papers published in nine top conferences in Machine Learning, including NeurIPS, ICML, ICLR, CVPR, ICCV, ACL, EMNLP, AAAI and IJCAI. An important objective of this challenge is to contribute toward improving the understanding of the central claims of the papers published in these top conferences, by inviting participants to run reproducibility study on them. In this special issue of ReScience C Journal, we are proud to present the peer-reviewed accepted papers of the 2021 ML Reproducibility Challenge.
 
-The biggest and most visible change we would like to propose is to change the
-name of the journal ``ReScience'' in favor of ``ReScience C'' where the C
-stands for (c)omputational. This change would be necessary to have consistent
-naming with the upcoming creation of the ``ReScience X'' journal that will be
-dedicated to e(x)perimental replications and co-directed by E.Roesch
-(University of Reading) and N.Rougier (University of Bordeaux). The name
-``ReScience'' would then be used for the name of a non-profit organization
-(that is yet to be created) for the two journals as well as future journals
-(such as the utopian CoScience\supercite{Rougier:2017} or a future and
-tentative ``ReScience T'' for theoretical science).
+\section{Challenge}
 
+The goal of the challenge was to reproduce the central claims of papers published in top Machine Learning conferences of the year. Participants were invited to work on either all claims, or partial claims, depending on the complexity of the project. Participants were also free to reuse authorsʼ code when available, while being encouraged to explore beyond simply running the code provided to verify reproducibility. Unlike the previous challenge, in this iteration we removed the “Claim paper” step. This step, which was previously used, involved participants pre-registering which paper they wanted to reproduce, in order to encourage early commitment, narrow down the claims they wish to explore in the paper, and covering a larger number of papers. However, we received feedback that this step was not useful for participants, which was also reflected by the low percentage of the number of reproducibility reports submitted vs papers claimed. Removing this step also reduced the complexity of participating in the challenge.
 
-\subsubsection{A new submission process}
+\begin{figure}%
+    \centering
+    \subfloat[\centering Growth of MLRC over the years]{{\includegraphics[width=6cm]{rc2021_growth.pdf} }}%
+    \qquad
+    \subfloat[\centering Distribution of reproducibility reports submitted per conference in MLRC 2021]{{\includegraphics[width=6cm]{rc2021_per.pdf} }}%
+    \caption{Statistics of the ML Reproducibility Challenge}%
+    \label{fig:rcstats}%
+\end{figure}
 
-The current submission process requires authors to fork, clone and branch the
-submission repository in order to write their article and to place code and
-data at the relevant places in the forked repository. Once done, authors have
-to push their changes and to make a pull request that is considered as a
-submission. This process is cumbersome for authors and has induced many
-troubles for editors as well once the article is accepted and ready to be
-published, mostly because of the complexity of the editing procedure. In order
-to make life easier for everyone, we greatly simplified the submission process
-for ReScience C and X. Authors are now responsible for getting a DOI for their
-code \& data and only have to submit a PDF and a metadata file in a GitHub
-issue.
-We also provide Python programs that largely automate the subsequent editing
-process. We will still archive the submission on Zenodo but this archive will
-be made for the final PDF only. However, both the PDF and the Zenodo entry will
-contain all associated DOIs (data and code).
+As in the last iteration, participants were free to claim multiple papers, and multiple teams could claim the same paper. In this iteration, we observed a jump of reproducibility report submissions to 102, compared to 82 from last year (Figure \ref{fig:rcstats}). Reproducibility reports were spread across all nine conferences, with most papers chosen from ICML 2021, and the least from ACL 2021. A majority of the participants were students using the challenge as a part of their machine learning courses from various institutions around the world, including but not limited to: KTH (Royal Institute of Technology Stockholm, Sweden), Queen's University (Ontario, Canada), Indian Institute of Technology (Gandhinagar, India), University of Amsterdam (Netherlands), University of Southern California, (USA), Indian Institute of Technology (Guwahati, India), Tsinghua University (China), University of Ljubljana (Slovenia), University of Michigan (USA), University of Waterloo (Ontario, Canada), Istanbul Technical University (Turkey), and EPFL (Switzerland).
+\\
+\\
+After in-depth peer review, in this special issue we present the top \textbf{47} \footnote{We accepted 48 reports, but one team did not submit their camera ready version till the time of the publication of this editorial.} accepted reports, selected from 102 submissions, thus driving up the acceptance rate from 28\% last year to 47\% this year. This increase is largely due to significant improvements in the quality of the reports \& their methodology, which is encouraging to see.
+
+\section{Best Paper Awards}
+
+Starting this year, we are presenting best paper awards to a few select reports to highlight the excellent quality all-round of their reproducibility work. The selection criteria consisted of votes from the Area Chairs, based on the reproducibility motivation, experimental depth, results beyond the original paper, ablation studies, and discussion/recommendations. We believe the community will appreciate the strong reproducibility efforts in each of these papers, which will improve the understanding of the original publications, and inspire authors to promote better science in their own work.
 
 
-\subsubsection{A simplified publishing process}
+\subsection{Best Paper Award}
 
-In ReScience, we have have been using a combination of
-\href{https://daringfireball.net/projects/markdown/syntax}{markdown} and
-\href{http://pandoc.org/}{pandoc} for producing both the draft and the final
-version of all the published articles. This had worked reasonably well until it
-started to cause all kind of problems for both authors and editors, especially
-with the reference and citation plugins. Consequently, articles will be now
-submitted directly in PDF with accompanying metadata in a separate file using
-the \href{https://en.wikipedia.org/wiki/YAML}{YAML} format (they were
-previously embedded in the markdown file). Once an article has been accepted,
-authors will be responsible for updating the metadata and for rebuilding the PDF if
-necessary. We could also consider using the
-\href{https://github.com/openjournals/whedon}{Whedon} API that helps with automating
-most of the editorial tasks for \href{http://joss.theoj.org/}{JOSS} and
-\href{http://jose.theoj.org/}{JOSE}. This will most probably require some
-tweaking because our publishing pipeline is a bit different.
+\begin{itemize}
+    \item Piyush Bagad, Jesse Maas, Paul Hilders, Danilo de Goede; \textit{Reproducibility Study of “Counterfactual Generative Networks”}
+\end{itemize}
 
+\subsection{Outstanding Paper Award}
 
-\subsubsection{A new design}
+\begin{itemize}
+  \item Matija Teršek, Domen Vreš, Maša Kljun; \textit{Study of “Counterfactual Generative Network''}
+  \item Ian Hardy; \textit{[RE] An Implementation of Fair Robust Learning}
+  \item Guilly Kolkman, Maks kulicki, Jan Athmer, Alex Labro; \textit{Strategic classification made practical: reproduction}
+  \item Andrea Lombardo, Matteo Tafuro, Tin Hadži Veljković, Lasse Becker-Czarnetzki; \textit{On the reproducibility of "Exacerbating Algorithmic Bias through Fairness Attacks"}
+\end{itemize}
 
-The combination of markdown and pandoc has also severely limited the layout and
-style possibilities for the article template and since we are switching to
-\LaTeX, this is the opportunity to propose a new design based on a more elegant
-style, using a new font stack\supercite{SourceSerifPro:2014, Roboto:2011,
-  SourceCodePro:2012} (you are currently reading it). The goal is to have a
-subtle but strong identity with enhanced readability. Considering that articles
-will be mostly read on screen (as opposed to printed), we can benefit from a
-more ethereal style. Once this design will have stabilized, an
-\href{https://www.overleaf.com/}{overleaf} template will be made available for
-those without a \TeX~installation. If a \TeX~expert is ready to help review
-the template (and possibly rewrite it as a class), their help would be much
-welcome and appreciated. The same holds for LibreOffice, Word or Pages, any
-template is welcome, just contact us beforehand such that we can coordinate
-efforts.
+\section{Platforms}
 
+This challenge is conducted with the support of PapersWithCode\footnote{\url{https://paperswithcode.com}} and OpenReview\footnote{\url{https://openreview.net/group?id=ML_Reproducibility_Challenge/2021/Fall/}}. PapersWithCode is an open, collaborative platform to discover latest trending machine learning research papers with their codebases, which enables rapid re-usability and reproducibility of published works. PapersWithCode enabled the challenge organizers to reach a wide audience
+of students and researchers who participated in the competition. As was the case last year, OpenReview provided crucial logistic support by providing an unique platform to claim and submit reproducibility reports. After submission, all reports went through a thorough peer review process consisting of hundreds of reviewers from the Machine Learning
+community, and OpenReview provided an easy-to-use platform for managing reviews and administrative processes. Finally, we used a public Github repository\footnote{\url{https://github.com/ReScience/MLRC}} to perform the final editorial process of converting accepted papers into ReScience format, and thereby publish 48 high quality reports in this special issue.
 
-\subsubsection{Editorials, letters and special issues}
+\section{Conclusion}
 
-ReScience C remains dedicated to the publication of computational replications
-but we (i.e., the editorial team) would like to have the opportunity to
-publish \emph{editorials} when deemed necessary and to give anyone the
-opportunity to write \emph{letters} to the community on a specific topic
-related to reproducibility. Both editorials and letters are expected to be 1 or
-2 pages long (but no hard limit will be enforced), will be (quickly) peer reviewed,
-and will be assigned a DOI. Furthermore, with the advent of reproducibility
-hackatons worldwide, we will host {\em special issues} with guest editors (such
-as, for example, the organizers of a hackaton) in order to publish the results
-and to enhance their discoverability. Each entry will have to go through the
-regular open peer-reviewed pipeline.\\
+Reproducibility of central claims of papers published in Machine Learning conferences has been a center of considerable attention over the past several years. In recent years, conferences such as NeurIPS, ICLR, AAAI, ICML, EMNLP have routinely included reproducibility
+workshops and challenges to cultivate the culture of reproducible science in the community. Several conferences have also introduced code submission policies and Reproducibility Checklists to further advance the cause and build momentum of reproducible science. We hope our continued endeavour of hosting annual challenges and publishing high-quality peer-reviewed reproducibility reports will contribute more information about existing published papers, and help strengthen their core contributions in the process, while also promoting open, accessible and sound machine learning research.
 
+\section{Acknowledgement}
 
-We hope that most readers will agree on the proposed changes such that we can
-commit to them in the next few weeks. The review for this editorial is open (as
-usual) and anyone can comment on and/or oppose any of the proposed changes. New
-ideas are also welcome.
+We thank the board and program committee of NeurIPS, ICML, ICLR, ACL, EMNLP, CVPR, ICCV, AAAI and IJCAI for partnering with us in this massive initiative and supporting the challenge. We thank the OpenReview team (in particular Andrew McCallum, Parag Pachpute, Melisa Bok, Celeste Martinez Gomez, Pam Mandler and Mohit Uniyal) for their constant support in hosting and building the customized portal used in our challenge. We thank Ana Lucic, Maurits Bleeker and Samarth Bhargav for their feedback on using the Reproducibility Challenge in their course at University of Amsterdam. We thank Robert Stojnic, Ross Taylor and Elvis Saravia from PapersWithCode for hosting and supporting the challenge along with its logistics. We thank the ReScience board (in particular Nicolas Rougier, Konrad Hinsen, Olivia Guest and Benoît Girard)
+for presenting the accepted reports in their esteemed journal. Finally, we thank all of our participants who dedicated time and effort to verify results that were not their own, to help strengthen our understanding of the concepts presented in the papers.
+
+\section{Reviewers}
+
+Our reviewers need a special section dedicated to thank them for their tireless efforts in screening and providing valuable feedback to the Area Chairs (Jesse Dodge, Sasha Luccioni, Jessica Zosa Forde, Sharath Chandra Raparthy and Koustuv Sinha) to select the best papers. We were fortunate enough to attract a large pool of reviewers, who spent their precious time to critically review the reports. We would like to specifically acknowledge our Emergency reviewers who responded to our call for help to review some additional reports at the last minute. Starting this iteration, we also introduce Outstanding Reviewer Award to select reviewers for their high quality and timely reviews for the challenge. The selection criteria involved votes from the Area Chairs after careful review of the reviews posted in the challenge. We thank the reviewers for their exceptional effort and hope they will continue to support us in future iterations.
+
+\subsection{Outstanding Reviewers}
+
+\begingroup
+\fontsize{8pt}{8pt}\selectfont
+\begin{multicols}{3}
+\begin{itemize}[label={}]
+  \item Alex Gu
+  \item Cagri Coltekin
+  \item David Rau
+  \item Divyat Mahajan
+  \item Frederik Paul Nolte
+  \item Kanika Madan
+  \item Karan Shah
+  \item Leo M Lahti
+  \item Maxime Wabartha
+  \item Maxwell D Collins
+  \item Olga Isupova
+  \item Olivier Delalleau
+  \item Pascal Lamblin
+  \item Prithvijit Chattopadhyay
+  \item Samuel Albanie
+  \item Sunnie S. Y. Kim
+  \item Tobias Uelwer
+  \item Varun Sundar
+\end{itemize}
+\end{multicols}
+\endgroup
+
+\subsection{All Reviewers}
+
+\begingroup
+\fontsize{8pt}{8pt}\selectfont
+\begin{multicols}{3}
+\begin{itemize}[label={}]
+  \item Abhinav Agarwalla
+  \item Akshay Ravindra Kulkarni
+  \item Ali Hürriyetoğlu
+  \item Andreas Ruttor
+  \item Animesh Gupta
+  \item Anis Zahedifard
+  \item Brent M. Berry
+  \item Chao Qin
+  \item David Arbour
+  \item David Krueger
+  \item Dong Gong
+  \item Fan Feng
+  \item Felix Gimeno
+  \item Furkan Kınlı
+  \item Gabriel Synnaeve
+  \item Gang Wang
+  \item Georgios Leontidis
+  \item Hanna Suominen
+  \item Hao He
+  \item Harsha Kokel
+  \item Heng Fang
+  \item Jiangwen Sun
+  \item Jie Fu
+  \item Jishnu Jaykumar P
+  \item Kaushy Kularatnam
+  \item Kiana Alikhademi
+  \item Labiba Kanij Rupty
+  \item Li Erran Li
+  \item Lluis Castrejon
+  \item Mahima Agumbe Suresh
+  \item Mahzad Khoshlessan
+  \item Maja Schneider
+  \item Mani A
+  \item Marija Stanojevic
+  \item Martin Klissarov
+  \item Matthew Kyle Schlegel
+  \item Matthew Ryan Krause
+  \item Mayur Arvind
+  \item Melanie F. Pradier
+  \item Mike Chrzanowski
+  \item Minjia Zhang
+  \item Monjoy Saha
+  \item Nadia Tahiri
+  \item Nan Rosemary Ke
+  \item Nikolaos Vasiloglou
+  \item Otasowie Owolafe
+  \item Owen Lockwood
+  \item Pablo Robles-Granda
+  \item Patrick Philipp
+  \item Paul Tylkin
+  \item Prateek Garg
+  \item Praveen Narayanan
+  \item Qingzhi Hu
+  \item Raj Ghugare
+  \item Ramesh Ragala
+  \item Razvan Pascanu
+  \item Samiran Das
+  \item Seohyun Kim
+  \item Shiju SS
+  \item Simon Kornblith
+  \item Stefan Magureanu
+  \item Ujjwal Verma
+  \item Venkatadheeraj Pichapati
+  \item Vibha Belavadi
+  \item Wei Han
+  \item Wenbin Zhang
+  \item Wenhao Yu
+  \item Xavier Bouthillier
+  \item Xavier Sumba
+  \item Xiang Zhang
+  \item Xin Lu
+  \item Xinggang Wang
+  \item Xingrui Yu
+  \item Yuntian Deng
+  \item Zahra Atashgahi
+  \item Zhourong Chen
+\end{itemize}
+\end{multicols}
+\endgroup
