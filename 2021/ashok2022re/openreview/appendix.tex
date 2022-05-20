@@ -7,7 +7,8 @@
 Continuing section \ref{ss:comp_req}, we report the exact values per epoch across experiment configurations. We do so, since different architectures and datasets may require training for different number of epochs, however the epoch time remains the same across experiments.
 
 \begin{table*}[hbt!]
-\begin{center}
+  \begin{center}
+          \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
 \textbf{Experiment}      & \textbf{Setup (way,shot)} & \textbf{Seconds per epoch (Conv4 / ProtoNet)}   \\
@@ -23,7 +24,7 @@ ProtoNet+Rotation        & (20,5)         &             65/81                   
 ProtoNet+Jigsaw+Rotation & (5,5)          &              42/70                            \\\hline
 ProtoNet+Jigsaw+Rotation & (20,5)         &              83/95  \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{Average seconds per epoch across experimental setups and ways}
 \label{table:epoch_time}
@@ -49,7 +50,7 @@ The last two parameters are optimized only when self-supervision is applied. Thi
 
 Hence we do a total of \textbf{24} sweeps.
 
-The sweeps and the exact hyperparameters obtained can be visualized at \url{https://wandb.ai/meta-learners/FSL-SSL/sweeps}. All the runs in the paper can be seen at \url{https://wandb.ai/meta-learners}. Our code can be accessed at \url{https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision}.
+The sweeps and the exact hyperparameters obtained can be visualized at \url{https://wandb.ai/meta-learners/FSL-SSL/sweeps}. All the runs in the paper can be seen at \url{https://wandb.ai/meta-learners}. Our code can be accessed at \href{https://github.com/ashok-arjun/MLRC-2021-Few-Shot-Learning-And-Self-Supervision}{this link}.
 
 % \clearpage
 
@@ -58,7 +59,8 @@ The sweeps and the exact hyperparameters obtained can be visualized at \url{http
 \subsubsection{Results on the applying self-supervision - with the Conv4 architecture}
 
 \begin{table*}[hbt!]
-\begin{center}
+  \begin{center}
+          \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Method & CUB & Cars & Aircrafts & Dogs & Flowers \\
@@ -68,7 +70,7 @@ ProtoNet + Jigsaw & 75.57 \textpm\ 0.7 & 62.54 \textpm\ 0.39 & 74.53 \textpm\ 0.
 ProtoNet + Rotation & 77.5 \textpm\ 0.55 & 66.8 \textpm\ 0.40 & 74.16 \textpm\ 0.40 & 60.74 \textpm\ 0.58 & 84.55 \textpm\ 0.5 \\
 ProtoNet + Jigsaw + Rotation & 69.66 \textpm\ 0.45 & 59.76 \textpm\ 0.77 & 74.79 \textpm\ 0.4 & 49.48 \textpm\ 0.54 & 81.43 \textpm\ 0.51 \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{Conv-4's performance on few-shot learning tasks. 
 Applying self-supervision to few-shot learners results in decrease in performance} 
@@ -175,7 +177,8 @@ ProtoNet + Rotation & 83.51 \textpm\ 0.55 & 85.53 \textpm\ 0.53 & 81.74 \textpm\
 \subsubsection{Results on domain selection}
 
 \begin{table}[H]
-\begin{center}
+  \begin{center}
+          \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Method & CUB & Cars & Aircrafts & Dogs & Flowers \\
@@ -185,7 +188,7 @@ SSL Pool (Random) & 71.11 \textpm\ 0.43 & 75.27 \textpm\ 0.39 & 75.81 \textpm\ 0
 SSL Pool (Weight) & \textbf{71.25 \textpm\ 0.55} & \textbf{75.65 \textpm\ 0.40} & \textbf{80.13 \textpm\ 0.40} & \textbf{70.66 \textpm\ 0.58} & \textbf{82.16 \textpm\ 0.5} \\
 
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{Domain selection results. The implementation of the domain selection algorithm is verified, and using the algorithm to select unlabelled data for SSL gives the best results across all datasets}
 \label{table:domain}
@@ -194,7 +197,8 @@ SSL Pool (Weight) & \textbf{71.25 \textpm\ 0.55} & \textbf{75.65 \textpm\ 0.40} 
 \subsubsection{Results on cross-domain few-shot learning}
 
 \begin{table*}[hbt!]
-\begin{center}
+  \begin{center}
+          \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 Method & ChestX & Crop Disease & EuroSAT & ISIC \\
@@ -205,7 +209,7 @@ ProtoNet + Rotation & \textbf{24.46 \textpm\ 0.39} & 79.30 \textpm\ 0.7 & 66.50 
 ProtoNet + Jigsaw + Rotation & 24.16 \textpm\ 0.37 & 78.67 \textpm\ 0.66 & \textbf{67.60 \textpm\ 0.66} & 40.22 \textpm\ 0.54 \\
 
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{CDFSL Benchmark for Conv-4. Applying SSL decreases performance in the cross-domain few-shot inference setup, and fully-supervised learning is state-of-the-art in $3$ out of $4$ datasets}
 \label{table:cdfsl_conv}

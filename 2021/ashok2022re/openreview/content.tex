@@ -139,14 +139,18 @@ Here, we consider the same architecture that the paper uses - ResNet-18, with an
 Here, we successfully verify claim $1$ of the paper which states that with no additional unlabelled data, SSL improves few-shot learning when applied as an auxiliary task. We conduct experiments across all the 5 small datasets as well as the large-scale miniImageNet dataset. We also reproduce results on the baseline from \cite{chen2018a}, and MAML and MAML+Jigsaw. We present results in figure \ref{fig:Res-18-small}, and tables \ref{table:mini_imagenet} and \ref{table:resnet_few_shot}. All results are on 5-way 5-shot classification.
 
 \begin{table}
-	\begin{minipage}{0.55\linewidth}
-		\centering
-		\includegraphics[height=8.0cm, width=8.5cm]{pdfs/Res18.pdf}
+	\begin{minipage}{0.45\linewidth}
+      \centering
+
+      \resizebox{\columnwidth}{!}{
+		\includegraphics[]{pdfs/Res18.pdf}}
 		\captionof{figure}{Results on applying SSL tasks to Prototypical networks, across 6 datasets}
 		\label{fig:Res-18-small}
 	\end{minipage}\hfill
-	\begin{minipage}{0.5\linewidth}
-		\centering
+	\begin{minipage}{0.45\linewidth}
+      \centering
+
+      \resizebox{\columnwidth}{!}{
 		\begin{tabular}{|c|c|c|}
             \hline
             Method & Accuracy \\
@@ -156,14 +160,15 @@ Here, we successfully verify claim $1$ of the paper which states that with no ad
             ProtoNet + Rotation & 74.93 \textpm\ 0.9  \\
             ProtoNet + Jigsaw + Rotation & 76.23 \textpm\ 0.9  \\
             \hline
-        \end{tabular}
+        \end{tabular}}
         \caption{miniImageNet Results with ResNet-18}
         \label{table:mini_imagenet}
 	\end{minipage}
 \end{table}
 
 \begin{table*}[hbt!]
-\begin{center}
+  \begin{center}
+    \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Method & CUB & Cars & Aircrafts & Dogs & Flowers \\
@@ -175,7 +180,7 @@ ProtoNet + Jigsaw & \textbf{89.57 \textpm\ 0.43} & 92.67 \textpm\ 0.39 & 91.72 \
 ProtoNet + Rotation & 88.9 \textpm\ 0.55 & 91.61 \textpm\ 0.40 & 91.69 \textpm\ 0.40 & 83.94 \textpm\ 0.58 & 90.12 \textpm\ 0.5 \\
 ProtoNet + Jigsaw + Rotation & 88.98 \textpm\ 0.45 & \textbf{93.27 \textpm\ 0.38} & 91.26 \textpm\ 0.4 & 85.29 \textpm\ 0.54 & 90.01 \textpm\ 0.51 \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{ResNet-18's performance on the $5$ small datasets.}
 \label{table:resnet_few_shot}
@@ -186,26 +191,30 @@ ProtoNet + Jigsaw + Rotation & 88.98 \textpm\ 0.45 & \textbf{93.27 \textpm\ 0.38
 We successfully verify claim $2$ of the authors that the relative gains of using SSL are more when the difficulty of the task is higher. The authors experiment with two types of difficult tasks: one with low-resolution/greyscale images as input, and another with less labelled data from the base training set. We experiment with $3$ selected datasets and were successful in reproducing the results. We report the results on figures \ref{fig:20-40-60-80} and \ref{fig:lowres}. The exact numbers are given on tables \ref{table:grey_low_res} and \ref{table:20_ssl} respectively in the appendix. We find that the claims of the paper hold true, and that self-supervision has higher gains in harder tasks.
 
 \begin{figure}[t]
-    \begin{minipage}{0.33\textwidth}
-        % \centering
-        \vspace{0.2cm}
-        \includegraphics[width=5cm, height=5.5cm]{pdfs/ssl.pdf} % first figure itself 
+  \centering
+    \begin{minipage}{0.48\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{
+        \includegraphics[]{pdfs/ssl.pdf}} % first figure itself
         % \hspace{-2em} 
         \caption{Results of applying SSL \\ when the amount of labelled data \\ for supervision is lesser. The gains \\ obtained by SSL grow with \\ the amount of labelled data}
         \label{fig:20-40-60-80}
     \end{minipage}\hfill
-    \begin{minipage}{0.33\textwidth}
-        % \centering
-        \includegraphics[width=5cm, height=5.5cm]{pdfs/ssl_other_domains.pdf} % first figure itself
+    \begin{minipage}{0.48\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{
+        \includegraphics[]{pdfs/ssl_other_domains.pdf}} % first figure itself
         \caption{Performance on tasks \\ where a portion of the labelled data \\ is replaced with data from \\ other domains}
         \label{fig:20-60-other}
-    \end{minipage}\hfill
-    \begin{minipage}{0.33\textwidth}
-        % \centering
-        \includegraphics[width=6cm, height=4.5cm]{pdfs/grey_low_res.pdf} % first figure itself
+      \end{minipage}
+    \end{figure}
+
+\begin{figure}
+      \centering
+            \resizebox{0.7\columnwidth}{!}{
+        \includegraphics[]{pdfs/grey_low_res.pdf}} % first figure itself
         \caption{Results of applying self-supervised learning on artificially constructed harder tasks.}
         \label{fig:lowres}
-    \end{minipage}\hfill
 \end{figure}
 
 \subsubsection{Unlabelled data for SSL from dissimilar domains negatively impacts the few-shot learner}
@@ -247,7 +256,6 @@ We next study the effect of $\alpha$ on the results, with the CUB and cars datas
 % \end{figure*}
 
 \begin{table}
-\parbox{.45\linewidth}{
     \centering
     \begin{tabular}{|c|c|c|}
             \hline
@@ -261,10 +269,10 @@ We next study the effect of $\alpha$ on the results, with the CUB and cars datas
             \hline
         \end{tabular}
     \caption{Conv-4's performance on applying SSL through Rotation}
-    \label{table:conv_rotation}    
-    }
-    \hfill
-    \parbox{.45\linewidth}{
+    \label{table:conv_rotation}
+  \end{table}
+  \begin{table}
+    % \hfill
     \centering
     \begin{tabular}{|c|c|c|}
             \hline
@@ -279,7 +287,6 @@ We next study the effect of $\alpha$ on the results, with the CUB and cars datas
         \end{tabular}
     \caption{Conv-4's performance on applying SSL through Jigsaw}
     \label{table:conv_jigsaw}
-    }
 \end{table} 
 
  
@@ -316,22 +323,25 @@ We find that self-supervision results in learning heavily domain-specific repres
 
 
 \begin{figure}[t]
-    \begin{minipage}{0.5\textwidth}
-        \centering
-        \includegraphics[, height=7cm]{pdfs/domain.pdf} % first figure itself
+    \begin{minipage}{0.48\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{
+        \includegraphics[]{pdfs/domain.pdf}} % first figure itself
         \caption{Results of the domain selection algorithm}
         \label{fig:domain}
     \end{minipage}\hfill
-    \begin{minipage}{0.5\textwidth}
-        \centering
-        \includegraphics[ height=7cm]{pdfs/Conv4.pdf} % first figure itself
+    \begin{minipage}{0.48\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{
+        \includegraphics[]{pdfs/Conv4.pdf}} % first figure itself
         \caption{Results of using SSL with the Conv4 architecture}
         \label{fig:Conv4}
     \end{minipage}\hfill
 \end{figure}
 
 \begin{table*}[hbt!]
-\begin{center}
+  \begin{center}
+          \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 Method & ChestX & Crop Disease & EuroSAT & ISIC \\
@@ -342,7 +352,7 @@ ProtoNet + Rotation & 23.84 \textpm\ 0.39 & 79.11 \textpm\ 0.68 & 72.47 \textpm\
 ProtoNet + Jigsaw + Rotation & 23.73 \textpm\ 0.38 & 77.39 \textpm\ 0.68 & 71.91 \textpm\ 0.7 & 40.05 \textpm\ 0.55 \\
 
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \caption{CDFSL Benchmark for ResNet-18}
 \label{table:cdfsl_resnet}
