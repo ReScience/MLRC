@@ -5,58 +5,98 @@
 #  - For a successful replication, it should be prefixed with "[Re]"
 #  - For a failed replication, it should be prefixed with "[¬Re]"
 #  - For other article types, no instruction (but please, not too long)
-title: "ReScience (R)evolution"
+# Change the default title
+title: "ML Reproducibility Challenge 2021"
 
 # List of authors with name, orcid number, email and affiliation
 # Affiliation "*" means contact author (required even for single-authored papers)
 authors:
-  - name: Konrad Hinsen
-    orcid: 0000-0003-0330-9428
-    email: konrad.hinsen@cnrs.fr
-    affiliations: 1,2
-    
-  - name: Nicolas P. Rougier
-    orcid: 0000-0002-6972-589X
-    email: Nicolas.Rougier@inria.fr
-    affiliations: 3,4,5,*      # * is for contact author
+  - name: Koustuv Sinha
+    orcid: 0000-0002-2803-9236
+    email: koustuv.sinha@mail.mcgill.ca
+    affiliations: 1,2,*
+
+  - name: Jesse Dodge
+    orcid:
+    email: dodgejesse@gmail.com
+    affiliations: 6      # * is for contact author
+
+  - name: Sasha Luccioni
+    orcid: 0000-0001-6238-7050
+    email: sasha.luccioni@mila.quebec
+    affiliations: 5      # * is for contact author
+
+  - name: Jessica Zosa Forde
+    orcid: 0000-0003-0632-7058
+    email: jessica_forde@brown.edu
+    affiliations: 4      # * is for contact author
+
+  - name: Sharath Chandra Raparthy
+    orcid: 0000-0003-0655-6715
+    email: sharathraparthy@gmail.com
+    affiliations: 3      # * is for contact author
+
+
+  - name: Joelle Pineau
+    orcid: 0000-0003-0747-7250
+    email: jpineau@cs.mcgill.ca
+    affiliations: 1,2,8      # * is for contact author
+
+  - name: Robert Stojnic
+    email: rstojnic@fb.com
+    orcid: 0000-0002-6458-0273
+    affiliations: 7,8      # * is for contact author
+
+
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
   - code:    1
-    name:    Centre de Biophysique Moléculaire, CNRS UPR4301
-    address: Orléans, France
-    
+    name:    School of Computer Science, McGill University
+    address: Montreal, Canada
+
   - code:    2
-    name:    Synchrotron SOLEIL, Division Expériences
-    address: Gif sur Yvette, France
-    
-  - code:    3
-    name:    INRIA Bordeaux Sud-Ouest
-    address: Bordeaux, France
-    
+    name:    Mila - Quebec AI Institute
+    address: Montreal, Canada
+
+  - code:   3
+    name: Université de Montréal
+    address: Canada
+
   - code:    4
-    name:    LaBRI, Université de Bordeaux, Institut Polytechnique de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5800
-    address: Talence, France
-    
+    name:    Brown University
+    address: USA
+
   - code:    5
-    name:    Institut des Maladies Neurodégénératives, Université  de Bordeaux,
-             Centre National de la Recherche Scientifique, UMR 5293
-    address: Bordeaux, France
+    name:    Allen Institute for AI
+    address: USA
+
+  - code:    6
+    name:    HuggingFace
+    address: USA
+
+  - code: 7
+    name: PapersWithCode
+    address: USA
+
+  - code:  8
+    name:    Meta AI
+    address: USA and Canada
+
 
 
 # List of keywords (adding the programming language might be a good idea)
-keywords: rescience c, rescience x
+keywords:  rescience c, machine learning, deep learning, python, pytorch
 
 # Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
 # You can get a DOI for your code from Zenodo, or an SWH identifier from
 # Software Heritage.
 #   see https://guides.github.com/activities/citable-code/
 code:
-  - url: https://github.com/rescience-c/template
-  - doi: 
+  - url:
+  - doi:
   - swh: 
 
 # Data URL and DOI (optional if no data)
@@ -66,26 +106,17 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: # Full textual citation
- - bib:  # Bibtex key (if any) in your bibliography file
- - url:  # URL to the PDF, try to link to a non-paywall version
+ - cite:
+ - bib:
+ - url:
  - doi:  # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
-abstract: "Three years have passed since ReScience published its first article
-           and since September 2015, things have been going steadily. We're
-           still alive, independent and without a budget. In the meantime, we
-           have published around 20 articles (mostly in computational
-           neuroscience & computational ecology) and the initial has grown
-           from around 10 to roughly 100 members (editors and reviewers), we
-           have advertised ReScience at several conferences worldwide, gave
-           some interviews and we published an article introducing ReScience in
-           PeerJ. Based on our experience at managing the journal during these
-           three years, we think the time is ripe for proposing some changes."
+abstract: "The Fifth Editon of Reproducibility Challenge, ML Reproducibility Challenge 2021, is an open, peer-reviewed, collaborative experiment in evaluating Replicability and Reproducibility of Machine Learning articles accepted at top ML conferences in 2021, including NeurIPS, ICML, ICLR, ACL, EMNLP, CVPR, ICCV, AAAI and IJCAI. We conduct the challenge through Fall 2021 on accepted papers in these conferences, and in this special issue of ReScience journal we present the peer-reviewed selected reports."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
-  
+
 # Type of the article
 # Type can be:
 #  * Editorial
@@ -95,45 +126,47 @@ type: Editorial
 
 # Scientific domain of the article (e.g. Computational Neuroscience)
 #  (one domain only & try to be not overly specific)
-domain: 
+domain: ML Reproducibility Challenge 2021
 
 # Coding language (main one only if several)
-language:
+language: Python
 
-  
+
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review: 
-  - url: 
+review:
+  - url:
 
 contributors:
-  - name:
-    orcid: 
+  - name: Nicolas P. Rougier
+    orcid:
     role: editor
-  - name:
+  - name: Anonymous Reviewers
     orcid:
     role: reviewer
   - name:
     orcid:
     role: reviewer
+
 
 # This information will be provided by the editor
 dates:
-  - received:  November 1, 2018
-  - accepted:
-  - published: 
+  - received:  May 19, 2022
+  - accepted:  May 19, 2022
+  - published:  May 23, 2022
+
 
 # This information will be provided by the editor
 article:
-  - number: # Article number will be automatically assigned during publication
-  - doi:    # DOI from Zenodo
-  - url:    # Final PDF URL (Zenodo or rescience website?)
+  - number: 48
+  - doi: 10.5281/zenodo.6574723
+  - url: https://zenodo.org/record/6574723/files/article.pdf
 
 # This information will be provided by the editor
 journal:
   - name:   "ReScience C"
   - issn:   2430-3658
-  - volume: 4
-  - issue:  1
+  - volume: 8
+  - issue: 2
