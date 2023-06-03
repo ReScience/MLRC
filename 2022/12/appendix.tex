@@ -1,0 +1,227 @@
+\newpage
+\appendix
+
+\section{Hyperparameters for retrained models}
+\label{appendix:train parameters}
+Table \ref{table:hparams_train} reports the hyperparameters that were used to retrain each model for each dataset. Retrained DT models still employ the same hyperparameters as the original models, but the other models, most of them have a smaller structure than the original models.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccc}
+Dataset &
+  Hyperparameter &
+  DT &
+  RF &
+  AB \\ \hline
+\multirow{2}{*}{Wine} &
+  Max Depth &
+  \begin{tabular}[c]{@{}c@{}}2\\ (2)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}4\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}2\\ (4)\end{tabular} \\
+ &
+  Num Trees &
+  \begin{tabular}[c]{@{}c@{}}1\\ (1)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (500)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (100)\end{tabular} \\  \hline
+\multirow{2}{*}{HELOC} &
+  Max Depth &
+  \begin{tabular}[c]{@{}c@{}}4\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}2\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1\\ (8)\end{tabular} \\
+ &
+  Num Trees &
+  \begin{tabular}[c]{@{}c@{}}1\\ (1)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (500)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (100)\end{tabular} \\ \hline
+\multirow{2}{*}{COMPAS} &
+  Max Depth &
+  \begin{tabular}[c]{@{}c@{}}4\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}2\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1\\ (2)\end{tabular} \\
+ &
+  Num Trees &
+  \begin{tabular}[c]{@{}c@{}}1\\ (1)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (500)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (100)\end{tabular} \\ \hline
+\multirow{2}{*}{Shopping} &
+  Max Depth &
+  \begin{tabular}[c]{@{}c@{}}4\\ (4)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}4\\ (8)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}1\\ (2)\end{tabular} \\
+ &
+  Num Trees &
+  \begin{tabular}[c]{@{}c@{}}1\\ (1)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (500)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (100)\end{tabular} \\ \hline
+\multirow{2}{*}{German} &
+  Max Depth &
+  \begin{tabular}[c]{@{}c@{}}2\\ (-)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}3\\ (-)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}2\\ (-)\end{tabular} \\
+ &
+  Num Trees &
+  \begin{tabular}[c]{@{}c@{}}1\\ (-)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (-)\end{tabular} &
+  \begin{tabular}[c]{@{}c@{}}100\\ (-)\end{tabular} \\ \hline
+\end{tabular}
+\caption{Hyperparameters of retrained models. Numbers in the parentheses are the hyperparameters of the original models.}
+\label{table:hparams_train}
+\end{table}
+
+
+\section{Model size comparison}
+\label{appendix:model size comparison}
+Table \ref{table:model size} reports the model sizes of retrained and original models on the disk. Most retrained models have a smaller size as smaller hyperparameters were used compared to the original models.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccccc}
+         & \multicolumn{2}{c}{DT}    & \multicolumn{2}{c}{RF}        & \multicolumn{2}{c}{AB}       \\ \hline
+Dataset &
+  \multicolumn{1}{l}{Retrained} &
+  \multicolumn{1}{l}{Original} &
+  \multicolumn{1}{l}{Retrained} &
+  \multicolumn{1}{l}{Original} &
+  \multicolumn{1}{l}{Retrained} &
+  \multicolumn{1}{l}{Original} \\ \hline
+Wine     & \multicolumn{1}{c}{3} & 2 & \multicolumn{1}{c}{263} & 711 & \multicolumn{1}{c}{48} & 131 \\
+HELOC    & \multicolumn{1}{c}{4} & 2 & \multicolumn{1}{c}{94}  & 703 & \multicolumn{1}{c}{34} & 148 \\ 
+COMPAS   & \multicolumn{1}{c}{2} & 2 & \multicolumn{1}{c}{94}  & 467 & \multicolumn{1}{c}{34} & 85  \\
+Shopping & \multicolumn{1}{c}{4} & 2 & \multicolumn{1}{c}{265} & 143 & \multicolumn{1}{c}{34} & 89  \\
+German   & \multicolumn{1}{c}{2} & - & \multicolumn{1}{c}{144} & -   & \multicolumn{1}{c}{48} & -   \\ \hline
+\end{tabular}
+\caption{Size of models on the disk. The unit of this table is KB.}
+\label{table:model size}
+\end{table}
+
+
+\section{Accuracy of retrained models}
+\label{appendix:train accuracy}
+This study retrained models with new hyperparameters in order to conduct further experiments. The train/test split method used in this study follows the original paper, where 70\% of the dataset was used for training and 30\% was used for test. This study employs the accuracy score as a metric. The accuracy score can be derived as
+
+\begin{equation}
+Accuracy = \frac{TP + TN}{TP + TN + FP + FN},
+\end{equation}
+
+where TP is true positive, TN is true negative, FP is false positive and FN is false negative.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccc}
+Dataset  & DT    & RF    & AB    \\ \hline
+Wine     & 0.796 & 0.788 & 0.771 \\
+HELOC    & 0.679 & 0.692 & 0.701 \\
+COMPAS   & 0.651 & 0.677 & 0.675 \\
+Shopping & 0.890 & 0.893 & 0.892 \\
+German   & 0.700 & 0.713 & 0.723 \\ \hline
+\end{tabular}
+\caption{Accuracy of all the models}
+\label{table:trainAccuracy}
+\end{table}
+
+\section{Hyperparameter tuning}
+\label{appendix:hparams tuning}
+In this study, hyperparameter tuning was performed on a few pretrained models and retrained DT models by using Optuna's Bayesian optimisation. Table \ref{table:hparamsSearch} illustrates the search spaces of hyperparameters. It is worth noting that since DT models do not use the temperature parameter, the search for temperature was disabled when tuning DT models to save some computational costs.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{cccc}
+                                      & \multicolumn{3}{c}{Search space}                              \\
+\multicolumn{1}{c}{Hyperparameter}  & \multicolumn{1}{c}{Min}   & \multicolumn{1}{c}{Max}  & Step  \\ \hline
+\multicolumn{1}{c}{sigma}           & \multicolumn{1}{c}{1}     & \multicolumn{1}{c}{20}   & 1     \\
+\multicolumn{1}{c}{temperature}     & \multicolumn{1}{c}{1}     & \multicolumn{1}{c}{20}   & 1     \\
+\multicolumn{1}{c}{distance weight} & \multicolumn{1}{c}{0.01}  & \multicolumn{1}{c}{0.1}  & 0.01  \\
+\multicolumn{1}{c}{learning rate}   & \multicolumn{1}{c}{0.001} & \multicolumn{1}{c}{0.01} & 0.001 \\ \hline
+\end{tabular}
+\caption[hparamsSearch]{Hyperparameters and their search spaces}
+\label{table:hparamsSearch}
+\end{table}
+
+\section{FOCUS hyperparameters}
+\label{appendix:focus hyperparameters}
+Table \ref{table:euclidean params}, \ref{table:cosine params}, \ref{table:l1 params} and \ref{table:mahal params} report used hyperparameters for retrained models. As DT models do not use temperature, it is not reported.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{cccccc}
+Dataset                   & Model & sigma & temperature & weight distance & learning rate \\ \hline
+\multirow{2}{*}{Wine}     & DT    & 1     & -          & 0.05            & 0.001         \\
+                          & AB    & 5     & 1           & 0.05            & 0.005         \\ \hline
+\multirow{2}{*}{HELOC}    & DT    & 2     & -          & 0.05            & 0.001         \\
+                          & AB    & 10    & 1           & 0.05            & 0.001         \\ \hline
+\multirow{3}{*}{COMPAS}   & DT    & 4     & -          & 0.01            & 0.009         \\
+                          & RF    & 7     & 3           & 0.01            & 0.001         \\
+                          & AB    & 10    & 1           & 0.01            & 0.005         \\ \hline
+\multirow{2}{*}{Shopping} & DT    & 2     & -          & 0.05            & 0.005         \\
+                          & AB    & 10    & 1           & 0.05            & 0.001         \\ \hline
+\multirow{3}{*}{German}   & DT    & 7     & -           & 0.01            & 0.001         \\
+                          & RF    & 7     & 3           & 0.01            & 0.001         \\
+                          & AB    & 7     & 3           & 0.01            & 0.001         \\ \hline
+\end{tabular}
+\caption{FOCUS hyperparameters for using Euclidean distance}
+\label{table:euclidean params}
+\end{table}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{cccccc}
+Dataset                   & Model & sigma & temperature & weight distance & learning rate \\ \hline
+\multirow{2}{*}{Wine}     & DT    & 1     & -          & 0.05            & 0.005         \\
+                          & AB    & 1     & 1           & 0.01            & 0.005         \\ \hline
+\multirow{3}{*}{HELOC}    & DT    & 2     & -          & 0.05            & 0.005         \\
+                          & RF    & 5     & 5           & 0.05            & 0.005         \\
+                          & AB    & 1     & 1           & 0.05            & 0.005         \\ \hline
+\multirow{3}{*}{COMPAS}   & DT    & 10    & -          & 0.05            & 0.005         \\
+                          & RF    & 10    & 6           & 0.01            & 0.005         \\
+                          & AB    & 10    & 1           & 0.05            & 0.005         \\ \hline
+\multirow{2}{*}{Shopping} & DT    & 10    & -          & 0.05            & 0.001         \\
+                          & AB    & 10    & 5           & 0.05            & 0.001         \\ \hline
+\multirow{3}{*}{German}   & DT    & 7     & -           & 0.01            & 0.001         \\
+                          & RF    & 7     & 3           & 0.01            & 0.001         \\
+                          & AB    & 7     & 3           & 0.01            & 0.001         \\ \hline
+\end{tabular}
+\caption{FOCUS hyperparameters for using Cosine distance}
+\label{table:cosine params}
+\end{table}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{cccccc}
+Dataset                   & Model & sigma & temperature & weight distance & learning rate \\ \hline
+\multirow{2}{*}{Wine}     & DT    & 1     & -          & 0.05            & 0.001         \\
+                          & AB    & 6     & 1           & 0.01            & 0.005         \\ \hline
+\multirow{3}{*}{HELOC}    & DT    & 2     & -          & 0.05            & 0.001         \\
+                          & RF    & 5     & 5           & 0.01            & 0.005         \\
+                          & AB    & 4     & 1           & 0.05            & 0.001         \\ \hline
+\multirow{2}{*}{COMPAS}   & DT    & 6     & -          & 0.01            & 0.005         \\
+                          & AB    & 5     & 10          & 0.05            & 0.005         \\ \hline
+\multirow{2}{*}{Shopping} & DT    & 2     & -          & 0.05            & 0.005         \\
+                          & AB    & 10    & 1           & 0.05            & 0.001         \\ \hline
+\multirow{3}{*}{German}   & DT    & 7     & -           & 0.01            & 0.001         \\
+                          & RF    & 7     & 3           & 0.01            & 0.001         \\
+                          & AB    & 7     & 3           & 0.01            & 0.001         \\ \hline
+\end{tabular}
+\caption{FOCUS hyperparameters for using Manhattan distance}
+\label{table:l1 params}
+\end{table}
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{cccccc}
+Dataset                   & Model & sigma & temperature & weight distance & learning rate \\ \hline
+\multirow{2}{*}{Wine}     & DT    & 4     & -           & 0.01            & 0.003         \\
+                          & AB    & 10    & 1           & 0.01            & 0.005         \\ \hline
+\multirow{2}{*}{HELOC}    & DT    & 7     & -           & 0.01            & 0.002         \\
+                          & AB    & 10    & 1           & 0.01            & 0.005         \\ \hline
+\multirow{3}{*}{COMPAS}   & DT    & 4     & -          & 0.01            & 0.008         \\
+                          & RF    & 10    & 1           & 0.01            & 0.005         \\
+                          & AB    & 4     & 2           & 0.05            & 0.001         \\ \hline
+\multirow{2}{*}{Shopping} & DT    & 20    & -           & 0.02            & 0.003         \\
+                          & AB    & 10    & 1           & 0.01            & 0.001         \\ \hline
+\multirow{2}{*}{German}   & DT    & 18    & -           & 0.01            & 0.003         \\
+                          & AB    & 7     & 3           & 0.01            & 0.001         \\ \hline
+\end{tabular}
+\caption{FOCUS hyperparameters for using Mahalanobis distance}
+\label{table:mahal params}
+\end{table}
+
