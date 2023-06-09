@@ -1,0 +1,134 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] On the Reproducibility of CartoonX"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Elias Dubbeldam
+    orcid: 0009-0001-0665-4545
+    email: elias.dubbeldam@student.uva.nl
+    affiliations: 1,*
+
+  - name: Aniek Eijpe
+    orcid: 0009-0009-7785-8885
+    email: aniek.eijpe@student.uva.nl
+    affiliations: 1
+
+  - name: Jona Ruthardt
+    orcid: 0000-0002-3077-8302
+    email: jona.ruthardt@student.uva.nl
+    affiliations: 1
+
+  - name: Robin Sasse
+    orcid: 0009-0005-8409-0641
+    email: robin.sasse@student.uva.nl
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
+
+  - code:    1
+    name:    Equal contribution
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: machine learning, artificial intelligence, deep learning, reproducibility, explainable AI, explanation methods, image classifiers, CartoonX, piece-wise smooth, Vision Transformer, runtime efficiency, Python, rescience c
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/JonaRuthardt/MLRC-CartoonX
+  - doi: 
+  - swh: swh:1:dir:691b7400b38017cfe651a59735dc715755388c4d;origin=https://github.com/JonaRuthardt/MLRC-CartoonX;visit=swh:1:snp:ffead088e1c166ac58b0f37c5c8e87344f638b3d;anchor=swh:1:rev:38364e7eef0fbc99f2b143fad90a29dae113f95c
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: Kolek, S., and Nguyen, D.A., and Levie, R., and Bruna, J., and Kutyniok, G. "Cartoon Explanations of Image Classifiers."  European Conference on Computer Vision (ECCV) 2022, 2022. # Full textual citation
+ - bib: cartoonX # Bibtex key (if any) in your bibliography file
+ - url:  https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136720439.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi:  https://doi.org/10.1007/978-3-031-19775-8_26 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility — CartoonX [1] is a novel explanation method for image classifiers. In this reproducibility study, we examine the claims of the original authors of CartoonX that it: (i) extracts relevant piece‐wise smooth parts of the image, resulting in explanations which are more straightforward to interpret for humans; (ii) achieves lower distortion in the model output, using fewer coefficients than other state-of‐the‐art methods; (iii) is model‐agnostic. Finally, we examine how to reduce the runtime.
+
+Methodology — The original authors’ open‐sourced implementation has been used to examine (i). We implemented the code to examine (ii), as there was no public code available for this. We tested claim (iii) by performing the same experiments with a Vision Transformer instead of a CNN. To reduce the runtime, we extended the existing implementation with multiple enhanced initialization techniques. All experiments took approximately 38.4 hours on a single NVIDIA Titan RTX.
+
+Results — Our results support the claims made by the original authors. (i) We observe that CartoonX produces piece‐wise smooth explanations. Most of the explanations give valuable insights. (ii) Most experiments, that show how CartoonX achieves lower distortion outputs compared to other methods, have been reproduced. In the cases where exact reproducibility has not been achieved, claim (ii) of the author still holds. (iii) The model‐agnosticism claim still holds as the overall quality of the ViT‐based explanations almost matches that of the CNN‐based explanations. Finally, simple heuristical initializations did not improve the runtime.
+
+What was easy — The mathematical background and intuition of CartoonX were clearly explained by the original authors. Moreover, the original author’s code was well structured and documented, which made it straightforward to run and extend.
+
+What was difficult — Some hyperparameter settings and implementation details needed to reproduce the experiments were not clear or transparent from the original paper or code. This made it difficult to implement and reproduce these experiments.
+
+Communication with original authors — We have been in brief communication with the original authors. They were able to address most of our points, providing us with some additional clarifications about the exact implementation and hyperparameter settings."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=MK4IQJdLLeo
+
+contributors:
+  - name: Samarth Bhargav
+    orcid: 0000-0001-5204-8514
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  04 February 2023
+  - accepted:  5 June 2023
+  - published: 
+
+# This information will be provided by the editor
+article:
+  - number: # Article number will be automatically assigned during publication
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  2
