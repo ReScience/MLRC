@@ -1,0 +1,303 @@
+\section{Introduction}
+In recent years, facial recognition (FR) systems have become increasingly important \citep{masi2018deep}. One sub-area of FR, \textit{face verification}, attempts to determine whether two faces belong to the same person. However, these methods were repeatedly shown to be biased against certain demographic subgroups defined by attributes such as ethnicity, age or gender \citep{pmlr-v81-buolamwini18a, https://doi.org/10.48550/arxiv.1809.02169}. This was especially frequent when considering how often a face in incorrectly interpreted as a match, i.e.\ \textcolor{Plum}{\textbf{false positive rate}} (FPR). This has serious ethical implications in contexts such as law enforcement, security and privacy.
+
+Often, these methods use a deep neural network to generate representations of images called \textit{embeddings}. The images are said to be of the same person if the cosine similarity of their embeddings exceeds a certain threshold. However, as Salvador \textit{et al.}\ \citep{2106.03761} show, this `baseline' method does not provide the same \textcolor{Emerald}{\textbf{accuracy}} for all ethnic subgroups. One approach to reduce the bias has been to simply learn less biased representations \citep{https://doi.org/10.48550/arxiv.1905.06517, 9025595}, which generally also results in lower \textcolor{Emerald}{\textbf{accuracy}} \citep{https://doi.org/10.48550/arxiv.1911.08080}, requires re-training of the model, and/or requires the information about the \textcolor{CornflowerBlue}{\textbf{\textcolor{CornflowerBlue}{\textbf{sensitive attribute}}}}. 
+
+In an effort to alleviate this bias, Salvador \textit{et al.} propose the \textit{FairCal} calibration method. FairCal is a post-processing method that clusters image embeddings using K-means clustering and calibrates the cosine similarity scores between the images based on their cluster membership. A more detailed description of FairCal can be found in section 3.1. The authors claim that FairCal is \textcolor{Bittersweet}{\textbf{fairly calibrated}}, achieves equal \textcolor{Plum}{\textbf{false positive rates}} (FPRs) across subgroups (i.e.\ fewer incorrect matches), while achieving state-of-the-art (SOTA) \textcolor{Emerald}{\textbf{accuracy}}, all without the need for \textcolor{Orchid}{\textbf{retraining}} or knowledge about \textcolor{CornflowerBlue}{\textbf{sensitive attributes}} such as ethnicity. This paper aims to reproduce their results.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+In this work, we run several experiments to explore the authors' findings and attempt to verify their claims, namely:
+\begin{itemize}
+    \item FairCal achieves SOTA \textcolor{Emerald}{\textbf{accuracy}} for face verification on two large datasets,
+    \item FairCal outputs SOTA \textcolor{Bittersweet}{\textbf{fairness-calibrated}} probabilities without knowledge of the \textcolor{CornflowerBlue}{\textbf{sensitive attribute}},
+    \item FairCal reduces the gap in FPRs across \textcolor{CornflowerBlue}{\textbf{sensitive attributes}} compared to the baseline method.
+\end{itemize}
+The authors also introduce another method named \textit{Oracle}, which works similarly to FairCal, but uses explicit knowledge of the \textcolor{CornflowerBlue}{\textbf{sensitive attributes}} to group images instead of unsupervised clustering. We report our results for Oracle and other benchmarking methods used by the authors in Appendix B, but focus on FairCal here. We subjectively decided a result to be \textit{reproducible} if they did not deviate greatly from the authors' values.
+
+
+\section{Methodology}
+The authors provide an open-source implementation of their setup on GitHub \citep{faircalgithub}. 
+Though the code for the implementation of FairCal and Oracle required minimal debugging, it had room for improvement in readability and efficiency -- thus, it was refactored keeping this in mind. Furthermore, code files were added to generate the image embeddings and the files describing the pairs in the datasets (see section \ref{sec:datasets} for details). For the rest of this section, we followed the authors' implementations unless otherwise specified.
+
+\subsection{Model descriptions}
+Salvador \textit{et al.}\ propose FairCal, a post-processing method to ensure face verification which is \textcolor{Bittersweet}{\textbf{fairly calibrated}} across subgroups, and exhibits \textcolor{Plum}{\textbf{predictive equality}}. The authors define a model to be \textit{calibrated} if the true probability of a match is equal to the model's confidence output. Thus, a binary classifier is fairly-calibrated if it is calibrated when conditioned on each subgroup. For a pair of images $(x_1, x_2)$ with corresponding embeddings $(f(x_1), f(x_2))$, calibration can be seen as a function $\mu$ that maps the cosine similarity score, $s(x_1, x_2)=\frac{f(x_1) . f(x_2)} {|f(x_1)| |f(x_2)|}$, to probabilities. This map can then be used to define a binary classifier, where the score threshold $s_{thr}$ can be computed. Additionally, the authors define a binary classifier to exhibit \textcolor{Plum}{\textbf{predictive equality}} for subgroups $g_1$ and $g_2$ if the classifier has equal FPRs for each subgroup.
+
+Mathematical details of this method can be found in the original paper. Briefly, the authors describe FairCal as having three steps:
+\begin{itemize}
+    \item[1] Apply K-means to the image embeddings, forming $K$ clusters $Z_k$. Use these to create $K$ calibration sets $S^{cal}_k$, which contain similarity scores of embedding pairs where either $x_1$ or $x_2$ belong to $Z_k$.
+    \item[2] Use a post-hoc calibration method on $S^{cal}_k$ to compute a map $\mu_k$ from cosine similarities to cluster-conditional probabilities. The authors use beta calibration \citep{kull2017beta}.
+    \item[3] Compute their calibrated score for each image pair $(x_1, x_2)$ in the test set. Now, if the embeddings $f(x_1)$ and $f(x_2)$ belong to clusters $k_1$ and $k_2$ respectively, their overall calibrated score is defined as a linear combination of their respective mapped calibrated scores $\mu_{k_1}(s(x_1, x_2))$ and $\mu_{k_2}(s(x_1, x_2))$, weighted by the relative population fraction of the two calibration sets $S^{cal}_{k^1}$ and $S^{cal}_{k^2}$.
+\end{itemize}
+The authors use three pretrained models to generate embeddings:
+ \begin{itemize}
+     \item \textbf{`Facenet (VGGFace2)'}: An Inception Resnet model trained on the VGGFace2 dataset.
+     \item \textbf{`Facenet (Webface)'}: An Inception Resnet model trained on CASIA-Webface dataset.
+     \item \textbf{`ArcFace'}: An ArcFace model trained on the refined version of MS-Celeb-1M.
+ \end{itemize}
+ To pre-process the images, they employed a Multi-Task Convolutional Neural Network (MTCNN), removed images for which it failed to identify a face, and cropped and aligned those for which is did identify a face. This pipeline was attained from \citep{facenetpytorch} and \citep{arcface}, where default hyperparameters were used. To create the functions that map the cosine similarity scores to probabilities and determine the thresholds of those probabilities, the authors used beta calibration. The authors used 100 clusters for their results.
+
+ To benchmark FairCal, the authors define a \textit{baseline} method. This method simply calculates the cosine similarity of two image embeddings, and determines them to be a genuine pair if the cosine similarity exceeds a certain threshold determined using beta calibration. Beta calibration works by fitting a logistic regression model with respect to the cosine similarities and ground truth labels. Though logistic regression has no closed-form solution \citep{bishop2006pattern}, repeated experiments with the baseline method on the same set of embeddings gave the exact same results (validated experimentally by us). The previous SOTA mentioned in the original paper is called \textit{Fair Score Normalization} (FSN) \cite{TERHORST2020332}, has also been reproduced in our tables and figures for comparison. The authors implemented several more methods to compare against FairCal, and our comparison of these can be found in Appendix B.
+ 
+As an extension to the original paper, we experimented with using Gaussian mixture models (GMMs) \citep{bishop2006pattern} as a clustering method instead of K-means for FairCal, in an attempt to validate the use of unsupervised clustering methods in general to achieve the claims of Salvador \textit{et al}. Additionally we hypothesized that the clusters found by this approach may be able to model the underlying structure of the embeddings as well as, if not better, than clusters that arise from K-means, which tend to be roughly isotropic and sensitive to outliers  \citep{raykov2016k}. Thus, the embedding space was partitioned into discrete regions, with each data point being assigned to the cluster corresponding to the Gaussian component with the highest probability. Additional experiments were done with different numbers of Gaussian components, which can be found in Appendix E. For the sake of comparison with the K-means version of FairCal, 100 Gaussian components were used for the results mentioned in sections below (with this method referred to as \textit{FairCal-GMM}).
+ 
+\subsection{Datasets}\label{sec:datasets}
+The authors used two datasets: the \textit{Balanced Faces in the Wild} (BFW) dataset \citep{robinson2020face} and \textit{Racial Faces in the Wild} (RFW) \citep{Wang2019ICCV}. Both datasets label their images by ethnicity (African, Asian, Caucasian or Indian) and BFW also labels by gender (Female, Male). In RFW, all image pairs are same-ethnicity images, while BFW includes both mixed-gender and mixed-ethnicity pairs. The authors report that RFW is made up of images from MS-Celeb-1M, and BFW is made up of images from VGGFace2. These were used to train the ArcFace and Facenet (VGGFace2) models respectively. Thus, the BFW dataset could only be used with the FaceNet (Webface) and ArcFace models, while RFW could only be used with the two FaceNet models, to ensure the models were tested on unseen examples.
+
+The MTCNN pipelines provided by \citep{facenetpytorch} (`Facenet-MTCNN') and \citep{arcface} (`Arcface-MTCNN') were used to preprocess images. After the Facenet-MTCNN pre-processing, there remained 23,903 image pairs for RFW dataset. The authors reported using 23,541 pairs, meaning we used 1.5\% more pairs. For the BFW dataset, 891,622 image pairs were available after Facenet-MTCNN pre-processing and 888,833 after Arcface-MTCNN, while the authors reported using 890,347 pairs, meaning we used 0.14\% more and 0.17\% fewer pairs respectively. For both datasets, we found the same approximate ratio of genuine/imposter pairs as the authors, namely 1:1 for RFW and 1:3 for BFW. The authors used folds given alongside each dataset to perform five-fold cross validation. 
+
+Since Salvador \textit{et al.} do not provide their implementation for the MTCNN pipeline, it is possible that our implementations differed, which led to the differing amount of images for each dataset. Thus, we cannot be sure that the pairs the authors used are included in our version and vice versa, meaning differences between results can occur. 
+
+The authors' code base refers to CSV files relating to each of the datasets, which provide essential information to replicate the author's experiments: namely, the pairing of images and their embeddings' cosine similarities. However, these files were not provided in the author's repository, nor were there instructions on how to find them. The paper's first author generously provided us with a format for each file during correspondence, which, combined with metadata available on the datasets themselves, allowed us to create compatible versions of these files. 
+
+\subsection{Hyperparameters}
+100 clusters were used for the K-means clustering, the same as Salvador \textit{et al.}, and for FairCal-GMM. In Appendix C, we show the results for varying amounts of clusters. Additionally, we use the default MTCNN hyperparameters specified in \citep{facenetpytorch} and \citep{arcface}.
+
+\subsection{Experimental setup and code}
+Our setup was based on existing code by Salvador \textit{et al.} in a GitHub repository \citep{faircalgithub}. We improved the experimental setup by making the code more efficient, primarily by using more efficient data structures. In the author's code, the time to run one experiment (i.e.\ one dataset for one model) using FairCal was approximately 2 hours. We were able to reduce this to around 54 seconds on average ($\approx$133x speedup). For the sake of reproducibility, we set the random seed to 42, since pseudo-random initialization was used for both K-means and GMM clustering. 
+
+\subsection{Computational requirements}
+The authors specify several approaches in their original paper in addition to FairCal. Most are computationally light and are thus able to run on a CPU in relatively little time. For the results provided in this paper, an AMD Ryzen 7 2700X CPU was used. To speed up the K-means and GMM algorithms, we used a GPU implementation \citep{pycave}, which was run on a NVIDIA GeForce GTX1080Ti. An additional benchmarking method, AGENDA (used in Table \ref{tab:AccAp}), requires the training of a multilayer perceptron, which was also done using the above GPU. The runtimes for the main experiments can be found in Table \ref{tab:runtimes}.
+
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{c c | cc | cc}
+\toprule
+&& \multicolumn{2}{c}{RFW} & \multicolumn{2}{c}{BFW} \\
+&& FaceNet (VGGFace2) & FaceNet (Webface) & FaceNet (Webface) & ArcFace \\  
+\hline
+\multirow{2}{5em}{Preprocessing} & Embeddings & 2237 & 2198 & 284 & 4085 \\
+& Cosine sims & 11 & 11 & 1 & 1 \\
+\hline
+\multirow{3}{5em}{Experiments} 
+& Baseline & 1 & 1 & 12 & 15 \\
+& FSN & 53& 47 & 45 & 47 \\
+& FairCal & 54 & 54 & 53 & 57 \\
+& FairCal-GMM & 247 & 108 & 68 & 576 \\
+\bottomrule
+    
+\end{tabular}
+\caption{The runtimes for the pre-processing of the dataset and the experiments in seconds. The row \textit{Embeddings} refers to the generation of image embeddings, and the row \textit{Cosine sims} refers calculating cosine similarities for all image embedding pairs.}
+\label{tab:runtimes}
+\end{table}
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Results reproducing original paper}
+\subsubsection{Claim 1 (\textcolor{Emerald}{\textbf{Accuracy}})}
+The first claim we aimed to reproduce was that FairCal achieves SOTA \textcolor{Emerald}{\textbf{accuracy}} for face verification on two large datasets. As can be seen in Table \ref{tab:AccMain}, we were able to reproduce most of the author's results regarding this over all datasets and models. Thus, we have successfully reproduced this claim. 
+
+
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{l l ll ll ll}
+\toprule
+&& \multicolumn{2}{c}{AUROC} & \multicolumn{2}{c}{TPR @ 0.1\% FPR} & \multicolumn{2}{c}{TPR @ 1\% FPR} \\
+RFW & &  Authors  &   Ours   & Authors &  Ours   & Authors & Ours \\
+\midrule
+\multirow{4}{4em}{FaceNet (VGGFace2)} 
+& Baseline    &  88.26$\pm$0.19 &  \green{89.97$\pm$0.58} &   18.42$\pm$1.28 &  \green{25.27$\pm$6.51} &  34.88$\pm$3.27 &  \green{39.92$\pm$2.40} \\
+& FSN         &  90.05$\pm$0.29 &  \green{91.30$\pm$0.35} &   23.01$\pm$2.00 &  \green{26.79$\pm$4.63} &   40.21$\pm$2.09 &  \green{44.52$\pm$2.91} \\
+& FairCal     &  90.58$\pm$0.29 &  \green{92.17$\pm$0.40} &   23.55$\pm$1.82 &  \green{26.93$\pm$5.23} &  41.88$\pm$1.99 & \green{ 49.68$\pm$2.40} \\
+& FairCal-GMM &           -- &  92.46$\pm$0.43 &            -- &  29.88$\pm$4.34 &           -- &  50.86$\pm$3.42 \\
+\hline
+\multirow{4}{4em}{FaceNet (Webface)} 
+& Baseline    &  83.95$\pm$0.22 &  \green{84.46$\pm$0.47} &   11.18$\pm$3.45 &  \green{11.14$\pm$5.34} &  26.04$\pm$2.11 &  \green{26.45$\pm$4.90} \\
+& FSN         &  85.84$\pm$0.34 &  \green{86.24$\pm$0.63} &   17.33$\pm$3.01 &  \green{17.98$\pm$5.74} &  32.90$\pm$1.03 &  \green{31.68$\pm$2.02} \\
+& FairCal     &  86.71$\pm$0.25 &  \green{86.97$\pm$0.72} &   20.64$\pm$3.09 &  \green{19.23$\pm$3.64} &  33.13$\pm$1.67 &  \green{33.82$\pm$4.55} \\
+& FairCal-GMM &           -- &  87.19$\pm$0.53 &            -- &  20.49$\pm$5.36 &           -- &  33.44$\pm$4.09 \\
+\\\midrule
+BFW & & & & & & \\
+\midrule
+\multirow{4}{4em}{FaceNet (Webface)} 
+& Baseline    &  96.06$\pm$0.16 &  \green{94.62$\pm$0.17 }&   33.61$\pm$2.10 &  \green{27.93$\pm$2.02} &  58.87$\pm$0.92 &  \green{52.79$\pm$1.74} \\
+& FSN         &  96.77$\pm$0.20 &  \green{94.84$\pm$0.22} &   47.11$\pm$1.23 &  37.87$\pm$0.98 &  69.92$\pm$1.01 &  59.86$\pm$1.23 \\
+& FairCal     &  96.90$\pm$0.17 & \green{ 95.67$\pm$0.13} &   46.74$\pm$1.49 &  \green{37.68$\pm$0.87} &  69.21$\pm$1.19 &  \green{60.21$\pm$1.09} \\
+& FairCal-GMM &           -- &  95.48$\pm$0.15 &            -- &  35.39$\pm$1.46 &           -- &  58.49$\pm$1.57 \\
+\hline
+\multirow{4}{4em}{ArcFace} 
+& Baseline    &  97.41$\pm$0.34 &  \green{97.34$\pm$0.36} &   86.27$\pm$1.09 &  \green{84.75$\pm$1.26 }&  90.11$\pm$0.87 &  \green{89.51$\pm$0.98} \\
+& FSN         &  97.35$\pm$0.33 &  \green{97.32$\pm$0.35} &   86.19$\pm$1.13 &  \green{84.77$\pm$1.20} &  90.06$\pm$0.84 &  \green{89.49$\pm$0.98} \\
+& FairCal     &  97.44$\pm$0.34 &  \green{97.37$\pm$0.35} &   86.28$\pm$1.24 &  \green{84.95$\pm$1.32 }&  90.14$\pm$0.86 & \green{89.55$\pm$1.01} \\
+& FairCal-GMM &           -- &  97.35$\pm$0.37 &            -- &  84.78$\pm$1.21 &           -- &  89.51$\pm$1.00 \\
+\bottomrule
+\end{tabular}
+\caption{Global \textcolor{Emerald}{\textbf{accuracy}} measured by AUROC, TPR at 0.1\% FPR threshold and TPR at 1\% FPR threshold. Higher is better. If we successfully reproduced a result, our result is colored green. Entries indicate mean $\pm$ 1 standard deviation over 5-fold validation.}
+\label{tab:AccMain}
+\end{table}
+
+\subsubsection{Claim 2 (\textcolor{Bittersweet}{\textbf{Fairness Calibration}})}
+Secondly, we aimed to reproduce the authors' claim that FairCal outputs SOTA fairness-calibrated probabilities without knowledge of the \textcolor{CornflowerBlue}{\textbf{sensitive attribute}}. The authors measure this by computing the Kolmogorov-Smirnov (KS) score per subgroup and comparing the mean KS across subgroups, the average absolute deviation from the mean (AAD), maximum absolute deviation from the mean (MAD) and standard deviation from the mean (STD). By construction, FairCal does not take into account the sensitive attribute. Our results can be seen in Table \ref{tab:FairCalMain}. We find these to be partly reproducible, due to the fact that we are able to reproduce the difference in mean KS between baseline and FairCal, but the authors find a larger difference than we do. Furthermore, the AAD, MAD and STD we attained are not consistently similar to the authors' results.
+
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{l l ll ll ll ll}
+\toprule
+&& \multicolumn{2}{c}{Mean} & \multicolumn{2}{c}{AAD} & \multicolumn{2}{c}{MAD} & \multicolumn{2}{c}{STD} \\
+RFW & &  Authors & Ours & Authors & Ours & Authors & Ours & Authors & Ours \\
+\midrule
+\multirow{3}{5em}{FaceNet (VGGFace2)} 
+& Baseline    &    6.37 & \green{ 6.29}  &    2.89 &  \green{2.60}  &    5.73 &  \green{5.10}  &    3.77 &  \green{3.84}  \\
+& FSN          &    1.43 &  3.67  &    0.35 &  0.59  &    0.57 &  1.07  &    0.40 &  0.79  \\
+& FairCal     &    1.37 &  \green{1.67}  &    0.28 &  \green{0.47}  &    0.50 &  \green{0.93}  &    0.34 &  \green{0.66}  \\
+& FairCal-GMM &     -- &  1.77  &     -- &  0.60  &     -- &  0.98  &     -- &  0.78  \\
+\hline
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    5.55 &  \green{5.55}  &    2.48 &  \green{2.31}  &    4.97 &  \green{4.60 } &    2.91 &  \green{3.34}  \\
+& FSN         &    2.49 &  3.90  &    0.84 &  0.54  &    1.19 &  1.05  &    0.91 &  0.75  \\
+& FairCal     &    1.75 &  \green{1.74}  &    0.41 &  \green{0.48}  &    0.64 &  \green{0.92}  &    0.45 &  \green{0.67}  \\
+& FairCal-GMM &     -- &  1.75  &     -- &  0.48  &     -- &  0.82  &     -- &  0.62  \\
+\midrule
+\\
+BFW & & &  &  &  &  &  &  &  \\
+\midrule
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    6.77 &  4.72  &    3.63 &  \green{2.83}  &    5.96 &  \green{7.62}  &    4.03 &  \green{3.50}  \\
+& FSN          &    2.76 &   3.45  &    1.38 &  \green{1.40}  &    2.67 &   4.60  &    1.60 &  \green{1.90}  \\
+& FairCal     &    3.09 &  \green{3.06}  &    1.34 &  \green{1.19}  &    2.48 &  \green{2.59}  &    1.55 &  \green{1.45}  \\
+& FairCal-GMM &     -- &  3.43  &     -- &  1.40  &     -- &  3.64  &     -- &  1.80  \\
+\hline
+\multirow{3}{5em}{ArcFace} 
+& Baseline    &    2.57 &  \green{2.17}  &    1.39 &  \green{1.24}  &    2.94 &  \green{3.30}  &    1.63 &  \green{1.57}  \\
+& FSN          &    2.65 &   \green{2.91}  &    1.45 &  \green{1.29}  &    3.23 &  4.26  &    1.71 &  \green{1.72}  \\
+& FairCal     &    2.49 &  \green{1.94}  &    1.30 &  \green{1.16}  &    2.68 &  \green{3.09}  &    1.52 &  \green{1.46}  \\
+& FairCal-GMM &     -- &  1.58  &     -- &  0.85  &     -- &  2.71  &     -- &  1.13  \\
+\bottomrule
+\end{tabular}
+\caption{\textcolor{Bittersweet}{\textbf{Fairness Calibration}} measured by KS score across sensitive subgroups. Measured by mean, the average absolute deviation from the mean (AAD), maximum absolute deviation from the mean(MAD) and standard deviation from the mean (STD). Lower is better in all cases. If we successfully reproduced a result, our result is colored green.}
+\label{tab:FairCalMain}
+\end{table}
+
+\subsubsection{Claim 3 (Gap in FPRs)}
+Thirdly, we aimed to reproduce the authors' claim that FairCal reduces the gap in FPRs across \textcolor{CornflowerBlue}{\textbf{sensitive attributes}} compared to the baseline method. The results can be seen in Figure \ref{fig:ViolPl} and Table \ref{tab:PredEqMain}. From this, we conclude that the authors' results are reproducible in most cases. We were able to decrease the gap in FPRs across \textcolor{CornflowerBlue}{\textbf{sensitive attributes}}, but not for all experiments and not as strongly as the authors' results show -- thus, we see the same trends despite having different absolute results.
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{images_and_figures/violin_plots.png}
+\caption{Illustration of bias in FPR rates globally and across subgroups, with the FaceNet (Webface) feature model. Plots from the original paper are in blue (their figure 2) and plots from the current paper are in green. \textcolor{Plum}{\textbf{False positives}} are indicated by imposter pairs above the decision threshold value (horizontal lines). Black horizontal lines indicate thresholds which achieve a global FPR of 5\%. Red horizontal lines indicate thresholds which achieve a FPR of 5\% for a specific subgroup. Greater distance of red horizontal lines from the black horizontal line indicates greater bias. This shows that the baseline method is biased. Furthermore, global calibration (based on cosine similarity alone) does not reduce the bias. Lastly, we see that the FairCal method reduces bias in both the original and the present paper.}
+\centering
+\label{fig:ViolPl}
+\end{figure}
+
+\begin{table}
+\footnotesize
+\centering
+\begin{tabular}{l l ll ll ll}
+% model | approach | aad (2) | mad (2) | std (2)
+\toprule
+\textbf{Global FPR: 1\%}\\
+&& \multicolumn{2}{c}{AAD} & \multicolumn{2}{c}{MAD} & \multicolumn{2}{c}{STD} \\
+RFW && Authors & Ours & Authors & Ours & Authors & Ours \\
+\midrule
+\multirow{3}{5em}{FaceNet (VGGFace2)} 
+& Baseline    &    0.68 &  \green{0.74}  &    1.02 &  \green{0.94}  &    0.74 &  0.90  \\
+& FSN         &    0.37 &  \green{0.42}  &    0.68 &  \green{0.77}  &    0.46 &  \green{0.58}  \\
+& FairCal     &    0.28 &  0.59  &    0.46 &  0.95  &    0.32 &  0.77  \\
+& FairCal-GMM &     -- &  0.44  &     -- &  0.74  &     -- &  0.59  \\
+\hline
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    0.67 &  \green{0.68}  &    1.23 &  \green{1.21 } &    0.79 &  \green{0.91}  \\
+& FSN         &    0.35 &  \green{0.33}  &    0.61 &  \green{0.58}  &    0.40 &  \green{0.45}  \\
+& FairCal     &    0.29 &  \green{0.33}  &    0.57 &  \green{0.53}  &    0.35 &  \green{0.44}  \\
+& FairCal-GMM &     -- &  0.32  &     -- &  0.62  &     -- &  0.47  \\
+\midrule
+BFW & & & & & & &  \\
+\midrule
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    2.42 &  \green{1.99}  &    7.48 &  \green{6.30}  &    3.22 &  \green{2.85}  \\
+& FSN         &    0.87 &  \green{0.72}  &    2.19 &  1.71  &    1.05 &  \green{0.96}  \\
+& FairCal     &    0.80 &  \green{0.60}  &    1.79 &  \green{1.52}  &    0.95 &  \green{0.81}  \\
+& FairCal-GMM &     -- &  0.66  &     -- &  1.54  &     -- &  0.89  \\
+\hline
+\multirow{3}{5em}{ArcFace} 
+& Baseline    &    0.72 &  \green{0.70}  &    1.51 &  \green{1.58}  &    0.85 &  \green{0.92}  \\
+& FSN         &    0.55 &  \green{0.60}  &    1.27 &  \green{1.45}  &    0.68 &  \green{0.80}  \\
+& FairCal     &    0.63 &  \green{0.62}  &    1.46 &  \green{1.34}  &    0.78 &  \green{0.80}  \\
+& FairCal-GMM &     -- &  0.70  &     -- &  1.54  &     -- &  0.91  \\
+\end{tabular}
+
+\begin{tabular}{l l ll ll ll}
+% model | approach | aad (2) | mad (2) | std (2)
+\toprule
+\textbf{Global FPR: 0.1\%}\\
+&& \multicolumn{2}{c}{AAD} & \multicolumn{2}{c}{MAD} & \multicolumn{2}{c}{STD} \\
+RFW && Authors & Ours & Authors & Ours & Authors & Ours \\
+\midrule
+\multirow{3}{5em}{FaceNet (VGGFace2)} 
+& Baseline    &    0.10 &  0.17  &    0.15 &  0.31  &    0.10 &  0.22  \\
+& FSN         &    0.10 &  0.19  &    0.18 &  0.29  &    0.11 &  0.24  \\
+& FairCal     &    0.09 &  0.18  &    0.14 &  0.33  &    0.10 &  0.24  \\
+& FairCal-GMM &     -- &  0.19  &     -- &  0.37  &     -- &  0.25  \\
+\hline
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    0.14 &  \green{0.14}  &    0.26 &  \green{0.27}  &    0.16 &  \green{0.19}  \\
+& FSN         &    0.11 &  0.16  &    0.23 &  \green{0.26}  &    0.23 &  \green{0.20}  \\
+& FairCal     &    0.09 &  0.17  &    0.16 &  0.23  &    0.10 &  0.21  \\
+& FairCal-GMM &     -- &  0.15  &     -- &  0.21  &     -- &  0.19  \\
+\midrule
+BFW & & & & & & &  \\
+\midrule
+\multirow{3}{5em}{FaceNet (Webface)} 
+& Baseline    &    0.29 &  \green{0.25}  &    1.00 &  \green{0.83}  &    0.40 &  \green{0.36}  \\
+& FSN         &    0.09 &  \green{0.09}  &    0.20 &  0.17  &    0.11 &  \green{0.11}  \\
+& FairCal     &    0.09 &  \green{0.08}  &    0.20 &  \green{0.19}  &    0.11 &  \green{0.10}  \\
+& FairCal-GMM &     -- &  0.10  &     -- &  0.28  &     -- &  0.14  \\
+\hline
+\multirow{3}{5em}{ArcFace} 
+& Baseline    &    0.12 &  \green{0.12}  &    0.30 &  \green{0.27}  &    0.15 &  \green{0.16}  \\
+& FSN         &    0.11 &  \green{0.11}  &    0.28 &  \green{0.23}  &    0.14 &  \green{0.14}  \\
+& FairCal     &    0.11 &  \green{0.10}  &    0.31 &  \green{0.24}  &    0.15 &  \green{0.13}  \\
+& FairCal-GMM &     -- &  0.13  &     -- &  0.27  &     -- &  0.16  \\
+\bottomrule
+\end{tabular}
+\caption{\textcolor{Plum}{\textbf{Predictive equality}}, measured by the deviation in subgroup FPRs in terms of average absolute Deviation (AAD), maximum absolute deviation (MAD), and standard deviation (STD). Lower is better in all cases. The top and bottom tables report results for a global FPR of 0.1\% and 1\% respectively. If we successfully reproduced a result, our result is colored green.}
+\label{tab:PredEqMain}
+\end{table}
+
+\subsection{Results beyond original paper}
+
+\subsubsection{Additional Result 1}
+As was described in section 3.4, we extended the original paper by using Gaussian mixture models (GMMs) instead of the K-means algorithm to cluster the image embeddings. These results can be found in Tables \ref{tab:AccMain}, \ref{tab:FairCalMain} and \ref{tab:PredEqMain}. Concerning \textcolor{Emerald}{\textbf{accuracy}}, FairCal-GMM achieves the same or even slightly higher results than FairCal, the KS score same or lower than FairCal, and comparable deviation in subgroup FPRs.
+
+\subsubsection{Additional Result 2}
+In their original paper, the authors compare the group FPRs for different values of global FPR. The authors claim that if these lines are closer together, it reflects better fairness (cf.\ figure 1 in Salvador \textit{et al.} \citep{2106.03761}). Thus, in a perfectly fair setting, the lines are identical. As such, \textit{un}fairness may be quantified by measuring the extent to which the lines differ. In an attempt to do so, we fitted a line using linear regression to all points in subgroup-data and calculated the sum of squared error residuals from each subgroup to the fitted line. These results can be seen in Figure \ref{fig:residuals}. Note that the points included in this analysis are limited to Global FPR $\leq0.1$, similarly to the authors. From this, we can see that FairCal brings improvements over the baseline, and performs comparably to FairCal-GMM. 
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{images_and_figures/fairness_plots.png}
+\caption{Illustration of quantified reduction in bias (improved fairness) measured by the FPRs evaluated on intra-ethnicity pairs on the RFW dataset with the FaceNet (Webface) feature model. The two leftmost plots are from the original paper (their figure 1) and the three rightmost plots are from the current paper. The best fit line for our experiments are indicated in black. Lines closer together indicate better fairness. Residual (SSE) values for the corresponding methods are: Baseline (0.499), FSN (0.037), FairCal (0.026), FairCal-GMM (0.019).}
+\centering
+\label{fig:residuals}
+\end{figure}
+
+\section{Discussion}
+
+\subsection{Discussion of the results}
+Overall, we found the authors' results to be mostly reproducible. While we largely saw the same patterns as the authors, we were unable to consistently reproduce their specific values. This is particularly remarkable for the baseline method, since it is deterministic. We verified this by using the embeddings \textit{we} generated and attained the same results for repeated runs of the baseline method for all datasets and models. As was explained in section 3.2, we believe that the discrepancy in image embeddings is also the primary basis for the differences in the results. 
+
+Additionally, since FairCal is non-deterministic due to using K-means (specifically in the initialization of cluster centroids), the authors may have had a very different initialization than we did. Thus, a future study may validate these results further by analysing several experiments with known seeds.
+
+We also find that GMM clustering is at least as good as using K-means, and in some cases, outperforms it. This fits well with the theoretical underpinning of GMMs, since they may produce more flexible, non-isotropic clusters. This also validates the underlying motivation of FairCal, which is that information about sensitive attributes is not required to have fair calibration, and that unsupervised clustering methods are a suitable replacement for sensitive attribute labels. However, the difference is usually under one standard deviation for each metric. Thus, more experimentation and analysis is required to confirm any additional improvement. We recommended this as a direction for further research.
+
+
+%gives a soft cluster assignment, meaning that the calibrated score for a pair of images can be calculated in a more fine-grained manner.
+
+
+
+
+\subsection{What was easy}
+We were very fortunate to be able to start with the author's implementation of the code, which required only minimal debugging. Once we had our datasets and embeddings in the correct format, we were able to run the code without issues. Additionally, though the RFW and BFW datasets are not freely available to the public, they are to researchers -- thus, contacting their authors allowed us to swiftly attain them. Furthermore, the authors' description of FairCal and how it implements fairness is very intuitive and clear in their paper. As a result, we were able to understand their methods without prior knowledge in the field of fairness in face verification.
+
+\subsection{What was difficult}
+There were mainly three difficulties: first, the environment that the authors provided with their code was not project-specific, contained conflicting dependencies, and assumed that the user had a specific operating system installed. Additionally, environments built from scratch often had issues with dependency conflicts depending on OS and hardware. Moreover, since the code expected the user to already possess files with image embeddings, several packages needed to generate them were not listed.
+
+Second, the pipeline of how to generate the image embeddings was not clear. For example, the authors report that they used an MTCNN for pre-processing; however, the Facenet-MTCNN repository has a different implementation from the one containing the Arcface-MTCNN. Thus, it was ambiguous which MTCNN was used for which model. 
+
+Third, the original authors' code was challenging to understand and optimize, especially since some of the functions or column names were renamed without adjusting downstream references. Fortunately, fixing these naming errors allowed us to run the code from start to end, albeit with a high runtime. We noted that some areas of the code could benefit from more efficient data structures, and the refactored code can be found in our repository.
+
+Finally, in our opinion, certain design decisions of the original authors need further verification, perhaps as future research directions. For example, though they do refer back to another paper's suggestions, it was not clear to us why 100 clusters should be the best performing specifically for FairCal. In addition, though KS scores are mentioned as a strong metric, others, such as ECE and Brier scores, may be more useful in different settings, and could provide insight into how these calibration methods work.
+
+\subsection{Communication with original authors}
+We emailed the first author of the paper twice. First at the beginning of our undertaking, they were enthusiastic about our attempt, and clarified a few initial doubts about their implementation, the embeddings, and missing files. As per the writing of this paper, they have not responded to the second email.

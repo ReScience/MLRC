@@ -1,0 +1,21 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+This paper aims to reproduce the study \textit{FairCal: Fairness Calibration for Face Verification} by Salvador \textit{et al.}\citep{2106.03761}, focused on verifying three main claims: FairCal (introduced by the authors) achieves state-of-the-art (i) global \textcolor{Emerald}{\textbf{accuracy}}, (ii) \textcolor{Bittersweet}{\textbf{fairness-calibrated}} probabilities and (iii) equality in \textcolor{Plum}{\textbf{false positive rates}} across sensitive attributes (i.e. \textcolor{Plum}{\textbf{predictive equality}}). The sensitive attribute taken into account is ethnicity.
+
+\subsubsection*{Methodology}
+Salvador \textit{et al}.\ provide partial code via a GitHub repository \citep{faircalgithub}. Additional code to generate image embeddings from three pretrained neural network models were based on \citep{facenetpytorch} and \citep{arcface}. All code was refactored to fit our needs, keeping extendability and readability in mind. Two datasets were used, namely, \textit{Balanced Faces in the Wild} (BFW) \citep{robinson2020face}
+and 
+\textit{Racial Faces in the Wild} (RFW) \citep{Wang2019ICCV}. Additional experiments using Gaussian mixture models instead of K-means clustering for FairCal validate the use of unsupervised clustering methods. The code was run on an AMD Ryzen 7 2700X CPU and NVIDIA GeForce GTX1080Ti GPU with a total runtime of around 3 hours for all experiments.
+
+\subsubsection*{Results}
+In most cases, we were able to reproduce results from the original paper to within 1 standard deviation, and observe similar trends. However, due to missing information about image pre-processing, we were unable to reproduce the results exactly.
+
+\subsubsection*{What was easy}
+The original paper is clear and understandable. Furthermore, the authors provided a mostly working version of the code. Though the datasets are not freely available to the public, their authors supplied these to us swiftly after contacting them.
+
+\subsubsection*{What was difficult}
+While most of the code worked with slight changes, it was assumed there were files containing image embeddings available for both datasets, which the authors neither provided nor gave details about. We therefore pre-processed and generated embeddings independent of the authors, which makes it more difficult to judge the overall reproducibility of their method. Additionally, we encountered difficulties while improving the efficiency and extendability of the code.
+
+\subsubsection*{Communication with original authors}
+We emailed the first author of the paper twice. First at the beginning of our undertaking, they were enthusiastic about our attempt, and clarified a few initial doubts about their implementation, the embeddings, and missing files. As per the writing of this paper, they have not responded to the second email.
