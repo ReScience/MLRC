@@ -1,0 +1,32 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+%}
+
+\subsubsection*{Scope of Reproducibility}
+
+This work studies the reproducibility of the paper "Label-Free Explainability for Unsupervised Models" by Crabb{\'e} and van der Schaar to validate their main claims. These state that: (1) their extension of linear feature importance methods to the label-free setting is able to extract the key attributes of the data, (2) the adaptation of example importance methods to the unsupervised setting succeeds in highlighting the most influential examples, (3) different pretext tasks do not produce interchangeable representations and (4) the interpretability of saliency maps is uncorrelated to the level of disentanglement between individual latent units. 
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+\subsubsection*{Methodology}
+
+The authors provided the code written in PyTorch needed to reproduce all the experiments. Some parts of the code were modified in order to extend the original experiments. The total computation time required to perform the original and extended versions of the experiments is 103 GPU hours. Most of the experiments were performed on NVIDIA TITAN RTX GPU.
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+The plots supporting the label-free feature and example importance match the ones from the paper, except for the label-free feature importance experiment for CIFAR-10. Similarly, the Pearson correlation results were successfully reproduced. Due to the nature of the autoencoders used for evaluation, we could not obtain the exact numerical results. However, we visually and numerically compare the trends, and in most cases, we observe that our results are similar to the ones in the paper.
+
+\subsubsection*{What was easy}
+
+The paper comes with publicly available code and an extensive appendix containing the setup for all experiments. With that, we were able to reproduce all the experiments with only minor changes to the code.
+
+\subsubsection*{What was difficult}
+
+ Despite the fact that running the original experiments was straightforward, extending them to new datasets or models was more challenging. Moreover, some of the experiments are more resource-consuming and require more time to run.
+
+\subsubsection*{Communication with original authors}
+
+We contacted the authors to resolve our concerns regarding some of the results. They were very helpful and answered all of our questions. Moreover, they provided us with a pre-trained SimCLR model. We used this model to validate our results.
