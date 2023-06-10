@@ -1,0 +1,153 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+#Title of the article:
+# - For a successful replication, it should be prefixed with "[Re]"
+# - For a failed replication, it should be prefixed with "[¬Re]"
+# - For other article types, no instruction (but please, not too long)
+title: "[Re] Masked Autoencoders Are Small Scale Vision Learners: A Reproduction Under Resource Constraints"
+
+# List of authors with name, orcid number, email, and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Athanasios Charisoudis
+    orcid: 0000-0003-4769-7813
+    email: thacha@kth.se
+    affiliations: 1,2
+
+  - name: Simon Ekman von Huth
+    orcid: 0000-0001-5905-6162
+    email: nomisevh@gmail.com
+    affiliations: 1,2,*
+
+  - name: Emil Jansson
+    orcid: 0009-0000-7695-3543
+    email: emijan@kth.se
+    affiliations: 1,2
+
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    School of EECS, KTH Royal Institute of Technology
+    address: Stockholm, Sweden
+
+  - code:    2
+    name:    Equal contributions
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, python, pytorch, machine learning, deep learning, computer vision, self-supervised learning, masked autoencoder, semantic, perceptual, reproduction, replication, reproducibility, image classification, small scale
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: "https://github.com/MLReproHub/SMAE"
+  - doi:
+  - swh: "swh:1:dir:4d37d466bafc5dc45bf5ba68caa53f207e6d0702"
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "K. He, X. Chen, S. Xie, Y. Li, P. Dollár, and R. Girshick. \"Masked autoencoders are scalable vision learners.\" In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2022, pp. 16000–16009" # Full textual citation
+ - url: "https://openaccess.thecvf.com/content/CVPR2022/papers/He_Masked_Autoencoders_Are_Scalable_Vision_Learners_CVPR_2022_paper.pdf" # URL to the PDF, try to link to a non-paywall version
+ - bib: # Bibtex key (if any) in your bibliography file
+ - doi: "10.1109/CVPR52688.2022.01553" # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "
+Scope of Reproducibility — The Masked Autoencoder (MAE) was recently proposed as a
+framework for efficient self‐supervised pre‐training in Computer Vision [1]. In this pa‐
+per, we attempt a replication of the MAE under significant computational constraints.
+Specifically, we target the claim that masking out a large part of the input image yields
+a nontrivial and meaningful self‐supervisory task, which allows training models that
+generalize well. We also present the Semantic Masked Autoencoder (SMAE), a novel yet
+simple extension of MAE which uses perceptual loss to improve encoder embeddings.
+
+Methodology — The datasets and backbones we rely on are significantly smaller than those
+used by [1]. Our main experiments are performed on Tiny ImageNet (TIN) [2] and trans‐
+fer learning is performed on a low‐resolution version of CUB‐200‐2011 [3]. We use a
+ViT‐Lite [4] as backbone. We also compare the MAE to DINO, an alternative frame‐
+work for self‐supervised learning [5]. The ViT, MAE, as well as perceptual loss were
+implemented from scratch, without consulting the original authors’ code. Our code is
+available at https://github.com/MLReproHub/SMAE. The computational budget for our
+reproduction and extension was approximately 150 GPU hours.
+
+Results — This paper successfully reproduces the claim that the MAE poses a nontrivial
+and meaningful self‐supervisory task. We show that models trained with this frame‐
+work generalize well to new datasets and conclude that the MAE is reproducible with
+exception for some hyperparameter choices. We also demonstrate that MAE performs
+well with smaller backbones and datasets. Finally, our results suggest that the SMAE
+extension improves the downstream classification accuracy of the MAE on CUB (+5 pp)
+when coupled with an appropriate masking strategy.
+
+What was easy — Given prior experience with a deep learning framework, re‐implementing
+the paper was relatively straightforward, with sufficient details given in the paper.
+
+What was difficult — We faced challenges implementing efficient patch shuffling and tun‐
+ing hyperparameters. The hyperparameter choices from [1] did not translate well to a
+smaller dataset and backbone.
+
+Communication with original authors — We have not had contact with the original authors."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: "https://openreview.net/forum?id=KXfjZPL5pqr"
+
+contributors:
+  - name:
+    orcid: 
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  November 1, 2018
+  - accepted:
+  - published: 
+
+# This information will be provided by the editor
+article:
+  - number: # Article number will be automatically assigned during publication
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  2

@@ -1,0 +1,45 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+%}
+
+\subsubsection*{Scope of Reproducibility}
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+The Masked Autoencoder (MAE) was recently proposed as a framework for efficient self-supervised pre-training in Computer Vision \cite{mae}. In this paper, we attempt a replication of the MAE under significant computational constraints. Specifically, we target the claim that masking out a large part of the input image yields a nontrivial and meaningful self-supervisory task, which allows training models that generalize well. We also present the Semantic Masked Autoencoder (SMAE), a novel yet simple extension of MAE which uses perceptual loss to improve encoder embeddings.
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+The datasets and backbones we rely on are significantly smaller than those used by \cite{mae}. Our main experiments are performed on Tiny ImageNet (TIN) \cite{tin} and transfer learning is performed on a low-resolution version of CUB-200-2011 \cite{cub}. We use a ViT-Lite \cite{hassani} as backbone. We also compare the MAE to DINO, an alternative framework for self-supervised learning \cite{dino}. The ViT, MAE, as well as perceptual loss were implemented from scratch, without consulting the original authors' code. Our code is available at \href{https://github.com/MLReproHub/SMAE}{https://github.com/MLReproHub/SMAE}. The computational budget for our reproduction and extension was approximately 150 GPU hours.
+
+\subsubsection*{Results}
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+This paper successfully reproduces the claim that the MAE poses a nontrivial and meaningful self-supervisory task. We show that models trained with this framework generalize well to new datasets and conclude that the MAE is reproducible with exception for some hyperparameter choices. We also demonstrate that MAE performs well with smaller backbones and datasets. Finally, our results suggest that the SMAE extension improves the downstream classification accuracy of the MAE on CUB (+5 pp) when coupled with an appropriate masking strategy.
+
+\subsubsection*{What was easy}
+
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+Given prior experience with a deep learning framework, re-implementing the paper was relatively straightforward, with sufficient details given in the paper.
+
+
+
+\subsubsection*{What was difficult}
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+% We temporarily struggled with the details of implementing random shuffling and unshuffling of patches correctly and efficiently. A significant amount of time was spent tuning hyperparameters, as the choices of \cite{mae} turned out not to be applicable to a smaller dataset and backbone.
+
+We faced challenges implementing efficient patch shuffling and tuning hyperparameters. The hyperparameter choices from \cite{mae} did not translate well to a smaller dataset and backbone.
+
+\subsubsection*{Communication with original authors}
+
+%Briefly describe how much contact you had with the original authors (if any).
+
+We have not had contact with the original authors.
