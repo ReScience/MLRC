@@ -1,0 +1,213 @@
+\section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+VAE~\cite{vae} is a generative model of $p_\theta(x,z)$ where $x$ is observed and $z$ is a latent variable designed to generate novel samples of $x$ given $z \sim p(z)$ using a \textit{decoder} $p_\theta(x|z)$, jointly learned with an \textit{encoder} $q_\phi(z|x)$ using an Evidence Lower Bound (ELBO) objective $\mathcal{L}$. The objective consists of the latent prior loss and reconstruction loss.
+
+The gap between the true data likelihood and ELBO is the divergence between the approximate encoder and the true posterior:
+\begin{align}
+\log p_\theta(x) - \mathcal{L}(\theta, \phi) = \mathbb{E}_{p_{d}}[D_{KL}(q_{\phi}(z|x)||p_{\theta}(z|x))]
+\end{align}
+
+Impressive reconstruction results with VAEs involve employing autoregression~\cite{Kingma2016ImprovedVI}, normalizing flows~\cite{JimenezRezende2015VariationalIW}, hierarchies of latent spaces~\cite{Vahdat2020NVAEAD} or explicitly balancing rate-distortion tradeoff \cite{bae2023multirate} to make this gap low.
+
+\paragraph{} \cite{shekhovtsov2022vae} focuses on studying $q_\phi$ and $p_\theta$ from the exponential family that includes continuous Gaussian and discrete Bernoulli distributions. The so-called \textit{consistent} set of VAEs that can model the posterior exactly under this assumption is shown to be quite restricted: these models need to be \textit{linear mappings of sufficient statistics} of observations and latents, regardless of how deep or complex encoder and decoder neural networks are.
+
+\paragraph{} When an encoder is factorized and cannot fully model the posterior, joint optimization using ELBO forces the decoder to adapt to the posterior at the expense of reconstruction quality. \cite{shekhovtsov2022vae} enables better understanding of VAE designs.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+\paragraph{}
+%
+We support the following claims with our experiments:
+
+\begin{itemize}
+    \item setting up the encoder with conditionally independent bit outputs causes approximation errors in a perfect decoder, as shown in Section \ref{sec:gmm} with a synthetic experiment;
+    \item same behavior is observed on image data: conditionally independent Gaussian encoder causes approximation errors in a decoder initialized by GAN pretraining, as shown in Section \ref{sec:celeba};
+    \item word counts are better than word frequencies in a Bernoulli VAE in a semantic hashing task, as shown in Section \ref{sec:bern}.
+\end{itemize}
+
+\section{Gaussian mixtures with factorized encoder}\label{sec:gmm}
+
+\subsection{Methodology}
+
+We study the choice of encoder output distribution on a toy problem. \cite{shekhovtsov2022vae} predicts achieving zero approximation error when the approximate posterior can exactly represent the true posterior. We induce a factorization in the posterior and expect approximation errors to arise.  We implement this experiment from scratch using PyTorch.
+
+
+\begin{figure}
+    \centering
+    \subfigure[]{\includegraphics[width=0.32\textwidth]{fig/gmm_ground_truth_tight.pdf}} 
+    \subfigure[]{\includegraphics[width=0.32\textwidth]{fig/gmm_pretrained_encoder_decision_tight.pdf}} 
+    \subfigure[]{\includegraphics[width=0.32\textwidth]{fig/gmm_drift_tight.pdf}}
+    \caption{Cluster assignments according to the posterior distributions:
+    \\ \makebox[4mm][s]{\hfill(a)} ground truth $p(z|x)$ computed using Bayes rule 
+    \\ \makebox[4mm][s]{\hfill(b)} approximate $q_\phi$ trained using ELBO with frozen $p_\theta$ \\
+    \makebox[4mm][s]{\hfill(c)} approximate $q_\phi$ trained using ELBO jointly with $p_\theta$}
+    \label{fig:fac}
+\end{figure}
+
+\subsubsection{Model description}
+
+Following~\cite{shekhovtsov2022vae}, we define a ground truth decoder $p^*(x, z) = p^*(z)p^*(x|z)$ to be a mixture of four 2D Gaussians, where $x \in \mathbb{R}^2, z\in\{1, 2, 3, 4\}$, $p^*(z) = 0.25$, and $p^*(x|z) = \mathcal{N}(x|\mu_\theta(z), \sigma^2I)$.
+
+\paragraph{} Our decoder parameters are a single linear layer $\theta: \mathbb{R}^{4} \to \mathbb{R}^{2}$. Given a latent $z$ represented using one hot encoding $\theta$ computes a mean parameter: $\mu_\theta(z) = \theta{}z$.  Columns of $\theta$ are set to $(-1,0), (0,0),$ $(1,1), (1,-1)$. We guess these values by looking at cluster centers of Figure 2 in \cite{shekhovtsov2022vae}. Computed mean and fixed identity covariance scaled by $\sigma = 0.01$ determine the normal distribution that is used to evaluate log probability of $x$.
+
+\paragraph{} Our encoder is defined as $q_\phi(z|x) \propto \exp \langle g_\phi(x), z_b \rangle$, where $\langle \cdot, \cdot \rangle$ is a dot product. We implement $g_\phi$ as a network with three randomly initialized linear layers with input dimension 2, hidden dimensions of 64, and output dimension of 2. Every layer except the output uses ReLU activation functions. We rely on default PyTorch initialization.
+
+\paragraph{} $z_b \in \{0, 1\}^2$ is a random variable that can be viewed as a string of two bits. To compute $q_\phi(z|x)$, we evaluate $g_\phi(x)$ once and compute inner products of its output with each possible value of $z_b = [0, 0], [0, 1],$ $[1, 0], [1, 1]$ and apply the $\operatorname{softmax}$ function computes $\exp$ and normalizes, making the output a proper probability distribution. In this computation each bit of $z_b$ is considered independently, making the approximate posterior distribution \textit{factorized}. The factorization is chosen to demonstrate how preventing the encoder from exactly modeling the posterior causes approximation errors in the decoder.
+
+\subsubsection{Dataset}
+We make our training set $x$ by sampling $2000$ points from the ground truth decoder $g_\phi$ after setting the random seed to 0. To sample we choose a value of $z$ and then choose a point from a univariate normal distribution given $z$.
+
+% The true posterior distribution of $p^*(z|x)$ is represented by 4 different colors on Figure \ref{fig:trueposterior}.
+
+\subsubsection{Experimental setup}
+
+We train the encoder by minimizing negative ELBO keeping the decoder frozen for 10000 steps. We use Adam with a learning rate of 1e-3. Finally, we unfreeze the decoder and train both modules jointly for 10000 steps. We perform full batch training.
+
+\paragraph{} To calculate the reconstruction loss part of ELBO, we evaluate expectation  $$\mathbb{E}_{q_{\phi}}\log p_{\theta}(x|z) = \sum_i q_\phi(z_i|x) \log p_\theta(x|z = z_i)$$ exactly, running the decoder forward once for every possible $z$.
+
+\paragraph{} It takes under 10 minutes to run all experiments on a laptop CPU.
+
+\subsection{Results}
+\label{sec:gmmresults}
+
+After training the encoder alone, we achieve ELBO of $-3.37$. After training encoder and decoder jointly we observed a large improvement of ELBO to $-3.31$, however the clusters' geometric structure as shown in Figure \ref{fig:fac} (c) is completely destroyed. In the original paper the ELBO value after first frozen decoder training is $-3.74$ and improves to $-3.70$. The relative behavior of the values is the same, however the overall likelihood is impacted by different choice of ground truth cluster center locations: perturbing their relative positions causes small changes in likelihoods. Changing $\sigma$ significantly impacts the scale of the values.
+
+\paragraph{} The factorization assumption in the encoder prevents our VAE from being consistent.
+
+\subsubsection{Restoring consistency of this VAE}
+
+A consistent VAE \cite{shekhovtsov2022vae} for exponential family distributions allows the encoder to model the posterior exactly. We get rid of the factorization to output all four sufficient statistics of $z$. We simplify the encoder network to have a single linear layer with input dimension $2$ and output dimension $4$ and use the $\operatorname{softmax}$ activation function in the output.
+
+\section{DCGAN turned Gaussian VAE on CelebA}\label{sec:celeba}
+
+\subsection{Methodology}
+In this experiment, we train a ground truth decoder as a GAN \cite{gan}. Then, we pretrain the encoder using conditional likelihood. Next, we reinterpret GAN generator as the decoder and then train both components jointly using ELBO. We compare FID score \cite{ganfid} before and after joint training to detect approximation errors.
+
+We use the code of \cite{Inkawhich} to implement DCGAN~\cite{dcgan}. We use the authors' code for conditional likelihood training of the encoder and joint fine-tuning.
+
+\subsubsection{Model description}
+We designate a trained DCGAN $g_\theta: \mathbb{R}^{100} \to \mathbb{R}^{64\times{}64\times{}3}$ to be ground truth decoder, making it probabilistic by adding Gaussian noise: $z \sim \mathcal{N}(0 \in \mathbb{R}^{100}, I), x \sim \mathcal{N}(g_\theta(z), \sigma^2I)$, $\sigma = 0.05$. We use an architecture similar to DCGAN as the encoder: transposed convolutions are replaced with convolutions, and ReLU activation is replaced with leaky ReLU with slope 0.2.
+
+\subsubsection{Dataset}
+We use an aligned and cropped version of the CelebA dataset. It contains 202,599 face images of 10,177 celebrity identities~\cite{liu2015faceattributes}.
+
+\subsubsection{Experimental setup}
+To train a ground truth decoder as a DCGAN, we follow hyperparameters from~\cite{Inkawhich}, training with an epoch limit of 100 epochs. We select a checkpoint from one epoch before mode collapse, inspired by \cite{brock2019large}.
+
+\paragraph{} Next, we train the encoder: we sample $z$, generate $x$ given $z$, use the encoder to predict parameters $\mu$ and $\sigma$ given $x$ and maximize $\mathcal{N}(z | \mu, \sigma)$ using Adam optimizer with a learning rate of 2e‐4 for 1e6 iterations. After training we compute FID between 2e5 images generated from the ground truth decoder and re-decoded images after encoding them.
+
+\paragraph{} Next, we jointly update both modules with ELBO using Adam with a learning rate of 2e‐4 for another 1e6 iterations. After joint training we compute FID between same ground truth and re-decoded images from new models.
+
+\subsubsection{Computational requirements}
+Pretraining of the decoder as a GAN takes about 5 hours. Training the encoder takes about 1 hour. Joint training takes about 3 hours. All experiments are performed on A100 40GiB GPUs.
+
+\subsection{Results}
+We report results in Table \ref{tab:gan}: we see ELBO improve after joint training. However this happens at the cost of introducing approximation errors: we observe significant degradation of FID.
+
+\paragraph{} Why does \textit{ELBO go up, but FID goes down}? Optimization of ELBO harms a good image decoder to accommodate the parameters of approximate posterior. \cite{shekhovtsov2022vae} argue that a Gaussian latent variable model is not expressive enough to generate realistic images.
+
+\cite{shekhovtsov2022vae} additionally performs experiments where $\sigma$ is a learned parameter which we choose to leave out for simplicity.
+
+\begin{table}[H]
+\caption{CelebA results}
+\label{tab:gan}
+\centering
+\begin{tabular}{lrr}
+\hline
+%\multicolumn{3}{l}{Experiment}  & \multicolumn{3}{l}{ELBO}        & \multicolumn{3}{l}{FID}        \\ \hline
+Experiment & ELBO$\uparrow$ & FID$\downarrow$ \\
+\hline
+trained encoder, frozen decoder & -19072.746 & 1.311\\ 
+joint training & 5137.171 & 71.852\\
+\hline
+\end{tabular}
+\end{table}
+
+% \begin{figure}[H]
+%     \begin{center}
+%     \includegraphics[width=0.8\textwidth]{fig/elbo.png}
+%     \caption{The Elbo of joint training}
+%     \label{fig:spectral_layout}
+%     \end{center}
+% \end{figure}
+
+\section{Semantic hashing on 20 Newsgroups}\label{sec:bern}
+
+\subsection{Methodology}
+
+We investigate a Bernoulli VAE for the semantic hashing task. In this task, we aim to learn an encoder that maps our document to binary codes comparable using Hamming distance. We compare the performance of term frequencies as features in~\cite{Chaidaroon2017VariationalDS} to term counts suggested in~\cite{shekhovtsov2022vae}.
+
+We first become acquainted with the experiment by running the code provided by the author. One experiment for one set of hyperparameters runs for about 30 minutes on one GPU. The whole set of experiments takes about 16 GPU hours in total. Next, we study the author's code by reimplementing it and improving results as described in Section \ref{sec:disarm}.
+
+\subsubsection{Dataset}
+We use a preprocessed 20 Newsgroups dataset~\cite{20ng}. The vocabulary is restricted to 10000 most common words. Each document is represented as a vector of smoothed word counts. The training set contains 11269 documents, and a test set contains 7505 documents. We do not use text categories.
+
+\subsubsection{Model description}
+
+The encoder takes a vector of $10000$ word counts as input and passes them through one linear layer with output dimension $b$, representing logits of $b$ Bernoulli variables. The decoder takes $b$ binary digits as input and passes them through $d$ hidden layers with hidden dimension 512 and output dimension matching vocabulary size. The final activation of the decoder is $\log$ of $\operatorname{softmax}$.
+
+\subsubsection{Gradient estimation for Bernoulli variables}\label{sec:disarm}
+
+Evaluation of ELBO involves estimating the decoder likelihood over the approximate posterior distribution. In discrete settings, implementations resort to Monte Carlo sampling. A commonly used method for gradient estimation of discrete variables is the REINFORCE algorithm~\cite{reinforce}. This estimator is unbiased and has high variance. Reducing variance involves taking many samples, trading variance for bias~\cite{Shekhovtsov2021BiasVarianceTI}, and sample augmentation.
+
+ARM~\cite{arm} re-parametrizes Bernoulli variables using a continuous Logistic distribution and evaluates them in antithetic pairs $(\epsilon, -\epsilon)$, benefiting from augmentation. DisARM~\cite{disarm} improves upon ARM by observing that Logistic reparametrization comes at the cost of increasing variance on its own and integrates continuous variables out using a conditioning technique. We implement DisARM method in our experiments.
+
+\subsubsection{Experimental Setup}
+
+We use a seed of 1, Adam with a learning rate of 1e-3 and a batch size of 256. We train the model for 1000 epochs estimating ELBO using an antithetic gradient estimator. We're additionally computing ELBO without augmentations to estimate training and test losses. Next, we train the model for 500 more epochs, averaging the loss over 10 backward passes for further gradient variance reduction.
+
+\paragraph{} We sweep over the following hyperparameters: varying latent dimension $b = 8, 16,$ $ 32, 64$, varying decoder hidden layer count $d = 0, 1, 2$. We use three following encoder designs. We refer to models with word counts as features as configuration \texttt{e1}. We convert word counts to word frequencies and add an extra hidden layer of dimension 512 to the encoder in configuration \texttt{e2}. We use word frequencies without extra hidden layers in configuration \texttt{e3}.
+
+\begin{table}[]
+\caption{Train Negative ELBO (lower is better)}
+\label{tab:train}
+\centering
+\begin{tabular}{llllllllll}
+\hline
+   & \multicolumn{3}{l}{d=0}  & \multicolumn{3}{l}{d=1}        & \multicolumn{3}{l}{d=2}        \\ \hline
+b  & e1           & e2  & e3  & e1                 & e2  & e3  & e1                 & e2  & e3  \\ \hline
+8  & \textbf{406} & 419 & 432 & {\ul \textbf{325}} & 382 & 407 & {\ul \textbf{325}} & 363 & 415 \\
+16 & \textbf{372} & 383 & 418 & \textbf{191}       & 298 & 397 & {\ul \textbf{169}} & 287 & 406 \\
+32 & \textbf{332} & 343 & 409 & \textbf{153}       & 181 & 391 & {\ul \textbf{118}} & 170 & 405 \\
+64 & \textbf{288} & 304 & 405 & \textbf{151}       & 174 & 391 & {\ul \textbf{122}} & 165 & 401 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\caption{Test Negative ELBO (lower is better). All tests use DisARM gradient estimator. For the best overall configuration (no hidden decoder layers, word counts as features, no hidden encoder layers, 64 latent outputs) we repeat the column from the original paper for comparison. The column is labeled ``ARM'' for the used gradient estimator.}
+\label{tab:test}
+\centering
+\begin{tabular}{lrlrrrrrrrr}
+\hline
+   & \multicolumn{1}{l}{d=0} &              & \multicolumn{1}{l}{}   & \multicolumn{1}{l}{}  & \multicolumn{3}{l}{d=1}                                                  & \multicolumn{3}{l}{d=2}                                                  \\ \hline
+b  & \multicolumn{1}{l}{e1}  & ARM      & \multicolumn{1}{l}{e2} & \multicolumn{1}{l}{e3} & \multicolumn{1}{l}{e1} & \multicolumn{1}{l}{e2} & \multicolumn{1}{l}{e3} & \multicolumn{1}{l}{e1} & \multicolumn{1}{l}{e2} & \multicolumn{1}{l}{e3} \\ \hline 
+8  & \textbf{423}            & \textbf{423} & 444                    & 439                    & {\ul \textbf{413}}     & 453                    & 427                    & \textbf{419}           & 431                    & 431                    \\
+16 & \textbf{409}            & \textbf{409} & 451                    & 430                    & {\ul \textbf{403}}     & 466                    & 431                    & \textbf{408}           & 448                    & 441                    \\
+32 & {\textbf{397}}      & {\ul \textbf{396}}          & 439                    & 433                    & {\ul \textbf{396}}           & 454                    & 455                    & \textbf{402}           & 466                    & 473                    \\
+64 & {\ul \textbf{387}}      & 392          & 460                    & 467                    & \textbf{393}           & 486                    & 481                    & \textbf{401}           & 484                    & 478                    \\ \hline 
+\end{tabular}
+\end{table}
+
+
+\subsection{Results}
+\label{sec:results}
+
+Configurations with word counts as features consistently achieve lower negative ELBO, as shown in Tables \ref{tab:train} and \ref{tab:test}.
+
+\paragraph{} We also note that best test results are achieved very early in training and low negative ELBO values in Table \ref{tab:train} correspond to final epochs: there is a significant gap in ELBO values between test and train sets. In accordance with the experiment protocol of \cite{shekhovtsov2022vae}, we keep track of all test ELBOs over time and choose the minimum to report, so it would be fair to consider this test set as development.
+
+\paragraph{} In our implementation, we use DisARM to estimate gradients and see that its variance reduction additionally improves the best configuration performance by $5$ nats over results reported in \cite{shekhovtsov2022vae}, as shown in Table \ref{tab:test}. We report only one column for brevity and refer readers to the original paper for side-by-side comparison.
+
+\section{Conclusion}
+
+We focused on the most fundamental examples of the exponential family models: continuous Gaussian and a discrete Bernoulli and observed the importance . The original paper provides a general framework to analyze more complex distributions that fall into exponential family, like Markov Random Fields, which we would like to explore in the future.
+
+\section{Acknowledgements}
+
+We would like to thank paper authors Alexander Shekhovtsov for discussing the paper and suggesting to try DisARM, and Dmitrij Schlesinger for feedback and encouraging us to implement experiments on our own.
+
+We would like to thank Cesare Alippi, Andrea Cini and Ivan Marisca for enabling this work as part of Advanced Topics in Machine Learning course in USI. We want to thank Anthony Bugatto for the discussions on the paper.
+
+We would like to thank anonymous reviewers for providing invaluable feedback on the paper.
