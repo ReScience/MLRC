@@ -1,0 +1,72 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+% good
+This work aims to reproduce the findings of the paper “CrossWalk: Fairness-enhanced Node Representation Learning” \cite{crosswalk} by investigating the two main claims made by the authors about CrossWalk, which suggest that (i) CrossWalk enhances fairness in three graph algorithms, while only suffering from small decreases in performance, and that (ii) CrossWalk preserves the necessary structural properties of the graph while reducing disparity. \vspace{-1mm}
+
+%bringing peripheral nodes towards neighbouring nodes from other groups in the embedding space. 
+
+
+\subsubsection*{Methodology}
+% shorten
+% remove cpu stuff
+% describe what we did etc
+% The code provided by \citet{crosswalk} must be used and modified for easy replication of CrossWalk's findings. The required resources are a CPU, GPU and 40GB disk space. The CPU is used for latent representation generation and the GPU is used only for influence maximization in experiments that involve an adversarial auto-encoder. All other processes run on CPU have a total runtime of roughly 80 hours.
+The authors made the CrossWalk repository available, which contained most of the datasets used for their experimentation, and the scripts needed to run the experiments. However, the codebase lacked documentation and was missing logic for running all experiments and visualizing the results. We, therefore, re-implement their code from scratch and deploy it as a python package which can be run to obtain all the showcased results. \vspace{-1mm}
+
+
+% Also used GPU for influence maximization autoencoder (cuda)
+% embeddings, walks, datasets, train-test sets for link prediction -- disk space
+% 80 hours runtime on AMD Ryzen 7 5800H 16 cores
+    % incl greedy alg for influence maximization
+% storage: 30-40 gb
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+\subsubsection*{Results}
+Our work suggests that the first claim of the paper, which states that Crosswalk minimizes disparity and thus enhances fairness is partially reproducible, and only for the tasks of Node classification and Influence maximization as the parameters specified in the paper do not always yield similar results. Then, the second claim of the paper which states that Crosswalk attains the necessary structural properties of the graph is fully reproducible through our experiments. \vspace{-1mm}
+
+
+% However, we found certain
+% 16 experiments that were not directly reproducible due to either inconsistency between the paper and code, or incomplete
+% 17 specification of the necessary hyperparameters. Further, we were unable to reproduce a subset of experiments on a
+% 18 large-scale dataset due to resource constraints, for which we compensate by performing those on a smaller version of
+% 19 the same dataset with our results supporting the general performance trend.
+
+% The results validate that CrossWalk is successful in enhancing fairness for node classification and influence maximization. Compared to standard DeepWalk, however, CrossWalk did not enhance fairness for the task of link prediction. Furthermore, the results show that CrossWalk is able to preserve the necessary structural properties of the graph while bringing peripheral nodes towards neighbouring nodes from other groups in the embedding space, as claimed in the original paper.
+
+% influence maximization
+%The task of influence maximization delivered total influence percentages similar to those reported in the paper for all datasets. The disparity values differed significantly. All disparity values obtained for influence maximization were multiple orders of magnitude larger than in the original paper \cite{crosswalk}.  
+
+% Node classification
+%The total accuracies obtained for node classification were similar. The disparity values obtained however are much larger for all algorithms tested on the Rice-Facebook dataset. CrossWalk displayed the highest disparity value, and DeepWalk \cite{deepwalk} the lowest. This was opposite to the results in the original paper \cite{crosswalk}.
+
+% link prediction
+%The results obtained for link prediction generally displayed accuracies close to that of the original paper. For the Rice-Facebook dataset, all accuracies were within 5\% of those of the original paper. For the Twitter dataset, the accuracies were within 2\% of those of the original paper. The disparity values for both datasets differed significantly, however, compared to those in the original paper. For the Rice-Facebook dataset, all disparity values were less than 50\% of those of the original paper. Additionally, the disparity of CrossWalk was equal to that of FairWalk and about 2\% higher compared to the original paper, where CrossWalk had a significantly lower disparity. The Twitter dataset disparity values were significantly lower than those of the original paper. Contrary to the original paper, DeepWalk had the lowest disparity, and CrossWalk had the highest disparity. The disparity values for all algorithms were less than 50\% of those in the original paper, differing by at least 20 and at most 70.
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsubsection*{What was easy}
+% overall pipeline not clear and easy to understand
+% general intuition behind CrossWalk was easy to understand through the paper
+The original paper contained the necessary information about hyperparameters, which coupled with the publicly available repository made it straightforward to refactor the code and understand the idea of the proposed method. \vspace{-1mm}
+
+
+% The GitHub repository included the various datasets covered in the original paper. CrossWalk has been implemented in the DeepWalk code as a random walk, making CrossWalk easy to utilize for those familiar with DeepWalk.
+
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+%% Andre ! So the summary should be at max one page long! you hafta cut sum parts to make it a bit shorter
+
+\subsubsection*{What was difficult}
+% clean up --> shorten
+The difficulty stems from the lack of structure and documentation in the provided code which made the original experiments hard to reproduce. Furthermore, there were missing files in the provided datasets. Also, some experiments were not reproducible at all through the provided code. One more important aspect is that the experiments are CPU intensive which made the reproducibility even harder. \vspace{-1mm}
+
+%The code is very ambiguous, with many unused parameters. Many of the comments left in the code were for old variables. There were little to no comments describing the processes occurring within the code, requiring extra time to understand and debug. 
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsubsection*{Communication with original authors}
+Albeit rather late, the authors provided meaningful feedback on our questions about implementation details and initial results.
