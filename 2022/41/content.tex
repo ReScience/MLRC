@@ -1,0 +1,459 @@
+\section{Introduction}
+Graph Neural Networks (GNN) achieve increasingly better results in the three main tasks regarding graphs: node classification, graph classification and link prediction.
+However, the lack of interpretability of machine learning models is a barrier hindering their adoption \cite{Molnar19}.
+Therefore, a post-hoc explanation algorithm for GNNs would be desirable.
+There already exist some techniques for explaining black-box GNNs, which mainly focus on explanations by edge- or feature masks, for example GNNExplainer \cite{Ying19}.
+
+Empirical studies already showed that an explanation by a subgraph is more interpretable to humans than a soft edge- or feature mask \cite{Yuan2021b}. 
+Therefore, Yuan et al.\ \cite{Yuan21} proposed an algorithm named SubgraphX for explaining a GNN by the most important subgraph of the graph instance.
+To briefly outline the SubgraphX algorithm:
+\begin{enumerate}
+    \item 
+    Start with the full graph instance if the GNN performs graph classification.
+    In the case of node/edge classification, one can prune all nodes and edges outside of the receptive field of the GNN for efficiency reasons.
+    Therefore, start with the subgraph containing the $k$-hop neighborhood around the target node/edge.
+    $k$ denotes the number of layers of the respective GNN model.
+    % Start with the subgraph containing the $k$-hop neighborhood around the node/edge, whose prediction is to be explained (target node/edge). $k$ denotes the number of layers of the respective GNN model. 
+    % Therefore, the subgraph contains the receptive field of the model.
+    % In case of a graph classification task, use the full graph.
+    
+    \item 
+    Perform Monte-Carlo Tree Search (MCTS) \cite{remi07} with the subgraph identified in step one as root node. 
+    Children nodes are subgraphs where a single node was removed from the parent subgraph. 
+    Leaf nodes are subgraphs whose sizes are smaller than a constant threshold $N_{min}$. 
+    The score of a node during search is determined by the Upper Confidence Bound (UCB) regarding the Shapley Value \cite{shapley53} of its subgraph. 
+    More details about the Upper Confidence Bound are discussed in subsection \ref{subsec:greedy}.
+    The Shapley Value is approximated by Monte-Carlo sampling.
+    Repeat this step for $M$ iterations.
+    
+    \item
+    Output the best leaf node found by MCTS.
+\end{enumerate}
+
+During MCTS, if the removal of a node splits the subgraph in multiple connected components, only the component including target node/edge is kept. 
+In graph classification, there exists no target node/edge and therefore only the largest component is kept. 
+The Shapley Value of a subgraph $E \subseteq G$ (approximated by Monte-Carlo sampling) is computed as:
+
+\begin{align}
+\phi(E) &= \frac{1}{T} \sum_{t=1}^{T} f(S_t \cup E)_{y} - f(S_t)_{y}, \quad S_t \subseteq (G \setminus E)
+\end{align}
+where $f(\cdot)_y$ is the model output for class $y$ and $T$ is the number of Monte-Carlo sampling steps. 
+The coalitions $S_t$ are sampled randomly. 
+All nodes, which are not considered in the current sampling step, are excluded from the model input by setting their attributes to a baseline of zero.
+
+The authors also propose MCTS\_GNN, a faster variant of SubgraphX. MCTS\_GNN determines the score of a subgraph $E$ by the model prediction for that subgraph. This is equivalent to an approximated Shapley Value with just the empty coalition $S_t = \emptyset$ (sampling size $T = 1$):
+\begin{align}
+\text{MCTS\_GNN}(E) &= f(E) - f(\emptyset) \approx f(E).
+\end{align}
+The term $f(\emptyset)$ is the same for all subgraphs and therefore can be omitted in the computation of Monte-Carlo Tree Search.
+
+\section{Scope of Reproducibility}
+\label{sec:claims}
+As part of the ML Reproducibility Challenge we reimplemented SubgraphX using the PyTorch-Geometric library \cite{fey19}. Then, we replicated the experiments performed by the authors on a smaller scale, using a subset of the original datasets. The central claims of Yuan et al.\ \cite{Yuan21} regarding SubgraphX are the following:
+\begin{itemize}
+    \item SubgraphX achieves higher fidelity scores than the GNNExplainer for graph- and node classification tasks.
+    \item The computation time of SubgraphX is at a "reasonable level" in comparison to GNNExplainer. To specify this exactly, we consider a "reasonable level" to be up to a factor of ten. In other words, the computation of SubgraphX should be at most ten times slower than GNNExplainer.
+\end{itemize}
+
+Note that in the original paper the authors also consider PGExplainer \cite{luo20} for comparison. We excluded PGExplainer in our experiments as its implementation would exceed any reasonable effort for a student project. 
+In addition to the two main claims, we tested the sensitivity of SubgraphX to its hyperparameters. 
+Next, we tested the transferability of the algorithm to a new datasets. 
+Lastly, we empirically tested two novel optimizations to the SubgraphX algorithm. 
+These novel optimizations improve the runtime drastically while scoring a higher fidelity than the original algorithm.
+
+
+
+\section{Methodology}
+Even though Yuan et al. \cite{Yuan21} performed experiments on five different datasets, we focused only on the MUTAG dataset \cite{Debnath1991} due to our limited resources. We chose the MUTAG dataset for two reasons:
+
+\begin{itemize}
+\item The number of graphs (188) and the size of the graphs (${\approx}18$ nodes) is small enough for training a GNN model and computing the explanation with limited resources.
+\item The paper considered two different GNN models for this dataset, namely a Graph Convolutional Network (GCN) and a Graph Isomorphism Network (GIN), hence in using this dataset we 'kill two birds with one stone'.
+\end{itemize}
+
+We trained both models on an $80\%$ training split (i.e.\ 150 graphs) and used the remaining 38 graphs as the test set. 
+The structure of the models is the same as described in the appendix of the original paper \cite{Yuan21}. 
+Both models achieved a test accuracy of around 92\%.
+Note that in the original paper the authors tested the the explanation performance on all 188 graphs, but this would take too long on our hardware.
+Therefore, we decided to use the 38 graphs of the test set. 
+Unless specified otherwise, our calculations were performed on a computer with an AMD Ryzen 9 3900 12-Core processor and a NVIDIA GeForce RTX 2080 Super GPU.
+
+Like Yuan et al. \cite{Yuan21}, we measure the performance of an explanation by the fidelity metric, i.e. the decrease in model confidence when removing the nodes in the explanation. As this is highly dependent on the number of nodes in the explanation, the results are plotted as fidelity versus sparsity curves. Fidelity and sparsity are computed as:
+
+\begin{align}
+\mathit{Fidelity} &= \frac{1}{N} \sum_{i=1}^{N} f(G_i)_{y_i} - f(G_i \setminus E_i)_{y_i}, \\
+\mathit{Sparsity} &= \frac{1}{N} \sum_{i=1}^{N} (1 - \frac{|E_i|}{|G_i|}).
+\end{align}
+
+where $N$ is the number of instances (graphs, nodes or edges depending on the task at hand). 
+$G_i$ is the graph corresponding to a single of those instances. 
+$G_i \setminus E_i$ denotes the graph, where the features of nodes contained in the explanation set $E_i$ are set to zero.
+The class $y_i$ is the prediction of the model on the original graph $G_i$.
+
+For GNNExplainer, we used the implementation available in the PyTorch-Geometric library \cite{fey19}. 
+Even though SubgraphX is available as part of the DIG library, we chose to reimplement it using the PyTorch-Framework. 
+That is, because the DIG-library is currently not compatible with some of the newer version of PyTorch and PyTorch-Geometric. 
+Additionally, this gave us the opportunity to extend the original implementation with further algorithmic optimizations (see Section \ref{sec:improvements}). 
+Our implementation is publicly available at \url{https://github.com/ymahlau/subgraphx}.
+
+
+
+
+\section{Replication}
+\label{sec:replication}
+\subsection{Performance Study}
+For each explanation method, each graph in the test set and each explanation size $N_{min} \in \{4,\dots,12\}$  we collected sparsity, fidelity and execution time for the respective explanation node set.
+Then for each size $N_{min}$ we calculated the average sparsity and fidelity of all explanations. 
+The results are reported in Figure \ref{fig:mutag_result}. 
+It is clearly visible that SubgraphX outperforms both GNNExplainer and MCTS\_GNN in both experiments. 
+The difference is most prominent for GCN.
+
+\begin{figure}[htb]
+  \begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{gcn_result_three_cropped.png}
+    \caption{GCN on test set}
+  \end{subfigure}
+  \hspace*{\fill}
+  \begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{gin_result_three_cropped.png}
+    \caption{GIN on test set}
+  \end{subfigure}
+  \hspace*{\fill}
+  \begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{gin_result_all_cropped.png}
+    \caption{GIN on whole dataset}
+  \end{subfigure}
+\caption{Fidelity vs Sparsity of the explanation algorithms for GCN (a) and GIN (b)/(c) model on the MUTAG dataset.}
+\label{fig:mutag_result}
+\end{figure}
+
+To address the concern that the small number of graphs may distort the experimental results, we repeated the experiment for the GIN model (which is the faster one of the two) for all 188 graphs in the MUTAG dataset. 
+Even though the individual fidelity scores are different between the two setups, the general trends are the same. 
+Therefore, we conclude that it is valid to restrict our experiments to a subset of the dataset.
+
+
+\subsection{Efficiency Study}
+To compare the runtime of these algorithms we measured the runtime for explanations of the GIN model. The average runtime is displayed in Table \ref{tab:execution_time}.
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{lccc}
+    \textsc{Method} & GNNExplainer & MCTS\_GNN\footnotemark & SubgraphX \\ \hline
+    \textsc{Time}   & 6.6s & 2.9s & 45.8s
+    \end{tabular}
+    \caption{Average execution time of explanation algorithms for GIN model on MUTAG dataset.}
+    \label{tab:execution_time}
+\end{table}
+
+\footnotetext{Notice that the \enquote{MCTS} values in the efficiency study  of the original paper \citep[Table 2]{Yuan21} have nothing to do with MCTS\_GNN. This is just an unfortunate naming issue.}
+
+MCTS\_GNN has an even lower runtime than GNNExplainer with similar or slightly better performance (see Figure \ref{fig:mutag_result})
+Therefore, MCTS\_GNN appears to be the best choice if time constraints are important. 
+If performance is more important than time constraints, SubgraphX is suited best. 
+These results adhere to the findings of the original paper.
+
+
+
+\section{Transfer Study}
+
+Yuan et al. \cite{Yuan21} already extensively studied the performance of SubgraphX on the graph classification task, which we validated in Section \ref{sec:replication}. 
+However, they only tested a single node classification dataset.
+Therefore, we tried to verify the transferability of their results to another dataset, which is the Karate Club Network \cite{Zachary77} (See Figure \ref{fig:karate_graph}).
+This is a very small dataset consisting of only a single graph, which is perfect for our limited compute capabilities.
+The experiments in this section were performed on a consumer grade laptop with Intel Core i7-1065G7 (1.30GHz) CPU and NVIDIA GeForce MX330 GPU.
+The training set is already given and consists of a total of four nodes; One node of each class. 
+Furthermore, we randomly picked 16 validation and 14 test nodes with class distributions as equal as possible. 
+
+To generate node features we first trained an unsupervised Node2Vec-Embedding \cite{grover16}. 
+The model to be analyzed was a two layer Graph Convolutional Network (GCN) \cite{kipf17} with a hidden dimension of 20 and ReLU activation function. 
+The prediction scores were normalized into probabilities by a softmax layer. 
+The model scored 85.7\% accuracy on the test set. 
+
+We compared the performance of SubgraphX and GNNExplainer. 
+Both explanation methods were evaluated for $N_{min}\in \{4,..,12\}$ on all nodes in the test set.
+Figure \ref{fig:karate_result} displays the results of our experiments.
+It is clearly visible that SubgraphX outperforms GNNExplainer at any sparsity.
+Especially at high sparsity SubgraphX performs much better than GNNExplainer. 
+This validates the claim of the original authors that SubgraphX can be used in node classification tasks.
+The average runtime per node (of a single explanation) is 80.5 seconds for SubgraphX and 9 seconds for GNNExplainer. 
+Therefore, according to our own definition, the runtime is still within a "reasonable limit".
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{karate_club_graph.png}
+    \caption{The Karate Club Network.}
+    \label{fig:karate_graph}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{karate_results.png}
+    \caption{Fidelity vs Sparsity of the explanation algorithms for GCN on the Karate Club Network.}
+    \label{fig:karate_result}
+\end{minipage}
+\end{figure}
+
+
+
+\section{Hyperparameter Study}
+\subsection{MCTS iterations and MC sampling steps}
+There are two central hyperparameters which directly trade performance for runtime: The number of iteration of MCTS \textit{M} and the number of Monte-Carlo sampling steps \textit{T} (for the shapley value). 
+More iterations and more sampling steps yield better results at the cost of higher runtime.
+
+\begin{figure}[htb]
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/m_and_t_fidelity_mutag_gin.png}
+    \caption{SubgraphX for GIN model on MUTAG dataset} \label{fig:m_and_ta}
+  \end{subfigure}%
+  \hspace*{\fill}   % maximize separation between the subfigures
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/m_and_t_fidelity_karate.png}
+    \caption{SubgraphX for GCN model on Karate Club Network} \label{fig:m_and_tb}
+  \end{subfigure}%
+\caption{Effect of Monte-Carlo sampling steps $T$ on fidelity. The number of MCTS iterations $M$ is kept at 20.} \label{fig:m_and_t}
+\end{figure}
+
+
+\begin{figure}[htb]
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/m_and_t_over_time_mutag_gin_polished.png}
+    \caption{SubgraphX for GIN model on MUTAG dataset} \label{fig:m_and_t_timea}
+  \end{subfigure}
+  \hspace*{\fill} 
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/m_and_t_over_time_karate_polished.png}
+    \caption{SubgraphX for GCN model on Karate Club Network} \label{fig:m_and_t_timeb}
+  \end{subfigure}%
+\caption{Effect of MCTS iterations $M$ and Monte-Carlo sampling steps $T$ on runtime and fidelity.} \label{fig:m_and_t_time}
+\end{figure}
+
+The authors chose values of $M = 20$ and $T = 100$ for all of their experiments. Figure \ref{fig:m_and_t} shows the effect of $T$ on the fidelity, which is higher for the MUTAG dataset than the Karate Club network. It seems that $T=20$ is a sufficient value, because the performance is similar at lower runtime. The difference in runtime as well as performance is displayed in Figure \ref{fig:m_and_t_time}. The number of MCTS iterations $M$ has a strong effect on fidelity and therefore should not be lower than $M=20$ as chosen by the authors. 
+
+\subsection{MCTS Exploration vs Exploitation}
+There is a key difference between the original Monte-Carlo Tree Search algorithm, e.g.\ as employed by AlphaGo \cite{silver16}, and MCTS employed by the authors.
+In the original version unexplored nodes in the search tree are treated as leaf nodes until they are explored. 
+Then, from leaf node to terminal node a game would be simulated, for example by playing randomly. 
+In contrast, in SubgraphX only terminal nodes are considered leaf nodes,
+meaning there is no simulation phase in SubgraphX and there is no benefit in exploiting existing leaf nodes (visiting multiple times).
+Therefore, the MCTS algorithm should focus on exploration, which the authors enforce by choosing a sufficiently high exploration rate $\lambda$.
+
+Looking at a representative MCTS search tree (see Figure \ref{fig:lambda}), we indeed observe this behavior as most subgraphs are visited only once. 
+In our experiment, a broad range of exploration rates resulted in the desired wide exploration with little effect on the fidelity.
+
+\begin{figure}[ht]
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/lambda_fidelity_mutag_gin.png}
+    \caption{SubgraphX for GIN model on MUTAG dataset}
+  \end{subfigure}%
+  \hspace*{\fill}   % maximize separation between the subfigures
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/search_tree_mutag_gin.png}
+    \caption{Example of MCTS search Tree}
+    \label{fig:lambda_tree}
+  \end{subfigure}%
+\caption{Effect of exploration rate $\lambda$ on fidelity and an example search tree. Blue nodes are visited once, green nodes twice and red nodes more than two times. The red border indicates the best nodes found for different thresholds $N_{min}$.}
+\label{fig:lambda}
+\end{figure}
+
+
+
+
+\section{Improvements beyond original Paper}
+\label{sec:improvements}
+
+\subsection{Greedy Initialization}
+\label{subsec:greedy}
+During MCTS, the path to the terminal node is taken by choosing the best children according to the upper confidence bound for trees. 
+For node $N_i$ the best pruning action $a^*$ in SubgraphX is chosen as \cite{Yuan21}: 
+\begin{equation}
+\label{eq:ucb}
+    \centering
+    a^* = \operatorname{argmax}_{a_j} \frac{W(N_i, a_j)}{C(N_i, a_j)} + \lambda R(N_i, a_j) \frac{\sqrt{\sum_k C(N_i, a_k)}}{1 + C(N_i, a_j)}
+\end{equation}
+where $C(N_i, a_j)$ is the visit count, $W(N_i, a_j)$ the total reward of all visits, and $R(N_i, a_j)$ the score function, i.e.\ the Shapley Value. 
+However, while exploring a new part of the search tree, the visit counts of all nodes are inherently zero. 
+Therefore, the upper confidence bound for all these nodes is not defined due to division by zero.
+A tie-break has to be used to resolve this conflict.
+Note that this situation would never occur in the original version of Monte-Carlo Tree Search because it would be in the random simulation phase. 
+However, this situation occurs very often in SubgraphX, as most nodes in the search tree are visited only once (recall Figure \ref{fig:lambda_tree}). 
+In fact, the tie-break has to be used more often than the upper confidence bound.
+
+In the implementation of the authors, children are chosen by a tie break according to the pruning strategy, which depends only on the node degree.
+Since the node degree is completely independent of the model to explain, we propose a tie-break based on the Shapley Values of the children.
+In other words, we greedily choose the child with the highest immediate reward.
+This strategy is equivalent to initializing the visit counts of all nodes to one.
+That is, because the only term of equation \ref{eq:ucb} differing between children in an unexplored subtree would be the immediate reward $R(N_i, a_j)$, i.e.\ the shapley value.
+The effects of a greedy strategy are shown in Figure \ref{fig:better}.
+
+
+\subsection{Fidelity Score Function}
+Internally, the SubgraphX algorithm uses a metric derived from Shapley Values, denoted as $\phi$, to guide the MCTS and select the subgraph for the final explanation. 
+In the end, Yuan et al.\ use the fidelity of explanations to quantitatively compare their method against others like GNNExplainer \cite{Ying19}. 
+For a single explanation $E$ of predicted class $y$ on graph $G$, they are computed as \cite{Yuan21}:
+
+\begin{align}
+\mathit{Fidelity} &= f(G)_{y} - f(G\setminus E)_{y} \\
+\phi(E) &= \frac{1}{T} \sum_{t=1}^{T} f(S_t \cup E)_{y} - f(S_t)_{y}, \quad S_t \subseteq (G \setminus E)
+\end{align}
+
+where $f(\cdot)_y$ is the models output for class $y$, $T$ is the number of Monte-Carlo sampling steps and $S_t$ is sampled randomly. 
+The features of nodes which are not passed to the model are set to a baseline of zero. 
+Comparing these formulas, fidelity is a special case of the Shapley Value (with $S_t = G \setminus E$). 
+Similarly to MCTS\_GNN, we can directly optimize for fidelity by using it as the score function. 
+Optimizing for fidelity ($S_t = G \setminus E$) can be seen as the antipodal method to MCTS\_GNN ($S_t = \emptyset$).
+
+In Figure \ref{fig:better}, a comparison between the scoring functions is shown. 
+In addition to superior performance, using fidelity as a scoring function has the advantage of requiring much less computational effort. 
+That is, because only one step of Monte-Carlo sampling has to be performed. 
+Unfortunately, we did not record the runtime in this experiment. 
+Yet, a comparison can be made because the computation of fidelity as a score function is similar to MCTS\_GNN.
+Thus, it is reasonable to assume that the runtime difference is similar to the values reported in Table \ref{tab:execution_time}.
+
+\begin{figure}[ht]
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/better_fidelity_mutag_gin.png}
+    \caption{Improved SubgraphX for GIN on MUTAG dataset}
+  \end{subfigure}%
+  \hspace*{\fill}   % maximize separation between the subfigures
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=\linewidth]{img/better_fidelity_karate.png}
+    \caption{Improved SubgraphX for GCN on Karate Club}
+  \end{subfigure}%
+\caption{Effect of greedy initialization and fidelity as a score function on the fidelity of SubgraphX.} 
+\label{fig:better}
+\end{figure}
+
+
+\subsection{Edge Case Behavior}
+During our experiments, we observed that SubgraphX explored the same leaf node multiple times for some graph instances. 
+In the usual setting of MCTS, for example in the game of Go \cite{silver16}, this is desirable as it updates the estimated $Q$-value of all nodes on the path in the search tree. 
+However, in this case we are only interested in the best leaf node.
+Exploring a leaf node multiple times only repeats the same computation. 
+Therefore, reaching the same leaf node multiple times is wasted computational effort. 
+This problem becomes especially apparent when using a small exploration rate $\lambda$. 
+As a solution, we propose to mark nodes in the search tree whose subgraphs are already completely explored. 
+These nodes should be ignored during search.
+Future work could include empirical investigation of this effect.
+
+ %Since we made these observation at the end of the project, we were unfortunately not able to implement our proposed solution. Therefore, we were also not able to empirically show the impact of this edge case behavior. 
+
+
+
+\section{Discussion}
+We were able to reproduce the main claims made by Yuan et al.\ \cite{Yuan21} regarding SubgraphX using our own implementation.
+SubgraphX has a higher fidelity score than GNNExplainer, while being slower by a factor of seven. This is, according to our own definition, a "reasonable runtime".
+Additionally, we were able to transfer the results to the Karate Club dataset, where SubgraphX outperforms GNNExplainer as well. 
+During our hyperparameter study, we discovered that SubgraphX is sensitive to number of MCTS iterations $M$ and Monte-Carlo sampling steps $T$. 
+However, the exploration rate $\lambda$ has little effect on the performance.
+
+Lastly, we propose to improve SubgraphX by using a greedy initialization and optimizing directly for fidelity. Using these improvements, we were able to achieve higher fidelity at lower runtime.
+
+\subsection{What was easy}
+SubgraphX is explained very concisely in the original paper. It was quite easy to understand and implement the method by ourselves. 
+It was also helpful to check the original implementation in the DIG repository to compare against our own. 
+Furthermore, the datasets were readily available and easy to download and use. 
+The appendix of the paper contained most of the information necessary for the reproduction process.
+
+
+\subsection{What was difficult}
+Even though the original code of the authors is available as part of the DIG-library, we had to spent considerable time to resolve version issues in order to use the datasets of the original experiments. That is, because at the start of this project the DIG-library did not support PyTorch versions above 1.6.
+
+Another challenge was the computational effort required to perform the experiments.
+The authors performed extensive experiments, which we could not repeat with our limited resources.
+Therefore, we  had to run the experiments on fewer instances and with fewer iterations than in the original experiments.
+
+\subsection{Communication with original authors}
+We contacted the original authors after finishing the first draft of this report. They briefly reviewed our work and agreed that our experiments prove a successful reproduction of their paper. Additionally, they gave helpful feedback regarding the presentation of our results.
+
+
+
+
+
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+% \section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+% \section{Scope of reproducibility}
+% \label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+% %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+% \section{Methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+% \subsection{Model descriptions}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+% \subsection{Datasets}
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+% \subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+% \subsection{Experimental setup and code}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+% \subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+% \section{Results}
+% \label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+% \subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+% \subsubsection{Result 1}
+
+% \subsubsection{Result 2}
+
+% \subsection{Results beyond original paper}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+% \subsubsection{Additional Result 1}
+% \subsubsection{Additional Result 2}
+
+% \section{Discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+% \subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+% \subsection{What was difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+% \subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
