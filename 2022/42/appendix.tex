@@ -1,0 +1,58 @@
+\section*{Appendix}
+\label{sec:app}
+
+\subsection*{A. Phase diagrams for different random seeds}
+\label{app:A}
+
+In this section, we study the importance of random seeds for reproducing phase diagrams from the paper for the toy model. We sweep over 3 data splitting random seeds (\emph{data seed}) and 3 model initialization random seeds (\emph{model seed}). The results are presented in Figures~\ref{fig:cls-seeds}, \ref{fig:regr-seeds}. Turns out that the presence and proportion of the 4 phases is heavily affected by the data seed. For some setups it becomes impossible to observe grokking for any considered set of hyperparameters (Addition regression, data seed = 43, model seed = 101, 102), while other setups make confusion much less common (Addition classification, data seed = 41). The impact of model seed is much smaller but still considerable. Variation of model initialization changes the shape of phase borders, while the localization of the phases is mainly preserved.
+
+\begin{figure}[H]
+\caption{Addition classification phase diagrams for different pairs of data seed and model seed.}
+\centering
+\includegraphics[width=0.9\textwidth]{images/cls_seeds.png}
+\label{fig:cls-seeds}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Addition regression phase diagrams for different pairs of data seed and model seed.}
+\centering
+\includegraphics[width=0.9\textwidth]{images/regr_seeds.png}
+\label{fig:regr-seeds}
+\end{figure}
+
+\subsection*{B. Phase diagrams for different activation functions}
+\label{app:B}
+
+Initially, we failed to reproduce the toy model because we used an activation function (ReLU) different from the one used by the authors (Tanh). After all, it is not specified in the paper. Inspired by this mismatch, we plot the phase diagrams for different MLP activations with fixed data and model seeds. We consider \textbf{ReLU}, \textbf{LeakyReLU} with negative slope = $0.1$ and \textbf{Tanh}. The resulting diagrams are shown in Figures~\ref{fig:cls-acts}, \ref{fig:regr-acts}. Piecewise linear functions (ReLU and LeakyReLU) significantly decrease the area of generalization, turning large values of weight decay into confusion. ReLU function makes the comprehension phase impossible in the Addition regression setup. At first, we hypothesized that the problem of ReLU is its non-injectivity. However, LeakyReLU is injective, but large areas of confusion are still present in the diagrams. So, we leave the question: ''What is wrong with these activations?'' for future studies. But clearly, the use of Tanh is crucial to reproducing the diagrams from the original paper.
+
+\begin{figure}[H]
+\caption{Addition classification phase diagrams for different MLP activation functions.}
+\centering
+\includegraphics[width=\textwidth]{images/cls_acts.png}
+\label{fig:cls-acts}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Addition regression phase diagrams for different MLP activation functions.}
+\centering
+\includegraphics[width=\textwidth]{images/regr_acts.png}
+\label{fig:regr-acts}
+\end{figure}
+
+\subsection*{C. Embedding optimization trajectories}
+\label{app:C}
+
+Finally, we compare the training phases by optimization trajectories of embeddings. This experiment is inspired by Figure 4 from the original paper. We plot the embedding trajectories for different phases of the Addition regression setup. Figure~\ref{fig:embeds} shows the disentanglement of embeddings for comprehension, grokking, and confusion. Memorization is the only phase, which does not have embeddings sorted after 2000 iterations. Interestingly, we do not observe any difference between \textit{grokking} and \textit{confusion}. The discrepancy between these two phases is revealed during further training (Figure~\ref{fig:embeds-long}) when the magnitude of embeddings starts growing faster for \textit{confusion}. It happens because large values of learning rate and weight decay, which correspond to confusion (see Figure~\ref{fig:toy-phases}, right), make it impossible for the decoder to fit, even though the embeddings evolved to the correct order. Note also that the magnitude of converged \textit{grokking} embeddings is remarkably larger than the one of the \textit{comprehension} embeddings. Thus, the magnitude of embeddings \textit{may be a witness} to different training phases.
+\begin{figure}[H]
+\caption{Optimization trajectories of embeddings over first 2000 training iterations.}
+\centering
+\includegraphics[width=0.9\textwidth]{images/regr_trajectories.png}
+\label{fig:embeds}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Optimization trajectories of embeddings over whole training process.}
+\centering
+\includegraphics[width=0.9\textwidth]{images/regr_trajectories_long.png}
+\label{fig:embeds-long}
+\end{figure}
