@@ -1,0 +1,39 @@
+\section{Hyperparameter Sweeps}\label{app:hyp}
+
+\subsection{MLP hyperparameter optimization}\label{sec:mlp-hyp}
+This section presents the domain explored for the MLP trunk ablation model using the Optuna framework for hyperparameter optimization.
+In particular, for each environment, we trained the MLP trunk ablation model for 25 different sets of parameters proposed by the Optuna framework. The explored domain is shown in table \ref{tab:mlp_optuna}. 
+
+\begin{table}[htb]
+\centering
+\caption{MLP hyperparameter domain explored by the Optuna algorithm.
+For the learning rate, Optuna sampled values in a continuous interval.
+All other parameters were given discrete values.
+The hyperparameters used in the original paper are underlined except for Batchnorm, as it is unclear whether it was used in the original paper.
+The best hyperparameter configurations found for both environments are in bold.}
+\label{tab:mlp_optuna}
+\resizebox{0.9\textwidth}{!}{
+\begin{tabular}{lcc}
+Hyperparameters                             & Blockpush       & Kitchen         \\ \hline
+\multicolumn{1}{l|}{Learning Rate}          & 1e-5 to 1e-1 (\underline{1e-4}, \textbf{3.05e-4})    & 1e-5 to 1e-1 (\underline{1e-4}, \textbf{5.3e-4})  \\
+\multicolumn{1}{l|}{Gradient Norm Clipping} & \textbf{None}, \underline{1}         & \textbf{None}, \underline{1}         \\
+\multicolumn{1}{l|}{Weight Decay}           & 0.01, \textbf{0.05}, \underline{0.1} & \textbf{0.01}, 0.05, \underline{0.1} \\
+\multicolumn{1}{l|}{Number Hidden Layers}   & \underline{\textbf{4}}, 6, 8         & \underline{\textbf{6}}, 8, 10, 12    \\
+\multicolumn{1}{l|}{Hidden Layers Width}    & \underline{\textbf{72}} , 128, 144   & \underline{\textbf{120}}, 132        \\
+\multicolumn{1}{l|}{Batchnorm}              & \textbf{True}, False     & \textbf{True}; False    
+\end{tabular}
+}
+\end{table}
+
+\subsection{Sensitivity sweep}\label{sensitivity-sweep}
+
+In this section, we present the results concerning the sweeps performed on the number of action centers and on the window sizes (see figure \ref{fig:sensitivity-sweep}).
+
+\begin{figure}[htb]
+\includegraphics[width=0.95\textwidth]{figures/sweeps_legend.pdf}
+\centering
+\caption{Boxplot for the average reward across rollouts for models swept in the number of action centers (bottom) and of window sizes (top). 
+These sweeps were run both for Blockpush (left) and Kitchen (right).
+The hyperparameter values are shown on the $x$-axis, while the $y$-axis corresponds to the average reward.}
+\label{fig:sensitivity-sweep}
+\end{figure}

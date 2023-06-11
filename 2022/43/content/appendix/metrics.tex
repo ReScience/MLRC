@@ -1,0 +1,158 @@
+\section{Metrics}\label{app:metrics}
+\subsection{Metrics and Threshold Analysis}
+\subsubsection{Franka Kitchen environment}
+
+This section describes the metrics used to analyze performance and diversity in the Franka Kitchen environment, referred to simply as ``Kitchen'' below. 
+We also delve into a more granular analysis of the \textit{threshold} parameter, which defines task completion in this environment.
+
+\paragraph{Metric definition}
+
+The Franka Kitchen environment uses an array of observations to track the position of the Franka Emika Panda robotic arm and various household items.
+The distance between these observations and a set of predefined goals is computed at each step. 
+If this distance falls below a predefined threshold, the goal is achieved. 
+The following metrics are used to assess model performance and diversity in Kitchen:
+
+\begin{itemize}
+    \item Number of tasks completed \textbf{[Performance]}: There are seven tasks in total, and the agent has 280 timesteps to complete as many of them as it can.
+    The demonstration dataset has rollouts with four tasks completed in each, and BeT is able to complete more than four in the allotted time in a subset of rollouts.
+    \item Reward \textbf{[Performance]}: The reward is calculated based on the number of tasks completed during each rollout.
+    More tasks completed lead to a higher reward.
+    \item Task entropy \textbf{[Diversity]}: Entropy computed on the distribution of achieved tasks during 1,000 rollouts.
+    This is the main metric used by the authors.
+    \item Sequence entropy \textbf{[Diversity]} \textbf{[New]}: Entropy computed on the sequence distribution of achieved tasks during 1,000 rollouts. It takes into account the number of unique and chronologically recorded task sequences. As the authors did not differentiate between different permutations of the same tasks when completed in a different order, we propose this additional metric to better measure the model's multimodality.
+\end{itemize}
+
+\paragraph{Discrepancies in metric computation}
+
+The authors kindly shared the Jupyter notebook they used to compute their tables, allowing us to describe the two main choices we made regarding metric computation.
+
+We describe below how their version of the metrics and our version of the metrics are computed on the demonstration dataset.
+The same applies to computing the metrics on a set of rollouts.
+
+\begin{itemize}
+    \item The original work determines the task entropy by first sampling 100 task sequences uniformly at random out of the 566 sequences in the demonstration dataset and computing the entropy on the subset formed by all the tasks completed in these 100 task sequences.
+    This process is repeated 5,000 times, and the final entropy value is obtained by averaging the subset entropies.
+    There was no seed to make the process deterministic, and each entropy calculation will result in a slightly different value.
+    Since precise values were important for reproducibility and random sampling was not considered essential for computing this metric, we decided to made to calculate task entropy directly on all tasks completed in the 566 rollouts, eliminating the stochasticity.
+    \item Additionally, we acquire demonstration sequences directly from the training observations (same as with sampled rollouts), as opposed to the authors obtaining them from the ground truth dataset found in the Relay Policy Learning repository by \cite{gupta_relay_2019} creating a discrepancy with how they compute them on the rollouts.
+    We noticed that there is a slight difference between the sequences obtained through these two methods, with 13 rollouts having only 3 completed tasks when obtained from the training observations, while every sequence in the ground truth of 566 has 4 completed tasks.
+
+\end{itemize}
+
+\begin{figure}[htb]
+\includegraphics[width=\textwidth]{figures/multimodal_colorbar_flipped.pdf}
+\centering
+\caption{Visualization of the sequence distributions presented by the authors and the ones we obtained. Made using the plotting function from \citet{shafiullah2022behavior}. }
+\label{fig:multimodal_distr}
+\end{figure}
+
+
+\paragraph{Threshold analysis}
+
+An appropriate threshold is pivotal to obtaining a correct success metric, as an incorrect threshold can result in significant performance misalignment. In fact, a threshold that is too high for any single task can result in the agent receiving a reward for an incomplete run, even if the obtained configuration would not adhere to the standard expected by a human. Conversely, an excessively low threshold can lead to an unrealistically null success rate.
+
+This value is set to 0.3 for all seven tasks in the original paper.
+We computed the achievement rate for 24 different threshold values to validate their choice.
+We also computed the number of rollouts for each tentative value where each task would be considered completed over the human demonstration dataset.
+The results are then normalized.
+As shown in figure \ref{fig:kitchen_threshold}, a threshold of 0.3 is an optimal value as it results in a balanced achievement rate for each task.
+
+\begin{figure}[H]
+\includegraphics[scale=0.45]{figures/threshold.png}
+\centering
+\caption{Achievement rate of the different tasks from observations in the demonstration dataset for different threshold values in the Kitchen.
+The value 0.3 results in a balanced rate for each task.}
+\label{fig:kitchen_threshold}
+\end{figure}
+
+\subsubsection{Blockpush environment}
+
+Similarly to Kitchen, we describe the metrics used to analyze performance and diversity of models in the Blockpush environment~\cite{florence_implicit_2021}. 
+Moreover, we also investigate the influence of the \textit{threshold} parameter in this environment.
+
+\paragraph{Metric definition}
+
+For the Blockpush tasks, \citet{shafiullah2022behavior} adopted the PyBullet-based environment implemented by \citet{florence_implicit_2021}. 
+The objective of the XArm robot agent is to successfully push a block into a target, defined as a square area of the plane.
+If both blocks are successfully pushed into the two separate targets, the rollout is considered complete, and the maximum reward is awarded.
+A block is considered correctly pushed if the distance between its center and a target falls below a predetermined threshold at any moment in time during the rollout.
+In this environment, we define the following metrics to assess model performance and diversity in Blockpush, where each probability is obtained by normalizing the number of occurrences over 1,000 rollouts.
+
+\begin{itemize}
+    \item Reward \textbf{[Performance]}: The reward is based on how many blocks are pushed into the target: 0.49 when only one block is recorded as pushed and 1 when both are pushed.
+    \item R1 \textbf{[Performance]}: The probability of reaching one block.
+    \item R2 \textbf{[Performance]}: The probability of reaching both blocks.
+    \item P1 \textbf{[Performance]}: The probability of pushing one block into a target.
+    \item P2 \textbf{[Performance]}: The probability of pushing both blocks into the two different targets.
+    \item $1^{\text{st}}$ block reached (red/green)\textbf{[Diversity]}: The probability of the block (red/green) being reached first.
+    \item Push: red block target (red/green) \textbf{[Diversity]}: The probability of the red block being  pushed to the (green/red) target. 
+    \item Push: green block target (red/green) \textbf{[Diversity]}: The probability of the green block being  pushed to the (green/red) target. 
+\end{itemize}
+
+\paragraph{Proposed metrics}
+
+To further investigate BeT performance, we implemented additional metrics that differ from the ones of \citet{shafiullah2022behavior}.
+The authors determine if a block has reached its goal by measuring the distance between the initial block position and its position at each subsequent time step.
+The goal is considered reached if this distance is less than $10^{-3}$. 
+We decided to recompute this metric by checking the distance between the arm and the block and to determine whether a block is reached if it falls below 0.05, a value already used by the authors to record pushes. 
+This decision is substantiated by the fact that while pushing the first block to a target, the first block can cross and interact with the second block, barely moving it, resulting in what we deem an unintentionally recorded reach of the second block. 
+Our proposed metric seeks to reduce the occurrence of these false positives, directly affecting the computed values of R1 and R2.
+Moreover, by observing the rendered rollouts, we noticed that sometimes a block is only momentarily pushed into a target and then pushed out, which would be considered a valid push by the original metrics, even if the intended goal is not properly achieved.
+A pattern that we observed, and that is considered BeT's primary failure mode by the authors, occurs when the first block is accurately reached but pushed just outside the target; then, the arm moves to push the second block into the target. 
+However, since the rollout does not stop due to the first block being misaligned, the arm continues pushing the second block further away from the target, following its initial path.
+In this scenario, both blocks are correctly recorded as reached, but the second block is wrongly counted as successfully pushed, even if, by the end of the rollout, its position is outside the intended target. 
+To avoid these false positives, we compute the distances between the blocks and the targets on the last timestep of each rollout and only count as correct pushes the ones where the block actually stays in the target, disregarding the runs where the block is pushed in and then out the target.
+This directly affects the computation of the values for P1 and P2.
+The differences in performance between the original way of implementing the metrics and the ones we propose can be visualized in table \ref{tab:blockpush_improved_metrics}.
+
+
+\begin{table}[htb]
+\centering
+\caption{Comparison of the probabilities of reaching and pushing one or two blocks to the targets, first using the metrics established by the author and then using our proposed metrics. Some values are rounded to 3 decimal cases (contrarily to the rest of the paper) to better illustrate the effect of the different metrics.}
+\label{tab:blockpush_improved_metrics}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccc|cccc}
+                                    & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Distance between \\ block positions at t and t+1\end{tabular}} & \multicolumn{2}{c|}{\begin{tabular}[c]{@{}c@{}}Distance between \\ arm and block\end{tabular}} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Block enters \\ the target\end{tabular}} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Block stays \\ in the target\end{tabular}} \\ \cline{2-9} 
+\multicolumn{1}{l|}{}               & R1                                                   & R2                                                    & R1                                            & R2                                             & P1                                         & P2                                        & P1                                          & P2                                         \\ \cline{2-9} 
+\multicolumn{1}{l|}{BeT}            & 1.0                                                  & 0.976                                                 & 1.0                                           & 0.975                                          & 0.940                                      & 0.180                                     & 0.682                                       & 0.002                                      \\
+\multicolumn{1}{l|}{Demonstrations} & 1.0                                                  & 1.0                                                   & 1.0                                           & 1.0                                            & 1.0                                        & 0.996                                     & 0.997                                       & 0.983                                     
+\end{tabular}
+}
+\end{table}
+
+
+It is possible to conclude that while the new metric regarding R1 and R2 does not cause a significant deviation, the same does not hold for P1 and P2.
+In this paper, for the sake of consistency, we considered the same metrics as the original paper. 
+Nevertheless, it is clear that they are not correctly capturing the primary objectives of the considered environment in some cases and allowing the aforementioned false positives.
+
+\paragraph{Threshold analysis}
+
+Similarly to Kitchen, the threshold parameter choice is crucial to compute correct success metrics. 
+Thus, we investigated how the probabilities of pushing one and two blocks to respective squares would change when dealing with different threshold values. 
+We observed that \citet{shafiullah2022behavior} used a higher threshold value than the original implementation.
+The threshold value used by \citet{florence_implicit_2021} is 0.04, while the authors used 0.05. With a higher value, we naturally expected a higher success rate. 
+
+This was accomplished by calculating success metrics for the two different thresholds on the 1,000 demonstration rollouts from the training dataset and on 1,000 evaluation rollouts using BeT with its original hyperparameter configuration.
+We also tested other threshold values and noticed that: \emph{i)} a threshold $\leq 0.03$ is too strict, making it excessively difficult to succeed; and \emph{ii)} for a threshold $\geq 0.06$, it becomes too easy to achieve the goal, and this criterion is no longer a good measure of success.
+
+We observed that in the demonstration dataset, the probabilities remain unchanged when computed using either a threshold of 0.04 or 0.05.
+A block was considered pushed with a tolerance of 0.05 but not with 0.04 in only one instance out of the 1,000 samples.
+During the evaluation rollouts using a BeT agent trained with the original hyperparameters, the differences in probabilities are more pronounced, as shown in table ~\ref{tab:blockpush_threshold}. 
+We can see that, even though 0.05 is still a reasonable threshold,  it clearly simplifies the problem for the model. Therefore, unless the threshold is the same for both cases, direct comparisons to other models also running in the Blockpush environment should be carried out carefully and interpreted with a grain of salt.
+
+\begin{table}[htb]
+\centering
+\caption{Comparison of the metrics proposed by the authors for the threshold values of 0.04, used in the original implementation by \citet{florence_implicit_2021}, and 0.05, used by \citet{shafiullah2022behavior}.
+The two P2 values for ``Demonstrations" are rounded to 3 decimal cases to highlight the influence of different threshold values.}
+\label{tab:blockpush_threshold}
+\resizebox{0.8\textwidth}{!}{
+\begin{tabular}{l|cc|cc}
+                             & \multicolumn{2}{c|}{Demonstrations}                                                                                  & \multicolumn{2}{c}{BeT}                                                                                             \\ \cline{2-5} 
+                             & \begin{tabular}[c]{@{}c@{}}Threshold \\ 0.05\end{tabular} & \begin{tabular}[c]{@{}c@{}}Threshold\\ 0.04\end{tabular} & \begin{tabular}[c]{@{}c@{}}Threshold\\ 0.05\end{tabular} & \begin{tabular}[c]{@{}c@{}}Threshold\\ 0.04\end{tabular} \\ \hline
+R1 (block-block distance)    & 1.00                                                      & 1.00                                                     & 1.00                                                     & 1.00                                                     \\
+R2 (block-block distance)    & 1.00                                                      & 1.00                                                     & 0.98                                                     & 0.98                                                     \\
+P1 (block enters the target) & 1.00                                                      & 1.00                                                     & 0.94                                                     & 0.86                                                     \\
+P2 (block enters the target) & 0.996                                                     & 0.995                                                    & 0.18                                                     & 0.10                                                    
+\end{tabular}
+}
+\end{table}

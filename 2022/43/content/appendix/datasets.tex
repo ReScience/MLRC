@@ -1,0 +1,36 @@
+\section{Datasets}\label{app:datasets}
+
+A detailed description of the datasets used in \citet{shafiullah2022behavior} is provided below:\\
+
+\textbf{Point mass.}
+Point mass is a synthetic toy dataset used to demonstrate the benefits of BeT's representational power by showing that a history-dependent policy implemented with a transformer does not collapse when trained on a dataset of trajectories with multiple modes and can represent them faithfully in rollouts.
+Observations and actions in this environment are 2-dimensional $(x,y)$ coordinates.
+The dataset has two versions, one with two modes and trajectories of lengths 8 and one with three modes and trajectories of lengths between 8 and 16.
+
+Unfortunately, although this environment was used throughout the paper as a proof of concept, the authors did not provide the dataset of demonstrations they used in this environment.
+We found fragments of code that we used to generate the dataset during training, but some hyperparameters, such as the number of demonstrations and noise level, differ from what is described in the paper.
+In particular, the authors do not mention any source of stochasticity in this dataset in the paper.
+However, their figures demonstrating Point mass do show stochastic behavior, significantly impacting the reproducibility of the paper.\\
+
+\textbf{CARLA.}
+The authors use the CARLA self-driving environment \cite{dosovitskiy_carla_2017} to test BeT's capability in learning from high dimensional observations of (224,224,3)-dimensional RGB images.
+We do not include this dataset in our experiments as we do not have the computational requirements to get rollouts for it\footnote{Ideally, an 8-GB GPU in addition to the one used for training. \href{https://carla.readthedocs.io/en/latest/start_quickstart/}{(Requirements reference)}}.
+Nevertheless, we believe that as the dataset only contains 2 modes, uses a pre-trained ResNet-18 for observation embeddings, and 2-dimensional actions, excluding it is not detrimental to assessing the paper's main claims.
+In particular, excluding high-dimensional observations, Point mass has a similar complexity, and the following datasets have greater complexity.\\
+
+\textbf{Blockpush.}
+The multi-modal block-pushing environment \cite{florence_implicit_2021} features a robotic arm moving two blocks of different colors in two targets of different colors.
+The observations are 16-dimensional, and the actions 2-dimensional.
+The dataset has 1000 demonstrations generated from a deterministic controller, and its multi-modality comes from the different combinations of starting block and target colors.
+The greater complexity of the environment comes from the stochasticity in the starting positions of the blocks and the trajectory lengths varying between 85 and 201.\\
+
+\textbf{Kitchen.}
+The Franka Kitchen environment \cite{gupta_relay_2019} features human demonstrations recorded via VR headsets in a virtual kitchen environment.
+The participants were instructed to perform different sequences of four tasks from a list of seven possible tasks.
+The observation and actions are 30 and 9-dimensional, respectively.
+The dataset contains 566 demonstrations in total, with trajectories of lengths between 161 and 409.
+This is the most complex environment due to its larger action space and longer trajectories coming from human demonstrations, which may differ from the simpler synthetic demonstrators in the previous datasets.
+This environment has a stochastic starting position, a detail omitted in the paper.\\
+
+For more details, the datasets are comprehensively described in the original paper \cite{shafiullah2022behavior} (see Section 3.1 and appendix, Section A).
+The original authors provide a link to download all but the Point mass dataset in their repository \texttt{README}. 

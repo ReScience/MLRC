@@ -1,0 +1,169 @@
+\section{Results}\label{sec:results}
+
+\subsection{Results reproducing original paper}
+We report the results of our runs with BeT and its ablations, using the same table format as  \citet{shafiullah2022behavior} and show BeT and its ablations in the same table for each experiment.
+We highlight the differences between our results and the authors' and how they relate to their claims.
+Discussions of the overall interpretation of the results, the sources of discrepancies, and the global success of the reproduction are deferred to section \ref{sec:discussion}.
+
+\subsubsection{Performance}\label{results:performance} Assessing the authors' first claim (\ref{claim:author-1}).\\
+
+\begin{table}[htb]
+\centering
+\caption{Performance of BeT and its ablations on the Blockpush environment. Performance is measured by computing the probabilities of reaching one (R1) and two blocks (R2) and pushing one (P1) and two blocks (P2) to the respective target squares.
+Best in bold.}
+\label{tab:performance_blockpush}
+\resizebox{0.85\textwidth}{!}{
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Models          & \#Runs & R1              & R2               & P1              & P2              \\ \midrule
+BeT             & 5       & \textbf{1.00 $\pm$ 0.00} & \textbf{0.98  $\pm$ 0.01} & \textbf{0.94 $\pm$ 0.02} & 0.18 $\pm$ 0.01  \\
+No offsets      & 3       & \textbf{1.00 $\pm$ 0.00} & 0.96 $\pm$ 0.02  & 0.89 $\pm$ 0.09 & 0.11 $\pm$ 0.05 \\
+No binning      & 3       & 0.99 $\pm$ 0.01 & 0.68 $\pm$ 0.07  & 0.52 $\pm$ 0.11 & 0.04 $\pm$ 0.01 \\
+No history      & 3       & \textbf{1.00 $\pm$ 0.00} & \textbf{0.98 $\pm$ 0.01}  & \textbf{0.94 $\pm$ 0.02} & 0.17 $\pm$ 0.04 \\
+Trunk MLP       & 3       & 0.93 $\pm$ 0.05 & 0.49 $\pm$ 0.06  & 0.01 $\pm$ 0.00 & 0.00 $\pm$ 0.00 \\
+\textbf{[new]} Trunk MLP (Opt) & 3       & 0.95 $\pm$ 0.04 & 0.41 $\pm$ 0.15  & 0.03 $\pm$ 0.01 & 0.00 $\pm$ 0.00 \\
+\textbf{[new]} No focal loss   & 3       & \textbf{1.00 $\pm$ 0.00} & 0.96 $\pm$ 0.00  & 0.91 $\pm$ 0.05 & \textbf{0.20 $\pm$ 0.07} \\
+\hline
+BeT (paper)   &     1   & 1.00 & 0.99 & 0.96    & 0.71    \\
+Demonstration   &        & 1.00 & 1.00 & 1.00    & 1.00   
+\end{tabular}
+}
+\end{table}
+
+\textbf{Blockpush (table \ref{tab:performance_blockpush})} 
+Regarding BeT, we recover the same R1, R2, and P1 numbers. However, our P2 results diverge from those of the paper.
+Yet, those numbers still beat the baselines reported by the authors, supporting their first (\ref{claim:author-1}) claim.
+Moreover, we show that the variance across different training folds is low.
+Regarding the ablations, for the no-offsets, no-binning, and no-history ablations, we recover numbers coherent with what the authors report in terms of relative cumulative reward.
+For the MLP ablation, the authors report training collapse for P1 and P2, where performance is computed from the reward.
+With our detailed reporting of the metrics, we can see that this ablated model, nonetheless, reaches the blocks and pushes one block to a target in a few rollouts.
+Finally, the focal loss ablation performs on par with BeT but with much higher variance.
+This is consistent with its desired effects, and addresses point \ref{claim:ablation} in our reproducibility scope.
+
+
+\begin{table}[htb]
+\centering
+\caption{Performance of BeT and its ablations on the Kitchen environment. Performance is measured by computing the probabilities of $\it{n}$ tasks being completed during an episode.}
+\label{tab:performance_kitchen}
+\resizebox{0.95\textwidth}{!}{
+\begin{tabular}{@{}lcccccc@{}}
+                &         &                 &                 &                     &                 & \multicolumn{1}{l}{} \\ \midrule
+Models          & \# Runs & 1 task             & 2 tasks           & 3 tasks                 & 4 tasks             & 5 tasks                   \\ \midrule
+BeT             & 5       & 0.92 $\pm$ 0.06 & 0.69 $\pm$ 0.18 & 0.47 $\pm$ 0.19     & 0.20 $\pm$ 0.01 & 0.02 $\pm$ 0.01      \\
+No offsets       & 3       & 0.18 $\pm$ 0.04 & 0.03 $\pm$ 0.01 & 0.01 $\pm$ 0.00     & 0.00 $\pm$ 0.00 & 0.00 $\pm$ 0.00      \\
+No binning  & 3       & \textbf{0.99 $\pm$ 0.01} & \textbf{0.90 $\pm$ 0.12} & \textbf{0.74 $\pm$ 0.19}    & \textbf{0.40 $\pm$ 0.16} & \textbf{0.06 $\pm$ 0.03}      \\
+No history      & 3       & 0.87 $\pm$ 0.02 & 0.53 $\pm$ 0.14 & 0.32 $\pm$ 0.09  & 0.07 $\pm$ 0.02 & 0.00 $\pm$ 0.00      \\
+Trunk MLP       & 3       & 0.20 $\pm$ 0.17 & 0.03 $\pm$ 0.03 & 0.00 $\pm$ 0.00     & 0.00 $\pm$ 0.00 & 0.00 $\pm$ 0.00      \\
+\textbf{[new]} Trunk MLP (Opt) & 3       & 0.19 $\pm$ 0.07 & 0.01 $\pm$ 0.01 & 0.00 $\pm$ 0.00     & 0.00 $\pm$ 0.00 & 0.00 $\pm$ 0.00      \\
+\textbf{[new]} No focal loss   & 3       & 0.96 $\pm$ 0.02 & 0.77 $\pm$ 0.12 & 0.52  $\pm$ 0.14    & 0.25 $\pm$ 0.09 & 0.02 $\pm$ 0.01     \\ \hline
+BeT (paper)   &     1   & 0.99 & 0.93 & 0.71    & 0.44   & 0.02  \\
+Demonstration   &        & 1.00 & 1.00 & 1.00    & 0.98   & 0.00 
+\end{tabular}
+}
+\end{table}
+
+\textbf{Kitchen (table \ref{tab:performance_kitchen})} 
+Our results diverge from the authors' when BeT is evaluated on achieving more than one task.
+Although the performance is still good, they make some baselines reported by the authors stronger than BeT, thus refuting their first (\ref{claim:author-1}) claim.
+Our no-history and MLP trunk ablations results match the relative performance reported by the authors.
+However, the numbers for the no-offset and no-binning ablations do not match, with the no-binning ablation outperforming BeT.
+Moreover, we can observe that the focal loss performs on par with BeT and even outperforms it on its best random seed.
+
+\textbf{Point mass} We show qualitatively in figure \ref{fig:pointmass-results} that BeT produces trajectories with different modes without collapsing, supporting the authors' first (\ref{claim:author-1}) claim.
+
+\subsubsection{Diversity}\label{results:diversity} Assessing the authors' second (\ref{claim:author-2}) claim.
+When the performance results diverge, so will the diversity results.
+However, we can still compare those numbers relative to the performance obtained and thus assess claim \ref{claim:author-2} independently of claim \ref{claim:author-1}.\\
+\textbf{Blockpush (table \ref{tab:res-diversity-bp})} 
+In our experiments for BeT, we obtain results consistent with the authors'.
+BeT has equal probabilities of reaching and pushing blocks with different colors.
+This result supports the authors' second (2) claim.
+The authors did not provide diversity metrics for the ablations, but we can see from our numbers that the no-binning and MLP ablations do not generate balanced rollouts, supporting the architectural choices of BeT and addressing point \ref{claim:ablation} of our reproducibility scope.
+
+\textbf{Kitchen (table \ref{tab:tab:performance_kitchen})}
+In appendix \ref{app:metrics}, we describe sources of divergence between our metrics and the authors'.
+Our results support the authors' claim \ref{claim:author-2} that BeT captures multi-modality.
+The relative entropy between BeT and the demonstrations is high and comparable to the authors' for the task entropies, as are the sequence entropies, a new metric that we compute.
+We also observe that ablations with low performance have low entropy as they achieve fewer tasks.
+The no-history ablation exhibits a significant decrease in the diversity of its rollouts, supporting the authors' architectural choices and addressing claim \ref{claim:ablation} of our reproducibility scope.
+The no-binning and no-focal loss ablations, however, achieve a higher entropy than BeT, but this cannot be disentangled from the fact that they also perform better than BeT.
+We can only say that these ablations are not detrimental to BeT's ability to capture multi-modality on the Kitchen dataset.
+
+\textbf{Point mass} We show qualitative rollout plots in figure \ref{fig:pointmass-results}, showing that BeT exhibits different modes, though not exactly as reported by the authors.
+
+\begin{table}[htb]
+\centering
+\caption{Metrics to measure the ability of the models to capture the different modes in the datasets.
+For Blockpush, we measure the relative frequencies of the first block to be reached, those of the different targets to where the red block is pushed, and the different targets to where the green block is pushed.
+These metrics are described in further detail in appendix \ref{app:metrics}.}
+\label{tab:res-diversity-bp}
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lccccccc}
+                & \multicolumn{1}{l}{}                              & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}1st Block \\ Reached\end{tabular}} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Push: Red \\ Block Target\end{tabular}} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Push: Green \\ Block Target\end{tabular}} \\
+Models          & \begin{tabular}[c]{@{}c@{}}\#\\ Runs\end{tabular} & Red                                     & Green                                  & Red                                       & Green                                     & Red                                        & Green                                      \\ \hline
+BeT             & \multicolumn{1}{c|}{5}                            & 0.51 ± 0.02                             & 0.49 ± 0.02                            & 0.29 ± 0.02                               & 0.28 ± 0.01                               & 0.28 ± 0.02                                & 0.28 ± 0.01                                \\
+No offsets      & \multicolumn{1}{c|}{3}                            & 0.50 ± 0.01                             & 0.50 ± 0.01                            & 0.26 ± 0.04                               & 0.24 ± 0.04                               & 0.26 ± 0.03                                & 0.25 ± 0.03                                \\
+No binning      & \multicolumn{1}{c|}{3}                            & 0.54 ± 0.03                             & 0.45 ± 0.04                            & 0.15 ± 0.03                               & 0.13 ± 0.03                               & 0.14 ± 0.02                                & 0.14 ± 0.04                                \\
+No history      & \multicolumn{1}{c|}{3}                            & 0.50 ± 0.02                             & 0.50 ± 0.02                            & 0.29 ± 0.03                               & 0.29 ± 0.02                               & 0.27 ± 0.04                                & 0.27 ± 0.06                                \\
+Trunk MLP       & \multicolumn{1}{c|}{3}                            & 0.51 ± 0.06                             & 0.42 ± 0.03                            & 0.00 ± 0.00                               & 0.00 ± 0.00                               & 0.00 ± 0.00                                & 0.00 ± 0.00                                \\
+Trunk MLP (Opt) & \multicolumn{1}{c|}{3}                            & 0.50 ± 0.03                             & 0.45 ± 0.01                            & 0.01 ± 0.00                               & 0.01 ± 0.01                               & 0.01 ± 0.00                                & 0.01 ± 0.00                                \\
+No focal loss   & \multicolumn{1}{c|}{3}                            & 0.50 ± 0.02                             & 0.50 ± 0.02                            & 0.27 ± 0.02                               & 0.29 ± 0.02                               & 0.27 ± 0.04                                & 0.28 ± 0.06                                \\ \hline
+BeT (paper)    & \multicolumn{1}{c|}{1}                            & 0.54                                    & 0.46                                   & 0.43                                      & 0.44                                      & 0.41                                       & 0.40                                       \\
+Demonstrations  & \multicolumn{1}{l|}{}                             & 0.50                                    & 0.50                                   & 0.50                                      & 0.50                                      & 0.50                                       & 0.50                                                                                                           
+\end{tabular}
+}
+\end{table}
+
+
+\begin{table}[htb]
+\centering
+\caption{Metrics to measure the ability of the models to capture the different modes in the datasets.
+For Kitchen, we measure the task and sequence entropies of the distribution of tasks performed during an episode.
+These metrics are also described in further detail in appendix \ref{app:metrics}.}
+\label{tab:tab:performance_kitchen}
+\resizebox{0.45\textwidth}{!}{
+\begin{tabular}{lcc}
+                                     & \begin{tabular}[c]{@{}c@{}}Sequence\\ Entropy\end{tabular} & \begin{tabular}[c]{@{}c@{}}Task \\ Entropy\end{tabular} \\
+Models                               & \multicolumn{1}{l}{}                                       & \multicolumn{1}{l}{}                                    \\ \hline
+\multicolumn{1}{l|}{BeT}             & 3.98 ± 0.65                                                & 2.63 ± 0.07                                             \\
+\multicolumn{1}{l|}{No offsets}      & 1.16 ± 0.23                                                & 1.79 ± 0.10                                              \\
+\multicolumn{1}{l|}{No binning}      & \textbf{4.26 ± 0.61}                                               & \textbf{2.71 ± 0.04}                                             \\
+\multicolumn{1}{l|}{No history}      & 3.51 ± 0.43                                                & 2.39 ± 0.06                                             \\
+\multicolumn{1}{l|}{Trunk MLP}       & 1.00 ± 0.85                                                 & 1.59 ± 0.37                                             \\
+\multicolumn{1}{l|}{Trunk MLP (Opt)} & 0.98 ± 0.27                                                & 1.66 ± 0.09                                             \\
+\multicolumn{1}{l|}{No focal loss}   & 4.16 ± 0.66                                                & 2.67 ± 0.05                                             \\ \hline
+\multicolumn{1}{l|}{BeT (paper)}     & /                                                          & 2.47*                                                   \\
+\multicolumn{1}{l|}{Demonstrations}  & 4.69                                                       & 2.88                                                   
+\end{tabular}
+}
+\end{table}                                      
+
+\subsubsection{Sensitivity to critical hyperparameters}\label{results:sensitivity}
+In Figure 6 of \citet{shafiullah2022behavior}, the authors show a sweep over the number of action centers and claim that the range for near-optimum performance is quite wide.
+However, the figure does not fully support this claim as they use a logarithmic scale over $k$.
+We perform a more granular sweep over both the number of bins $k$ and the window size $h$ independently to first reproduce their sweep results over cross-validation runs and, more importantly, better assess the claims concerning the sensitivity of BeT near high-performing hyperparameters.
+Results are in figure \ref{fig:sensitivity-sweep}.
+The results do not match the numbers obtained by the \citet{shafiullah2022behavior}. However, we can see that there is indeed a sweet spot around high-performing hyperparameters, supporting the authors' claims.
+
+\subsection{Results beyond the original paper}\label{sec:results_beyond_paper}
+
+\subsubsection{A limitation in BeT's representation power}\label{results:sensitivity-k}
+
+A major design choice in the action binning of BeT is that action bins are determined from clusters computed on \emph{all} the actions in the dataset.
+In particular, this means that all actions at all timesteps ``compete'' to give the bin centers.
+However, a model only needs to distinguish between the different modes at the specific state it is considering, so there are actually fewer actions ``competing'' for action centers at a given output step.
+As the idea is to capture the different modes with these centers, BeT assumes that to clone $k$ different modes, one can use $k$ action bins, but this may be insufficient.
+For example, in Point mass 1, we deem that $k=2$ is enough to clone the two modes ``up'' and ``down'', appearing at the early timestep when the agents diverge in the up and down directions.
+When aggregating these up \& down actions with the third action going forward to obtain the bin centers, those 3 actions must be captured with only 2 centers.
+In this case, it is possible that the $k$-means clustering converges to the centers $[0,0]$ and $[1,0]$, collapsing the up \& down actions to a single bin and hence collapsing the performance of BeT in the environment.
+We empirically show this failure case in figure \ref{fig:pointmass-limitation}.
+We believe that considering a state-dependent, or perhaps timestep-dependent, binning can be a valid solution to overcome this problem.
+
+\subsubsection{An LSTM trunk}\label{sec:lstm-baseline}
+\citet{shafiullah2022behavior} report a surprisingly poor performance with an LSTM trunk on the Blockpush and Kitchen environments.
+Although such recurrent neural network architectures are known to be slower and harder to train than a Transformer,
+we are interested in showing that an LSTM can be a strong candidate for the context‐based multi‐modal prediction task BeT is addressing,
+as both models have similar representational power.
+We run BeT with an LSTM trunk on the simple Point mass 2 environment to avoid issues related to training and show in figure \ref{fig:pointmass-results} that it provides performant rollouts capturing the multi-modality of the dataset.
+The hyperparameters of the model were manually tuned and are listed in Table \ref{tab:hyper_lstm}.
+The performance of the LSTM is actually better than that of the Transformer using the hyperparameters provided by the authors in that environment, which suggests that practitioners with relatively easy environments may also consider using an LSTM trunk.

@@ -1,0 +1,24 @@
+\section{Introduction}
+\label{sec:intro}
+
+Reinforcement Learning (RL) \parencite{sutton_reinforcement_2018} has been a successful method for training agents in sequential decision-making tasks \parencite{mnih_human-level_2015}.
+When a reward signal is available to judge the actions performed by the learning agent in the environment, RL can be used to optimize the total rewards obtained by the agent throughout its experience.
+However, such a reward signal is often hard to design in real-world environments such as autonomous driving or robotic manipulation, where it could be subjective or hard to attribute to individual actions \parencite{ng_algorithms_2000}.
+Behavior Cloning (BC) \parencite{osa_algorithmic_2018} can be used in cases where a dataset of expert demonstrations is available instead of the reward function.
+BC trains the agent to mimic the actions performed in the expert demonstrations at every state in a supervised learning fashion.
+More precisely, given a dataset of observation and expert action pairs $\mathcal{D} \equiv \{(o_t, a_t)\} \subset \mathcal{O} \times \mathcal{A}$, the aim is to learn a policy $\pi:\mathcal{O} \to \Delta(\mathcal{A})$ that specifies a distribution over the actions to be performed by the agent for a given observation.
+A typical approach is to model the policy by choosing a hypothesis class parameterized by some $\theta \subset \Theta$ and optimize the likelihood of observed expert actions:
+\begin{equation}
+    \theta^* = \underset{\theta \subset \Theta}{\mathrm{argmax}} \prod_{t}  \pi(a_t | o_t; \theta)
+\end{equation}
+Still, this formulation assumes that the demonstrations come from a single Markovian expert demonstrator, a strong assumption that may not hold in large real-world settings or which may restrict the amount of data available to the learner.\\
+
+\citet{shafiullah2022behavior} propose the Behavior Transformer (BeT) to overcome two key assumptions in the above BC formulation.
+First, instead of assuming a Markovian policy, they model $\pi(a_t | o_t, o_{t-1}, \ldots, o_{t-h+1}; \theta)$ for window size $h$ to learn a policy that conditions on a history of size $h$.
+Second, instead of assuming a unimodal action distribution, they learn a mixture of $k$ Gaussians.
+They leverage the Transformer \cite{vaswani_attention_2017} architecture for this context-based multi-modal prediction task, adapting the discrete classes predicted by transformers to continuous actions.
+With this architecture, the authors claim that:
+\begin{enumerate}
+    \item BeT generates rollouts with higher performance than other BC baselines when trained on multi-modal datasets. \label{claim:author-1}
+    \item BeT captures the multi-modality of these datasets instead of collapsing onto single modes. \label{claim:author-2}
+\end{enumerate}
