@@ -1,0 +1,22 @@
+\section*{\centering Reproducibility Summary}
+\subsubsection*{Scope of Reproducibility} This study focuses on investigating the reproducibility of \textit{Joint Multisided Exposure Fairness (JME) for Recommendation} by Wu et al\cite{wu}. Our objective is to verify the following claims suggested by the paper: (i) each of the proposed exposure fairness metrics quantifies a different notion of unfairness, (ii) for each of the proposed metrics there exists a disparity-relevance trade-off, and (iii) recommender systems can be optimized towards multiple fairness goals using JME-fairness measures.
+
+\subsubsection*{Methodology}
+We modify and extend upon the open-source implementation of the pipeline, published by the authors on GitHub \cite{Wugit2022}. Our adjustments include restructuring the codebase, adding experimental setup files, and removing several bugs. We run the experiments on a RTX 3070 GPU, at a reproducibility cost of 44.5 GPU hours.
+
+\subsubsection*{Results}
+We successfully reproduce the major trends of the core results, although some numerical deviations occur. We are able of providing support to two out of three claims. However, due to insufficient documentation and resources, we were unable to verify the paper's third claim. We conclude that in order to determine the fairness of a recommender system, considering different fairness dimensions with a multi-stakeholder perspective is essential.
+
+\subsubsection*{What was easy}
+The JME-fairness metrics proposed in the paper are well-explained and fairly intuitive. Even without a background in fairness in AI and recommender systems, we were able to follow the pipeline and the main ideas presented.
+
+\subsubsection*{What was difficult}
+Details regarding the setup of the experiments are missing from the original codebase, and  documentation is limited. In addition, for the reproduction of their third claim, familiarity with topics not analyzed in the paper is required.
+
+\subsubsection*{Communication with original authors}
+Per request by email, the authors provided some clarifications regarding experimental setups and calculations performed in the experiments of the original paper. We received a response that answered part of our questions, and a reference to a GitHub repository \cite{latataro} which is potentially suitable for demonstrating optimization with a JME-fairness loss.
+
+
+
+
+
