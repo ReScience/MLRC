@@ -1,0 +1,110 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Hierarchical Shrinkage: Improving the Accuracy and Interpretability of Tree-Based Methods"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Domen Mohorčič
+    orcid: 0009-0004-6327-4591
+    email: dm4492@student.uni-lj.si
+    affiliations: 1
+    
+  - name: David Ocepek
+    orcid: 0009-0008-8453-0231
+    email: do8572@student.uni-lj.si
+    affiliations: 1,*      # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Ljubljana, Faculty of Computer and Information Science
+    address: Ljubljana, Slovenia
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: "rescience c, machine learning, decision tree, random forest, post-hoc regularization, Python"
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/do8572/MLDS
+  - doi: 10.5281/zenodo.7951629
+  - swh: "swh:1:dir:81c99d3cd87ec4ed1186297730f07530b5157ac1"
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+  - cite: "Agarwal, A., Tan, Y.S., Ronen, O., Singh, C. &amp; Yu, B.. (2022). Hierarchical Shrinkage: Improving the accuracy and interpretability of tree-based models.. <i>Proceedings of the 39th International Conference on Machine Learning</i>, in <i>Proceedings of Machine Learning Research</i> 162:111-135 Available from https://proceedings.mlr.press/v162/agarwal22b.html." # Full textual citation
+  - bib: agarwal2022 # Bibtex key (if any) in your bibliography file
+  - url: https://proceedings.mlr.press/v162/agarwal22b/agarwal22b.pdf # URL to the PDF, try to link to a non-paywall version
+  - doi:  # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility: The paper presents a novel post-hoc regularization technique for tree-based models, called Hierarchical Shrinkage (Agarwal 2022). Our main goal is to confirm the claims that it substantially increases the predictive performance of both decision trees and random forests, that it is faster than other regularization techniques, and that it makes the interpretation of random forests simpler.\nMethodology: In our reproduction, we used the Hierarchical Shrinkage, provided by the authors in the Python package imodels. We also used their function for obtaining pre-cleaned data sets. While the algorithm code and clean datasets were provided we re-implemented the experiments as well as added additional experiments to further test the validity of the claims. The results were tested by applying Hierarchical Shrinkage to different tree models and comparing them to the authors' results.\nResults: We managed to reproduce most of the results the authors get. The method works well and most of the claims are supported. The method does increase the predictive performance of tree-based models most of the time, but not always. When compared to other regularization techniques the Hierarchical Shrinkage outperforms them when used on decision trees, but not when used on random forests. Since the method is applied after learning, it is extremely fast. And it does simplify decision boundaries for random forests, making them easier to interpret.\nWhat was easy: The use of the official code for Hierarchical Shrinkage was straightforward and used the same function naming convention as other machine learning libraries. The function for acquiring already clean data sets saved a lot of time.\nWhat was difficult: The authors also provided the code for their experiments in a separate library, but the code did not run out of the box and we had no success reproducing the results with it. The code was inconsistent with the paper methodology. We had the most problems with hyperparameter tuning. The authors did not specify how they tuned the hyperparameters for the used RF regularizers.\nCommunication with original authors: We did not contact the authors of the original paper."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=NgPQSqpz-Y
+
+contributors:
+  - name:
+    orcid: 
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  November 1, 2018
+  - accepted:
+  - published: 
+
+# This information will be provided by the editor
+article:
+  - number: 1 # Article number will be automatically assigned during publication
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name: ReScience C
+  - issn: 2430-3658
+  - volume: 9
+  - issue: 2
