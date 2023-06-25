@@ -1,0 +1,132 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reproducibility study of ``Explaining Deep Convolutional Neural Networks via Latent Visual-Semantic Filter Attention''"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Erik Buis
+    orcid: 0009-0000-9149-4824
+    email: ebbuis@gmail.com
+    affiliations: 1,*      # * is for contact author
+
+  - name: Sebastiaan Dijkstra
+    orcid: 0009-0002-6402-5816
+    email: sebastiaandijkstra@gmail.com
+    affiliations: 1
+
+  - name: Bram Heijermans
+    orcid: 0009-0005-2623-8396
+    email: b.heijermans@gmail.com
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: Reproduce, Interpretability, Convolutional Neural Networks, Post-hoc global method, Latent Visual Semantic Filter Attention, Python, PyTorch, Common Objects in Context, machine learning, rescience c
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/ErikBuis/FACT2023
+  - doi: https://zenodo.org/badge/latestdoi/585223762
+  - swh: swh:1:dir:3b9cb41cd6d8680801f3b80b29410b641408348e
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Y. Yang, S. Kim and J. Joo, \"Explaining Deep Convolutional Neural Networks via Latent Visual-Semantic Filter Attention,\" 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), New Orleans, LA, USA, 2022, pp. 8323-8333, doi: 10.1109/CVPR52688.2022.00815." # Full textual citation
+ - bib: yang2022explaining # Bibtex key (if any) in your bibliography file
+ - url: https://arxiv.org/pdf/2204.04601.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi: 10.1109/CVPR52688.2022.00815 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility
+In this work, we aim to reproduce the findings of the paper Explaining Deep Convolutional Neural Networks via Latent Visual-Semantic Filter Attention (LaViSE). This paper presents a global post-hoc explanation framework for deep learning models that generates semantic explanations for CNN filters. To assess the reproducibility of this work, we verify the main claims made in the paper. More specifically, we evaluate whether the framework creates an accurate mapping to the semantic space, generates words which were not seen in the training data, and is able to generalize to any pre-trained CNN.
+
+Methodology
+To reproduce the experiments detailed in the original paper, we first obtained the author's code. However, we had to modify the code for the experiments to be executable, adding missing code, debugging, and making the code more maintainable. Additionally, we evaluated the model's generalizability to other CNNs. The project required a total of 62 GPU hours.
+
+Results
+Our recall scores and qualitative experiments validate all claims of the authors: the framework creates an accurate mapping between the visual and semantic space, can analyze any trained CNN regardless of original training data availability, and is able to generate novel out-of-dataset descriptions for filters.
+
+What was easy
+The paper was well-written and easy to understand, with helpful figures illustrating the LaViSE framework that aided in the implementation process.
+
+What was difficult
+The implementation of the methodology outlined in the paper was particularly challenging due to limited documentation and insufficient details about parts that were not implemented in the existing codebase. Additionally, some experiments could not be recreated because they would require a significant amount of resources to verify.
+
+Communication with original authors
+We contacted the authors to clarify missing information and aspects that were not functioning as expected. However, we did not receive a response to our questions."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=nsrHznwHhl
+
+contributors:
+  - name: Maurits Bleeker
+    orcid: 0000-0002-1572-6926
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:
+  - accepted:
+  - published:
+
+# This information will be provided by the editor
+article:
+  - number: 1 # Article number will be automatically assigned during publication
+  - doi:      # DOI from Zenodo
+  - url:      # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  2
