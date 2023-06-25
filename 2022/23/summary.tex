@@ -1,0 +1,27 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+This paper attempts to reproduce the main claims of ``Focus On The Common Good: Group Distributional Robustness Follows'' by Piratla et al., which introduces Common Gradient Descent (\texttt{CGD}), a novel optimization algorithm for handling spurious correlations and sub-population shifts. We have identified three central claims: (I) \texttt{CGD} is more robust than \texttt{Group-DRO} and leads to the largest average loss decrease across all groups (II) \texttt{CGD} generalizes better across all groups in comparison to \texttt{ERM}, and (III) \texttt{CGD} monotonically decreases the group-average loss.
+
+\subsubsection*{Methodology}
+
+The experiments of this paper are based on the open source implementation of \texttt{CGD} released by the authors, which required some modifications to work with the latest version of the WILDS framework.
+
+\subsubsection*{Results}
+The results from our experiments were overall in line with the paper.
+We show that \texttt{CGD} outperforms \texttt{Group-DRO} on synthetic datasets with induced spurious correlations, but the benefits of \texttt{CGD} are not clear in a real-world setting. Beyond the results of the original paper, our attempt to empirically verify the mathematical proof of the authors that \texttt{CGD} monotonically decreases the loss was not conclusive.
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsubsection*{What was easy}
+The implementation from the original paper was available on GitHub with detailed instructions provided in the documentation. It was also relatively easy to introduce additional datasets and algorithms to the WILDS codebase.
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+\subsubsection*{What was difficult}
+The \texttt{CGD} implementation and several experiments could not be run out-of-the-box and required major modifications to run with the latest version of WILDS. The majority of the hyperparameter values for the experiments were not clearly stated. Lastly, the experiments were computationally expensive and required 440 GPU hours.
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsubsection*{Communication with original authors}
+We reached out to the original authors to request additional information about the hyperparameter values and the implementation of some experiments. The authors promptly responded with sources for the hyperparameters, useful information about WILDS and provided some missing parts of the code. Overall, the communications were timely and effective.
+% Briefly describe how much contact you had with the original authors (if any).

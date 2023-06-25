@@ -1,0 +1,132 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reproducibility Study of ”Focus On The Common Good: Group Distributional Robustness Follows”"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Walter Simoncini
+    orcid: 0009-0006-3086-7141
+    email: walter.simoncini@student.uva.nl
+    affiliations: 1,*
+    
+  - name: Ioanna Gogou
+    orcid: 0000-0002-9223-9726
+    email: ioanna.gogou@student.uva.nl
+    affiliations: 1
+
+  - name: Marta Freixo Lopes
+    orcid: 0009-0007-9039-1349
+    email: m.freixolopes@uva.nl
+    affiliations: 1
+
+  - name: Ron Kremer
+    orcid: 0009-0005-8973-7133
+    email: ron.kremer@student.uva.nl
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:    
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, machine learning, deep learning, python, pytorch, robustness
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/WalterSimoncini/CGD-Reproduction
+  - doi: 10.5281/zenodo.7998663
+  - swh: swh:1:dir:4a89288fc050158c419caee05af572cad7b71a12
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "V. Piratla, P. Netrapalli, and S. Sarawagi. “Focus on the Common Good: Group Distributional Robustness Follows.” In: Proceedings of the International Conference on Learning Representations (2022)."
+ - bib: piratla2022focus
+ - url: https://openreview.net/pdf?id=irARV_2VFs4
+ - doi: 10.48550/arXiv.2110.02619
+
+# Don't forget to surround abstract with double quotes
+abstract: "- Scope of Reproducibility
+  This paper attempts to reproduce the main claims of Focus On The Common Good: Group Distributional Robustness Follows by Piratla et al., which introduces Common Gradient Descent (CGD), a novel optimization algorithm for handling spurious correlations and sub-population shifts. We have identified three central claims: (I) CGD is more robust than Group-DRO and leads to the largest average loss decrease across all groups (II) CGD generalizes better across all groups in comparison to ERM, and (III) CGD monotonically decreases the group-average loss.
+  - Methodology
+  The experiments of this paper are based on the open source implementation of CGD released by the authors, which required some modifications to work with the latest version of the WILDS framework.
+  - Results
+  The results from our experiments were overall in line with the paper. We show that CGD outperforms Group-DRO on synthetic datasets with induced spurious correlations, but the benefits of CGD are not clear in a real-world setting. Beyond the results of the original paper, our attempt to empirically verify the mathematical proof of the authors that CGD monotonically decreases the loss was not conclusive.
+  - What was easy
+  The implementation from the original paper was available on GitHub with detailed instructions provided in the documentation. It was also relatively easy to introduce additional datasets and algorithms to the WILDS codebase.
+  - What was difficult
+  The CGD implementation and several experiments could not be run out-of-the-box and required major modifications to run with the latest version of WILDS. The majority of the hyperparameter values for the experiments were not clearly stated. Lastly, the experiments were computationally expensive and required 440 GPU hours.
+  - Communication with original authors
+  We reached out to the original authors to request additional information about the hyperparameter values and the implementation of some experiments. The authors promptly responded with sources for the hyperparameters, useful information about WILDS and provided some missing parts of the code. Overall, the communications were timely and effective."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=ye8PftiQLQ
+
+contributors:
+  - name: Maurist Bleeker 
+    orcid: 0000-0002-1572-6926
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:
+  - accepted:
+  - published: 
+
+# This information will be provided by the editor
+article:
+  - number: 1 # Article number will be automatically assigned during publication
+  - doi:    10.5281/zenodo.7998663
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  2
