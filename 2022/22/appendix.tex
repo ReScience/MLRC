@@ -1,0 +1,33 @@
+\appendix 
+\section{Hyperparameter deviations}
+We found two deviations between the hyperparameters as provided in the Proto2Proto codebase and the hyperparameters as reported in the paper.
+\subsection{Cluster loss} \label{cluster}
+ProtoPNet supplement: \begin{quote}In our experiments on both CUB-200-2011 and Stanford Cars, \hl{we set the coefficient of the cluster cost to 0.8}, and the coefficient of the separation cost to 0.08 during stochastic gradient descent of layers before the last layer, and we set the coefficient of the $L^1$-regularization term (on the weight connection between each prototype of class $k$ and the logit of class $k^\prime \neq k$) to $10^{−4}$ during convex optimization of the last layer. For the coefficient of the cluster cost and the coefficient of the separation cost, we considered three different settings: (1, 0.1), (0.8, 0.08), (0.6, 0.06), and chose the pair (0.8, 0.08) using cross validation. For the coefficient of the $L^1$-regularization term, we considered $10^{−3}$, $10^{−4}$,
+and $10^{−5}$, and chose $10^{−4}$ also by cross validation.\end{quote} 
+Proto2Proto YAML file:\begin{quote}
+\begin{verbatim}
+  lossList:
+    crossEntropy:
+      consider: true
+      weight: 1.0
+    clusterSep:
+      consider: true
+      clusterWeight: 1.0 # Not 0.8
+      sepWeight: -0.08
+    l1:
+      consider: true
+      weight: 1.0e-04    
+\end{verbatim}
+\end{quote}
+
+\subsection{Possible values of τ} \label{tau}
+Proto2Proto supplement:\begin{quote}
+For training $\tau_{train} = 100$ and for testing, \hl{we choose $\tau_{test}$ from the set \\
+$\{0.1, 0.45, 1, 5, inf \}$}.
+\end{quote}
+
+Proto2Proto code:
+
+\begin{verbatim}
+distance_thresholds = [0.01, 0.1, 0.2, 0.45, 1.0, 3.0, 5.0, None]
+\end{verbatim}

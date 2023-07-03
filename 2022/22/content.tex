@@ -1,0 +1,204 @@
+\section{Introduction}
+
+Within the field of computer vision, deep models have achieved high accuracy in a variety of tasks. However, it remains generally difficult to understand their predictions because of their black-box nature. This interpretability issue is problematic when considering applications involving high-stakes decisions \citep{li2022interpretable}. Prototypical deep learning methods have relatively high levels of interpretability, by comparing parts of the input image to prototypes learned during training. For example, a bird image classification decision could be explained as `an image seems to contain a green kingfisher, because \emph{this} part of the image looks like \emph{this} prototypical feature of a green kingfisher' \citep{donnelly2022deformable}. Prototypical methods introduced in recent years include ProtoPNet \citep{chen2019this} and ProtoTree \citep{nauta2021neural}. \par
+
+Knowledge distillation, a concept that has recently received increased attention, uses deep teacher models to train shallower student networks that aim to imitate the teacher and obtain competitive performance \citep{gou2021knowledge}. Although there has been a lot of focus on retaining or increasing accuracy between student and teacher models (for example \cite{hinton2015distilling}, \cite{hong2020distilling}, \cite{hong2021student}), interpretability is often disregarded. \citet{keswani2022proto2proto} propose the Proto2Proto technique, which applies knowledge distillation to prototypical methods to transfer interpretability from teacher to student models without significantly compromising performance. This method assumes an interpretable teacher model and transfers both performance \emph{and} interpretability to the student.
+
+\par
+This paper aims to reproduce the experiments of the Proto2Proto study and verify the authors' main claims. We try to reinforce the claims with both qualitative analysis (showing images with their respective prototypes) and quantitative analysis (using various metrics).
+
+The rest of this paper is structured in the following way. We first list the main claims of the Proto2Proto paper that we attempt to verify. In section \ref{sec:theory}, we summarize the necessary theoretical background to understand Proto2Proto. Section \ref{sec:method} describes the original experiments and explains how we attempted to reproduce the study. In section \ref{sec:results}, we present the results of our reproduction and investigations. These results and the overall reproducibility of the experiments and claims are discussed in section \ref{sec:discussion}.
+
+
+\subsection{Scope of reproducibility}
+\label{sec:claims}
+The main claims of the Proto2Proto paper are:
+\begin{enumerate}    
+\item \label{claim1} \hypertarget{claim1}{Using Proto2Proto, a shallower student model is more faithful to the teacher in terms of interpretability than a baseline student model, while also showing the same or better accuracy.}
+\item \label{claim2} \hypertarget{claim2}{Global Explanation Loss forces student prototypes to be close to teacher prototypes.}
+\item \label{claim3}  \hypertarget{claim3}{Patch-Prototype Correspondence Loss enforces the local representations of the student to be similar to those of the teacher.}
+\item \label{claim4}  \hypertarget{claim4}{The proposed evaluation metrics determine the faithfulness of the student to the teacher in terms of interpretability.}
+\end{enumerate}
+
+The fourth claim requires a theoretical discussion of the concept of interpretability and an analysis of the paper's method. To verify the other claims, it is necessary to reproduce the experiments and analyze the results.
+
+
+\section{Background}\label{sec:theory}
+
+\subsection{ProtoPNet}
+ProtoPNet is a prototypical model. These models use prototypes that provide a way of adding interpretability to image classification models. During training, the model learns a set of prototypes that represent the most relevant regions of the dataset. When an input image is fed into the network, it is first put through a backbone CNN, which results in a set of features. These features are used to extract a set of patches (parts of the image) that can be compared to the prototypes. These features are compared to every prototype by calculating the distance between the two. The similarity score is the inverse of this distance and the highest similarity score for each prototype is stored. These scores are fed into the decision module to compute the output logits.\par 
+ProtoPNet is inherently interpretable by displaying which local image patches contri\-bute to its decision. Besides this local interpretability, prototypical models also provide global interpretability, because the learned prototypes show the regions that the model focuses on to make its decisions. An example of prototype activation can be seen in Figure \ref{fig:local_analysis}. \par
+
+\subsection{Proto2Proto}
+The purpose of Proto2Proto is to transfer interpretability from a (prototypical) teacher model to a student model. To do this, the authors define two new losses that force the student model to agree with the teacher model on both prototypes and local representations. The \textit{Global Explanation Loss} $L_{\text{global}}$ is an average of the distance between the prototypes of the student and the teacher (any distance metric could be used, but both the original and our paper use Euclidean distance). The \textit{Patch-Prototype Correspondence Loss} $L_{\text{ppc}}$ is calculated by taking the difference between the student's and the teacher's feature maps of all the active patches, divided by the number of training images. Active patches are local patches whose distance to the closest prototype is below a threshold $\tau$. Thus, $\tau$ is a hyperparameter that influences the amount of active patches.
+
+The total loss function now becomes $$L_{\text{total}} = L_{\text{model}} + \lambda_{\text{global}} L_{\text{global}} + \lambda_{\text{ppc}} L_{\text{ppc}}$$
+where $L_{\text{model}}$ is the loss of the prototypical method being used and $\lambda_{\text{global}}$ and $\lambda_{\text{ppc}}$ are hyperparameters that balance the newly introduced losses.\par
+
+
+In addition to these two new losses, the authors also introduce three new metrics that evaluate how close the student and teacher models are in terms of interpretability. The \textit{Average number of Active Patches} (AAP) is the average number of active patches that a model has per test image. It is related to local interpretability and should be as similar as possible between the teacher and student.
+The \textit{Average Jaccard Similarity of Active Patches with Teacher} (AJS) gives the overlap of the student's and teacher's active patches. It is calculated for a pair of models and can never be higher than 1. AAP and AJS are used to determine the Patch-Prototype Correspondence Loss.
+Finally, the \textit{Prototype Matching Score} (PMS) determines the Global Explanation Loss by comparing the prototypes of the teacher and the student. This requires a modified distance metric and matching algorithm because the mapping between student and teacher prototypes is not known.
+
+
+
+\section{Methodology} \label{sec:method}
+To verify the first three claims, we identified the following requirements:
+
+Evaluating \hyperlink{claim1}{claim 1} requires training a teacher model, a baseline student trained without Proto2Proto and a student model trained using knowledge distillation with the \linebreak Proto2Proto method. If the claim holds, the knowledge distillation model is expected to be evaluated higher on both accuracy and the novel evaluation metrics than the baseline student model. Furthermore, we perform a qualitative analysis of the learned prototypes.
+
+For \hyperlink{claim2}{claim 2}, we need to confirm that $L_{\text{global}}$ forces high PMS. As such we need to ablate $L_{\text{ppc}}$ and confirm that PMS stays high.
+
+For \hyperlink{claim3}{claim 3}, we need to confirm that $L_{\text{ppc}}$ forces high AJS and high similarity between the student's and the teacher's AAP. As such we need to ablate $L_{\text{global}}$ and confirm that AJS stays high and the student's AAP remains close to the teacher's AAP.
+
+Finally, \hyperlink{claim4}{claim 4} needs to be verified by conducting a theoretical analysis.
+
+
+To conduct the experiments we used the public code repository of the authors\footnote{\url{https://github.com/archmaester/proto2proto}\label{p2pgithub}}. We used YAML files containing arguments provided by the authors, and altered them where necessary.
+
+\subsection{Model descriptions}
+The authors use two existing prototypical methods: ProtoPNet \citep{chen2019this} and ProtoTree \citep{nauta2021neural}. Different CNN architectures were used to extract features from the input image. For teacher models, the ResNet-50 and VGG-19 architectures were used. The student models used the ResNet-18, ResNet-34, and VGG-11 architectures. All of these CNN models have been pre-trained on the ImageNet-1K dataset and the weights are downloaded from the PyTorch website. 
+
+The provided codebase lacked any reference to ProtoTree, thus we did not use this architecture in our experiments. We reproduced only the ResNet-50 to ResNet-18 experiment because this was the only configuration for which the authors provided the YAML files.
+
+
+\subsection{Datasets}
+The authors conducted experiments on two datasets. The first is the Stanford Cars Dataset (CARS)\footnote{\url{https://ai.stanford.edu/~jkrause/cars/car_dataset.html}} \cite{krause20133d}. It contains 16,185 images in 196 classes, which are split into a training set of 8144 and a test set of 8041 images. The training set is augmented by rotating, skewing, flipping, and distorting the images. The original paper created 40 variations of each picture. This was not feasible for our experiment since it increased train times beyond our computational capacity. Therefore, we lowered the number of variations to 4 per picture. \par 
+The second dataset that was used was the CUB-200-2011 \cite{wah2011caltech} dataset. However, the authors did not provide documentation on the used parameters for the models trained on this dataset. We augmented the CUB dataset and trained it with the same argument settings. However, due to the lack of hyperparameters, we were unable to train the models on this dataset faithfully. As such, we only used the CARS dataset.
+
+
+\subsection{Hyperparameters}
+Training the models requires different hyperparameters, that can be separated into a few categories.
+
+\subsubsection{Prototypical method}
+In both ProtoPNet and Proto2Proto, the network learns 10 prototypes per image class. Other hyperparameters for the knowledge distillation experiment from ResNet-50 to ResNet-18 were provided by the Proto2Proto authors in YAML files. These files include learning rates for several parts of the model and information about the dataset. In the supplement, the authors state that `[They] follow the same hyperpar[a]meters as ProtoPNet [...]' \citep[Suppl. p.~1]{keswani2022proto2proto}. However, when comparing the YAML file with the hyperparameters used to train the models in the original ProtoPNet paper \citep[Suppl. p~24]{chen2019this}, we found that both deviate in the weight for the cluster cost (see \ref{cluster}).\par
+
+\subsubsection{New hyperparameters for Proto2Proto}
+The loss function contains two novel hyperparameters: $\lambda_{\text{global}}$ and $\lambda_{\text{ppc}}$. Both values are set to 10 in all experiments. The threshold value $\tau$ that determines the maximum distance between a prototype and its active patch is set to 100 during training. During testing, models are evaluated using different values of $\tau$ (see \ref{tau}) including infinity (i.e. no maximum distance), and the value yielding the highest accuracy is used. Prototypes have a dimension of 128 for the VGG model architectures and 256 for the ResNet architectures. The authors note that these values were found to be optimal, but do not explain why or how they arrived at them.
+
+
+\subsection{Experimental setup and code}
+To carry out the two experiments to reproduce the results of the paper and verify the authors' main claims, we modified the provided PyTorch code. Our code was made publicly available\footnote{\url{https://github.com/gersondekleuver/Fact}}. The large majority of our code comes from the original authors\footnote{\url{https://github.com/archmaester/proto2proto}} and the authors of ProtoPNet\footnote{\url{https://github.com/cfchen-duke/ProtoPNet}}.\par 
+We trained the student, knowledge distillation, and teacher models with a batch size of 128. We trained the models for 35 epochs. All other hyperparameters were as provided in the YAML file of the Proto2Proto repository.\par
+When reproducing Table 4 from the original paper in our second experiment, we did not include the rows that reused the teacher's decision module for the student, because the code contained no reference to this configuration. Furthermore, for the knowledge distillation student with both novel losses ablated, we reused the baseline student, because the Global Correspondence Loss and Patch-Prototype Loss were the only losses back-propagated in the first phase of loss calculation.
+
+
+\subsection{Evaluation metrics}
+
+To evaluate whether the models satisfy \hyperlink{claim1}{claim 1} and \hyperlink{claim3}{claim 3} we used the metrics accuracy, \textit{Average number of Active Patches} (AAP) and \textit{Average Jaccard Similarity of Active Patches with Teacher} (AJS). 
+
+Due to computational constraints, we were unable to evaluate the models using \textit{Prototype Matching Score} (PMS), which prevented the reproduction of the experiment to verify \hyperlink{claim2}{claim 2}. 
+
+\subsection{Computational requirements}
+
+
+For training, we used a local device with an AMD Ryzen 7 3700x CPU with a RTX 2070 super GPU and 2 cloud devices which both used an NVIDIA T4 GPU from Google Colab. 
+
+
+The computational requirements per experiment were 15 GPU hours on average using a batch size of 128 with 8 workers. The total computational requirements of all experiments were 60 GPU hours.
+
+Our experiments only used 4 augmentations per image instead of 40. The average runtime of the model, when given the test set, is 25 minutes given a batch size of 128.
+
+
+
+\section{Results}
+\label{sec:results}
+\subsection{Experiment 1}
+The results of the first experiment are shown in Table \ref{table:exp1}. In agreement with the original study, our knowledge distillation student model is closer to the teacher model in both accuracy and interpretability. These results support \hyperlink{claim1}{claim 1}. Comparison of our results with Table 2 from \citet{keswani2022proto2proto} shows that our trained models obtain lower accuracy and higher AJS.
+
+\begin{table} \resizebox{\textwidth}{!}{
+        \begin{tabular}{| c | c | c | c c | c |}
+         \hline
+         \hfil Datasets & \hfil Methods & \hfil Settings &  \hfil AAP & \hfil AJS ($\uparrow$) & \hfil Accuracy  ($\uparrow$)\\
+         \hline
+         \multirow{4}{4em}{ \hfil CARS } &  \hfil ProtoPnet & \hfil ResNet-50 (Teacher) & \hfil 35.53 & \hfil 1.0 & \hfil 77.32\% \\ 
+        & \hfil ProtoPnet & \hfil ResNet-18 (Student) & \hfil 40.55 & \hfil 0.71 & \hfil 70.39\% \\ 
+        & \hfil Ours & \hfil ResNet-50 $\rightarrow$ ResNet-18 (KD) & \hfil 39.31 & \hfil 0.73 & \hfil 72.94\% \\ 
+        & \hfil  & \hfil   & \hfil  & \hfil \textbf{(+0.02)} & \hfil \textbf{(+2.55\%)} \\ 
+         \hline
+    \end{tabular}}
+    \caption{Accuracy and interpretability of the Proto2Proto student with a ProtoPNet teacher and ResNet backbone. Interpretability is evaluated using the AAP and AJS interpretability metrics.}
+    \label{table:exp1}
+\end{table}
+Figure \ref{fig:local_analysis} shows the most highly activated prototypes for our trained models for a sample test image. Contrarily to Figure 1 in the original paper, we do not observe similarities between the most active prototypes of the teacher and the knowledge distillation student. 
+
+\subsection{Experiment 2}
+
+Table \ref{table:exp2} shows the results of the loss ablation experiment. When $L_{\text{global}}$ is ablated, the distance between the student's and teacher's AAP become larger. Moreover, AJS decreases. Furthermore, when $L_\text{ppc}$ is ablated, the AJS remains the same. These results are in line with the results from the original paper, but go against \hyperlink{claim3}{claim 3}. 
+
+
+\begin{table}
+\begin{tabular}{|c|c|c|c c|c|} 
+\hline
+$L_{ppnet}$ & $L_{ppc}$ & $L_{global}$ & AAP & AJS & Accuracy \\
+\hline
+\checkmark &  &  & 40.55 & 0.71 & 70.39\% \\
+\checkmark &  & \checkmark & 17.78 & 0.73 & 51.22\% \\
+\checkmark & \checkmark &  & 31.51 & 0.53 & 13.44\% \\
+\checkmark & \checkmark & \checkmark & 39.31 & 0.73 & 72.94\% \\ \hline
+\multicolumn{3}{|c|}{Teacher} & 35.53 & 1.0 & 77.32\% \\
+\hline
+\end{tabular}
+\caption{Performance of ResNet-18 student trained using a ResNet-50 teacher on different losses.}
+\label{table:exp2}
+\end{table}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 0.6\textwidth]{Figure 1.pdf}
+    \caption{Comparison of sample prototypes of test image between teacher model, baseline student model and Proto2Proto student model, following Figure 1 from the original paper. We do not observe noticeable similarities between any of the models' most active prototypes.}
+    \label{fig:local_analysis}
+\end{figure}
+
+\subsection{Theoretical analysis}
+To evaluate \hyperlink{claim4}{claim 4}, it has to be made explicit what the authors mean by `faithfulness of the student to the teacher in terms of interpretability'. Usage of the concept interpretability varies throughout the field \citep{chakraborty2017interpretability}. Definitions are often left implicit, but one that has been given is `the ability to explain or to provide the meaning in understandable terms to a human' \citep[p.~93:5]{guidotti2018a}. Prototypical methods satisfy this notion of interpretability. The goal, then, is not just to use an interpretable teacher model to train an interpretable student model, as the student model is already inherently interpretable due to its prototype layer.\par
+Instead, the goal is that the student provides explanations that are similar to those of the teacher. When the authors talk about transferring interpretability from teacher to student, they do not refer to how interpretable the model is, but to the specific explanations that the model provides. This is why the proposed evaluation metrics are measures of proximity between the prototypes of both models. Under this understanding of interpretability transfer, \hyperlink{claim4}{claim 4} holds.
+
+\section{Discussion} \label{sec:discussion}
+
+The principal goal of this paper was to reproduce the experiments of the Proto2Proto study and to verify the authors' main claims. We were able to reproduce two experiments from the original setup, with some limitations.\par
+\subsection{Verifying claims}
+\subsubsection{Claim 1}
+The quantitative results we obtained are in line with \hyperlink{claim1}{claim 1}. However, we were not able to conduct as many experiments as in the original research, so these results are weak. Moreover, our qualitative results do not show the same conclusion. The code required to obtain these results had to be modified, and we have reason to believe the final code is faulty: 10 out of 10 runs on the teacher model with different test images each gave an incorrect prediction, which seems unlikely given that the model got an accuracy score of 77\%.\par
+\subsubsection{Claim 2}
+We were unable to verify or falsify \hyperlink{claim2}{claim 2} because we could not use the provided code to calculate PMS. This code could be optimized in future work.\par
+\subsubsection{Claim 3}
+Our quantitative results go against \hyperlink{claim3}{claim 3}. Ablating the global loss leads to an increased difference in AAP and a lower AJS, suggesting that Patch-Prototype Correspondence Loss is not sufficient to force student prototypes to be close to the teacher.
+\subsubsection{Claim 4}
+Our theoretical analysis of the paper supports \hyperlink{claim4}{claim 4}. Future research could make the goal and interpretation of interpretability transfer more explicit.
+
+
+\subsection{What was easy}
+The original paper was clearly written and well-structured, which facilitated a quick understanding of the theoretical knowledge. There was a clear overview of the claims, which simplified the process of verifying the paper in an organized manner. The experiments for which YAML files were provided were simple to conduct. 
+
+
+\subsection{What was difficult}
+
+\subsubsection{Deficient documentation}
+Using the authors' code was more difficult than expected. There was minimal documentation: the code contains some comments, but functions and classes had no explanation. Furthermore, there was no overview of the folder structure.\par
+Use of variable names in the paper and in the codebase did not correspond (e.g. in the paper they refer to `Patch-Prototype Correspondence Loss' and `Global Explanation Loss' for the novel losses, while the codebase uses `addOnLoss' and `protoLoss', respectively). Additionally, the YAML file with arguments for the various scripts completely lacked documentation and not all variable names were transparent. 
+
+\subsubsection{Incomplete codebase}
+
+The codebase lacked elements vital to reproducing some experiments. Specifically, there was no reference to the CUB dataset and ProtoTree.
+
+YAML files were provided only for the experiment with knowledge distillation from Resnet-50 to Resnet-18. We tried recreating the other experiments, but had to make too many assumptions about the missing values to be able to faithfully reproduce them.\par
+Furthermore, the code contained no reference to the experimental configuration that reused the teacher's decision module for the knowledge distillation student. 
+
+\subsubsection{Computational restraints}
+We were unable to run Proto2Proto on the CPU, since the code attempts to use a GPU regardless of the specified argument in the YAML file. As a result, a GPU was required not only for training, but also for setup and testing of the code.
+
+Furthermore, a significant constraint in reproducing the paper were the computational requirements needed to reproduce the authors' original experiments. The requirements to train the models with the provided hyperparameters were beyond our computational resources, as were the requirements to evaluate the PMS metric. We were unable to obtain the weights of the trained models to alleviate this issue. In further research, the reproduction could be conducted with more computational resources, allowing for a more accurate reproduction.\par
+
+\subsubsection{Visualization}
+Figure \ref{fig:local_analysis} is a recreation of Figure 1 in \citet{keswani2022proto2proto}, for which the authors claim to have used similar code to the original ProtoPNet paper. The code required for these visualizations was not included in the Proto2Proto repository. To reproduce these images, we modified the ProtoPNet codebase. 
+Although the Proto2Proto model builds on ProtoPNet, the implementations differ. 
+Additionally, the ProtoPNet code expects different directory and model structure. Furthermore, generating the prototype visualization requires data about the model's prototypes. We had to modify the train scripts, in order to retrieve the model prototypes needed.
+
+
+
+
+\subsection{Communication with original authors}
+
+We reached out to the authors to ask for trained model weights and unspecified hyperparameters. We did not receive a response.
