@@ -1,0 +1,555 @@
+\section{Introduction}
+
+Data Valuation in Machine Learning (ML) is commonly understood as the task of
+assigning a scalar \tmtextit{value} to samples in a training set
+$\mathcal{D}_{\tmop{train}}$ which reflects their usefulness for a ML
+algorithm. Being a form of credit (or \tmtextit{payoff}) assignment, a
+game-theoretic concept called \tmtextit{Shapley value} (SV), which is unique
+in fulfilling several reasonable axioms, has established itself as a popular
+means of computing such a \tmtextit{valuation function} $\phi :
+\mathcal{D}_{\tmop{train}} \rightarrow \mathbb{R}$. Valuation methods are
+interesting for applications of model debugging, data acquisition, outlier
+detection and active learning. We refer to {\cite{sim_data_2022}} for a recent
+survey.
+
+The {\tmdfn{Original Paper}} {\cite{yan_if_2021}} (OP in the sequel) proposes
+an alternative game-theoretic solution concept, the {\tmem{Least Core}} (LC)
+for the task of valuation. The LC dispenses with some of the properties that
+SV fulfils and whose relevance in ML is contentious,\footnote{In particular
+the axiom of {\tmem{linearity}}.} but has instead the property of
+{\tmem{Coalitional Rationality}} (see the discussion in
+Section~\ref{sec:least-core-vs-shapley}).
+
+The main obstacle with combinatorial methods stemming from game theory is the
+cost of exact computation, which is exponential in the number of training
+samples. For this reason, much work revolves around Monte Carlo
+approximations, as is the case of the OP.
+
+\subsection{Notation and definitions}
+
+We follow the notation of the OP and set $N =\mathcal{D}_{\tmop{train}}$, $n =
+| N |$ and $\tmmathbf{x}: N \rightarrow \mathbb{R}$ the valuation function,
+which we identify with a vector $x \in \mathbb{R}^n$. The utility function $v
+: 2^N \rightarrow \mathbb{R}$ is the {\tmem{score}} of a ML model trained on
+some $S \subseteq N$, evaluated on unseen data $\mathcal{D}_{\tmop{val}}$. For
+some tasks, an additional held-out set $\mathcal{D}_{\tmop{test}}$ is used.
+The {\tmdfn{least core}} (LC) is the set of solutions $x \in \mathbb{R}^n$ to
+the following minimisation problem:
+\begin{equation}
+  \begin{array}{rccc}
+    \min e &  & s.t. & \\
+    \sum_{i \in N} x_i & = & v (N) & \\
+    \sum_{i \in S} x_i + e & \geqslant & v (S) & \forall S \subseteq N.
+  \end{array} \label{LP}
+\end{equation}
+Each of these is a complete valuation function, or {\tmdfn{payoff}}. The
+scalar $e > 0$ is known as {\tmdfn{subsidy}} and the set of all solutions as
+{\tmem{$e$-core}}. The 0-core is known simply as the core. Because \eqref{LP}
+has $1 + 2^n$ constraints, the authors propose to solve a reduced problem with
+only $m \ll 2^n$:
+\begin{equation}
+  \begin{array}{rccc}
+    \underset{e > 0}{\min} e &  & s.t. & \\
+    \sum_{i \in N} x_i & = & v (N) & \\
+    \sum_{i \in S_j} x_i + e & \geqslant & v (S) & S_j \sim \mathcal{D}, \quad
+    j \in \{ 1, \ldots, m \},
+  \end{array} \label{LP_m}
+\end{equation}
+where $\mathcal{D}$ is any distribution over the power set of
+$N$.\footnote{Because $N$ might not be among the $S_j$, one must enforce
+non-negativity of the subsidy $e$.} After obtaining an optimal $\hat{e}$ in
+\eqref{LP_m}, the so-called {\tmdfn{egalitarian least core}} is selected from
+the $\hat{e}$-core by minimizing the $\ell_2$ norm:
+\begin{equation}
+  \begin{array}{rccc}
+    \min \| x \|_2 &  &  & \\
+    \sum_{i \in N} x_i & = & v (N) & \\
+    \sum_{i \in S} x_i + \hat{e} & \geqslant & v (S) & \forall S \subseteq N.
+  \end{array} \label{LP_eg}
+\end{equation}
+We will denote the algorithm solving \eqref{LP_m}, then \eqref{LP_eg}, Monte
+Carlo Least Core (MCLC). In order to connect the solution of \eqref{LP_eg}
+with that of \eqref{LP}, the authors define the following relaxation: Let
+$e^{\star}$ be the optimum in \eqref{LP}, a payoff $x$ is in the
+{\tmdfn{$\delta$-approximate least core}} iff
+\begin{equation}
+  \mathbb{P}_{S \sim \mathcal{D}} \left( \sum_{i \in S} x_i + e^{\star}
+  \geqslant v (S) \right) \geqslant 1 - \delta .
+  \label{eq:delta-approximate-lc}
+\end{equation}
+\section{Scope of reproducibility}\label{sec:claims}
+
+The first theoretical result (OP Theorem 1) is a sample bound for the reduced
+problem \eqref{LP_m} which is polynomial in $n$: using $m =\mathcal{O} \left(
+\left( n + \log \frac{1}{\Delta} \right) \delta^{- 2} \right)$ samples, there
+is a $(1 - \Delta)$-probable guarantee of obtaining a $\delta$-approximate
+least core. The experimental claim (OP Section 5.1 and
+Claim~\ref{claim:delta-lc} below) is that this bound translates to an
+effective algorithm for computing the LC. It is substantiated by an experiment
+in feature valuation using three public datasets.\footnote{Feature valuation
+refers to using features instead of samples as players in the coalitional
+game. An evaluation of the utility over a subset of features $S$ corresponds
+to training the model on the whole $\mathcal{D}_{\tmop{train}}$ using only
+those features.}
+
+The second theoretical result is a further relaxation adding a slack variable
+({\tmem{subsidy}}) to the approximate constraint
+\eqref{eq:delta-approximate-lc}, which becomes $\mathbb{P}_{S \sim D} \left(
+\sum_{i \in S} x_i + e^{\star} + \varepsilon \geqslant v (S) \right) \geqslant
+1 - \delta$. The set of payoffs for which this holds is called
+{\tmdfn{$(\varepsilon, \delta)$-probably approximate least core}}. For this
+condition a new sample bound which is {\tmem{logarithmic}} in $n$ is obtained
+in OP, Theorem 2. There is however no corresponding experimental claim related
+to this result. We discuss this in Section~\ref{sec:using-eps-delta-lc}.
+
+The second set of experiments attempts to verify that MCLC payoffs outperform
+SV for data valuation tasks. These are Claims~\ref{claim:sample-removal}
+and~\ref{claim:flipped-labels} below. An additional experiment checks how MCLC
+handles noisy data, cf. Claim~\ref{claim:noisy-data}.
+
+The third and final theorem of the paper is a minimal sample complexity of a
+similar relaxation for a further solution concept, the \tmtextit{nucleolus}.
+Given the negative character of the result, which states the impracticality of
+the nucleolus, we did not verify it experimentally.
+
+Finally, the authors comment on the relevance of the LC for ML applications.
+We discuss it in Section~\ref{sec:least-core-vs-shapley}
+
+To summarise, the main claims which we set to verify or refute are:
+
+\begin{claim}
+  \label{claim:delta-lc}Sub-sampling of constraints for \eqref{LP} leads to a
+  stable solution converging to the LC with high probability. See
+  Section~\ref{sec:result-delta-lc}.
+\end{claim}
+
+\begin{claim}
+  \label{claim:sample-removal}Under a limited computational budget, MCLC
+  outperforms SV in best and worst sample removal. See
+  Section~\ref{sec:result-sample-removal}.
+\end{claim}
+
+\begin{claim}
+  \label{claim:noisy-data}MCLC assigns lower value to noisy data than to
+  ``clean'' one, and the fraction of utility assigned to clean data increases
+  as the noise level does. See Section~\ref{sec:result-noisy-data}.
+\end{claim}
+
+\begin{claim}
+  \label{claim:flipped-labels}Under a limited computational budget, MCLC
+  outperforms SV in flipped label detection. See
+  Section~\ref{sec:result-flipped-labels}.
+\end{claim}
+
+\section{Methodology}
+
+We verified all our implementation choices with the source code that the
+authors provided via email, to the extent that it matched the paper and to the
+best of our understanding. In what follows, we detail the OP's setup, and any
+departure will be explicitly mentioned. In particular, we remark that the OP's
+code for the solution of \eqref{LP_m} includes an additional non-negativity
+constraint on the payoffs which we did not implement.
+
+All experiments are repeated 10 times and 95\% Normal confidence intervals
+estimated. Each experiment repetition uses either a new split for ``natural''
+data or generates it anew in the case of synthetic data.
+
+\subsection{Model descriptions}
+
+We benchmark Truncated Monte Carlo Shapley (TMCS,
+{\cite{ghorbani_data_2019}}), Group Testing Shapley (GTS,
+{\cite{jia_efficient_2019}}), Monte Carlo Least Core (MCLC), Leave One Out
+(LOO) and random values.
+
+\subsubsection{Experiment 1: $\delta$-approximate least core}
+
+We use logistic regression with the {\tmname{liblinear}} solver and 100
+maximum iterations. We test three scoring functions $v$ for the utility:
+accuracy, average precision and $F_1$ score (the last two are not in the OP).
+We compute the MCLC with fixed constraint budgets of 1, 2, 5, 7.5, 10 and 15\%
+of all $2^n$ constraints.
+
+\subsubsection{Experiment 2: Sample removal}
+
+We use a logistic regression model with the {\tmname{liblinear}} solver and
+100 iterations. As scoring function for the utility we used accuracy. For data
+values we use MCLC, TMCS, GTS, LOO and random.
+
+\subsubsection{Experiment 3: Noisy data detection}
+
+We use logistic regression with the {\tmname{liblinear}} solver and 100
+iterations. As scoring function for the utility we used accuracy. For
+valuation we use MCLC, random, TMCS, GTS and LOO (the last three are not in
+the OP).
+
+\subsubsection{Experiment 4: Fixing mislabeled data}
+
+We use a
+\href{https://scikit-learn.org/stable/modules/generated/sklearn.naive\_bayes.GaussianNB.html\#sklearn.naive\_bayes.GaussianNB}{Gaussian
+Naive Bayes} model and 3 scoring functions for the utility: accuracy, average
+precision and $F_1$ score. For valuation we use MCLC, random, TMCS, GTS and
+LOO (the last three are not in the OP).
+
+\subsubsection{Hyperparameter search}
+
+We did not run any.
+
+\subsection{Datasets}
+
+In all experiments we used the same datasets as in the paper or our best
+approximation. The dog-vs-fish dataset was unavailable. We release code to
+generate it as part of the experiments.
+
+\subsubsection{Experiment 1: $\delta$-approximate least core}
+
+Train-test split in all three datasets was 80\% / 20\%. The OP's authors use
+only 11 features in every dataset, but we used all of them. All features were
+standardised.
+\begin{itemize}
+  \item {\tmem{House}}:
+  \href{https://www.openml.org/search?type=data&status=active&id=56}{US
+  Congressional Voting Dataset}. 16 features. Additional pre-processing: NaN
+  values imputed with most frequent ones, encoded categorical features and
+  target labels.
+  
+  \item {\tmem{Medical}}:
+  \href{https://www.openml.org/search?type=data&status=active&id=43611}{Breast
+  Cancer Dataset}. 9 features. Additional pre-processing: Dropped rows with
+  NaNs, dropped {\tmname{id}} column.
+  
+  \item {\tmem{Chemical}}:
+  \href{https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load\_wine.html}{Wine
+  Dataset}. 13 features. Additional pre-processing: None.
+\end{itemize}
+
+\subsubsection{Experiment 2: Sample removal}
+
+\begin{itemize}
+  \item Synthetic Gaussian data with 2 classes, 200 training samples, 5000
+  testing samples. To generate, we sample from a 50-dimensional spherical
+  Gaussian with parameters $\mu = 0$, $\Sigma = \tmop{Id}$. 50\% of the
+  features are selected at random and a sigmoid is applied to their sum. The
+  5200 resulting scalars are thresholded with as many $U (0, 1)$ values to
+  generate the labels. All features were standardised.
+  
+  \item Dog vs Fish dataset with 2 classes, 600 imbalanced training samples,
+  600 imbalanced testing samples. Pre-processed with pre-trained
+  {\tmname{InceptionV3}} model to produce embeddings in $\mathbb{R}^{2000}$.
+  All features were standardised.
+\end{itemize}
+\subsubsection{Experiment 3: Noisy data detection}\label{sec:dataset-noisy}
+
+Using the synthetic Gaussian dataset, we select 20\% of the training samples
+and apply increasing noise to the covariates in multiples 0.5, 1, 2 and 3 of
+the standard deviation of the original data. This differs from the OP, where
+``noise level'' is not clearly defined.\footnote{And from the original code,
+which {\tmem{appends}} data with {\tmem{fixed noise}} while {\tmem{also
+flipping the labels}}. We believe this transformation to confuse the
+experiment so we followed the procedure above.}
+
+\subsubsection{Experiment 4: Fixing mislabeled data}
+
+We take 1000 samples from the
+\href{https://www2.aueb.gr/users/ion/data/enron-spam/index.html}{Enron1 spam
+dataset} {\cite{metsis_spam_2006}} and pre-process with
+{\tmname{scikit-learn}}'s
+\href{https://scikit-learn.org/stable/modules/generated/sklearn.feature\_extraction.text.TfidfVectorizer.html\#sklearn.feature\_extraction.text.TfidfVectorizer}{TfIdfVectorizer}
+to convert the emails to a matrix of token counts. 30\% of the data is
+reserved for $\mathcal{D}_{\tmop{test}}$, the remaining is split 70/30 into
+$\mathcal{D}_{\tmop{train}}$ and $\mathcal{D}_{\tmop{val}}$. We randomly flip
+10\%, 20\% and 30\% of the training set labels (as opposed to just 20\% in the
+OP). We depart from the OPs implementation, which also adds noise to the
+covariates.\footnote{We believe this to be a bug but are unable to verify it
+since the complete code for this experiment was unavailable.}
+
+\subsection{Experimental setup and code}
+
+We used the open source library
+{\tmname{\href{https://github.com/appliedAI-Initiative/pydvl}{pyDVL}}}
+{\cite{transferlab_pydvl_2022}} for its implementation of valuation methods
+and release the code for all our experiments at {\cite{benmerzoug_mlrc22_2022}}. Environment
+setup is done with {\tmname{poetry}} and easy experiment reproduction is
+ensured with {\tmname{dvc}} {\cite{kuprieiev_dvc_2023}} pipelines. Detailed
+instructions are given in the repository's documentation.
+
+\subsection{Computational requirements}
+
+Single experiments without uncertainty estimates can run on a 2022 consumer
+laptop without a GPU in a few hours, but computing confidence intervals
+considerably increases cost. Because the problems are embarrasingly parallel,
+time scales almost linearly with the number of cores, so we used one high-cpu
+machine in GCP to repeat the experiments before submission.
+
+\section{Results}\label{sec:results}
+
+\subsection{Results reproducing the original paper}
+
+\subsubsection{Experiment 1: $\delta$-approximate least
+core}\label{sec:result-delta-lc}
+
+The goal is to verify Claim~\ref{claim:delta-lc}. As in the OP, we uniformly
+sample $m_1 = 0.01 \times 2^n, \ldots, m_6 = 0.15 \times 2^n$ constraints and
+solve \eqref{LP_m}, then \eqref{LP_eg}, obtaining payoffs $x^{(j)} \in
+\mathbb{R}^n$. The fraction of all $2^n$ constraints which is fulfilled by
+each $x^{(j)}$ is calculated. We are able to (almost) exactly reproduce OP,
+Figure 1, concluding that this gives credence to the procedure, see
+Figure~\ref{fig:delta-approximation}. See however our discussion in
+Section~\ref{sec:validity-of-delta-lc-experiment}.
+
+Because we used every feature instead of just 11, we had higher scores across
+the board, hence lower utility variance, possibly leading to a smaller
+fraction of constraint violations overall wrt. the OP. In particular the
+maximal utility $v (N)$ is higher for all three datasets, leading to higher
+payoffs.
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/least_core_accuracy_over_coalitions_accuracy_log.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/least_core_accuracy_over_coalitions_average_precision_log.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/least_core_accuracy_over_coalitions_f1_log.pdf}}
+  \caption{\label{fig:delta-approximation}For all 3 utilities, as $m_j$ grows,
+  the approximate payoffs fulfil an increasing fraction of the whole set of
+  constraints. $\delta$ in \eqref{eq:delta-approximate-lc} corresponds to the
+  distance from the top of the bars to $y = 1$. For a fixed height, $\Delta$
+  of the main theorem corresponds roughly to the portion of the black bar
+  below it.}
+\end{figure}
+
+\subsubsection{Experiment 2: Sample removal}\label{sec:result-sample-removal}
+
+The goal is to verify Claim~\ref{claim:sample-removal}. Fixed budgets of 10K
+and 50K subsets $S \subseteq N$ are fixed for the methods TMCS, GTS and
+MCLC.\footnote{Time constraints forced us to leave the 50K experiment with
+dog-vs-fish out, but we were observing similar trends before interrupting it.}
+LOO requires only $n$ evaluations of the utility and random values do not
+require a budget. Two sets of experiments are run after computing the payoffs.
+In the first, training samples are ranked from highest to lowest value, and in
+the second from lowest to highest. In each case, samples are successively
+removed from $\mathcal{D}_{\tmop{train}}$ in the corresponding order, the
+model is retrained, and its performance on $\mathcal{D}_{\tmop{test}}$
+recorded.
+
+Surprisingly, we observe that LOO performs comparably to the game-theoretic
+methods with the synthetic data, casting doubt over the adequacy of the choice
+of distribution.
+
+\paragraph{Worst sample removal, Figure~\ref{fig:worst-sample-removal}:} For
+the synthetic data our results do not allow picking a winner, but GTS is
+clearly useless with so few subsets of $N$. For the natural data we observe
+clearer margins than the OP's (both for MCLC and TMCS) but note that theirs
+and ours are uninformative, representing just a 0.2\% change in accuracy.
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_worst_10000_synthetic.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_worst_50000_synthetic.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_worst_10000_natural.pdf}}
+  \caption{\label{fig:worst-sample-removal}Worst sample removal. LTR:
+  synthetic data 10K and 50K subsets, natural data 10k subsets.}
+\end{figure}
+
+\paragraph{Best sample removal, Figure~\ref{fig:best-sample-removal}:}For the
+synthetic data our results qualitatively follow those of the OP, except for
+LOO as noted. For the natural data we observe similar trends to the OP, with
+MCLC marginally better than TMCS, but again by an inconclusive
+0.5\%.\footnote{However, at a buget of 5K, we observe that TMCS outperforms
+MCLC, in contrast to Claim~\ref{claim:sample-removal}.}
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_best_10000_synthetic.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_best_50000_synthetic.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_best_10000_natural.pdf}}
+  \caption{\label{fig:best-sample-removal}Best sample removal. LTR: synthethic
+  data 10K and 50K subsets, natural data 10k subsets.}
+\end{figure}
+
+\subsubsection{Experiment 3: Noisy data
+detection}\label{sec:result-noisy-data}
+
+The goal is to test Claim~\ref{claim:noisy-data}. We defined our own
+experiment:\footnote{The OP lacked details, and their code seemed to lack this
+particular experiment.} For each noise level we compute: the fraction of noisy
+samples among those with the lowest 20\% assigned payoffs, the percentage of
+total utility assigned to the clean data, and the sum of all values assigned
+to noisy, clean and all data.
+
+MCLC and TMCS perform comparably (Figure~\ref{fig:noisy-detection}), but even
+at $3 \sigma$ noise both detect less than 50\% of the noisy samples.
+Furthermore, the percentage of ``clean'' utility is approximately constant
+wrt. noise level, refuting Claim~\ref{claim:noisy-data}. Interestingly, the
+distribution of values is insensitive to the noise
+(Figure~\ref{fig:histograms-noisy}), so that the identification of samples is
+due to different rankings, and not because of more extreme values.
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/noisy_data_accuracy.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/clean_data_utility_percentage.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/clean_data_vs_noisy_data_utility_least_core_0.20.pdf}}
+  \caption{\label{fig:noisy-detection}LTR: a) Fraction of noisy samples among
+  the lowest 20\% values; b) Percentage of value assigned to noisy data,
+  values were shifted up to be non-negative; c) Sum of values for each subset
+  (MCLC).}
+\end{figure}
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/values_histogram_random_noisy.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/values_histogram_least_core_noisy.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/values_histogram_tmc_shapley_noisy.pdf}}
+  \caption{\label{fig:histograms-noisy}Histograms of values for increasing
+  noise levels. LTR: Random, MCLC and TMCS.}
+\end{figure}
+
+\subsubsection{Experiment 4: Fixing mislabeled
+data}\label{sec:result-flipped-labels}
+
+The goal is to verify Claim~\ref{claim:flipped-labels}. For each amount of
+flipped data, the payoffs are computed using 5K elements of $2^N$. Training
+points are ranked by increasing value and successively removed from
+$\mathcal{D}_{\tmop{train}}$, retraining with every removal and evaluating
+performance on $\mathcal{D}_{\tmop{test}}$.
+
+We could not reproduce the OP using accuracy as score. For average precision
+and $F_1$, we did observe the reported behaviour for MCLC, but it was matched
+and even outperformed by TMCS. The same happened for detection rate, with TMCS
+around 50\% better than MCLC. Given our experience in
+Section~\ref{sec:result-sample-removal} we believe that the choice of 5K
+constraints might be too low for MCLC.
+
+\begin{figure}[h]
+  \hspace*{-3mm}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_accuracy_0.30.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_average_precision_0.30.pdf}}\resizebox{4.6cm}{!}{\includegraphics{img/utility_over_removal_percentages_f1_0.30.pdf}}
+  \caption{Performance after worst-sample removal for three scoring functions
+  and 30\% flipped labels.}
+\end{figure}
+
+\subsection{Results beyond original paper}
+
+As reported above: we tested several scoring functions for the utility besides
+accuracy; we repeated the experiments more times and computed confidence
+intervals for all quantities; we computed detection rates for noisy covariates
+and flipped labels in Sections~\ref{sec:result-noisy-data}
+and~\ref{sec:result-flipped-labels}.
+
+\section{Discussion}
+
+The major conclusion we extract from our experiments is that MCLC performs
+better in identifying high value points, as measured by best-sample removal
+tasks. In all other aspects, it performs worse or similarly to TMCS at
+comparable budgets. It is also more computationally intensive because of the
+solution of large linear and quadratic optimization problems. For this reason
+we would select (some variation of) SV for outlier detection, and perhaps MCLC
+for the selection of interesting points, but we believe that more benchmarks
+are required.
+
+One major point left out by the OP and us is the effect that the variance of
+the utility has on the values computed. This can be measured by the concept of
+``rank stability'', defined in {\cite{wang_data_2022}}. In our opinion it, or
+some variation thereof, should be part of all benchmarks in data valuation. To
+isolate the effect, one should use deterministic utilities too.
+
+Finally, we note that differences in datasets, data splits and model training
+have repeatedly led to different (higher in our case) model scores, and hence
+values. For instance, despite generating the synthetic data with what we
+believed to be the exact same procedure, we have had around 5 percentage
+points higher accuracy in several experiments.
+
+\subsection{Computational cost of the $\delta$-approximate least
+core}\label{sec:validity-of-delta-lc-experiment}
+
+Our main observation about the experiment in Section~\ref{sec:result-delta-lc}
+is the following: The core (pun intended) of the OP is
+Claim~\ref{claim:delta-lc}, namely that it is enough to solve \eqref{LP_m}
+with $m =\mathcal{O} (n / \delta^2)$ sufficiently large to fulfil to have a
+set of payoffs which is close to the exact $e^{\star}$-LC in the sense of
+\eqref{eq:delta-approximate-lc}. We find that their experiment only tackles
+this in a loose way.
+
+As one uses more constraints for \eqref{LP_m}, the fraction of {\tmem{all}}
+constraints fulfilled does increase. But no investigation is done of the
+constants hidden in the asymptotic bound. As the OP points out, this can be
+seen to be of minor relevance since it is $\mathcal{O} (n)$, but it is
+relevantfor low $n$, especially if, as we suspect, the constant hides a
+dependency on the range of the utility as is typically the case in such
+bounds, even in OP, Theorem 2.
+
+We also note that this experiment could have been done in data valuation using
+a small dataset, e.g. less than 20 samples. Finally, we believe that a
+deterministic utility would be better suited for the verification of the $(1 -
+\Delta)$-probable solution, because it would avoid the additional randomness
+inherent to ML training.
+
+\subsection{Applicability of the $(\varepsilon, \delta)$-approximate least
+core}\label{sec:using-eps-delta-lc}
+
+The logarithmic sample bound is a result of relaxing
+\eqref{eq:delta-approximate-lc}, not of a change in the problem formulation.
+Values of $\varepsilon > 0$ increase the fraction of sets for which the weaker
+constraints are satisfied, effectively decreasing $\delta$. This is
+potentially analogous to increasing $\delta$ while fixing $\varepsilon = 0$.
+It would be interesting to know how both are related.
+
+But crucially, it is unclear how to use this bound in practice. What is a
+reasonable value for the slack $\varepsilon$ and what is the corresponding
+sample size? How does this affect the ranking of payoffs and consequently
+sample removal, outlier detection, etc.? We believe that these questions
+should be addressed if the concept of $(\varepsilon, \delta)$-least core is to
+have any practical application.
+
+\subsection{The least core in ML}\label{sec:least-core-vs-shapley}
+
+In OP, Section 4, the authors discuss the relevance of the LC in machine
+learning and how it compares to SVs. Their arguments in favour of the LC are:
+\begin{enumerate}
+  \item The LC fulfils the same axioms as SVs except for linearity. However
+  this defficiency is inconsequential if one evaluates the model on the whole
+  test set instead of sample by sample.
+  
+  \item The stability property (Coalitional Rationality) aligns with human
+  expectations of fairness better than SVs, and enables using the LC for
+  actual economic compensation of data providers because it produces payoffs
+  which are {\tmem{plausible}}, in the sense that ``every coalition is
+  compensated for at least its market value''.
+  
+  \item SVs suffer from complexity results: exact computation is known to be
+  NP-complete, and there are hardness results for confidence intervals. This
+  makes Monte Carlo approximations necessary.
+\end{enumerate}
+We agree with the first point made and do not elaborate on it.
+
+As to the second point, one can ask whether Coalitional Rationality really
+matters in ML applications. This property ensures that every coalition is
+credited at least as much as it is worth in terms of the given utility. This
+is allegedly of interest when paying multiple data vendors: as a buyer one
+would like a credit assignment scheme that encourages providing data. However,
+we see a major technical dificulty in the application of data values to
+payments: they tend to concentrate around 0, with only the extremes
+significantly different. This is enough for worst/best data identification,
+but assigns very uninformative values to most points. Even more so, taking
+into account rank instability due to \ the stochasticity of ML training
+procedures (i.e. running the valuation a second time can permute many
+samples).
+
+Regarding the third item, Monte Carlo estimates of SVs are known to require
+$\mathcal{O} (n)$ subsets, but this is indeed not the case for the well-known
+TMCS, which employs heuristic stopping criteria. Nevertheless, we find that in
+practice this is not so much of an issue as are the stochasticity of the
+utility and its sensitivity to the size of the subset used. Generalizations of
+SV to {\tmem{semi-values}}, and in particular the Banzhaf index
+{\cite{wang_data_2022}}, exhibit provably robust behaviour wrt. these issues.
+In addition, the $(\varepsilon, \delta)$-approximate algorithm of
+{\cite{wang_data_2022}} includes an $\mathcal{O} (\log (n / \delta) /
+\varepsilon^2)$ sample bound for $\ell_{\infty}$-good approximations.
+
+\subsection{What was easy}
+
+Using open source libraries simplified and accelerated implementation.
+
+\subsection{What was difficult}
+
+With regards to the reproduction of the OP, we found several experiments
+difficult to interpret, even finding the need to design new ones instead.
+Our suggestion to the authors would be to always release code in a public
+repository clearly separating experiment configuration from execution,
+allowing reproduction, but also changes to the experiments just by modifying
+configuration files. There are multiple ways to achieve this, one of them being
+DVC \cite{kuprieiev_dvc_2023}, but there exist many others.
+
+But perhaps the most difficult aspect of data valuation is the inherent
+stochasticity and lack of convexity of most ML training procedures. This
+yields a very noisy signal, making applications brittle. In particular, the
+choice of the scoring function is crucial, a fact reflected in most sample
+bounds in the literature, where its range typically appears as an additional
+quadratic factor.
+
+\subsection{Communication with original authors}
+
+The authors kindly replied to our first questions and request for code. Alas,
+a nearing deadline made any further communication impossible and we could not
+ask for feedback on our analysis.
