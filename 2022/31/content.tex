@@ -1,0 +1,268 @@
+%\textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+%Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+%For more information on our previous challenges, refer to the editorials \cite{Sinha:2022, Sinha:2021, Sinha:2020, Pineau:2019}.}}
+\section{Introduction}
+
+%A few sentences placing the work in a high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, and you don’t have to motivate that work.
+
+This report presents a reproduction of a part of the results from the paper "Variational Neural Cellular Automata" \cite{palm2022variational} published in ICLR 2022. The authors of the original paper build upon previous research around fully-differentiable cellular automata called Neural Cellular Automata (NCA) and Variational Auto-Encoders (VAE). They propose a novel generative model, a VAE whose decoder is implemented using a NCA, which they name Variational Neural Cellular Automata (VNCA). 
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+In this study, we focus on the results in the original paper which treat the binarized MNIST dataset \cite{binarizedMNIST}. This includes all the proposed models which are: a baseline consisting of a convolutional VAE, a doubling version of the VNCA, and a non-doubling version of the VNCA that is trained to be resilient to damage during generation.
+
+%The first claim we investigate in our reproduction is the achieved ELBO stated in the paper.
+We identified the following claims in the original paper:
+\begin{description}
+    \item [Claim 1] The doubling VNCA architecture, using a self-organizing process, has similar generative performance as a convolutional baseline.
+    \item [Claim 2] The latent space of the Doubling VNCA architecture has a simpler t-SNE structure than that of the convolutional baseline.
+    \item [Claim 3] The non-doubling VNCA architecture performs well on damage recovery tasks.
+\end{description}
+
+% The VNCA learns a generative model of MNIST digits and also is capable of accurately reconstructing digits given a latent code by the encoder (Fig. 3). It achieves log p(x) ≥ −84.23 nats evaluated with 128 importance-weighted samples. While not state-of-the-art, which is around −77 nats (Sinha & Dieng, 2021; Maaløe et al., 2019), it is a decent generative model. In comparison, the complex auto-regressive PixelCNN decoder achieves −81.3 (Van den Oord et al., 2016).
+
+%Introduce the specific setting or problem addressed in this work and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pre-trained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.'' This is concise and is something that can be supported by experiments. An example of a claim that is too vague, and can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% Each experiment in Section~\ref{sec: results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly, it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+%Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+To reproduce the results, all models and methods are re-implemented from the indications present in the original paper. The original implementation was developed using PyTorch and is available on GitHub \cite{vnca}. Our re-implementation uses JAX \cite{jax2018github} and Equinox \cite{kidger2021equinox}, and we adhere to the same experimental setup and hyperparameters as the original authors. The training and evaluation data was the binarized MNIST dataset \cite{binarizedMNIST}, as used in the original paper. A TPU v4-8 from Kaggle was used with a 4 TPU hour budget.
+
+\subsection{Model descriptions}
+%Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's trained). 
+
+% Description
+
+The VNCA architecture is composed of a convolutional encoder and a NCA-based decoder. The encoder $q_\phi(z|x)$ is the same for all the VNCA models and the fully-convolutional baseline. The decoder $p_\theta(x|z)$ is NCA-based, meaning that the only parameters contained in the decoder are those of an iterative update rule that does local-only communication between neighboring cells. The cells of the NCA are vectors of size $|Z|$. It should also be noted that the aggregate of all NCA steps can be efficiently implemented as a sequence of CNN layers using $3\times3$ or $1\times1$ kernels that for a single cell represent local communication and linear layers respectively. 
+\\
+
+The first variant of the VNCA model is the doubling VNCA variant. This model is loosely inspired by the process of cellular growth. Presented in figure \ref{fig:DoublingVNCAOverview} is a corrected version of figure 2 from the original paper \cite{palm2022variational}, that is slightly misleading as it appears as if the NCA decoder ends with a doubling operation, severely limiting the decoders expressive power. The model would then in practice be constrained to generate images of resolution $16 \times 16$ which would be doubled to $32 \times 32$ without any additional NCA steps. However, as this was not the case in the figures showing the growing process, the mistake could be detected without inspecting the code.\\\\
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/Doubling.drawio4.pdf}
+    \caption{Overview of the doubling VNCA model, (inspired by figure 2 from \cite{palm2022variational}). \textbf{Left}: Whole reconstruction process, input image $x$ is encoded using the convolutional encoder and $z_0$ is sampled from the distribution $\mathcal{N}(\mu, \sigma)$ and then fed into the NCA decoder. \textbf{Middle left}: The decoder consists of K doubling steps, each followed by a number of NCA steps, the shape of the multidimensional array between each step is shown on the arrows. \textbf{Top middle right}: The doubling operation repeats the grid as depicted, each cell is repeated four times. \textbf{Bottom middle right}: The NCA steps consist as the name indicates of multiple steps using the NCA. It is to be noted that the NCA in all the steps contains the same parameters $\theta$. \textbf{Right}: The NCA step is defined by a local-only communication function $u_\theta$ that is added to the input.}
+    \label{fig:DoublingVNCAOverview}
+\end{figure}
+
+The second variant of the VNCA model is the non-doubling model. The decoder of this model repeats the initial sample from the latent distribution over the entire grid and then runs $T$ NCA steps. As the non-doubling VNCA variant does not change the resolution, it can be run for any number of steps $T$ and can be optimized for damage recovery and stability over many steps. To optimize for these properties, a pool of previous samples $z_T$ is stored and updated after each training batch. Half of every training batch is sampled from this pool, half of which are subjected to damage by setting a $|Z| \times H / 2 \times W / 2$ slice to zero. The number of NCA steps $T$ for each batch is sampled between $T_\text{min}$ and $T_\text{max}$. This training procedure will make a variable number of NCA steps $T$ and apply damage to some of the samples, which will encourage stability and damage recovery. Due to this training procedure, this model does not exactly maximize the ELBO but as shown by our results, it still produces good samples.\\\\
+In summary, these models were trained from scratch:
+
+\begin{itemize}
+    \item Convolutional Variational Autoencoder baseline with $10,282,497$ parameters.
+    % CELEBA 24,973,930  %  10,282,497
+    \item Doubling Variational Neural Cellular Automata with $6,585,088$ parameters.
+    % 6,585,088
+    \item Non-Doubling Variational Neural Cellular Automata with $5,042,432$ parameters.
+    % 5,042,432
+\end{itemize}
+
+\subsection{Datasets}
+\label{sec:data}
+%For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train/dev/test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+The dataset used by the original authors \cite{palm2022variational} is the publicly available statically binarized version of the MNIST dataset \cite{binarizedMNIST}, which contains binary images of size $28 \times 28$. However, to account for the fact that the doubling VNCA only can produce outputs of size with powers of $2$, the dataset is padded with zeros to become $32 \times 32$. Similarly, as the original MNIST dataset \cite{deng2012mnist}, the binarized MNIST dataset contains $60,000$ training samples and $10,000$ testing samples. As this version of the dataset is usually used for generative tasks, labels are not provided. %It can be downloaded from [INSERT LINK]
+
+\subsection{Hyperparameters}
+%Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+The hyperparameters are described in section 3 of \cite{palm2022variational} where it was stated that unless otherwise specified, all models are trained using a batch size of $32$, the Adam optimizer \cite{adam} was used, a learning rate of $10^{-4}$ was applied, gradient clipping was used with a norm of 10 \cite{clipGradient}, a latent vector of size $|Z| = 256$ was used and the models were trained for a total of $100,000$ gradient updates. These parameters were therefore used for training the convolutional baseline and the doubling VNCA. For the non-doubling VNCA, it is indicated that a larger batch size of 128 and a smaller latent vector size of $|Z| = 128$ was used. For the non-doubling VNCA $T_\text{min} = 32$ and $T_\text{max} = 64$ were set. When calculating the test ELBO, $T$ was not sampled but instead $T=36$ was used. Since all hyperparameters were provided no searching was needed.
+
+\subsection{Experimental setup and code}
+%Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+%Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+%Provide a link to your code.
+
+The first experiment consisted of training each model with the stated hyperparameters and then evaluating the ELBO with 128 importance weights on the test set.\\ 
+
+In the second experiment, multiple samples were created from each model by sampling from a  standard normal distribution of size $|Z|$ and then passing it through the doubling VNCA decoder and sampling from the output Bernoulli distribution. Test reconstruction was done in a similar way by passing test images into the model and sampling from the output Bernoulli distribution. The growth process was visualized by recording the first channel of each latent vector of decoder after each NCA step. The parameters of the final Bernoulli distribution is shown (meaning that the average of the samples). \\
+
+In the third experiment, linear interpolation was conducted by sampling two random points from a standard normal distribution of size $|Z|$ and then creating $8$ uniformly distant points linearly between them. All of these points were then fed through the doubling VNCA decoder and the results were plotted. A t-SNE reduction \cite{tSNE} is also done on $5,000$ randomly chosen images from the test set, encoded into the latent space of the doubling VNCA and convolutional baseline using their respective encoders.\\ %using the sci-kit learn implementation \cite{scikit-learn} with the default hyperparameters.\\
+
+In the fourth experiment, a standard normal distribution of size $|Z|$ was sampled $11$ times and was then fed through the non-doubling decoder for $40$ steps. Each produced image was then subjected to damage by setting a random $|Z| \times H / 2 \times W / 2$ slice to zero and then fed through the non-doubling decoder for $40$ steps again.\\
+
+Beyond the experiments of the original paper, we also investigated the representations of the individual cells' latent space using a linear probe \cite{linearprobe}. This was done to learn how much the model relies on the individual cell latent vector for generating the image, as the cell latent vector can potentially encode the content of the entire image.
+
+To train the linear probe we encoded the test set using the non-doubling vnca and got a dataset of cell latent vectors of shape $10,240,000 \times |Z|$ where the width and height dimensions have been merged ($10,240,000 = 32 \cdot 32 \cdot 10,000$). We then trained a one layer linear model on $80\%$ of this dataset to predict the label of the whole original image from which the individual cell latent vectors came from. The linear probe classification performance was then evaluated on the rest $20\%$ of the dataset.   
+
+The code can be found at \href{https://github.com/albertaillet/vnca/}{github.com/albertaillet/vnca}.
+
+\subsection{Computational requirements}
+%Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+%For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+%For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+%(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+The original paper's code implementation was run on some type of GPU, for which the exact specifications are not presented in \cite{palm2022variational}. However, these details are not crucial for the reproduction of the results. Our re-implementation was run in a single program, multiple data (SPMD) configuration over v3-8 TPU cores provided by Kaggle for a total of 4h using the stated hyperparameters. For the baseline model, the training time was $10$ minutes and the inference of a single image was $14.6$ ms. Calculating the ELBO with $128$ importance-weighted samples took $1.45$ seconds in total for the whole test dataset of $10,000$ images. The training time of the doubling VNCA was $40$ minutes, inference time $18.7$ ms, and test time $162$ seconds. Finally, for the non-doubling VNCA it took $2.5$ hours to train, inference time $12.3$ ms, and test time $75$ seconds.
+
+\section{Results}
+\label{sec:results}
+%Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, and reserve your judgment and discussion points for the next "Discussion" section. 
+The results was overall very similar to the experimental results in the original paper and therefore support its claims. For instance, the replicated ELBO was within $1.8\%$ of the paper's stated value. This was however not the case for the t-SNE experiment where our results differ from the original study.
+
+\subsection{Results reproducing original paper}
+%For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+%For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+%Logically group related results into sections. 
+\subsubsection{Result 1}
+
+ The convolutional baseline achieved $\log p(x) \geq -84.64$ nats evaluated with 128 importance-weighted samples on the entire test set, and cannot be compared with the original experiment since it is not presented in the paper. For the doubling VNCA, it achieved $\log p(x) \geq -84.15$ nats compared with the $\log p(x) \geq -84.23$ from the original paper. The non-doubling VNCA achieved $\log p(x) \geq -89.3$ nats compared with the $\log p(x) \geq -90.97$. These results are very similar to those from the original paper and therefore support the first claim.
+
+\subsubsection{Result 2}
+Figure \ref{fig:DoublingVNCA_recon_samples} presents test set reconstructions and unconditional samples from the prior $\mathcal{N}(0, I)$. In figure \ref{fig:DoublingVNCA_growth} a visualization of the growing process in the NCA decoder of the doubling VNCA is presented. 
+
+\begin{figure}[ht]
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/DoublingVNCA_reconstructions.png}
+        \label{fig:DoublingVNCA_reconstructions}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/DoublingVNCA_samples.png}
+        \label{fig:DoublingVNCA_samples}
+    \end{subfigure}
+    \caption{\textbf{Left:} Test set reconstructions. \textbf{Right:} Unconditional samples from the prior $\mathcal{N}(0, I)$. \textbf{Note:} This figure shows samples and not averages.}
+    \label{fig:DoublingVNCA_recon_samples}
+\end{figure}
+
+
+\begin{figure}[ht]
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/DoublingVNCA_growth1.png}
+        \label{fig:DoublingVNCA_growth1}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/DoublingVNCA_growth2.png}
+        \label{fig:DoublingVNCA_growth2}
+    \end{subfigure}
+    \caption{Visualization of the states in the NCA decoder. The first channel of $z_t$ is shown after each doubling or NCA step. Doubling is performed on the first column. Both figures show unconditional samples from the prior $\mathcal{N}(0, I)$. \textbf{Note:} This figure shows averages.}
+    \label{fig:DoublingVNCA_growth}
+\end{figure}
+These results are visually similar to the results of the original paper and therefore support its claims.
+
+\subsubsection{Result 3}
+
+In Figure \ref{fig:latent} an exploration of the latent space of the doubling VNCA is presented. This exploration includes linear interpolations between samples from the prior and the t-SNE reduction of $5,000$ encoded test set digits. 
+
+\begin{figure}[ht]
+    \begin{subfigure}{.46\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/interpolation.png}
+        \caption{}
+        \label{fig:interpolation}
+    \end{subfigure}
+    \begin{subfigure}{.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, trim=0 0 50 0,clip]{Images/t-sne_DoublingVNCA_5000points.png}
+        \caption{}
+        \label{fig:t-sne_DoublingVNCA}
+    \end{subfigure}
+    \begin{subfigure}{.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/t-sne_BaselineVAE_5000points.png}
+        \caption{}
+        \label{fig:t-sne_BaselineVAE}
+    \end{subfigure}
+    \caption{Latent space exploration of doubling VNCA. Figure \textbf{\ref{fig:interpolation}} shows decoded versions of linear interpolations between samples from the prior $\mathcal{N}(0, I)$. Figure \textbf{\ref{fig:t-sne_DoublingVNCA}} and \textbf{\ref{fig:t-sne_BaselineVAE}} show the t-SNE reduction of $5,000$ encoded images from the test. Figure \textbf{\ref{fig:t-sne_DoublingVNCA}} uses the doubling VNCA encoder and \textbf{\ref{fig:t-sne_BaselineVAE}} uses the encoder of the convolutional baseline. \textbf{Note:} This figure shows averages.}
+    \label{fig:latent}
+\end{figure}
+
+The obtained linear interpolation is visually similar to that of the original paper. The fully convolution baseline t-SNE structure does however look different. Both models appear to have a similar t-SNE structure, none of them appearing fragmented as in the original paper, meaning that the second identified claim is not supported by our results.
+
+\subsubsection{Result 4}
+
+ In Figure \ref{fig:damage} the damage recovery properties of the non-doubling VNCA are presented. 
+
+\begin{figure}[ht]
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/damage_recover.png}
+        \label{fig:damage_recover}
+    \end{subfigure}
+    \begin{subfigure}{.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/damage_half.png}
+        \label{fig:damage_half}
+    \end{subfigure}
+\caption{Damage recovery process for non-doubling VNCA. \textbf{Left}: \textbf{original}: Samples after $T=40$ NCA steps. \textbf{damaged}: Damage applied to the samples. \textbf{recovered}: Recovered samples after $40$ additional NCA steps. \textbf{Right}: Damage recovery process. %All the NCA steps can be seen in Figure \ref{fig:damage_full}.
+\textbf{Note:} This figure shows averages.}
+\label{fig:damage}
+\end{figure}
+
+These results are visually similar to the original paper's results and therefore support the third identified claim that damage recovery arises from the training process of the non-doubling VNCA.
+
+%Figure 9: Damage recovery on MNIST samples. Left: From top to bottom: samples from the model, samples with damage applied, recovered samples after T NCA steps. Right: details of the damage recovery process showing T = 36 steps of NCA growth on the leftmost damaged sample (T is sampled uniformly from 32 to 64). Note: this shows sample averages for clarity.
+
+\subsection{Results beyond original paper}
+
+The final accuracy of the linear probe was $80.37\%$ on the test set when predicting the whole image label from the latent vector of each cell. In figure \ref{fig:linear_probe} the results of classifying individual cell latent vectors decoded from samples of the prior are shown. For the digits 4, 5 and 1 almost all the cell vectors are classified correctly, with high certainty. For the digits 6 and 0, the cell vectors in the part of the image where the digit appears are correctly classified with high certainty while the parts of the image without any digit are often incorrectly classified. Finally, the digit 9 and the fifth digit from the right are given very different classes throughout the image. This could be explained by the fact that these unconditional samples from the prior seem out of the distribution of those present in the generated dataset.
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/linear_probe.png}
+    \caption{Classification using linear probe trained on individual cell latent vectors. \textbf{Top}: First channel of cell latent vector decoded from an unconditional sample of the prior. \textbf{Middle}: Top-1 predicted class of each of these cell latent vectors. \textbf{Bottom}: Softmax value of top-1 predicted class. 
+ \textbf{Note:} This figure shows averages.}
+    \label{fig:linear_probe}
+\end{figure}
+
+
+
+
+
+%Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+%\subsubsection{Additional Result 1}
+%\subsubsection{Additional Result 2}
+
+\section{Discussion}
+
+%Give your judgment on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+From our first two experiments, we find that the paper's results can successfully be replicated. It however has to be noted that these results concern the binarized MNIST dataset, which is relatively simple and these results might not hold for more complex datasets.
+%It would therefore be interesting to do similar experiments on a more complicated dataset to draw a more general conclusion. % OOOPS CELEB A 
+The study also utilized a substantial latent space size, leaving room for further exploration of the impact on performance when varying the latent space and the number of parameters in the update model.\\  %manifolds.
+
+It was not possible to replicate the experimental results supporting the claim of the doubling VNCA model having a simpler t-SNE structure than the convolutional baseline. As the parameters used for the t-SNE are not present in the original paper, we tried multiple different parameters and random subsets of the test data. We were however not able to reproduce a t-SNE structure similar to the one presented in the original paper. We obtained a very similar t-SNE structure for all three models. The fact that we found a t-SNE reduction of the baseline latent space with the same clean separation shows that the second identified claim of the original paper was not supported. %The result in the original paper is instead most likely from poorly selected parameters rather than a difference in latent space complexity.
+\\
+
+From the third result, it is apparent the model is capable of recovering from damage during the generation process. This result is visually similar to the one in the original paper and supports the identified third claim.  
+
+Our additional experiment was conducted to investigate the representational power of the individual cell latent vectors. From the high accuracy of the linear classifying probe we can conclude that the cell latent vectors encode a lot of information about the whole image which could be an explanation for the good reconstruction.
+
+% one detail?
+% Finally, to note is that the ELBO presented in nats is calculated by using images of size $32 \times 32$ instead of images of size $28 \times 28$. Since the outer values are always 0, they are very easy to predict and should therefore not impact the ELBO significantly. However, this detail makes the original paper reported ELBO not directly comparable with work other than the original paper.    
+
+
+\subsection{What was easy}
+%Give your judgment of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+%Be careful not to give sweeping generalizations. Something that is easy for you might be difficult for others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+Re-implementing the proposed models was easy since the original paper had a detailed description and the exact model specifications were provided as a PyTorch module in the appendix of the paper. The paper also had multiple diagrams, explanations and pseudocode for the used methods to facilitate understanding. % Pseudocode to how the pool operated was also in the paper 
+
+\subsection{What was difficult}
+%List part of the reproduction study that took more time than you anticipated or you felt was difficult. 
+
+%Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+% Dataset has no labels
+As mentioned in Section~\ref{sec:data}, the binarized MNIST dataset is provided without labels and is in a different ordering than the original MNIST dataset. It was therefore unclear how to get the dataset labels for the t-SNE latent space visualization in Figure \ref{fig:latent} as it is not mentioned in the paper \cite{palm2022variational}. It is however known that each image in the binarized MNIST is derived from the original MNIST by stochastically setting each pixel value to 1 in proportion to its intensity \cite{binarizedMNIST}. We could therefore estimate the source image by calculating the probability of each binarized image given the probability distribution of each original image and choose the original image $j$ to maximize $p(x^{\text{binary}}_i|x^{\text{original}}_j)$. As the original MNIST has labels, each image in the binarized MNIST could then be associated with the label of the estimated source image.\\
+
+A challenge when implementing the non-doubling version was making it work with a distributed training setup. This was due to the setup using a pool that had to be shared on each TPU core. In order to facilitate random shuffling of this shared buffer, all the TPU's local pools had to be combined at each step (gather-all operation), shuffled, and then returned. Using only a local permutation of the pool on each TPU was also attempted and yielded similar results with faster training time. However, due to this being a replication study, the method with global pooling was used as it was equivalent to the one proposed in the original paper.
+
+
+\subsection{Communication with original authors}
+%Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+There was no communication with the original authors.
