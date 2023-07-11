@@ -1,0 +1,34 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+In this reproducibility study, we present our results and experience during replicating the paper, titled Exact Feature Distribution Matching for Arbitrary Style Transfer and Domain Generalization \cite{zhang2021exact}. In real-world scenarios, the feature distributions are mostly much more complicated than Gaussian, so only mean and standard deviation may not be fully representative to match them. This paper introduces a novel strategy to exactly match the histograms of image features via the Sort-Matching algorithm in a computationally feasible way. We were able to reproduce most of the results presented in the original paper both qualitatively and quantitatively.
+
+\subsubsection*{Scope of Reproducibility}
+
+In the scope of this study, we aim to reproduce all the qualitative and quantitative results on two tasks, namely Arbitrary Style Transfer (AST) and Domain Generalization (DG). Moreover, we investigate the capability of forming better style representations by EFDM in another recent study \cite{kinli2023modeling}.
+
+\subsubsection*{Methodology}
+
+We have conducted all experiments in the original work by using the official repository, which is implemented by PyTorch \cite{paszke2017automatic}. For additional experiments, we have implemented the modular version of EFDM as a layer to replace it with the normalization modules. We have used 2 NVIDIA RTX 2080Ti GPUs for both training and testing, and it took roughly 1 day to complete a single training.
+ 
+% While reproducing the paper we have used author's code published in a GitHub repository. The author's clearly described the steps to reproduce the results. They have also provided input and style images, pre-trained encoder and decoders. For the experiments we have used 2 local NVIDIA GeForce RTX 2080 Ti GPU for both training and testing the results and it took roughly 20 GPU hours for reproducing all experiments.
+
+\subsubsection*{Results}
+
+We have reproduced the experiments done on two selected tasks, and compared their results with the reported results. Although our experimental results are not identical to the reported ones, we can validate the claims made by the original study according to these results.
+
+%For AST the output images and the original images are very close to each other we could only differ them by some pixels. For DG author's focused on two sub tasks: Image Classification and Person Re-identification. In the classification task two settings have been tested: leaving one domain and singe source generalization. The results are close comparing to the original results. We have reproduced 2.5\% below the reported numbers in leaving one domain out. In the single source generalization setting we reproduced better overall 0.7\% within the threshold. In the person re-identification task in both methods, Market to Grid and Grid to Market we reproduced overall 0.5\% to 1.5\% below the reported results.
+
+\subsubsection*{What was easy}
+
+The paper is well-written and easy to follow. The original repository is well-organized to run all tests with the data presented in the paper. 
+% It was easy to run the author's code, they clearly described the steps for reproducing the paper. The structure of the code was not perfect but it was readable and debuggable. 
+
+\subsubsection*{What was difficult}
+
+The requirements in the repository were not updated, and we had to manage different versions of Python packages to be able to conduct the experiments. 
+
+\subsubsection*{Communication with original authors}
+
+We were in contact with the authors, and asked for the original results as JPEG files to prepare the figures in this report.
