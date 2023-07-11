@@ -1,0 +1,89 @@
+% \begin{table}
+% \centering
+% \caption{Predictive equality: For two choices of global FPR compare the deviations in subgroup FPRs in terms of Average Absolute Deviation (AAD), Maximum Absolute Deviation (MAD), and Standard Deviation (STD). Comparing original results (Sal.) with ours. (Lower is better in all cases.)}
+% \label{tab:predictive-equality-full}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{llp{1.6cm}p{1.9cm}|rrr|rrr|rrr|rrr|}
+% \toprule
+%  &  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+%  &  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+% Threshold & Dataset & Feature & Metric\scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  \\
+% \midrule
+% \multirow[c]{9}{*}{0.1\% FPR} & \multirow[c]{6}{*}{RFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & AAD & 0.10 & 0.17 & +0.07 & 0.10 & 0.19 & +0.09 & 0.09 & 0.16 & +0.07 & 0.11 & 0.17 & +0.06 \\
+%  &  &  & MAD & 0.15 & 0.27 & +0.12 & 0.18 & 0.30 & +0.12 & 0.14 & 0.25 & +0.11 & 0.19 & 0.32 & +0.13 \\
+%  &  &  & STD & 0.10 & 0.19 & +0.09 & 0.11 & 0.20 & +0.09 & 0.10 & 0.17 & +0.07 & 0.12 & 0.19 & +0.07 \\
+% \cmidrule{3-4}
+%  &  & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.14 & 0.18 & +0.04 & 0.11 & 0.14 & +0.03 & 0.09 & 0.13 & +0.04 & 0.11 & 0.18 & +0.07 \\
+%  &  &  & MAD & 0.26 & 0.33 & +0.07 & 0.23 & 0.20 & -0.03 & 0.16 & 0.23 & +0.07 & 0.20 & 0.23 & +0.03 \\
+%  &  &  & STD & 0.16 & 0.21 & +0.05 & 0.13 & 0.15 & +0.02 & 0.10 & 0.15 & +0.05 & 0.13 & 0.18 & +0.05 \\
+% \cmidrule{2-4} 
+%  & \multirow[c]{3}{*}{BFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.29 & 0.19 & -0.10 & 0.09 & 0.07 & -0.02 & 0.09 & 0.07 & -0.02 & 0.12 & 0.11 & -0.01 \\
+%  &  &  & MAD & 1.00 & 0.74 & -0.26 & 0.20 & 0.19 & -0.01 & 0.20 & 0.20 & -0.00 & 0.25 & 0.36 & +0.11 \\
+%  &  &  & STD & 0.40 & 0.26 & -0.14 & 0.11 & 0.08 & -0.03 & 0.11 & 0.09 & -0.02 & 0.15 & 0.15 & -0.00 \\
+% \cmidrule{1-4} 
+% \multirow[c]{9}{*}{1.0\% FPR} & \multirow[c]{6}{*}{RFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & AAD & 0.68 & 0.64 & -0.04 & 0.37 & 0.44 & +0.07 & 0.28 & 0.52 & +0.24 & 0.40 & 0.35 & -0.05 \\
+%  &  &  & MAD & 1.02 & 1.00 & -0.02 & 0.68 & 0.81 & +0.13 & 0.46 & 0.96 & +0.50 & 0.69 & 0.61 & -0.08 \\
+%  &  &  & STD & 0.74 & 0.72 & -0.02 & 0.46 & 0.53 & +0.07 & 0.32 & 0.60 & +0.28 & 0.45 & 0.42 & -0.03 \\
+% \cmidrule{3-4}
+%  &  & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.67 & 0.77 & +0.10 & 0.35 & 0.38 & +0.03 & 0.29 & 0.39 & +0.10 & 0.41 & 0.40 & -0.01 \\
+%  &  &  & MAD & 1.23 & 1.27 & +0.04 & 0.61 & 0.68 & +0.07 & 0.57 & 0.72 & +0.15 & 0.74 & 0.61 & -0.13 \\
+%  &  &  & STD & 0.79 & 0.86 & +0.07 & 0.40 & 0.45 & +0.05 & 0.35 & 0.48 & +0.13 & 0.48 & 0.45 & -0.03 \\
+% \cmidrule{2-4}
+%  & \multirow[c]{3}{*}{BFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 2.42 & 1.52 & -0.90 & 0.87 & 0.56 & -0.31 & 0.80 & 0.56 & -0.24 & 0.77 & 0.60 & -0.17 \\
+%  &  &  & MAD & 7.48 & 5.44 & -2.04 & 2.19 & 1.88 & -0.31 & 1.79 & 1.77 & -0.02 & 1.71 & 1.78 & +0.07 \\
+%  &  &  & STD & 3.22 & 2.06 & -1.16 & 1.05 & 0.75 & -0.30 & 0.95 & 0.71 & -0.24 & 0.91 & 0.74 & -0.17 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+
+
+%%%% Now with new embeddings and ftc
+
+\begin{table}[btp]
+\centering
+\caption{Predictive equality: For two choices of global FPR compare the deviations in subgroup FPRs in terms of Average Absolute Deviation (AAD), Maximum Absolute Deviation (MAD), and Standard Deviation (STD). Comparing original results (Sal.) with ours. (Lower is better in all cases.)}
+\label{tab:predictive-equality-full}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llp{1.6cm}p{1.9cm}|*{5}{r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|}}
+\toprule
+ &  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FTC} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+ &  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+Thr. & Dataset & Feature & Metric \scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+\multirow[c]{12}{*}{0.1\% FPR} & \multirow[c]{6}{*}{RFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & AAD & 0.10 & 0.15 & +0.05 & 0.10 & 0.15 & +0.05 & 0.10 & 0.16 & +0.06 & 0.09 & 0.16 & +0.07 & 0.11 & 0.18 & +0.07 \\
+ &  &  & MAD & 0.15 & 0.29 & +0.14 & 0.15 & 0.29 & +0.14 & 0.18 & 0.25 & +0.07 & 0.14 & 0.27 & +0.13 & 0.19 & 0.34 & +0.15 \\
+ &  &  & STD & 0.10 & 0.17 & +0.07 & 0.11 & 0.17 & +0.06 & 0.11 & 0.17 & +0.06 & 0.10 & 0.18 & +0.08 & 0.12 & 0.21 & +0.09 \\
+\cmidrule{3-4}
+ &  & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.14 & 0.17 & +0.03 & 0.12 & 0.17 & +0.05 & 0.11 & 0.13 & +0.02 & 0.09 & 0.17 & +0.08 & 0.11 & 0.17 & +0.06 \\
+ &  &  & MAD & 0.26 & 0.28 & +0.02 & 0.23 & 0.28 & +0.05 & 0.23 & 0.21 & -0.02 & 0.16 & 0.26 & +0.10 & 0.20 & 0.27 & +0.07 \\
+ &  &  & STD & 0.16 & 0.19 & +0.03 & 0.14 & 0.19 & +0.05 & 0.13 & 0.14 & +0.01 & 0.10 & 0.18 & +0.08 & 0.13 & 0.18 & +0.05 \\
+\cmidrule{2-4}
+ & \multirow[c]{6}{*}{BFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.29 & 0.17 & -0.12 & 0.24 & 0.00 & -0.24 & 0.09 & 0.08 & -0.01 & 0.09 & 0.09 & +0.00 & 0.12 & 0.13 & +0.01 \\
+ &  &  & MAD & 1.00 & 0.63 & -0.37 & 0.74 & 0.00 & -0.74 & 0.20 & 0.31 & +0.11 & 0.20 & 0.37 & +0.17 & 0.25 & 0.45 & +0.20 \\
+ &  &  & STD & 0.40 & 0.24 & -0.16 & 0.32 & 0.00 & -0.32 & 0.11 & 0.11 & +0.00 & 0.11 & 0.13 & +0.02 & 0.15 & 0.17 & +0.02 \\
+\cmidrule{3-4}
+ &  & \multirow[c]{3}{*}{ArcFace} & AAD & 0.12 & 0.07 & -0.05 & 0.09 & N/A & N/A & 0.11 & 0.06 & -0.05 & 0.11 & 0.08 & -0.03 & 0.12 & 0.09 & -0.03 \\
+ &  &  & MAD & 0.30 & 0.25 & -0.05 & 0.20 & N/A & N/A & 0.28 & 0.16 & -0.12 & 0.31 & 0.25 & -0.06 & 0.27 & 0.32 & +0.05 \\
+ &  &  & STD & 0.15 & 0.09 & -0.06 & 0.11 & N/A & N/A & 0.14 & 0.07 & -0.07 & 0.15 & 0.10 & -0.05 & 0.14 & 0.12 & -0.02 \\
+\cmidrule{1-4}
+\multirow[c]{12}{*}{1.0\% FPR} & \multirow[c]{6}{*}{RFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & AAD & 0.68 & 0.67 & -0.01 & 0.60 & 0.67 & +0.07 & 0.37 & 0.48 & +0.11 & 0.28 & 0.54 & +0.26 & 0.40 & 0.46 & +0.06 \\
+ &  &  & MAD & 1.02 & 0.94 & -0.08 & 0.91 & 0.94 & +0.03 & 0.68 & 0.82 & +0.14 & 0.46 & 0.87 & +0.41 & 0.69 & 0.80 & +0.11 \\
+ &  &  & STD & 0.74 & 0.75 & +0.01 & 0.66 & 0.75 & +0.09 & 0.46 & 0.56 & +0.10 & 0.32 & 0.60 & +0.28 & 0.45 & 0.53 & +0.08 \\
+\cmidrule{3-4}
+ &  & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 0.67 & 0.74 & +0.07 & 0.54 & 0.74 & +0.20 & 0.35 & 0.42 & +0.07 & 0.29 & 0.30 & +0.01 & 0.41 & 0.36 & -0.05 \\
+ &  &  & MAD & 1.23 & 1.27 & +0.04 & 1.05 & 1.27 & +0.22 & 0.61 & 0.74 & +0.13 & 0.57 & 0.47 & -0.10 & 0.74 & 0.53 & -0.21 \\
+ &  &  & STD & 0.79 & 0.87 & +0.08 & 0.66 & 0.87 & +0.21 & 0.40 & 0.48 & +0.08 & 0.35 & 0.35 & -0.00 & 0.48 & 0.40 & -0.08 \\
+\cmidrule{2-4}
+ & \multirow[c]{6}{*}{BFW} & \multirow[c]{3}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & AAD & 2.42 & 1.32 & -1.10 & 1.94 & 0.00 & -1.94 & 0.87 & 0.57 & -0.30 & 0.80 & 0.57 & -0.23 & 0.77 & 0.62 & -0.15 \\
+ &  &  & MAD & 7.48 & 4.08 & -3.40 & 5.74 & 0.00 & -5.74 & 2.19 & 1.87 & -0.32 & 1.79 & 1.78 & -0.01 & 1.71 & 1.84 & +0.13 \\
+ &  &  & STD & 3.22 & 1.72 & -1.50 & 2.57 & 0.00 & -2.57 & 1.05 & 0.72 & -0.33 & 0.95 & 0.71 & -0.24 & 0.91 & 0.78 & -0.13 \\
+\cmidrule{3-4}
+ &  & \multirow[c]{3}{*}{ArcFace} & AAD & 0.72 & 0.45 & -0.27 & 0.54 & N/A & N/A & 0.55 & 0.31 & -0.24 & 0.63 & 0.40 & -0.23 & 0.83 & 0.44 & -0.39 \\
+ &  &  & MAD & 1.51 & 1.30 & -0.21 & 1.04 & N/A & N/A & 1.27 & 0.91 & -0.36 & 1.46 & 1.30 & -0.16 & 2.08 & 1.59 & -0.49 \\
+ &  &  & STD & 0.85 & 0.58 & -0.27 & 0.61 & N/A & N/A & 0.68 & 0.41 & -0.27 & 0.78 & 0.52 & -0.26 & 1.07 & 0.59 & -0.48 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

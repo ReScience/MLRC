@@ -1,0 +1,116 @@
+% \begin{table}
+% \centering
+% \caption{Global accuracy measured by TPR at several FPR thresholds, comparing the original results (Sal.) with ours. (Higher is better.)}
+% \label{tab:accuracy}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{lp{1.6cm}p{1.9cm}|rrr|rrr|rrr|rrr|}
+% \toprule
+%  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+%  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+% Dataset & Feature & TPR @ \scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  \\
+% \midrule
+% \multirow[c]{4}{*}{RFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & 0.1\% FPR & 18.42 & 22.26 & +3.84 & 23.01 & 26.48 & +3.47 & 23.55 & 27.20 & +3.65 & 21.40 & 25.95 & +4.55 \\
+%  &  & 1.0\% FPR & 34.88 & 40.35 & +5.47 & 40.21 & 44.97 & +4.76 & 41.88 & 50.19 & +8.31 & 41.83 & 48.93 & +7.10 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 11.18 & 11.93 & +0.75 & 17.33 & 18.11 & +0.78 & 20.64 & 21.76 & +1.12 & 16.71 & 17.12 & +0.41 \\
+%  &  & 1.0\% FPR & 26.04 & 26.79 & +0.75 & 32.80 & 33.97 & +1.17 & 33.13 & 34.06 & +0.93 & 31.60 & 32.78 & +1.18 \\
+% \cmidrule{1-3} 
+% \multirow[c]{2}{*}{BFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 33.61 & 29.96 & -3.65 & 47.11 & 39.79 & -7.32 & 46.74 & 39.73 & -7.01 & 45.13 & 37.50 & -7.63 \\
+%  &  & 1.0\% FPR & 58.87 & 54.96 & -3.91 & 68.92 & 62.54 & -6.38 & 69.21 & 62.59 & -6.62 & 67.56 & 60.87 & -6.69 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+
+
+%%% Our results with ArcFace included.  So different that there is certainly a bug in our code...
+
+% \begin{table}
+% \centering
+% \caption{Global accuracy measured by TPR at several FPR thresholds, comparing the original results (Sal.) with ours. (Higher is better.)}
+% \label{tab:accuracy}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{lp{1.6cm}p{1.9cm}|rrr|rrr|rrr|rrr|}
+% \toprule
+%  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+%  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+% Dataset & Feature & TPR @  &  &  &  &  &  &  &  &  &  &  &  &  \\
+% \midrule
+% \multirow[c]{4}{*}{RFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & 0.1\% FPR & 18.42 & 22.26 & +3.84 & 23.01 & 26.48 & +3.47 & 23.55 & 27.20 & +3.65 & 21.40 & 25.95 & +4.55 \\
+%  &  & 1.0\% FPR & 34.88 & 40.35 & +5.47 & 40.21 & 44.97 & +4.76 & 41.88 & 50.19 & +8.31 & 41.83 & 48.93 & +7.10 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 11.18 & 11.93 & +0.75 & 17.33 & 18.11 & +0.78 & 20.64 & 21.76 & +1.12 & 16.71 & 17.12 & +0.41 \\
+%  &  & 1.0\% FPR & 26.04 & 26.79 & +0.75 & 32.80 & 33.97 & +1.17 & 33.13 & 34.06 & +0.93 & 31.60 & 32.78 & +1.18 \\
+% \cmidrule{1-3} 
+% \multirow[c]{4}{*}{BFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 33.61 & 29.96 & -3.65 & 47.11 & 39.79 & -7.32 & 46.74 & 39.73 & -7.01 & 45.13 & 37.50 & -7.63 \\
+%  &  & 1.0\% FPR & 58.87 & 54.96 & -3.91 & 68.92 & 62.54 & -6.38 & 69.21 & 62.59 & -6.62 & 67.56 & 60.87 & -6.69 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{2}{*}{ArcFace} & 0.1\% FPR & 86.27 & 17.26 & -69.01 & 86.19 & 19.22 & -66.97 & 86.28 & 19.40 & -66.88 & 86.41 & 17.69 & -68.72 \\
+%  &  & 1.0\% FPR & 90.11 & 31.54 & -58.57 & 90.06 & 32.68 & -57.38 & 90.14 & 32.90 & -57.24 & 90.40 & 33.13 & -57.27 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+
+
+%%% And now with FTC
+
+% \begin{table}[b]
+% \centering
+% \caption{Global accuracy measured by TPR at several FPR thresholds, comparing the original results (Sal.) with ours. (Higher is better.)}
+% \label{tab:accuracy}
+% \resizebox{\columnwidth}{!}{%
+% % \begin{tabular}{lp{1.6cm}p{1.9cm}|r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|}
+% \begin{tabular}{lp{1.6cm}p{1.9cm}|*{5}{r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|}}
+% \toprule
+%  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FTC} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+%  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+% Dataset & Feature & \hfill TPR @ \scriptsize $\downarrow$  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+% \midrule
+% \multirow[c]{4}{*}{RFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & 0.1\% FPR & 18.42 & 22.26 & +3.84 & 6.86 & 23.57 & +16.71 & 23.01 & 26.48 & +3.47 & 23.55 & 27.20 & +3.65 & 21.40 & 25.95 & +4.55 \\
+%  &  & 1.0\% FPR & 34.88 & 40.35 & +5.47 & 23.66 & 40.34 & +16.68 & 40.21 & 44.97 & +4.76 & 41.88 & 50.19 & +8.31 & 41.83 & 48.93 & +7.10 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 11.18 & 11.93 & +0.75 & 4.65 & 0.00 & -4.65 & 17.33 & 18.11 & +0.78 & 20.64 & 21.76 & +1.12 & 16.71 & 17.12 & +0.41 \\
+%  &  & 1.0\% FPR & 26.04 & 26.79 & +0.75 & 18.40 & 0.00 & -18.40 & 32.80 & 33.97 & +1.17 & 33.13 & 34.06 & +0.93 & 31.60 & 32.78 & +1.18 \\
+% \cmidrule{1-3}
+% \multirow[c]{4}{*}{BFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 33.61 & 29.96 & -3.65 & 13.60 & 0.00 & -13.60 & 47.11 & 39.79 & -7.32 & 46.74 & 39.73 & -7.01 & 45.13 & 37.50 & -7.63 \\
+%  &  & 1.0\% FPR & 58.87 & 54.96 & -3.91 & 43.09 & 0.00 & -43.09 & 68.92 & 62.54 & -6.38 & 69.21 & 62.59 & -6.62 & 67.56 & 60.87 & -6.69 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{2}{*}{ArcFace} & 0.1\% FPR & 86.27 & 17.26 & -69.01 & 82.09 & 0.00 & -82.09 & 86.19 & 19.22 & -66.97 & 86.28 & 19.40 & -66.88 & 86.41 & 17.69 & -68.72 \\
+%  &  & 1.0\% FPR & 90.11 & 31.54 & -58.57 & 88.24 & 0.00 & -88.24 & 90.06 & 32.68 & -57.38 & 90.14 & 32.90 & -57.24 & 90.40 & 33.13 & -57.27 \\
+% \bottomrule
+% \end{tabular}%
+% }
+% \end{table}
+
+
+%%% And now with new embeddings
+
+\begin{table}
+\centering
+\caption{Global accuracy measured by TPR at several FPR thresholds, comparing the original results (Sal.) with ours. (Higher is better.)}
+\label{tab:accuracy}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lp{1.6cm}p{1.9cm}|*{5}{r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|}}
+\toprule
+ &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FTC} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+ &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+Dataset & Feature & TPR @ \scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+\multirow[c]{4}{*}{RFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & 0.1\% FPR & 18.42 & 21.52 & +3.10 & 6.86 & 21.52 & +14.66 & 23.01 & 27.26 & +4.25 & 23.55 & 28.34 & +4.79 & 21.40 & 26.84 & +5.44 \\
+ &  & 1.0\% FPR & 34.88 & 40.15 & +5.27 & 23.66 & 40.15 & +16.49 & 40.21 & 44.93 & +4.72 & 41.88 & 48.90 & +7.02 & 41.83 & 47.98 & +6.15 \\
+\cmidrule{2-3}
+ & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 11.18 & 13.00 & +1.82 & 4.65 & 13.00 & +8.35 & 17.33 & 15.24 & -2.09 & 20.64 & 21.05 & +0.41 & 16.71 & 19.18 & +2.47 \\
+ &  & 1.0\% FPR & 26.04 & 26.58 & +0.54 & 18.40 & 26.58 & +8.18 & 32.80 & 32.92 & +0.12 & 33.13 & 35.38 & +2.25 & 31.60 & 33.08 & +1.48 \\
+\cmidrule{1-3}
+\multirow[c]{4}{*}{BFW} & \multirow[c]{2}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & 0.1\% FPR & 33.61 & 27.59 & -6.02 & 13.60 & 0.12 & -13.48 & 47.11 & 35.02 & -12.09 & 46.74 & 34.96 & -11.78 & 45.13 & 32.83 & -12.30 \\
+ &  & 1.0\% FPR & 58.87 & 51.61 & -7.26 & 43.09 & 1.18 & -41.91 & 68.92 & 57.57 & -11.35 & 69.21 & 57.56 & -11.65 & 67.56 & 55.78 & -11.78 \\
+\cmidrule{2-3}
+ & \multirow[c]{2}{*}{ArcFace} & 0.1\% FPR & 86.27 & 17.36 & -68.91 & 82.09 & N/A & N/A & 86.19 & 19.23 & -66.96 & 86.28 & 19.58 & -66.70 & 86.41 & 17.78 & -68.63 \\
+ &  & 1.0\% FPR & 90.11 & 31.65 & -58.46 & 88.24 & N/A & N/A & 90.06 & 32.70 & -57.36 & 90.14 & 32.86 & -57.28 & 90.40 & 33.25 & -57.15 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
