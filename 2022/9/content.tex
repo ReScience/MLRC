@@ -1,0 +1,268 @@
+%\textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+
+%Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+%For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+%}}
+
+\section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+Transfer learning is a popular approach in deep learning, allowing model parameters from a trained model to be reused as an initialisation for a different task. This is especially useful when we have little data or computing resources available. Bayesian inference offers additional benefits with prior distributions encapsulating the uncertainty of pre-trained weights.
+
+The authors suggest a pipeline for Bayesian transfer learning consisting of three steps:
+\begin{enumerate}
+    \item Learning the prior on a source task.
+    \item Re-scaling the learned prior to express uncertainty.
+    \item Using the prior with Bayesian inference on a downstream task.
+\end{enumerate}
+To learn a prior, we fit a probability distribution to the parameters extracted from the model trained on the source task, meaning we extricate the knowledge about the source task and can then use it as an informative prior on the downstream tasks, which saves us time and resources. The source and the downstream task have related yet different data distributions; thus, it is important to re-scale the prior. With such an approach, we are less restrictive and explore a wider parameter space. Finally, we use the informative prior with Bayesian inference to learn a posterior distribution of the model parameters on the downstream task and draw samples to initialise the model. The authors state their pipeline outperforms the standard transfer learning and is simple to apply due to combining easy-to-use existing components.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+
+The paper suggests the pipeline for Bayesian transfer learning consisting of three main parts: (a) learning the prior, (b) re-scaling the prior and (c) Bayesian inference. We aimed to confirm the most important claim from each of those steps.
+
+The first step is using a SWAG method~\cite{https://doi.org/10.48550/arxiv.1902.02476} to construct a prior. We did not construct a prior using SWAG, as this was done using a method from another article. However, we used a pre-trained prior made public by the authors.
+With regard to this step, the authors claim that:
+\begin{itemize}
+    \item \textbf{Claim 1}: by increasing the low-rank component from zero, the model's performance improves until it saturates at a relatively small number.
+\end{itemize}
+They back this claim by increasing the low-rank component of the learned prior from 1 to 10 and comparing the model performance of the ResNet50 model on the CIFAR-10 data set. We tested this claim on the Oxford-102-Flowers data set using the same model and prior but only using the low-rank span from zero to five as the authors provided only a covariance matrix of rank five.
+
+The second step is re-scaling the prior with a variance and covariance scaling factor. Based on the scaling factor value, the re-scaling introduces the uncertainty in the prior; the larger the factor, the more uncertain it is. The authors claim that to optimise performance; we need to make a prior more diffuse, thus increasing the scaling factor.
+% The authors claim that:
+\begin{itemize}
+    \item \textbf{Claim 2}: using a non-re-scaled prior can provide a worse likelihood than using Bayesian methods from scratch. Using a more diffused prior optimises performance to a certain point. Increasing a scaling factor further decreases the effect, making the prior near-uniform.
+\end{itemize}
+They back this claim by comparing the performance of the ResNet50 model on the CIFAR-10 data set using different scaling factors on a logarithmic scale. We tested this claim on the Oxford-102-Flowers data set using \textit{torchvision} and \textit{SimCLR (self-supervised, SSL)} prior, provided by the authors.
+
+The third step is Bayesian inference, which uses a learned and re-scaled prior from the previous steps.
+The authors claim that:
+\begin{itemize}
+    \item \textbf{Claim 3:} modifying loss surface on a downstream task improves performance,
+    \item \textbf{Claim 4:} Bayesian learning provides a particular performance boost with informative priors,
+    \item \textbf{Claim 5:} informative priors lead to more data-efficient performance.
+\end{itemize}
+They back the claims by comparing the performance of different combinations of inference and priors on 4 different data sets with varying sizes. We chose the Oxford-102-flowers data set and \textit{SimCLR} prior to reproduce the results.
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+%Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+The authors released PyTorch pre-trained priors and the code for using priors for downstream inference. However, the code itself is insufficient to reproduce the paper's results. We used the authors' code as a framework for learning but implemented the evaluation part ourselves. The code was hard to navigate due to ambiguous parameters and a few hard-to-spot bugs.
+
+\subsection{Model descriptions}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+Replicated results are based on the ResNet50 model architecture with 2.5M trainable parameters.
+Throughout, we used \textit{SimCLR} (self-supervised) pre-trained prior as our prior. We only used \textit{torchvision} prior for the comparison of the scaling effect. 
+We use Stochastic Gradient Langevin Dynamics (SGLD) with Stochastic Gradient Hamiltonian Monte Carlo (SGHMC) for Bayesian inference and Stochastic Gradient Descent (SGD) for standard learning.
+
+\subsection{Data sets}
+
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+\subsubsection{Oxford 102 Flower Data set}
+The authors provided a python script that downloaded the data set and split it into train, test and validation sets based on the included files. Throughout the study, we use the Oxford-102-Flowers data set \cite{4756141}. The set consists of 8189 flower images distributed into 102 classes, where each class has 10 training and 10 validation images, while other images are used for testing.
+The data set can be downloaded from \url{https://s3.amazonaws.com/fast-ai-imageclas/oxford-102-flowers.tgz}. Train, test and validation sets contain all the classes and have 1020, 6149 and 1020 images, respectively.
+We used the authors' code for pre-processing, specified by the data set's authors.
+
+The authors did not specify the procedure for downsampling the data set.
+We took one image for each class for data sets of sizes 5, 10, 50 and 100 while sampling images uniformly for larger data set sizes.
+
+\subsection{Hyper-parameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+The authors performed a hyper-parameter search for models prior to training but did not report them.
+We extracted most of the parameters used in the final model from the available code and set the rest to the middle value among the tested ones. The hyper-parameters were the same for all trained models except for the one that was being varied in the experiment (rank and scaling factor).
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l r r r r}
+        \toprule
+        \textbf{Hyper-parameter} & \textit{batch size} & \textit{ learning rate} & \textit{no. cycles} & \textit{weight decay} \\
+        \midrule
+        \textbf{Value} & $16$ & $0.01$ & $4$ & $10^{-4}$\\
+        \bottomrule
+    \end{tabular}
+    \caption{Hyper-parameters used in training of models.}
+    \label{tab:hyper}
+\end{table}
+
+When training models on data sets with 5 and 10 images, we adjusted the batch size to 5 and 10, respectively. The number of epochs varied based on the size of the data set and the batch size.
+
+\subsection{Experimental setup and code}
+%Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+%Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+%Provide a link to your code.
+
+We modified and debugged the code from the authors. In every setting, we trained 5 models using the same parameters to evaluate the SE of the performance. This procedure was the same as in the original paper.
+Models were trained for 30000 training steps, resulting in 483 epochs for the full Oxford-102-Flowers data set. When training on smaller data sets (5 and 10), we trained models for up to 30000 epochs. The evaluation criteria of performance for all models was accuracy.
+
+\subsubsection{The importance of rank in low-rank approximation}
+We used Bayesian learning to train the model on the full training data set with re-scaled prior. We re-scaled the prior's variance and covariance matrix with a scaling factor of $10^5$ and evaluated the performance of models with their covariance rank from 1 through 5. For the rank 0 approximation, we used a zero covariance matrix.
+
+\subsubsection{Re-scaling the prior}
+We trained the model with the rank of the covariance matrix set to 5 and 10 for \textit{SimCLR} and \textit{torchvision} priors, respectively. When scaling, we scaled both the variance and the covariance matrix. We evaluated the performance of the models with their scaling factor set from $10^0$ through $10^9$ by increasing the exponent by one.
+
+\subsubsection{Evaluating the performance}
+We trained 2 models using Bayesian learning and 2 models using SGD.
+One Bayesian and one SGD model were trained using a learned prior with a rank five covariance matrix and scaling factor of $10^9$. The other two were trained using a non-learned prior using a normal zero-mean prior. The rank and the scaling of the prior were not specified by the authors, but we made an educated guess based on results from the first two steps and the default parameters of the pipeline.
+
+
+\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+We fine-tuned the models using RTX 3070 GPU with 8Gb of memory. Training a model on the Oxford-102-Flowers data set with batch size 16 took around 1 hour, thus taking approximately 5 hours to reproduce one data point with the standard error. Training on smaller data sets took up to 4 hours.
+The total GPU time to reproduce results was approximately 310 hours (Table \ref{tab:gpu}).
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l r r}
+        \toprule
+        Results & Claims & approx. GPU hours \\
+        \midrule
+        Rank influence & 1 & 30 \\
+        Scale influence & 2 & 80 \\
+        Inference comparison & 3,4,5 & 200 \\
+        \midrule
+        Total & & $\sim$ 310 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Approximate GPU hours to reproduce results of this paper.}
+    \label{tab:gpu}
+\end{table}
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section.
+
+We confirm the paper's main claims by replicating some of the results; however, we were not able to achieve the exact same accuracy.
+Firstly, the rank of a low-rank component of the covariance matrix did not significantly affect the models' performance when using the Oxford-102-Flowers data set and the ResNet50 architecture.
+Secondly, scaling either of the learned priors with an increasingly larger scaling factor increased the models' performance.
+Lastly, we observe that Bayesian learning with a learned prior outperforms learning with a non-learned prior. However, we could not reproduce the result where the Bayesian model outperforms the standard SGD learning.
+Even though we could not fully reproduce the paper's results, we must acknowledge that some parameters were not specified, and our parameter choices might differ.
+We report results step-wise following the three steps in the article.
+
+
+% \subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+%Logically group related results into sections. 
+
+
+\subsection{The influence of low-dimensional rank on performance}
+
+The authors claim that (\textbf{Claim 1}): with an increasing low‐rank component from zero, the model's performance improves until it saturates at a relatively small number.
+They argue that increasing the rank of a low-rank component of a covariance matrix improves performance.
+However, the performance should stagnate after increasing the rank to some low value. They note that higher ranks add incrementally smaller corrections to the approximation and mostly add noise.
+
+We observe the performance of the ResNet50 model with a learned \textit{SimCLR (SSL)} prior to varying low-rank covariance approximations on the Oxford-102-Flowers data set (Figre). We used the scaling factor of $10^5$ for variance and covariance scaling.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.9]{figures/figure-rank.pdf}
+    \caption{Model performance with varying ranks of a low-rank covariance matrix.}
+    \label{fig:ranks}
+\end{figure}
+
+We observe that changing the rank of low-rank covariance approximation does not affect performance on the Oxford-102-Flowers data set.
+The results indicate that either the rank does not affect the performance or the scaling factor was too large for effect to be visible.
+The authors did not specify the scaling factor used; thus, we cannot compare the results fully.
+
+\subsection{The influence of prior scaling on performance}
+
+The authors claim that (\textbf{Claim 2}): using a non-re-scaled prior can provide a worse likelihood than using Bayesian methods from scratch. Using a more diffused prior optimises performance to a certain point. Increasing a scaling factor further decreases the effect, making the prior near-uniform.
+
+We observe the performance of the ResNet50 model with a pre-trained prior with varying scaling factors on the Oxford-102-Flowers data set.
+We test the claim using \textit{torchvision} and \textit{SimCLR (SSL)} pre-learned prior.
+In experiments with varying scaling factors, a non-re-scaled prior is represented as scaling the variance and covariance by $10^0 = 1$. On the other hand, a non-informed prior is a pre-trained prior multiplied by a large scaling factor such as $10^9$.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.9]{figures/figure-scale.pdf}
+    \caption{Model performance with varying scaling factors.}
+    \label{fig:scaling}
+\end{figure}
+
+We observe that both the \textit{torchvision} and the \textit{SimCLR} prior produce a reduction in test error, thus increasing the performance.
+The decrease in test error using the \textit{SimCLR} prior is evident from scaling by a factor of $10^2$ through $10^5$. The decrease in test loss is shifted towards higher scaling factors and spans from $10^4$ through $10^8$ using the \textit{torchvision} prior. We note that these priors do not have the same rank with 5 and 10 for \textit{SimCLR} and \textit{torchvision}, respectively. Interestingly, the model performance is also better when using the \textit{torchvision} prior.
+
+We can confirm the first part of the authors' claim that using a non-re-scaled prior will negatively impact the performance compared to the re-scaled one. %However, increasing the performance towards the near-uniform prior does not decrease the performance compared to the prior multiplied by a smaller scaling factor. 
+However, increasing the scaling factor towards the near-uniform prior does not decrease the performance compared to the prior multiplied by a smaller scaling factor. 
+
+\subsection{Comparison of Bayesian and non-Bayesian learning}
+
+We observe the performance of the ResNet50 model with a combination of priors and inference techniques on the Oxford-102-Flowers data set. We use either Bayesian or SGD learning with the learned \textit{SimCLR} or a Gaussian zero-mean prior.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.9]{figures/figure-compare.pdf}
+    \caption{Comparison of model performance based on a prior selection.}
+    \label{fig:prior}
+\end{figure}
+
+We observe that models using the learned prior outperform models using non-learned prior. The increase in performance is mostly observed when training models on moderately sized data sets with only a few (if any) samples per target class.
+We also observe both Bayesian learning and standard SGD learning perform similarly on all data set sizes, with the SGD outperforming the Bayesian inference on larger data sets.
+
+The authors claim that (\textbf{Claim 3}): modifying loss surface on a downstream task improves performance. We observe the same trend in model performance; thus, we can confirm the claim for this data set. They also claim that (\textbf{Claim 4}): Bayesian learning provides a particular performance boost with informative priors. The authors did not specify whether they were comparing Bayesian learning to SGD or learning with a non-learned prior. In the former, we can only confirm the claim for using smaller versions of the Oxford-102-Flowers, as with larger variations, the SGD performs equally or outperforms Bayesian learning.
+In the latter, we can fully confirm the claim as the performance increase is substantial, especially for moderately sized data sets. The last claim is that (\textbf{Claim 5}): informative priors lead to more data-efficient performance. We can also confirm this claim, as we observe a larger difference between informative and non-informative model variants when the data set sizes are smaller.
+
+% \subsection{Results beyond original paper}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+ 
+% \subsubsection{Additional Result 1}
+% \subsubsection{Additional Result 2}
+
+\section{Discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+Our reproducibility report highlights the main claims of the paper. However, the reproducibility of the full paper was not achieved.
+There were a few unknown parameters regarding the model training and hyper-parameters for the models' optimal performance. 
+
+% Rank
+Using the low-rank approximation of the covariance matrix does not improve performance on the Oxford-102-Flowers data set. The lack of increasing performance when using higher approximation ranks might be attributed to the prior or the task itself. We can only claim that Claim 1 should not be generalised without a proper evaluation of the task at hand.
+
+% Scaling
+Increasingly scaling a learned prior does have a beneficial effect on model performance; thus we can confirm Claim 2. However, we cannot claim that the increased performance is due to added uncertainty or scaling prior to near-uniform prior.
+
+% Comparison
+Finally, we can confirm Claims 3 and 5 about performance gains of Bayesian learning and informative priors. Even though we did not reproduce the exact values, the trend in overall performance among inference-prior combinations is the same. We cannot confirm Claim 4 about the performance boost of Bayesian learning because the SGD model performs better on the large-sized Oxford-102-Flowers data set.
+
+There are many more experiments in this paper that we have not reproduced in this report. We would caution anyone who wishes to reproduce the results that the model performance will vary without an extensive and computationally demanding hyper-parameter search. 
+
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+The article was very well written, and its main claims were stated explicitly. The authors provided the code for the training pipeline, which is a great learning of individual parts of the proposed approach.
+Preparing the data and pre-processing were also well-written, and we could reuse those parts entirely.
+
+\subsection{What was difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+We underestimated the computational time to reproduce the results, thus we would discourage reproducing the results without access to a computing cluster. Navigating through the code is fairly simple, but the lack of documentation requires more effort to understand individual parts. A bunch of TO-DO comments in the code reduce the confidence in the code to function properly.
+Because the training cycles are long and parameter testing is time-consuming, we would encourage those who wish to reproduce the results, to take the authors' code as a template and write the pipeline themselves.
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+We communicated with the authors via e-mail but did not receive any reply. Thus we would caution about generalising our results as we did not perform a greedy hyper-parameter search as did the authors.

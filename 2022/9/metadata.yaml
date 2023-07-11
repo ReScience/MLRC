@@ -1,0 +1,116 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Easy Bayesian Transfer Learning with Informative Priors"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Martin Špendl
+    orcid: 0009-0008-0796-8985
+    email: martin.spendl@fri.uni-lj.si
+    affiliations: 1,*
+
+  - name: Klementina Pirc
+    orcid: 0009-0008-8202-3439
+    email: pirc.klementina@gmail.com
+    affiliations: 1      # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Ljubljana, Faculty of Computer and Information Science
+    address: Ljubljana, Slovenia
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, bayesian, deep learning, python, pytorch, machine learning
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/MartinSpendl/ML-reproducibility-challenge-23
+  - doi: 10.5281/zenodo.7949229 
+  - swh: swh:1:dir:a67381741fc59350e147883d925d6246f60bb3ef
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: 'Shwartz-Ziv, Ravid, et al. "Pre-train your loss: Easy bayesian transfer learning with informative priors." Advances in Neural Information Processing Systems 35 (2022)'
+ - bib:  
+ - url:  https://arxiv.org/abs/2205.10279v1
+ - doi:  10.48550/arXiv.2205.10279
+
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility — In this work, we study the reproducibility of the paper: Pre-Train Your Loss: Easy Bayesian Transfer Learning with Informative Priors. The paper proposes a three‐step pipeline for replacing standard transfer learning with a pre‐trained prior. The first step is training a prior, the second is re‐scaling of a prior, and the third is inference. The authors claim that increasing the rank and the scaling factor improves performance on the downstream task. They also argue that using Bayesian learning with informative prior leads to a more data‐efficient and improved performance compared to standard SGD transfer learning or using non‐informative prior. We reproduce the main claims on one of the four data sets in the paper. Methodology — We used a combination of the authors’ and our code. The authors provided a training pipeline for the user but not the code to fully reproduce the paper. We modified the training pipeline to suit our needs and created a testing pipeline to evaluate the models. We reproduced the results for the Oxford‐102‐Flowers data set on an Nvidia RTX 3070 GPU using approximately 310 GPU hours for the main results. Results — Our results confirm most of the claims tested, although we could not achieve the exact same accuracy due to missing hyper‐parameters. We reproduced the trend in how scaling the prior impacts the performance and how a learned prior outperforms a non‐learned prior. On contrary, we could not reproduce the effect of rank in low‐rank covariance approximation on model performance, as well as the beneficial boost in performance of Bayesian learning compared to the standard SGD. What was easy — The authors’ implementation provides various training and logging parameters. It is also helpful that the authors provided both the learned priors and scripts for the download, split and preprocessing of the data sets used in the study. What was difficult — Setting the environment for the used packages to work correctly was difficult. Although many parameters are available for running the pipeline, their descriptions are misguiding, therefore a lot of time went into clarifying the parameter function and debugging different settings. The training also took a while, especially when training 5 models per data point. Communication with original authors — We contacted the authors via e‐mail about their pipeline and their use of hyper‐parameters but did not hear back."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=JpaQ8GFOVu
+
+contributors:
+  - name: Koustuv Sinha,\\ Sharath Chandra Raparthy
+    orcid:
+    role: editor
+  - name: Anonymous Reviewers
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2022
+  - accepted:  April 11, 2022
+  - published:  May 23, 2022
+
+
+# This information will be provided by the editor
+article:
+  - number: 1
+  - doi: 10.5281/zenodo.6574623
+  - url: https://zenodo.org/record/6574623/files/article.pdf
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue: 2

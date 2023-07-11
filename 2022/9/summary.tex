@@ -1,0 +1,45 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+In this work, we study the reproducibility of the paper: \textit{Pre-Train Your Loss: Easy Bayesian Transfer Learning with Informative Priors}. The paper proposes a three-step pipeline for replacing standard transfer learning with a pre-trained prior. The first step is training a prior, the second is re-scaling of a prior, and the third is inference.
+The authors claim that increasing the rank and the scaling factor improves performance on the downstream task. They also argue that using Bayesian learning with informative prior leads to a more data-efficient and improved performance compared to standard SGD transfer learning or using non-informative prior. We reproduce the main claims on one of the four data sets in the paper.
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+We used a combination of the authors' and our code. The authors provided a training pipeline for the user but not the code to fully reproduce the paper. We modified the training pipeline to suit our needs and created a testing pipeline to evaluate the models. We reproduced the results for the Oxford-102-Flowers data set on an Nvidia RTX 3070 GPU using approximately 310 GPU hours for the main results.
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+% Our results confirm all the proposed claims we tested. 
+% Even though we could not replicate the exact values in the paper, the results show that using a learned prior provides a significant performance boost with and without Bayesian learning. 
+% From the same experiment, we also reproduced that the Bayesian inference provides a performance boost with the informative prior. We suspect that hyper-parameter choice is the source of the discrepancy.
+
+Our results confirm most of the claims tested, although we could not achieve the exact same accuracy due to missing hyper-parameters. We reproduced the trend in how scaling the prior impacts the performance and how a learned prior outperforms a non-learned prior.
+On contrary, we could not reproduce the effect of rank in low-rank covariance approximation on model performance, as well as the beneficial boost in performance of Bayesian learning compared to the standard SGD.
+
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The authors' implementation provides various training and logging parameters. It is also helpful that the authors provided both the learned priors and scripts for the download, split and pre-processing of the data sets used in the study.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+Setting the environment for the used packages to work correctly was difficult. Although many parameters are available for running the pipeline, their descriptions are misguiding, therefore a lot of time went into clarifying the parameter function and debugging different settings. The training also took a while, especially when training 5 models per data point. 
+
+\subsubsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+
+We contacted the authors via e-mail about their pipeline and their use of hyper-parameters but did not hear back.
+
