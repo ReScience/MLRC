@@ -1,0 +1,40 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+%}
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+In 2021, Chen et al. \cite{chen2021intriguing} studied three properties of contrastive learning. One of the results from the paper shows that the instance-based objective widely used in existing contrastive learning methods can learn meaningful local features (e.g. dogs' facial components, as shown in Figure \ref{fig:orig_paper}) despite operating on global image representation. In this paper, we validate this property, we perform experiments beyond the findings of Chen et al. \cite{chen2021intriguing}, and we evaluate the effect of the deep projection head on the accuracy when using different batch sizes for the linear evaluation of SimCLR.
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+\subsubsection*{Methodology}
+% Briefly describe what you did and which resources you used. For example, did you use author’s code? Did you re‐implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments.
+We implemented the project with Python using PyTorch as deep learning library, while the original paper's repository\textsuperscript{\ref{original_repo}} provides three Jupyter Notebooks using Tensorflow. In particular, the original paper's repository does not provide any code for the experiments we reproduced.
+Therefore, we fully re-implemented the proposed methods by following the description of the original paper. We used the pre-trained SimCLR models provided by the authors' repository.
+
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion — where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. ”we reproduced the accuracy to within 1% of reported value, which supports the paper’s conclusion that it outperforms the baselines”. Getting exactly the same number is in most cases infeasible, so you’ll need to use your judgement to decide if your results support the original claim of the paper.
+The obtained linear evaluation accuracies differ in a range between 0.19\% and 2.05\%, while the ones in the original paper differ from 0.20\% to 0.80\%. Nonetheless, we believe that our results support that the differences in top‐1 accuracy among different batch sizes are minimal because of different choices of the dataset, base encoder, and batch sizes, and also because the range substantially increases when the projection head is not deep. All the other experiments support the original and the newly tested claims. 
+
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author’s code, or easy to re‐implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The paper of Chen et al. \cite{chen2021intriguing} is well-written, which made it easy to comprehend. In addition to that, checkpoints of the models are provided and therefore it was relatively easy to reproduce the considered experiments.
+
+\subsubsection*{What was difficult}
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+We had issues reproducing the linear evaluation results of SimCLR due to our limited computational resources. So, we trained a smaller base encoder for fewer epochs compared to the original paper. We also had some doubts about the used version of SimCLR and some other implementation details because the original repository\textsuperscript{\ref{original_repo}} provides checkpoints for both versions and it does not provide code of the experiments we reproduced.
+
+
+\subsubsection*{Communication with original authors}
+%Briefly describe how much contact you had with the original authors (if any).
+We communicated with the first author of the original paper (Ting Chen) twice by email for doubts, and we promptly received replies.

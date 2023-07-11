@@ -1,0 +1,102 @@
+\newpage
+\appendix
+%\section{SimCLR Architecture}
+%\label{appendix:simclr}
+
+%Figure \ref{fig:simclr_arch} shows the architecture of SimCLR from \cite{simclr}. $f(\cdot)$ and $g(\cdot)$ respectively represent the neural network base encoder and the small neural network projection head. Chen et al. \cite{simclr} used a MLP with one hidden layer to obtain
+%$z_i = g(\textbf{h}_i) = W^{(2)}\sigma(W^{(1)}\textbf{h}_i)$ where $\sigma$ is a ReLU non-linearity. Given a set $\{{\tilde{\textbf{x}}_k}\}$ including a positive pair
+%of examples ${\tilde{\textbf{x}}_i}$ and ${\tilde{\textbf{x}}_j}$, the contrastive prediction task
+%aims to identify ${\tilde{\textbf{x}}_j}$ in $\{{\tilde{\textbf{x}}_k}\}_{k \neq i}$ for a given ${\tilde{\textbf{x}}_i}$.
+
+%\begin{figure}[H]
+%        \centering
+        %\includegraphics[width=0.5\textwidth]{images/simclr.JPG}
+        %\caption{From Chen et al. \cite{simclr}: A simple framework for contrastive learning of visual
+%representations. Two separate data augmentation operators are
+%sampled from the same family of augmentations ($t \sim T$ and
+%$t' \sim T$) and applied to each data example to obtain two correlated
+%views. A base encoder network $f(\cdot)$ and a projection head $g(\cdot)$
+%are trained to maximize agreement using a contrastive loss. After
+%training is completed, we throw away the projection head $g(\cdot)$ and
+%use encoder $f(\cdot)$ and representation h for downstream tasks.
+%.}
+%        \label{fig:simclr_arch}
+%    \end{figure}
+
+
+
+\section{Additional Figures}
+
+\subsection{Example figure from Chen et al. \cite{chen2021intriguing}}
+\label{appendix:old}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/1.JPG}
+        \caption{Result of experiment 3.2 from Chen et al. \cite{chen2021intriguing}. Later
+            layers of SimCLR/supervised ResNet tend to group by object parts. A simple ResNet is used for the supervised learning case.}
+        \label{fig:orig_paper}
+    \end{figure}
+
+\subsection{Experiment 2: Reproducing experiment 3.2 of Chen et al. \cite{chen2021intriguing}}
+\label{appendix:nni}
+
+
+
+In this appendix, we show the figures of Subsection \ref{subsec:exp_1} but upscaled using nearest neighbors interpolation instead of bilinear interpolation. 
+
+
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{pdfs/exp_1/exp1_simclrv2_kmeans_nni.pdf}
+        \caption{Visualizing features on an ImageNet validation image with K-means clustering. Each row denotes a type of local feature extracted from SimCLRv2, and each column denotes the number of K-means clusters.}
+        \label{fig:exp3.2_ours_nni}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{pdfs/exp_1/exp1_supervised_kmeans_nni.pdf}
+        \caption{Visualizing features on a ImageNet validation image with K-means clustering. Each row denotes a type of local features extracted from a supervised contrastive learning setting%TODO
+        , and each column denotes the number of K-means clusters.}
+        \label{fig:exp3.2_supervised_nni}
+    \end{figure}
+    
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{pdfs/exp_1/exp_1_raw_pixels_nni.pdf}
+        \caption{Visualizing clustered pixels on a ImageNet validation image with K-means clustering. Each column denotes the number of K-means clusters.}
+        \label{fig:exp3.2_ours_raw_pixels_nni}
+    \end{figure}
+
+\subsection{Experiment 3: Using different clustering methods}
+\label{appendix:exp2}
+
+In this appendix, we show the cluster assignment masks corresponding to the features of block groups 1, 2, and 4 of various clustering methods of Experiment 3 of Subsection \ref{subsec:exp_2}.
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.6\textwidth]{pdfs/exp_2/appendix/exp1_simclrv2_all_methods_bi_block1.pdf}
+            \caption{Visualizing features on an ImageNet validation image with different clustering methods. The features are  extracted from block group 1 of SimCLRv2. Each row denotes a clustering method, and each column denotes the number of clusters.}
+            \label{fig:exp3.2_all_methods_simclr_v2_bi_block1}
+        \end{figure}
+
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.6\textwidth]{pdfs/exp_2/appendix/exp1_simclrv2_all_methods_bi_block2.pdf}
+            \caption{Visualizing features on an ImageNet validation image with different clustering methods. The features are  extracted from block group 2 of SimCLRv2. Each row denotes a clustering method, and each column denotes the number of clusters.}
+            \label{fig:exp3.2_all_methods_simclr_v2_bi_block2}
+        \end{figure}
+
+        
+    
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.6\textwidth]{pdfs/exp_2/appendix/exp1_simclrv2_all_methods_bi_block4.pdf}
+            \caption{Visualizing features on an ImageNet validation image with different clustering methods. The features are  extracted from block group 4 of SimCLRv2. Each row denotes a clustering method, and each column denotes the number of clusters.}
+            \label{fig:exp3.2_all_methods_simclr_v2_bi_block4}
+        \end{figure}
+
+%\subsection{Experiment 4: Cross-image clustering}

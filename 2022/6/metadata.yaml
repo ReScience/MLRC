@@ -1,0 +1,156 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Intriguing Properties of Contrastive Losses"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Luca Marini
+    orcid: 0000-0001-5803-2329
+    email: lucamar@kth.se
+    affiliations: 1,* # * is for contact author
+    
+  - name: Mohamad Nabeel
+    orcid: 0009-0009-3917-4220
+    email: mohamadn@kth.se
+    affiliations: 1
+
+  - name: Alexandre Loiko
+    orcid: 0009-0006-6474-5820
+    email: loiko@kth.se
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    KTH Royal Institute of technology
+    address: Stockholm, Sweden
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, machine learning, self-supervised learning, SimCLR, contrastive learning, Python
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/mona251/Intriguing-Properties-of-Contrastive-Losses
+  - doi: 
+  - swh: swh:1:dir:35a398e4df2fda2f4241886f39c193b5a53a3e4c
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "Chen, Ting, Calvin Luo, and Lala Li. 'Intriguing properties of contrastive losses.' Advances in Neural Information Processing Systems 34 (2021): 11834-11845." # Full textual citation
+ - bib: chen2021intriguing # Bibtex key (if any) in your bibliography file
+ - url: https://proceedings.neurips.cc/paper_files/paper/2021/file/628f16b29939d1b060af49f66ae0f7f8-Paper.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi: https://doi.org/10.48550/arXiv.2011.02803 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Reproducibility Summary.
+           Scope of Reproducibility — In 2021, Chen et al. [1] studied three
+           properties of contrastive learning. One of the results from the 
+           paper shows that the instance‐based objective widely used in 
+           existing contrastive learning methods can learn meaningful local 
+           features (e.g. dogs’ facial components, as shown in Figure 9) 
+           despite operating on global image representation. In this paper,
+           we validate this property, we perform experiments beyond the 
+           findings of Chen et al. [1], and we evaluate the effect of the deep
+           projection head on the accuracy when using different batch sizes for
+           the linear evaluation of SimCLR.
+           Methodology — We implemented the project with Python using PyTorch 
+           as deep learning library, while the original paper’s repository3 
+           provides three Jupyter Notebooks using Tensorflow. In particular, 
+           the original paper’s repository does not provide any code for the 
+           experiments we reproduced. Therefore, we fully re‐implemented the
+           proposed methods by following the description of the original paper.
+           We used the pre‐trained SimCLR models provided by the authors’ 
+           repository.
+           Results — The obtained linear evaluation accuracies differ in a 
+           range between 0.19\\% and 2.05\\%, while the ones in the original paper
+           differ from 0.20\\% to 0.80\\%. Nonetheless, we believe that our results
+           support that the differences in top‐1 accuracy among different batch
+           sizes are minimal because of different choices of the dataset, base
+           encoder, and batch sizes, and also because the range substantially
+           increases when the projection head is not deep. All the other 
+           experiments support the original and the newly tested claims.
+           What was easy — The paper of Chen et al. [1] is well‐written, which
+           made it easy to comprehend. In addition to that, checkpoints of the
+           models are provided and therefore it was relatively easy to 
+           reproduce the considered experiments.
+           What was difficult — We had issues reproducing the linear evaluation
+           results of SimCLR due to our limited computational resources. So, we
+           trained a smaller base encoder for fewer epochs compared to the 
+           original paper. We also had some doubts about the used version of 
+           SimCLR and some other implementation details because the original 
+           repository3 provides checkpoints for both versions and it does not
+           provide code of the experiments we reproduced.
+           Communication with original authors — We communicated with the first
+           author of the original paper (Ting Chen) twice by email for doubts,
+           and we promptly received replies."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: "ML Reproducibility Challenge 2022"
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=gb71irTNN7
+
+contributors:
+  - name:
+    orcid: 
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:
+  - accepted:
+  - published: 
+
+# This information will be provided by the editor
+article:
+  - number: 1 # Article number will be automatically assigned during publication
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue:  2
