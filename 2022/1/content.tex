@@ -1,0 +1,302 @@
+\section{Introduction}
+Data augmentation, a process of artificially increasing the amount of data by generating new data points from existing data, has been shown to improve the generalization and robustness of neural networks. It is also present in graph analysis, where synthetic graphs are generated to create more training data for improving the generalization of graph classification models. However, all the prior methods operate on a within-graph level by altering the structure of an individual graph and do not capture between-graph information. In image recognition and natural language processing, Mixup has been shown to improve performance by linearly interpolating continuous values of random samples to generate more synthetic training data. This paper aims to adapt this method to graph data.
+
+A few problems occur when adapting Mixup to graph data: graph data is irregular and not well-aligned, and the graph topology between classes is divergent. The main assumption for $\mathcal{G}$-Mixup is that the graphs of one class are produced under the same generator called \textit{graphon}. A graphon \cite{airoldi2013stochastic} can be regarded as a probability matrix W, where W(i,j) represents the probability of an edge between node i and j. Graphons are regular, well-aligned, and defined in Euclidean space, so they can be easily mixed to generate new synthetic graphs from them. The main idea of $\mathcal{G}$-Mixup is to estimate graphons for each of the classes in the training set, and generate new, unseen examples by mixing the graphons of the random two classes and generating graphs from the mixed graphon.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+This report investigates the reproducibility of the original paper by Han et al. \cite{han2022g} and aims to verify its main claims. The main claims, highlighted in the original paper, can be summarized as follows:
+\begin{itemize}
+    \item \textbf{Claims relating to graphons}
+    \begin{itemize}
+        \item Claim 1: The graphons of a different class of graphs in one dataset are distinctly different
+        \item Claim 2: The synthetic graphs are indeed the mixture of the original graphs
+    \end{itemize}
+    \item \textbf{Claims relating to $\mathcal{G}$-Mixup}
+    \begin{itemize}
+        \item Claim 3: $\mathcal{G}$-Mixup can improve the performance of graph neural networks on various datasets
+        \item Claim 4: $\mathcal{G}$-Mixup can improve the generalization of graph neural networks
+        \item Claim 5: $\mathcal{G}$-Mixup could stabilize the model training
+        \item Claim 6: $\mathcal{G}$-Mixup improves the robustness of graph neural networks
+        \item Claim 7: Using the average node number of all the original graphs is a better choice for hyperparameter K in $\mathcal{G}$-Mixup
+        \item Claim 8: $\mathcal{G}$-Mixup improves the performance of graph neural networks with varying layers
+    \end{itemize}
+\end{itemize}
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+
+\subsection{Model descriptions}
+The core component of $\mathcal{G}$-Mixup is the graph estimation method. The authors reported in the paper that they tried several methods, including Stochastic Block Approximation (SBA) \cite{airoldi2013stochastic}, Largest gap (LG) \cite{channarond2012classification}, Smoothing-and-sorting (SAS) \cite{chan2014consistent}, Matrix Completion (MC) \cite{keshavan2010matrix} and Universal Singular Value Thresholding (USVT) \cite{chatterjee2015matrix}. The authors state that they used the LG method in their experiments. However, in their codebase, we only found the implementation of USVT. In our e-mail correspondence, the authors confirmed that they used the LG method and provided us with the repository where we could find the method implementation.
+
+The authors test the method with a few different GNN backbones that can be separated into two categories. The first category consists of Graph Convolutional Network (GCN) \cite{kipf2016semi} and Graph Isomorphism Network (GIN) \cite{xu2018powerful}. Even though the authors use the name GCN throughout the paper, they added a hyperlink to a PyTorch Geometric (PyG) \cite{fey2019fast} example in which GCNII \cite{chen2020simple}, an extension of the vanilla GCN model, is used. We assumed that the authors copied the model implementation from this hyperlink, so we used the GCNII model. The GCNII model uses 4 GCNII layers with ReLU activations followed by global mean pooling and two linear layers. The GIN model uses 5 GIN convolutional layers with ReLU activations and batch normalization followed by two linear layers. GIN was the only model whose implementation can be found in the authors' GitHub repository. In the paper, they added a hyperlink to another GIN model implementation in PyG. Comparing these two implementations, there is only a slight difference in how batch normalization is used. We decided to use the model implementation that we found in the authors' GitHub repository.
+
+The second category of GNN backbones consists of graph pooling methods. Specifically, the authors use TopK Pooling (TopKPool) \cite{gao2019graph}, Differentiable Pooling (DiffPool) \cite{ying2018hierarchical} and MinCut Pooling (MinCutPool) \cite{bianchi2020spectral} backbones. The authors again provided a hyperlink to PyG examples that implement these methods, so we assumed again that they used this code for their implementation. For TopKPool, 3 Graph convolution layers and 3 TopK pooling layers were used, followed by 3 Linear layers. DiffPool and MincutPool are more complex models, and the details about their implementation can be found in our GitHub repository.
+
+The authors also wanted to compare their method to other augmentation methods, so they included the results of several baseline methods: DropNode \cite{rong2019dropedge}, DropEdge \cite{rong2019dropedge}, Subgraph \cite{you2020graph} and M-Mixup \cite{wang2021mixup}. In each epoch, DropNode and DropEdge pick graphs from the dataset with probability $p_{pick}$ and then augment the graphs by removing nodes or edges from the graph with probability $p_{drop}$. Subgraph also picks graphs from the dataset in each epoch with probability $p_{pick}$, and for each graph, it randomly selects a node from the graph and takes an induced subgraph from the neighbourhood of that node. The size of the neighbourhood and the resulting graph is controlled by the parameter $p_{drop}$, which tells us how many nodes are going to be left out in the end from the induced subgraph. M-Mixup takes two random graphs from the dataset, creates embeddings for each of them, and then interpolates those embeddings in the embedding space. The authors did not provide implementations of these baseline methods, nor did they mention from where they obtained the results. We decided to implement DropNode, DropEdge and Subgraph ourselves, while we weren't able to implement M-Mixup because of the lack of details in the original M-Mixup paper and the deficit of any public repository that implements it. 
+
+\subsection{Datasets}
+
+The authors test their method on several datasets that can be directly imported from the PyG TUDataset \cite{morris2020tudataset} repository: IMDB-BINARY, IMDB-MULTI, REDDIT-BINARY, REDDIT-MULTI-5K, and REDDIT-MULTI-12K. We provide details about the datasets below.
+
+\subsubsection{IMDB-BINARY} This is a movie collaboration dataset that consists of 1000 ego networks of different actors/actresses who played roles in movies in IMDB. The nodes in the graph represent actors/actresses, and the link is formed if they performed in the same movie. The graphs and their labels are derived from Action and Romance genres (binary classification). The average number of nodes in the graphs is 19, and the average number of edges is 93. The nodes and edges in this dataset do not have any features associated with them.
+
+\subsubsection{IMDB-MULTI} This dataset is very similar to the IMDB-BINARY dataset. It consists of 1500 graphs, and the labels are derived from 3 genres: Sci-Fi, Romance and Action. The average number of nodes is 13, and the average number of edges is 65. This dataset does not have any node or edge features either.
+
+\subsubsection{REDDIT-BINARY} The graphs in this dataset correspond to online discussions on Reddit. Nodes in the graph represent users, and edges are formed between nodes if one of the users responded to another's comment. There are two graph labels. One of them corresponds to a question/answer-based community (r/iAmA and r/AskReddit) and the other to a discussion-based community (r/TrollXChromosomes and r/atheism). There are a total of 2000 graphs in the dataset, with an average of 429 nodes and 497 edges.
+
+\subsubsection{REDDIT-MULTI-5K and REDDIT-MULTI-12K} Similar to REDDIT-BINARY, these are balanced datasets from five and eleven different subreddits, respectively. REDDIT-MULTI-5K consists of discussion threads from r/worldnews, r/videos, r/AdviceAnimals, r/aww and r/mildlyinteresting, where each graph in the dataset is labelled with their corresponding subreddit (5-class classification). REDDIT-MULTI-12K consists of 11 different subreddits, namely, r/AskReddit, r/AdviceAnimals, r/atheism, r/aww, r/IAmA, r/mildlyinteresting, r/Showerthoughts, r/videos, r/todayilearned, r/worldnews, r/TrollXChromosomes. The task for both datasets is to predict which subreddit a given discussion graph belongs to. REDDIT-MULTI-5K consists of 5000 graphs with an average node count of 508 and an average edge count of 594, while the REDDIT-MULTI-12K consists of 11929 graphs with an average number of nodes of 391 and an average number of edges of 456.
+
+Since none of the data sets has any node or edge features associated with it, the authors preprocessed every dataset by adding custom node features to each graph. Namely, if the max node degree in the dataset is lower than 2000, the node feature matrix will be one hot encoded degree of each node (the feature vector of one node will be all 0's except in the column that corresponds to that node's degree, where it will be 1). If the max node degree is higher than 2000, each node will only have 1 feature, whose value will be the normalised degree of that node. Normalization is carried out by calculating the mean node degree and its standard deviation across the whole dataset.
+
+
+\subsection{Hyperparameters}
+
+The authors report that they've used the same hyperparameters across all experiments to ensure a fair comparison, and we copied their hyperparameter setup. We use the Adam optimizer, with an initial learning rate of 0.01, which is set to decrease by half every 100 epochs. The authors do not mention how many epochs of training they performed, so we chose a number based on the graphs that were in the report that showed 300 epochs. We split the dataset into train/validation/test sets with 7:1:2 proportions. The best test epoch is selected based on the accuracy of the model on the validation set, and accuracy is reported on ten runs. For $\mathcal{G}$-Mixup, we generate 20\% more training graphs and use $\lambda \in [0.1, 0.2]$ to mix up the graphons. The authors set the batch size to 128, and we follow that batch size for IMDB datasets, but due to lack of GPU VRAM, we lower it to 32 for REDDIT datasets.
+
+The authors fail to mention what hyperparameters they use for the baseline methods, so we decided to pick them based on our intuition. We choose to augment 20\% of the graphs in the dataset in each epoch for DropEdge and DropNode, and 10\% for Subgraph. In each graph that was chosen for augmentation, we eliminate 10\% of the edges/nodes for DropEdge/DropNode and 15\% of the nodes for Subgraph. 
+
+The authors do not report any hyperparameter search being performed in experiments 3 to 6, where $\mathcal{G}$-Mixup was compared to other baseline models. They do, however, test how the method behaves while varying the hyperparameter K (Experiment 7), which controls how many nodes will be generated in the synthetic graphs. In the Appendix, they also test how the performance of $\mathcal{G}$-Mixup changes by varying the mixup parameter $\lambda$, but they do not draw any clear conclusions. 
+
+\subsection{Experimental setup and code}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+The code with the implementation of the $\mathcal{G}$-Mixup method and graphon estimation is available on the author's GitHub repository\footnote{\href{https://github.com/ahxt/g-mixup}{https://github.com/ahxt/g-mixup}}. However, in order to test the claims from the paper, we had to write code for each experiment ourselves. Our project is also available as a GitHub repository. Code for each of the experiments is available as a regular python script inside the source folder (example: src/experiment1.py), and as self-explanatory Jupyter notebooks. \\
+For experiments 1 and 2, due to the nature of the claims we do not use any specific measure. We report on the outcome of the experiments and we make some observations about the way experiments were set up in order to make a final statement about their claims. For experiments 3-8 we use classification accuracy to compare results with those from the original paper.
+
+\subsection{Computational requirements}
+We run the experiments on 3 different pieces of hardware. For "lightweight" experiments, we use an Intel i5-10600K CPU. For most of the experiments, we use NVIDIA RTX 2070 SUPER GPU with 6GB of VRAM. For some parts of Experiment 3, this amount of VRAM was not enough, so we used Google Colab Pro+ GPUs and the GPUs on the National Supercomputing Network (both of which have 32GB VRAM). The details about execution times can be viewed in Tables \ref{tableexp6-1} and \ref{tableexp6-2}.
+
+%% TODO: ADD TABLE
+
+\section{Results}
+\label{sec:results}
+Our results provide partial support for claims made by authors. While the results we got from experiments gave us a confirmation that \textbf{the synthetic graphs are indeed the mixture of the original graphs}, some other claims are highly debatable. For claims relating to the superiority of $\mathcal{G}$-Mixup over other data augmentation methods we were not able to reproduce results from the paper.
+
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+\subsubsection{Result 1: The graphons of a different class of graphs in one dataset are distinctly different}
+
+We believe this claim is an overgeneralization. The authors provided a visualization of estimated graphons for datasets used in the paper, which can be seen in Figure 1. While the claim may be true for datasets \textbf{IMDB-BINARY} and \textbf{REDDIT-BINARY}, the same can not be said for \textbf{IMDB-MULTI} dataset. From the plots of estimated graphons, it is very difficult to find differences between classes 1 and 2 for example. The problem with this claim is that we can have a dataset in which classes are not that much different from each other, so the claim doesn't apply. \\
+
+\begin{figure}[!htb]
+\minipage{0.27\textwidth}
+  \includegraphics[width=\linewidth]{fig/IMDB-BINARY.png}
+\endminipage\hfill
+\minipage{0.27\textwidth}
+  \includegraphics[width=\linewidth]{fig/REDDIT-BINARY.png}
+\endminipage\hfill
+\minipage{0.45\textwidth}%
+  \includegraphics[width=\linewidth]{fig/IMDB-MULTI.png}
+\endminipage
+	\caption{ Estimated graphons from experiment 1. Note that we needed to manually update diagonal entries to zeros - something the original authors also did and did not report.}
+\end{figure}
+
+Additionally, the authors wrote that they used the average number of nodes in a dataset for graphon estimation, but for \textbf{REDDIT-BINARY} and \textbf{IMDB-MULTI} they used different sizes of graphons for visualization. This was done probably to highlight the differences between classes -- with a bigger size of the graphon the size of the cell representing each node would get smaller and the plot would be blurry. Nevertheless, this modification is not mentioned by the authors in the paper. To conclude, the experiment is reproducible, but the claim doesn't have strong foundations since graphons are highly dependent on the nature of the dataset.
+
+\subsubsection{Result 2: The synthetic graphs are indeed the mixture of the original graphs}
+This is true. In addition to what the authors did, we confirmed this claim by performing a modified version of the experiment. From \textbf{REDDIT-BINARY} dataset we estimated graphons for \textbf{Class 0} and \textbf{Class 1} respectively. After that, we performed a G-mixup with extracted graphons to get a mixed graphon. Then, we generated 500 synthetic graphs using mixed graphon. Finally, we estimated the graphon from synthetic graphs. From  Figure 2 it is easy to observe that the graphon estimated from synthetic graphs is indeed a mixture of two original classes. \\
+
+\begin{figure}[ht]\centering
+	\includegraphics[width=0.8\columnwidth]{fig/mixed_graphon_experiment.png}
+	\caption{ Class 0 and Class 1 are classes from the original dataset. Class 0 has two high-degree nodes, while Class 1 has only one high-degree node. Graphon for Class 2, which was created in a process of $\mathcal{G}$-Mixup of the previous two classes, actually has 1 high-degree node and a dense subgraph.}
+\end{figure}
+
+\subsection{Results that differ from the original paper}
+\subsubsection{Result 3: $\mathcal{G}$-Mixup can improve the performance of graph neural networks on various datasets} -- We perform the same experiments and create the same table (without one of the baseline augmentation methods) as the authors did in the original paper. However, while authors show that $\mathcal{G}$-Mixup gains 9 best performances among 10 reported accuracies, our experiments show that it performs the best only on 3 occasions out of 10, as shown in Table \ref{tableexp3}. We use the same methodology as the authors, i.e. different augmentation methods adopt the same GNN architecture and the same training hyperparameters. 
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{ccccccc}
+\hline
+Model                & Methods                         & IMDB-B                          & IMDB-M                                   & REDD-B                          & REDD-M5                         & REDD-M12                        \\ \hline
+\multirow{5}{*}{GCN} & vanilla                         & 71.40$\pm$2.22                     & \textbf{49.86}$\pm$\textbf{2.60}                     & 83.75$\pm$5.42                     & \textbf{53.15}$\pm$\textbf{1.63}          & 45.90$\pm$1.47                     \\
+                     & w/ DropEdge                     & 71.70$\pm$2.42                     & 48.26$\pm$2.90                              & 72.10$\pm$2.19                     & 47.15$\pm$1.36                     & 36.40$\pm$1.57                     \\
+                     & w/ DropNode                     & \textbf{72.05}$\pm$\textbf{3.36}          & 49.33$\pm$2.27                             & 72.95$\pm$2.11                     & 43.51$\pm$2.96                     & 31.84$\pm$1.39                     \\
+                     & w/ Subgraph                     & 72.00$\pm$3.95                     & 48.96$\pm$2.71                              & 73.61$\pm$1.87                     & 48.80$\pm$1.22                    & 37.82$\pm$0.81                     \\
+                     & w/ G-Mixup                      & 71.90$\pm$2.92                     & 49.66$\pm$2.56                              & \textbf{84.80}$\pm$\textbf{4.10}      &         51.39$\pm$2.10                     & \textbf{46.01}$\pm$\textbf{1.29}            \\ \hline
+\multirow{5}{*}{GIN} & vanilla                         & \textbf{72.00}$\pm$\textbf{2.98}            & 47.66$\pm$3.07                              & \textbf{91.47}$\pm$\textbf{1.70}            & \textbf{55.81}$\pm$\textbf{1.39}            & \textbf{49.34}$\pm$\textbf{0.75}            \\
+                     & \multicolumn{1}{l}{w/ DropEdge} & \multicolumn{1}{l}{71.20$\pm$3.16} & \multicolumn{1}{l}{45.63$\pm$2.19}          & \multicolumn{1}{l}{85.37$\pm$2.89} & \multicolumn{1}{l}{49.03$\pm$1.63} & \multicolumn{1}{l}{41.18$\pm$1.57} \\
+                     & \multicolumn{1}{l}{w/ DropNode} & \multicolumn{1}{l}{70.30$\pm$3.63} & \multicolumn{1}{l}{46.20$\pm$2.44}          & \multicolumn{1}{l}{81.17$\pm$2.73} & \multicolumn{1}{l}{46.85$\pm$1.57} & \multicolumn{1}{l}{38.93$\pm$1.14} \\
+                     & \multicolumn{1}{l}{w/ Subgraph} & \multicolumn{1}{l}{69.80$\pm$3.32} & \multicolumn{1}{l}{44.76$\pm$2.67}          & \multicolumn{1}{l}{88.80$\pm$1.52} & \multicolumn{1}{l}{49.83$\pm$1.86} & \multicolumn{1}{l}{41.67$\pm$1.91} \\
+                     & \multicolumn{1}{l}{w/ G-Mixup}  & \multicolumn{1}{l}{70.45$\pm$3.94} & \multicolumn{1}{l}{\textbf{49.53}$\pm$\textbf{2.59}} & \multicolumn{1}{l}{90.45$\pm$1.54} & \multicolumn{1}{l}{55.59$\pm$1.45} & \multicolumn{1}{l}{48.81$\pm$1.17} \\ \hline
+\end{tabular}
+\caption{Performance comparisons of $\mathcal{G}$-Mixup with different GNNs on different datasets. The metric is the classification accuracy along with standard error. Bolded are the augmentations that received the highest mean accuracy on ten runs for that particular GNN architecture, similar to what was done in the original paper.}
+\label{tableexp3}
+\end{table}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{clllcl}
+\hline
+Model                       & \multicolumn{1}{c}{Methods}     & \multicolumn{1}{c}{IMDB-B}                  & \multicolumn{1}{c}{IMDB-M}                  & REDD-B                                      & \multicolumn{1}{c}{REDD-M5}                 \\ \hline
+\multirow{5}{*}{TopKPool}   & \multicolumn{1}{c}{vanilla}     & \multicolumn{1}{c}{70.65$\pm$3.19}          & \multicolumn{1}{c}{\textbf{49.33$\pm$2.57}} & 88.60$\pm$2.05                              & \multicolumn{1}{c}{\textbf{49.93$\pm$1.41}} \\
+                            & \multicolumn{1}{c}{w/ DropEdge} & \multicolumn{1}{c}{68.70$\pm$4.17}          & \multicolumn{1}{c}{47.66$\pm$2.33}          & 76.55$\pm$5.53                              & \multicolumn{1}{c}{43.65$\pm$2.97}          \\
+                            & \multicolumn{1}{c}{w/ DropNode} & \multicolumn{1}{c}{\textbf{71.60$\pm$1.76}} & \multicolumn{1}{c}{46.36$\pm$3.15}          & 75.22$\pm$4.42                              & \multicolumn{1}{c}{39.05$\pm$3.58}          \\
+                            & \multicolumn{1}{c}{w/ Subgraph} & \multicolumn{1}{c}{69.40$\pm$4.73}          & \multicolumn{1}{c}{45.53$\pm$4.96}          & 78.93$\pm$4.54                              & \multicolumn{1}{c}{45.24$\pm$4.29}          \\
+                            & \multicolumn{1}{c}{w/ G-Mixup}  & \multicolumn{1}{c}{70.80$\pm$2.74}          & \multicolumn{1}{c}{49.00$\pm$1.80}          & \textbf{88.82$\pm$2.25}                     & \multicolumn{1}{c}{49.86$\pm$1.79}          \\ \hline
+\multirow{5}{*}{DiffPool}   & \multicolumn{1}{c}{vanilla}     & \multicolumn{1}{c}{\textbf{72.15$\pm$2.04}} & \multicolumn{1}{c}{\textbf{49.10$\pm$1.89}} & 91.90$\pm$2.11                              & \multicolumn{1}{c}{\textbf{55.71$\pm$0.70}} \\
+                            & w/ DropEdge                     & 71.90$\pm$2.54                              & 49.06$\pm$1.74                              & 89.50$\pm$1.62                              & 51.90$\pm$3.53                              \\
+                            & w/ DropNode                     & 71.05$\pm$2.25                              & 47.66$\pm$4.42                              & 84.67$\pm$3.10                              & 47.25$\pm$1.76                              \\
+                            & w/ Subgraph                     & 70.15$\pm$3.54                              & 47.76$\pm$1.30                              & 90.15$\pm$1.28                              & 51.11$\pm$2.49                              \\
+                            & w/ G-Mixup                      & 70.95$\pm$3.15                              & 49.03$\pm$2.20                              & \textbf{92.22$\pm$0.97}                     & 54.24$\pm$1.72                              \\ \hline
+\multirow{5}{*}{MincutPool} & vanilla                         & \textbf{71.55$\pm$2.67}                     & 48.63$\pm$2.58                              & \multicolumn{1}{l}{\textbf{84.87$\pm$4.02}} & 48.57$\pm$4.23                              \\
+                            & w/ DropEdge                     & 71.50$\pm$3.69                              & 49.10$\pm$2.57                              & \multicolumn{1}{l}{81.06$\pm$2.48}          & 44.70$\pm$1.35                              \\
+                            & w/ DropNode                     & 71.50$\pm$2.92                              & \textbf{49.83$\pm$3.15}                     & \multicolumn{1}{l}{75.68$\pm$1.95}          & 42.49$\pm$2.18                              \\
+                            & w/ Subgraph                     & 71.05$\pm$3.02                              & 48.43$\pm$2.82                              & \multicolumn{1}{l}{76.55$\pm$3.34}          & 40.33$\pm$3.11                              \\
+                            & w/ G-Mixup                      & 71.25$\pm$2.05                              & 48.93$\pm$1.59                              & \multicolumn{1}{l}{84.37$\pm$2.65}          & \textbf{48.60$\pm$1.88}                     \\ \hline
+\end{tabular}
+\caption{Performance comparisons of $\mathcal{G}$-Mixup with different Pooling methods. The metric is classification accuracy along with standard error. Bolded are the augmentations that received the highest mean accuracy on ten runs for that particular Pooling method, similar to what was done in the original paper.}
+\label{tableexp3-2}
+\end{table}
+
+\subsubsection{Result 4: $\mathcal{G}$-Mixup can improve the generalization of graph neural networks} 
+
+The authors look at the loss curves of GCN training and state that the test curves with $\mathcal{G}$-Mixup are consistently lower than the vanilla model. The loss curves of our experiments are shown in Figure \ref{testexp4}. We do not observe any notable differences between the two models. Furthermore, the test losses of the vanilla model may even be on average lower than the $\mathcal{G}$-Mixup model.
+
+\begin{figure}
+\centering
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{fig/IMDB-B_losses.png}
+\end{subfigure}%
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{fig/IMDB-M_losses.png}
+  \end{subfigure}%
+  \begin{subfigure}{.25\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{fig/REDDIT-B_losses.png}
+\end{subfigure}%
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{fig/REDDIT-5K_losses.png}
+\end{subfigure}
+\caption{The training/validation/test curves on IMDB-BINARY, IMDB-MULTI, REDDIT-BINARY and REDDIT-MULTI-5K with GCN as the backbone. The curves are depicted on ten runs.}
+\label{testexp4}
+\end{figure}
+
+\subsubsection{Result 5 - $\mathcal{G}$-Mixup could stabilize the model training}
+
+We do not notice any notable and consistent decrease in the average standard deviation of the classification accuracy in Table \ref{tableexp3} between the vanilla and $\mathcal{G}$-Mixup approach. We also do not notice that the loss curves of the $\mathcal{G}$-Mixup approach are smoother than the vanilla method, hence we can not support the authors' claim.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+
+\subsection{Results partly supporting the authors' claims}
+\subsubsection{Result 6: $\mathcal{G}$-Mixup improves the robustness of graph neural networks}
+
+The authors investigate two kinds of robustness experiments, \textit{Label Corruption Robustness} and \textit{Topology Corruption Robustness}. We perform the same experiments and report the results in Tables \ref{tableexp6-1} and \ref{tableexp6-2}. We can see that $\mathcal{G}$-Mixup does well when the topology changes, achieving the highest accuracy in 7 out of 8 runs, which is in line with the authors' results. The results for Label Corruption are not that impressive, as it beats the Vanilla model in only 4 out of 8 runs. For this experiment, we also add the average execution runtime needed to augment the dataset and train it for 300 epochs.
+
+\begin{table}[]
+\centering
+\footnotesize
+\begin{tabular}{ccccccc}
+\hline
+Dataset & Methods     & 10\%                 & 20\%                 & 30\%                 & 40\%                 & Avg. runtime   \\ \hline
+IMDB-B  & vanilla     & \textbf{72.05$\pm$4.16} & 67.65$\pm$4.21          & 66.40$\pm$3.60          & 62.65$\pm$5.28          & 15.44 {[}s{]}  \\
+        & w/ DropEdge & 70.00$\pm$3.77          & 68.00$\pm$4.52          & 67.25$\pm$4.42          & 59.75$\pm$4.11          & 36.38 {[}s{]}  \\
+        & w/ G-Mixup  & 71.05$\pm$0.45          & \textbf{69.50$\pm$4.65} & \textbf{68.60$\pm$4.35} & \textbf{65.70$\pm$4.28} & 17.45 {[}s{]}  \\ \hline
+REDD-B  & vanilla     & \textbf{81.35$\pm$5.55} & \textbf{77.10$\pm$5.31} & 74.56$\pm$3.86          & 72.07+-3.94          & 75.24 {[}s{]}  \\
+        & w/ DropEdge & 79.37$\pm$6.63          & 76.02$\pm$4.95          & \textbf{76.97$\pm$5.14} & 71.67$\pm$4.72          & 118.87 {[}s{]} \\
+        & w/ G-Mixup  & 78.65$\pm$3.80          & 76.85$\pm$2.94          & 73.85$\pm$3.71          & \textbf{72.25$\pm$2.69} & 99.83 {[}s{]}  \\ \hline
+\end{tabular}
+\caption{\textbf{Label Corruption Robustness results}. We invert the label of a certain percentage of nodes and observe the results. The metric is the classification accuracy along with standard error.}
+\label{tableexp6-1}
+\end{table}
+
+\begin{table}[]
+\centering
+\footnotesize
+\begin{tabular}{ccccccc}
+\hline
+Type                                                                      & Methods     & 10\%                 & 20\%                 & 30\%                 & 40\%                 & Avg. runtime   \\ \hline
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Removing\\ edges\end{tabular}} & vanilla     & 82.15$\pm$4.50          & 78.95$\pm$4.55          & 77.50$\pm$6.07          & 75.02$\pm$0.35          & 65.83 {[}s{]}  \\
+                                                                          & w/ DropEdge & 81.60$\pm$5.21          & 80.40$\pm$5.44          & 77.75$\pm$4.68          & 75.40$\pm$3.67          & 111.60 {[}s{]} \\
+                                                                          & w/ G-Mixup  & \textbf{82.25}$\pm$\textbf{4.55} & \textbf{81.35}$\pm$\textbf{3.56} & \textbf{78.85}$\pm$\textbf{0.45} & \textbf{76.35}$\pm$\textbf{0.50} & 88.98 {[}s{]}  \\ \hline
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Adding\\ edges\end{tabular}}   & vanilla     & 82.37$\pm$5.32          & 82.05$\pm$5.09          & 81.20$\pm$6.24          & \textbf{82.00}$\pm$\textbf{4.81} & 74.54 {[}s{]}  \\
+                                                                          & w/ DropEdge & 79.75$\pm$6.93          & 81.02$\pm$6.82          & 80.50$\pm$4.93          & 79.15$\pm$3.80          & 121.82 {[}s{]} \\
+                                                                          & w/ G-Mixup  & \textbf{85.82}$\pm$\textbf{3.64} & \textbf{82.25}$\pm$\textbf{6.59} & \textbf{82.07}$\pm$\textbf{4.83} & 81.12$\pm$4.14          & 98.48 {[}s{]}  \\ \hline
+\end{tabular}
+\caption{\textbf{Topology Corruption Robustness results}. We add/remove a certain percentage of edges and observe the results. The metric is the classification accuracy along with standard error.}
+\label{tableexp6-2}
+\end{table}
+
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{fig/imdb-binary-exp6.png}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{fig/reddit-binary-exp6.png}
+\end{subfigure}
+\caption{Influence of hyperparameter K \\ to test set classification accuracy}
+\label{claim7}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{fig/imdb-binary-exp7.png}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{fig/reddit-binary-exp7.png}
+\end{subfigure}
+\caption{Performance of $\mathcal{G}$-Mixup with GNNs with varying number of layers}
+\label{claim8}
+\end{minipage}
+\end{figure}
+
+\subsubsection{Result 7: Using the average node number of all the original graphs is a better choice for hyperparameter K in $\mathcal{G}$-Mixup}
+
+While we get quite similar graphs in our experiments as the authors, we would not say that the graphs support the claim. The graphs are shown in Figure \ref{claim7}. The difference between classification accuracy between the case where the average number of nodes of original graphs is used for hyperparameter K and other cases on the IMDB-BINARY dataset is negligible, while on REDDIT-BINARY it can even be seen that it is one of the worse performing ones. 
+
+\subsubsection{Result 8: $\mathcal{G}$-Mixup improves the performance of graph neural networks with varying layers}
+
+Our graphs for this claim are shown in figure \ref{claim8} and are quite different from the ones the authors show in their paper. We do not see any drop in performance when increasing the number of layers on IMDB-BINARY, and all three approaches (Vanilla, DropEdge and $\mathcal{G}$-Mixup) work equally well. On REDDIT-BINARY, we can see that drop in performance, and we can also see that $\mathcal{G}$-Mixup outperforms the other methods by a small margin.
+
+\section{Discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+Our goal was to reproduce the experiments from the paper \textit{$\mathcal{G}$-Mixup: Graph Data Augmentation for Graph Classification} and test the claims that the authors pointed out. While we were able to perform all the experiments from the paper, it did require a lot of additional effort to write the necessary code. We were not able to reproduce some of the results that support the claims from the original paper, as our results in some experiments notably differ from the authors' findings. Regarding the method itself, we were able to reproduce and confirm that synthetic graphs generated with $\mathcal{G}$-Mixup will preserve the key characteristics of both original classes. In contrast to that, we were not able to prove the superiority of this data augmentation method, made in claims 3, 4, and 5. All of the $\mathcal{G}$-Mixup results lie within the standard error of the Vanilla models, which is in our opinion not enough to claim the supremacy of the method. One of the reasons why we didn't get the same results as the authors did may lie in the fact that we didn't have the correct information about the models and hyperparameters used in the experiments, both for $\mathcal{G}$-Mixup and for other augmentation methods. The authors also might have done some data preparation and processing that we were not aware of. We showed, however, that $\mathcal{G}$-Mixup, on average, can improve the robustness of the GNN models, which is useful when the labels or/and the topology of the graphs are noisy.  \\
+
+
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+The paper presented the novel augmentation method precisely, and the authors provided the necessary code for the method implementation. It was also easy to grasp the main ideas of the paper. It was very simple to verify or disprove a certain claim because of the way the experiments were set up.
+
+\subsection{What was difficult}
+The biggest challenge for us was to recreate experiments as they were described in the paper. We needed to write the code for each experiment ourselves, and on top of that, we had to make a lot of educated guesses about the experimental settings and choices of hyperparameters. Additionally, some experiments required vast processing power and a lot of working memory, so we had to perform those experiments on the Google Colab Pro platform and rented virtual machines.
+
+\subsection{Communication with original authors}
+To reiterate, we contacted the authors on two occasions. The first
+time was very early in the reproduction process when we asked about the details of the graph estimation methods that they used and which weren’t explained in the paper, to which they responded swiftly. On the second occasion, we asked about the experimental settings and hyperparameter details, but we did not receive a reply.
+\newpage
