@@ -1,0 +1,25 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+We aim to reproduce a result from the paper ``Exploring the Role of Grammar and Word Choice in
+Bias Toward African American English (AAE) in Hate
+Speech Classification''~\cite{aae_paper}. Our study is restricted specifically to the claim that the use of swear words impacts hate speech classification of AAE text. We were able to broadly validate the claim of the paper, however, the magnitude of the effect was dependent on the word replacement strategy, which was somewhat ambiguous in the original paper.
+
+\subsubsection*{Methodology}
+The authors did not publish source code. Therefore, we reproduce the experiments by following the methodology described in the paper. We train BERT models from TensorFlow Hub \cite{bert} to classify hate speech using the DWMW17\cite{davidson} and FDCL18\cite{founta} Twitter datasets. Then, we compile a dictionary of swear words and replacement words with comparable meaning, and we use this to create ``censored'' versions of samples in Blodgett et al.’s\cite{blodgett} AAE Twitter dataset. Using the BERT models, we evaluate the hate speech classification of the original data and the censored data.  Our experiments are conducted on an open-access research testbed, Chameleon~\cite{chameleon}, and we make available both our code and instructions for reproducing the result on the shared facility.
+
+\subsubsection*{Results}
+Our results are consistent with the claim that the censored text (without swear words) is less often classified as hate speech, offensive, or abusive than the same text with swear words. However, we find the classification is very sensitive to the word replacement dictionary being used.
+
+\subsubsection*{What was easy}
+The authors used three well known datasets which were easy to obtain. They also used well-known widely available models, BERT and Word2Vec.
+
+
+\subsubsection*{What was difficult}
+Some of the details of model training were not fully specified. Also, we were not able to exactly re-create a comparable dictionary of swear words and their replacement terms of similar meanings, following their methodology.
+
+
+\subsubsection*{Communication with original authors}
+We reached out to the authors, but were not able to communicate with them before the submission of this report. 
