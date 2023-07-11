@@ -1,0 +1,25 @@
+\section*{\centering Reproducibility Summary}
+
+\textit{This report summarizes our reproduction of the ACL2021 paper \href{https://aclanthology.org/2021.acl-long.281/}{Exploring the Representation of Word Meanings in Context: A Case Study on Homonymy and Synonymy} by \citet{garcia:acl}.}
+
+\subsubsection*{Scope of Reproducibility}
+
+The original author looks at both static and contextualized word embeddings to assess their ability to adequately represent different lexical-semantic relations, such as homonymy and synonymy. While the author describes experiments with a number of contextualized and static models, we limit our reproducibility attempt to the results reported for BERT and fastText. We also extend the original experiment by compiling a new Italian dataset and report our findings for this additional resource.
+
+\subsubsection*{Methodology}
+
+We rely on the existing code-base, modifying it where necessary and integrating it with a few additional scripts for data preparation and statistics computation. Our code is available at \url{https://github.com/matteobrv/repro-homonymy-acl21}.
+
+\subsubsection*{Results}
+
+We only manage to partially reproduce the original scores. Nonetheless, the hypothesis formulated in the original paper are still corroborated.
+
+\subsubsection*{What was easy}
+
+Overall, the paper is clear and provides a good overview of the experiments. It outlines the structure of the data-sets and how they were compiled. The code and the data are available at \url{https://github.com/marcospln/homonymy_acl21}.
+
+\subsubsection*{What was difficult}
+An amended version of the original paper with additional details about the experiments is available on arXiv \citep{garcia:arxiv}. We initially relied on the ACL \citep{garcia:acl} version which led to some minor issues during the reproducibility attempt. The code-base does not include the script used to compute the reported statistics, but upon request the author provided a preliminary version which we re-implemented. Lastly, due to some minor bugs and lack of information about the version of the libraries being used, some minor changes to the original code-base were necessary.
+
+\subsubsection*{Communication with original authors}
+We exchanged a number of emails with the author to discuss implementation details and discrepancies in the reproducibility results. We received prompt and helpful responses to all of our questions.
