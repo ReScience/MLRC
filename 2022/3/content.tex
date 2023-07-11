@@ -1,0 +1,245 @@
+\section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+
+% Importance of claim and why we need to verify it
+% 1) Big claim to learn an algorithm
+% 2) Very new and they claim it works extremely well (OOD accuracy)
+% 3) New recall and progressive loss 
+% Questions left and how my work fills them
+
+% Not trivial work
+% 1) Takes deep understanding of the models, not just running code and graphing
+% 2) Wrote perturbation testing from scratch
+% 3) Got AA score integrated
+
+% We have NEW insights
+% 1) perturbation recovery
+% 2) alpha analysis
+% 3) hyperparameter search
+% 4) AA score - also new work -- add extra explaination to this section
+
+% Rest is just an expansion of intro
+
+In previous work by Schwarzchild et al. \cite{schwarzschild2021can}, it is shown that recurrent neural networks have the capability to logically extrapolate. This is where models trained on small/``easy'' problems can extrapolate to solve larger/``harder'' versions of the same problem, without the need for extra training. This is similar to the way humans learn, starting with toy problems, eventually being able to solve complex problems of the same nature.\\
+Bansal et al. \cite{bansal2022endtoend} extend this work introducing two new components to the neural networks used in \cite{schwarzschild2021can}. These are `recall', which is adding skip connections at the beginning of each application of the recurrent module, so the original problem is reintroduced to the network repeatedly; similar to rereading the question. Also added is a progressive loss function, this helps stop the model learning time related behaviour, crucial as we want to apply the recurrent module a different number of times, dependent on the complexity of the problem being solved. This progressive loss is analogous to truncated back propagation through time \cite{jaeger2002tutorial}. These models are then tested on three problems:
+
+\begin{enumerate}
+    \item Prefix Sums: Given a bit string, compute its prefix sum.
+    \item Mazes: Given a maze with the start marked as green and end as red respectively, find a route between the two points using the white corridors.
+    \item Chess: Given a chess board, find the optimal next move.
+\end{enumerate}
+
+The conclusion of this work is in the title of the paper, the neural networks introduced are able to synthesise algorithms to solve these problems. This is a large progression from previous work and combined with the claimed high out of distribution testing accuracy gained from the skip connections and progressive loss function, is a new and novel technique with possible far reaching impacts if the results are repeatable. 
+
+While Bansal et al. released code to reproduce the accuracy results they show, many require changes to input parameters and work to present them in the same format as originally shown in \cite{bansal2022endtoend}. We then extend this, creating experiments to test all perturbation results shown along with an in depth analysis of these results. Also, we conduct a hyperparameter search by extensively searching the space of possible hyperparameters, especially focused on the alpha hyperparameter introduced in the progressive loss function, to verify hyperparameter choice. Moreover, we integrate this with work from Anil et al. \cite{anil2022path} to generate Asymptotic Alignment scores for the models Bansal et al. propose.
+
+This new analysis shows on a deeper level the models unique behaviour under perturbation and the impact of the newly introduced alpha hyperparameter on both accuracy and Asymptotic Alignment score.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+In this report we aim to validate the claims of Bansal et al., present analysis of the alpha hyperparameter and investigate interesting perturbation behaviour of prefix sums models.
+\begin{enumerate}
+    \item First, we reproduce all results shown by Bansal et al. in \cite{bansal2022endtoend}. These can be summarised as:
+        \begin{itemize}
+            \item The provided recurrent architecture, with skip connections, prevents the original problem from being forgotten or corrupted.
+            \item The new progressive training routine prevents the network learning time specific behaviours, so the recurrent module can be applied indefinitely.
+            \item The models with this recurrent architecture avoid the overthinking trap, scaling arbitrarily.\\\newline
+            These claims are validated in \cite{bansal2022endtoend} by testing against the easy to hard data set \cite{Schwarzschild2021datasets}, showing higher accuracy than previously achieved, extrapolation to much more complex examples and that the original problem is not forgotten, we will verify them in the same way.\\Bansal et al. often validate their three claims together for each of the three test cases, this can be seen in Figures 3 to 6 of their paper. However, they do also validate the robustness of the skip connections and convergence over time in Figure 7 of their work.
+        \end{itemize}
+    \item We also do an analysis of the alpha hyperparameter introduced by Bansal et al. to control the progressive loss.\\
+    The alpha hyperparameter is shown to be crucial by Bansal et al. as it varies from 1.0 for prefix sums models to 0.01 for maze models, we look at the behaviour of this parameter for maze models.
+    \item We do an analysis of what is causing prefix sums models to recover quicker from some perturbations than others.\\
+    When reproducing the results we saw interesting behaviour in perturbation recovery, we look at this on a closer level for prefix sums models.
+\end{enumerate}
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+We are thankful to Bansal et al. for releasing such a well written code base, \footnote{https://github.com/aks2203/deep-thinking} different to most research code bases, the authors use the Hydra package \cite{Yadan2019Hydra} to control hyperparameters making the code much more readable. There is ample documentation in the README.md file and launch directory both in the GitHub repository to begin training models. In this code base there is all of the material to reproduce any accuracy experiment shown in \cite{bansal2022endtoend}. However, the code for perturbation experiments, which we believe to be as crucial as the accuracy experiments because they validate the methodology, was not released by the authors nor shared with us. We decided to use the PyTorchFI \cite{PytorchFIMahmoudAggarwalDSML20} library to implement these experiments as it allows run time access to the features of the networks with ease. We had good access to GPUs, thanks to department resources, sums and maze models were trained on a single Nvidia RTX 2080Ti GPU and chess models were trained on multiple sets of three NVIDIA Quadro RTX6000 GPUs.
+
+\subsection{Model descriptions}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+The models used are specific to this paper so there is a detailed description of them in \cite{bansal2022endtoend} but we will highlight the key points here. The Deep-Thinking (DT) models are created by using a recurrent module which can be repeatedly applied and is based on a ResNet block \cite{he2016deep} with ReLUs in between each layer in the block to create a recurrent neural network. The DT-Recall networks have the original input concatenated to the current features each time the recurrent module is applied. DT-Recall-Progressive (DT-Recall-Prog) models have an alpha hyperparameter strictly greater than 0 meaning that the progressive loss is used in training, which can be summarised as 
+\(L=(1-\alpha)\cdot L_{max-iters}+\alpha \cdot L_{progressive}\) and is detailed fully in Algorithm 1 of \cite{bansal2022endtoend} by Bansal et al.
+
+\subsection{Datasets}
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+All of the data used is taken from the easy to hard datasets \cite{Schwarzschild2021datasets}, this is downloaded locally at run time automatically by installing the PIP package of the GitHub repository. \footnote{https://github.com/aks2203/easy-to-hard-data} This is in the requirements.txt of the code base provided by Bansal et al. so should be installed automatically when setting up the whole code base.
+For prefix sums there are 10,000 examples of each size available and we used the default train to validation split of 80/20. Details of the examples available are in \cite{Schwarzschild2021datasets} or in the README.md of the GitHub repository for the datasets. As we are testing the model's ability to extrapolate, we test on a set of different size so we can use all the examples from this set. For mazes, we have 50,000 training examples again with a train to validation split of 80/20 and 10,000 testing examples. For maze models there is no defined difference between the sets for training and testing unlike for prefix sums where a set can be used for training or testing. For chess, we have 1.5 million examples sorted in ascending order of difficulty, for training we define a set from 0 to i and for testing we define a, not necessarily disjoint, set of [j-100,000, j] examples, the default i and j in \cite{bansal2022endtoend} are 600,000 and 700,000 respectively.
+
+\subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+We found the hyperparameters provided were stable and good choice in all cases, in the sense that they allowed us to reproduce all results with high accuracy but some can be varied without impact perhaps making them more suitable for particular use cases. We do however do a further analysis of the alpha hyperparameter in Section \ref{subsec:newresults} and a larger hyperparameter search in Appendix Section \ref{sec:hyperparameters}.
+
+\subsection{Experimental setup and code}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+The accuracy results presented are quickly recreated using the code base from Bansal et al. Specifically, the README.md, launch files and data analysis files are needed to do this. 
+For the perturbation results, which we have implemented in Python independently, it is slightly more complicated; as we need to firstly train the models, then reference them separately to do the testing. Meaning that there is a small amount of python knowledge required here, specifically, how file paths work and creating a string, before the user can execute this code.
+
+\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average run time (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+As referenced above, we used both a Nvidia RTX 2080Ti GPU with 11GB of memory and sets of three NVIDIA Quadro RTX6000 GPUs with 22GB of memory. The time taken to reproduce accuracy results are shown in Table \ref{table:timings}. The maze testing takes longer due to the number of iterations as we test for one thousand iterations. The chess training takes longer as our compute resources have a two day time limit so we use the implemented checkpoint system and restart from the best previous iteration meaning some iterations are ran twice, as they are not recalled in the second run when training the model. For perturbation results, the sums single bit flip result takes approximately 4.5 days on a single GPU as this goes through each of the 10,000 examples one at a time. The maze perturbation and average change in features results take 4.5 hours and 1 hour on average respectively.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Problem & Average Time to Train (hours) & Average Time to Test (hours) \\ \hline
+ Prefix Sums & 2 & 0.2 \\ \hline
+ Mazes & 9 & 2.25 \\ \hline
+ Chess & 72 & 1.3 \\ 
+ \hline
+\end{tabular}
+\caption{Average time taken to train and test the three types of models.}
+\label{table:timings}
+\end{center}
+\end{table}
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+Our results almost flawlessly support all claims made by Bansal et al. Also, we provide extra detail on the alpha hyperparameter and its role in Section \ref{subsec:newresults}. Following this, we do further analysis of the time taken to recover from perturbation for prefix sums models.
+
+\subsection{Results reproducing original paper}
+\label{subsec:resultsrepro}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+As stated in Section \ref{sec:claims}, the claims of the paper are often validated together for each of the three test cases in an ablation style, comparing each of the four possible types of models that can be created with the recall connections and progressive loss: Deep Thinking (DT), Deep Thinking Progressive (DT-Prog), Deep Thinking Recall (DT-Recall) and Deep Thinking Recall Progressive (DT-Recall-Prog). This further verifies the claims as we can be sure that both the recall and progressive loss are needed for the highest accuracy.
+
+\subsubsection{Prefix Sums Experiments}
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/Figure-3.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/Left-Figure-6.png}
+    \\[\smallskipamount]
+    \caption{My reproductions of:\\
+    Left: `Figure 3' of \cite{bansal2022endtoend}. Prefix sums models trained on 32 bit data, tested on 512 bit data.\\
+    Right: `Left of Figure 6' of \cite{bansal2022endtoend}. Prefix sums models trained on 32 bit data, tested on 48 bit data.}
+    \label{figs:sums}
+\end{figure}
+These experiments support all claims in point one of Section \ref{sec:claims}. The prefix sums results from Bansal et al. can be summarised in Figures 3 and left of 6 of \cite{bansal2022endtoend}. These results show DT-Recall models out performing DT and Feedforward networks in accuracy over time. This supports all of the claims as the original problem is not forgotten for 500 test iterations maintaining 100\% accuracy to the point when testing is stopped. The recurrent module is applied for this many steps also, supporting part two of the claim. The overthinking trap is avoided as once the solution has been found it is maintained. Our reproductions can be seen in Figure \ref{figs:sums}, we do see a difference in the DT-Prog line not gaining some accuracy when testing on 512 bits and a difference in the speed of degradation in accuracy for the DT-Prog model when testing on 48 bit data. We questioned Bansal et al. on this and believe it is because they had a 99\% training accuracy threshold for all models; we did not apply this, meaning some of our models may have performed worse.  This reinforces the repeatability of the claim for prefix sums models as the DT-Recall models were both reproduced easily without this threshold.
+
+\subsubsection{Mazes Experiments}
+These experiments support all claims in point one of Section \ref{sec:claims}. The maze models maintain the original problem throughout, supporting part one of the claims as the models maintain high accuracy once it has been achieved; also supporting part three of the claims that the overthinking trap is avoided. The recurrent module is applied many more times than in the prefix sums experiments, further supporting that it can be applied indefinitely and scale to arbitrarily many times. These results from Bansal et al. can be summarised in Figures 4 and Right of 6 of \cite{bansal2022endtoend} and our reproductions can be seen in Figure \ref{figs:mazes}. We see slight differences mainly attributed to our reproductions not using a 99\% accuracy threshold; meaning we see some of our reproductions fall towards the lowest variance bounds in the plots in \cite{bansal2022endtoend}, such as the DT-Recall model in Left of Figure \ref{figs:mazes}. 
+% We also see better than expected performance for the DT-Recall-Prog and DT-Recall models on 13x13 mazes.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/Reproduce_Figure_4.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/Right-Figure-6.png}
+    \\[\smallskipamount]
+    \caption{My reproductions of:\\
+    Left: `Figure 4' of \cite{bansal2022endtoend}. Maze models trained on 9x9 data, tested on 59x59 maze data.\\
+    Right: `Right of Figure 6' of \cite{bansal2022endtoend}. Maze models trained on 9x9 data, tested on 13x13 maze data.}
+    \label{figs:mazes}
+\end{figure}
+\subsubsection{Chess Experiments}
+These experiments support all claims in point one of Section \ref{sec:claims}. All claims are supported as the original problem is not forgotten and the overthinking tap is avoided as the DT-Recall-Prog model does not deteriorate after finding a high accuracy solution. Also, the models are tested for a different number of test iterations compared to prefix sums and mazes further supporting part two of the claims. This time we also reproduce an appendix result for completeness as for both prefix sums and mazes we showed testing for both a large and small extrapolation. Our reproductions of Figure 5 and 9 can be seen in Figure \ref{figs:chess}, of chess models trained on the first 600,000 examples and then tested on examples [600k,700k] and [1M, 1.1M] respectively. We do see the DT-Recall line peaking achieving multiple local maxima, throughout the testing in both cases; this could be the skip connections in practice but the lack of progressive loss function means that these peaks are not held and deteriorate. We see the DT-Prog models again achieving lower accuracy than expected, this is due to the lack of 99\% training accuracy threshold, which appears to impact the progressive model in all experiments. Our DT models accuracy peaks higher than in \cite{bansal2022endtoend} but without recall and progressive loss this accuracy deteriorates quickly, highlighting the impact of the additions Bansal et al. have made.
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/Reproduce_Figure_5.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/Reproduce_Figure_9.png}
+    \\[\smallskipamount]
+    \caption{My reproductions of:\\
+    Left: `Figure 5' of \cite{bansal2022endtoend}. Chess models trained on the first 600k examples, tested on examples [600k,700k].\\
+    Right: `Right of Figure 9' of \cite{bansal2022endtoend}. Chess models trained on the first 600k examples, tested on examples [1M, 1.1M].}
+    \label{figs:chess}
+\end{figure}
+\subsubsection{Perturbation Experiments}
+As stated earlier, this code has been independently reproduced by ourselves, so this further supports the repeatability of the results shown.\\
+There are three perturbation results shown in Figure 7 of \cite{bansal2022endtoend}. Left of Figure 7 shows the time taken to recover from a one bit flip at the ith index after solving for 50 iterations in a prefix sums test. A reproduction of this is shown in Figure \ref{figs:peturb}, we see hooked ends on the left side, a further analysis of this is provided in Section \ref{subsec:newresults} - Hooked End Perturbation Analysis.
+Middle of Figure 7 of \cite{bansal2022endtoend} shows the time taken to recover after swapping the features, after solving for 50 iterations for a maze model. We instead reproduce Figure 12 where all features are set to zero instead of another maze.
+These two results reinforce part one of the claim that the skip connections prevent the original problem being forgotten as even when perturbed the models still solve for the original problem solution.
+Also supporting part two of the claims of \cite{bansal2022endtoend}, that the learning is independent of time as the models recover from these perturbations after the 50th iteration when the original problem had already been solved.
+Right of Figure 7 of \cite{bansal2022endtoend} shows the change in features at each step of solving, measured by the L2 norm. This supports part three of the claim that the overthinking trap is being avoided as both the DT-Recall models continue to converge over time. This result does depend heavily on the models being used to produce it which explains the difference in values but the same overall pattern is seen.
+\begin{figure}[h]
+    \includegraphics[width=.32\textwidth]{figures/test_time_correctness.png}\hfill
+    \includegraphics[width=.32\textwidth]{figures/repo_7_corrected.png}\hfill
+    \includegraphics[width=.32\textwidth]{figures/test_changes_correctness.png}
+    \\[\smallskipamount]
+    \caption{My reproductions of:\\
+    Left: `Left of Figure 7' of \cite{bansal2022endtoend}. Prefix sums models perturbed by flipping the ith bit after 50 iterations.\\
+    Middle: `Figure 12' of \cite{bansal2022endtoend}. Maze models perturbed by setting all features to 0 after the 50th iteration.
+    Right: `Right of Figure 7' of \cite{bansal2022endtoend}. Change in the features of maze models over time when solving, measured by the L2 norm.}
+    \label{figs:peturb}
+\end{figure}
+
+\subsection{Results beyond original paper}
+\label{subsec:newresults}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+The new progressive loss measure is well reasoned in \cite{bansal2022endtoend} but there is no evidence to relate this to the choice of the alpha value for each model. In this section we further investigate this and also look into what is causing the hooked ends in Left of Figure \ref{figs:peturb}.
+
+\begin{figure}[h]
+\centering
+    \includegraphics[width=.75\textwidth]{figures/mazes_merged.png}\hfill
+    % \includegraphics[width=.5\textwidth]{figures/test_mazes_analysis_4.png}
+    \\[\smallskipamount]
+    \caption{
+    Multiple maze models trained on 9x9 mazes, tested on 59x59 mazes with alpha values of 0.1 or 0.2.}
+    % \\Right: Maze models trained on 9x9 mazes, tested on 59x59 mazes with varying alpha values.}
+    \label{figs:alpha}
+\end{figure}
+ 
+\subsubsection{Alpha Value Analysis}
+% \label{subsec:alpha}
+As seen in Figure \ref{figs:sums} both the DT-Recall and DT-Recall-Prog lines reach 100 \% accuracy for prefix sums models but for mazes only the DT-Recall-Prog model reaches 100\% accuracy, so we do our investigation on maze models. This will increase the reliability of results as in prefix sums models there is a lot of variability from the optimiser found, also noted by Bansal et al. in their paper. There is research into stabilising the optimiser that is found, such as by Bai et al. in \cite{bai2021jacobian} but this is not implemented in the current code base.
+Here we found that there does appear to be a point of degradation in accuracy as we change the alpha value, shown in Figure \ref{figs:alpha}. We do note that the networks may find a good optimiser from other alpha values due to the random nature of the learning process
+% as shown in Right of Figure \ref{figs:alpha} 
+but in Figure \ref{figs:alpha} we average multiple models to gain a repeatable picture of the models behaviour. It is important to note the default alpha value of 0.01 for mazes is above the threshold of 0.1 we have found, so this supports the authors choice.
+
+\subsubsection{Hooked End Perturbation Analysis}
+% \label{subsec:hooks}
+
+We decided we would look at the amount of work done by the models when recovering from perturbation which we measured by the amount of times the value of a bit is changed. We then averaged these results, which can be seen in Left of Figure \ref{figs:hooks}. We then multiplied the average number of bits changed per iteration by the average time to recover to get the average total amount of work done over all iterations, which can be seen in Right of Figure \ref{figs:hooks}. These both suggest that the amount of work the model is doing is  causing the hooks, possibly implying the models are learning the importance of these bits at the left end of the string, as these as the most important. This highly tailored behaviour is extraordinary and from conversations with the authors we agree this difference to the origional paper is because we have averaged over all testing examples, where as they only tested a subset for Figure 7 of \cite{bansal2022endtoend}. Bansal et al. noted similar extraordinary behaviour was seen in maze models when they are perturbed but we could not reproduce this in a manner which can be presented in a paper. Linking this point back to the previous two, when creating Middle of Figure \ref{figs:peturb} we repeated the result over multiple alpha values and found that testing on a subset we could produce the result with a large range of alpha values; where as when we worked with all examples available, the set of alpha values which could recover was only those smaller than 0.1, i.e. above the threshold of 0.1  found in Section \ref{subsec:newresults} - Alpha Value Analysis.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/test_time_track.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/test_time_track_mul.png}
+    \\[\smallskipamount]
+    \caption{
+    Left: The average number of changes to a bits value per iteration after a one bit perturbation.\\
+    Right: The total number of changes to a bits value after a one bit perturbation.}
+    \label{figs:hooks}
+\end{figure}
+
+\section{Discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+Overall, all of our results support those of Bansal et al. We shed more light on the new alpha hyperparameter presented and tested aspects more rigorously revealing the truly remarkable nature of the models created in \cite{bansal2022endtoend}. The largest noticeable weakness in our work is that the code base released by the authors is used and we have not recreated fully the code from the description given in the paper. However, over the course of this project we have become very well accustomed with both the paper and code and believe there is no discrepancy between the two. Also, we did not reproduce perturbations in the exact same way that the authors did but the benefit of this is that we have seen the same results from two perspectives. There are many strengths to this reproduction, the main ones being the rigour; models were trained and tested in batches of all models needed for one experiment, so there was no cherry picking of results. Moreover, for the perturbations section we reproduced the results fully independently, we believe this to be the gold standard of validation for the claims made in the paper by Bansal et al.
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+The code base released by Bansal et al. is very well written and documented, the use of the Hydra package \cite{Yadan2019Hydra} made all hyperparameters easily available to both change and understand their function. 
+The paper is written in a very intuitive way with the wording lending itself to the popular definitions of the words, such as `overthinking' meaning deteriorating accuracy due to processing for too long.
+The authors were easily accessible and more than happy to help with any questions we had, which made the experience of reproducing the results much better.
+
+\subsection{What was difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+The chess models requiring so much time to train was a drain both on time and resources but overall added to the rigour of the report. We had to request access to extra compute resources to do this as they require a lot of memory to train and test. 
+From the wording in \cite{bansal2022endtoend} we originally believed all code was available in the GitHub repository, so having to create all of the code for perturbation analysis was unexpected but did give us a deeper understanding of the code base and models, as we were dealing with them on a layer by layer basis.
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published.
+We had very good communication from the authors, with Avi Schwarzschild providing an email chain for questions and setting up multiple meetings with Eitan Borgnia and Arpit Bansal, for which we are extremely grateful. Through out the report we have mentioned where the authors added to our discussions.
+
+\subsection{Acknowledgements}
+We thank Avi Schwarzschild for feedback and comments on the report. We would also like to thank the Richard Cunningham and the Scientific Computing Research Technology Platform from the University of Warwick for maintaining the compute facilities used for this project. We also thank the reviewers for their detailed feedback.
