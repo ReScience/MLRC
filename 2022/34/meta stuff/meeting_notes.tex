@@ -1,0 +1,120 @@
+\documentclass[12pt]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\title{Meeting notes}
+
+\begin{document}
+
+\maketitle
+
+
+\section{10/20 Meeting}
+
+\subsection{Running G-Mixup}
+
+\begin{itemize}
+    \item Installing all the packages with the correct version was a challenge.
+    \item Need to uninstall pytorch and install the correct version.
+    \item dylan with share a Colab notebook with working import code and write some instructions for code.
+    \item Go into runtime and change to GPU!
+    \item dylan ran the scripts from Github.
+    \item \textbf{To-do:} Modify the scripts/write code to do other examples.
+    \begin{enumerate}
+        \item Need to estimate graphons?
+        \item Try replacing REDDIT-BINARY with some other dataset in pytorch-geometric.
+    \end{enumerate}
+    \item Datasets to try: \href{https://pytorch-geometric.readthedocs.io/en/latest/notes/data_cheatsheet.html}{Dataset Cheat Sheet}
+    \begin{enumerate}
+        \item Maybe try ModelNet10 or ModelNet40? (might be too big)
+        \item MNISTSuperPixels (much denser -- are the edges directed?)
+    \end{enumerate}
+    \item What are the hyperparameters here?
+    \item \textbf{To-do:} Try to reproduce Figure 4 (and also for new datasets!).
+\end{itemize}
+
+\subsection{Proofs}
+
+\begin{itemize}
+    \item 1/18 (\cite{lov-sze}) vs 1/8 in g-mixup paper. (maybe this is ok?)
+    \item Injection (as graphs!) vs homomorphism density ($t_0$ vs $t$).
+\end{itemize}
+
+\subsection{Pre-meeting Notes}
+
+\begin{enumerate}
+    \item Do we need to contact the authors?
+    % \item Reference for Azuma's lemma? (probably not needed)
+    \item Reference for cut norm/rectangle norm is a norm.
+    \item Lemma A.2 is also Lemma 4.1 in \cite{lov-sze} \href{https://arxiv.org/pdf/math/0408173.pdf}{ArXiv link} (pages 12-13). The reference given in the paper is a course at MIT/associated book draft theorem 4.5.1 \href{https://yufeizhao.com/gtac/}{Course Website link} (maybe the difference is finite simple vs (possibly infinite) simple?).
+    \item The book from the referenced course is actually very good! \href{https://yufeizhao.com/gtacbook/}{Book link}.
+    \item Maybe ask the authors if they've estimated graphons for any of the larger datasets (for example: ModelNet10).
+\end{enumerate}
+
+\section{10/13 Meeting}
+
+\begin{enumerate}
+    \item We have the template in this project.
+    \begin{enumerate}
+        \item There are some errors in the template, can we resolve them? Just errors from missing inputs?
+    \end{enumerate}
+    \item We need to reproduce two results of the original article.
+    \begin{enumerate}
+        \item \textbf{Idea 1:} Fill in proofs in section 4 (Theorem 4.2) in particular. They give a proof sketch that we can expand on.
+        \item Figure out how they construct the graphons.
+        \item Re-implementing code could be interesting but it will take a long time, so maybe do it for the final draft if we want to try it.
+        \item \textbf{Idea 2:} Rerun their code on one or more of the data sets they have. Make sure random seeds are different.
+        \item Data sets they use are included in pytorch.
+    \end{enumerate}
+    \item We need to do something on a new dataset.
+    \begin{enumerate}
+        \item Randomly generate some graphs with the same discriminative motif, experimentally verify 4.2 and 4.3 -- the mixed graphons should have the same discriminative motif.
+        \item Try the program on some other datasets in pytorch.geometric.
+        \item Get some real world data to introduce more complexity in data sets.
+    \end{enumerate}
+    \item We will use Colab for now, to try it out. We may try Great Lakes later.
+\end{enumerate}
+
+\subsection{This week To-Do}
+
+\begin{enumerate}
+    \item Play around with the code on Github, understand all the main functions, how to use it.
+    \begin{itemize}
+        \item Put working code in Colab.
+    \end{itemize}
+    \item Fill in proofs as much as possible for section 4 (Theorem 4.2 and Theorem 4.3). Explain these in a LaTeX document in this project.
+    \begin{itemize}
+        \item Each person should try to come up with a proof on their own and write it in this project.
+        \item If we have different solutions and one is clearer than the others we will use that one.
+    \end{itemize}
+    \item Find an extension.
+    \begin{itemize}
+        \item Look at the data sets in pytorch.geometric, or
+        \item figure out how to generate graphs with discriminative motifs.
+        \item Appendix G has other experiments, we could get some ideas from those.
+    \end{itemize}
+\end{enumerate}
+
+Next week: writing, do some experiments!
+
+\section{10/25 Meeting}
+\begin{enumerate}
+    \item Shelby: has files running and logging data for the proteins dataset, but ran out of GPU hours. For some of the seeds, G-mixup performs really badly.
+    \item Could try to store graphons in a separate file to clear up space for RAM
+    \item Could pay money to upgrade Colab
+    \item For 2nd replication result, try to run for IMDB-binary dataset (seems like smallest dataset). Paper reports that vanilla, G-mixup have comparable results for this dataset. 
+    \item Could use proteins dataset for our extension result.
+    \item Graphon estimator is different between paper/code
+    \item 
+    \end{enumerate}
+    
+\section{Questions for authors}
+
+Dylan: Questions I have about life: how were the hyperparameters chosen? Is there a reason you didn't try stuff on the PROTEINS dataset. How did you construct the graphs in figure 4 (i.e., what is the shading determined by?) The parameters for the script in run gmixup do not match the hyperparameters of the paper. Do you have any tips on using the system RAM (or am I not using google colab ram correctly?, can you say what your system parameters were.) How did you visualize the graphs in figure 2 to estimate the graphons (I am not sure how that code works.) When I run gmixup = True on PROTEINS with the GIN, my code compiles, but not when it is false. Where is the average number of nodes popping up in the code, not all the synthetic graphs have the same nummber of nodes. Best practice for running code on reddit binary: fix the same training set and run 10 seeds on it, or take different slices? 
+
+
+
+\bibliography{ref}
+\bibliographystyle{plain}
+
+\end{document}
