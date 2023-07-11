@@ -1,0 +1,172 @@
+\section{Introduction}
+In this reproducibility challenge, we aim to independently verify the claims made in the studied paper regarding the effectiveness of a novel machine learning-assisted approach for Directed Evolution (DE), a wet-lab method used for discovering novel protein designs. The authors proposed a Thompson Sampling-guided Directed Evolution (TS-DE) framework for sequence optimization, where the sequence-to-function mapping is unknown and querying a single value is subject to costly and noisy measurements. 
+
+We plan to reproduce the experiments presented in the original paper, where the authors tested their approach on a simulated population of protein sequences represented as binary motifs, corresponding to favorable and unfavorable sites, respectively. The authors demonstrated that the TS-DE approach, leveraging bandit learning and Thompson sampling, reaches a nearly optimal regret bound and outperforms the basic DE approach by converging faster and being more robust to mutation rate scheduling.
+
+In addition to reproducing the results, we aim to improve the original results by including uncertainty quantification, more accurately 95\% confidence intervals, and showing how population diversity evolves over iterations of the TS-DE approach. 
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+In this reproducibility study, we set out to rigorously validate the claims made by the authors in their original paper regarding the sublinear and nearly optimal regret bound of the proposed approach. Our primary objective is to replicate the key experiments presented in the original article and extend the evaluation to further test the efficacy of the proposed method.
+
+First, we list the main claims that the authors make in the original paper:
+\begin{itemize}
+    \item \textbf{Claim 1}: TS-DE reaches sublinear regret bound that decreases with the number of sequences in the population. 
+    
+    \textit{In the original paper, the claim is formally proven in Section 5.2. The experiment is shown in the left-hand side of Figure 6.1.}
+    \item \textbf{Claim 2}: TS-DE outperforms the basic DE when evaluating average population fitness. 
+    
+    \textit{The experiment that supports this claim is shown on the right-hand side of Figure 6.1 in the original article.}
+    \item \textbf{Claim 3}: TS-DE is less sensitive to mutation scheduling than the basic DE. 
+    
+    \textit{The experiment that supports this claim is shown on the right-hand side of Figure 6.1 in the original article.}
+    \item \textbf{Claim 4}: In TS-DE the population fitness distribution shifts towards optimal during evolution. 
+    
+    \textit{The experiment that supports this claim is shown on the right-hand side of Figure 6.2 in the original article.}
+    \item \textbf{Claim 5}: TS-DE first diversifies and then concentrates around the optimal solution. 
+    
+    \textit{The experiment that supports this claim is shown in the left-hand side of Figure 6.2 in the original article.}
+\end{itemize}
+Note that all claims were tested on a simulated dataset of zeros and ones, corresponding to unfavorable and favorable sites, respectively.
+
+
+\section{Methodology}
+The work we attempt to reproduce does not provide any source code and the authors were unresponsive to our attempts to further discuss the article. Hence we decided to reproduce the studied paper leveraging the thorough documentation of the process provided in the article. Although we did not have access to the original source code, we made every effort to match the implementation as described in the paper. No additional documentation and no GPUs were used in the process of reproducing the studied paper. 
+
+The main focus of our reproducibility work was to review the validity of the claims made in the original study. Our primary focus was to test whether we can confirm those claims by carefully following the procedure proposed in the main article. 
+
+In addition to testing the original claims, we deliver the source code of the original article to the broader research community. To ensure the code is accessible and usable by others, we include comprehensive documentation and unit tests.
+
+\subsection{Model descriptions}
+Our reproducibility work includes the implementation and evaluation of two Directed Evolution (DE) algorithms, TS-DE and the basic DE. Both aim to optimize utility of the population. The proposed TS-DE algorithm enhances the performance by incorporating the posterior update of the utility function parametrization, effectively incorporating learning from historical feedback data to drive the posterior toward the optimal $\theta^*$. 
+
+\subsubsection{Parameters: Basic DE}
+\begin{itemize}
+    \item \textbf{$d$} - Number of protein motifs in a sequence.
+    \item \textbf{$S_0$} - Initial population consisting of $M$ candidate sequences.
+    \item \textbf{$\theta^*$} - optimal $\theta$ - parametrization of the linear Bayesian utility model for which we aim to optimize the protein design.
+    \item \textbf{$\mu$} - Mutation rate, $\in (0, 1)$ - a function of $T$.
+    \item \textbf{$\sigma$} - Standard deviation used in noisy feedback evaluation in Assumption 3.5 in the original article.
+    \item \textbf{$T$} - Number of iterations we run in the TS-DE (or basic DE) algorithm.
+    \item \textbf{$f$} - Protein utility function that we are trying to maximize. The function includes a parameter theta that we are optimizing.
+\end{itemize}
+\subsubsection{Parameters: TS-DE}
+All the parameters as in the Basic DE. Additionally, TS-DE requires a few parameters more:
+\begin{itemize}
+    \item \textbf{$M$} - Population size.
+    \item \textbf{$\lambda$} - Scalar that controls the trade-off between exploitation and exploration in the optimization process.
+\end{itemize}
+
+\subsection{Datasets}
+All experiments use binary datasets, populations of sequences, where the initial population consists of all zeros. The only case where the initial population is randomly initialized and consists of both zeros and ones is the case where we are testing the basic DE approach with mutation rate $\mu=0$ to ensure the test case is non-trivial. Datasets differ from experiment to experiment due to different parameters $d$ (sequence length) and $M$ (population size).
+
+\subsection{Hyperparameters}
+Hyperparameters were carefully documented in the original article. Since our goal was to test the validity of the claims in the original article, we focused on testing the given hyperparameter values.
+
+When testing the claim whether TS-DE outperforms the basic DE, authors did not provide the value of the population size. $M=40$ was manually chosen. Figure \ref{population_diversity} uses the same setup as Figures \ref{evolving_population_2d} and \ref{evolving_population_fitness}.
+
+\subsection{Experimental setup and code}
+We constructed our experiments by meticulously following the comprehensive explanations of the process in the original article. Moreover, we provide uncertainty quantification in all experiments to be more convinced in the validity of the claims we test. For this reason, we run all experiments 100 times to be able to get 95\% confidence intervals in all the experiments. Confidence intervals are calculated using bootstrapping.
+
+In the experimental setup, we use three different measures to support the proposed claims:
+\begin{enumerate}
+    \item Bayesian regret: defined in the original article. In the article it is rather unclear which $\theta$ is used where, which is why we rewrite the definition here: 
+    \[BayesRGT(T, M) = E \left[\sum_{t=1}^{T}\sum_{i=1}^{M} (f_{\Tilde{\theta_{t}}}(x^*) - f_{\theta^*}(x_{t,i}))\right]\]
+    \item Average population fitness, where fitness is defined as $f(x) = \theta \cdot x$. $\theta^*$ is used as $\theta$ in all our experiments.
+    \item Nucleotide diversity \cite{nucleotide-diversity}: measures polymorphic population diversity. The metric is adapted to our definition of sequences using binary protein motifs. Note that $x_i$ and $x_j$ are frequencies of i-th and j-th sequences and $\pi_{ij}$ is the number of sites where those sequences differ. Definition:
+    \[\pi = \frac{M}{M - 1} \sum_{i,j} x_i x_j \pi_{ij}\]
+\end{enumerate}
+
+Source code is available on \href{https://anonymous.4open.science/r/RC2022-Bandit-Theory-and-Thompson-Sampling-Guided-Directed-Evolution-for-Sequence-Optimization-E1D4}{GitHub}.
+
+
+\subsection{Computational requirements}
+All the experimentation was done on a Lenovo Thinkpad X1 with the following specifications:
+\begin{itemize}
+    \item Windows 11 Pro
+    \item Processor: 11th Gen Intel(R) Core(TM) i7-1165G7, 2.80GHz
+    \item RAM: 32GB
+\end{itemize}
+
+Additionally, we provide required CPU time for each of the experiments in Section \ref{sec:results}.
+
+\section{Results}
+\label{sec:results}
+Our reproducibility study successfully reproduced the experiments supporting the main claims of the original paper. We observe significant differences in our results, likely due to missing specifics from the original source code. Despite that our conclusions align with the original article. We are unable to talk about how precise we were in reproducing the original article due to missing source code.
+
+
+\subsection{Results reproducing original paper}
+\subsubsection{Bayesian regret evolution with varying population sizes} 
+\textit{(CPU time: $\approx$ 15min)} supports \textbf{Claim 1}. As shown in Figure \ref{regret_curves}, we see that Bayesian regret curves converge to sublinear regret bound which is the main claim of the original article. We also note that as $M$ increases the Bayesian regret decreases. This supports the claim made with the left-hand side in Figure 6.1 in the original article. To show how certain we can be in confirming the claim, we include uncertainty quantification in our reproduced experiment. Results show that as $M$ decreases so does the size of the confidence intervals and our certainty in the validity of the claim increases.
+
+\begin{figure}
+\begin{minipage}[c]{0.48\linewidth}
+\includegraphics[width=\linewidth]{figures/regret_curves.png}
+\caption{Population accumulated Bayesian regret evolving over iterations of the TS-DE process. We test multiple population sizes $M$.}
+\label{regret_curves}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.48\linewidth}
+\includegraphics[width=\linewidth]{figures/fitness_curves.png}
+\caption{Average fitness evolution comparing TS-DE and the basic DE approach. With each approach we test different parameters $\mu$}
+\label{fitness_curves}
+\end{minipage}%
+\end{figure}
+
+\subsubsection{Average fitness evolution: TS-DE vs. basic DE}
+\textit{(CPU time: $\approx$ 17min)} supports \textbf{Claims 2 and 3}. In this task, we verify the claim that TS-DE outperforms the basic DE in convergence speed. Our results, shown in Figure \ref{fitness_curves}, confirm the claim. To reduce randomness effects and increase certainty in our results, we averaged 100 runs of the experiment and found that the results supported the original study. We also observed that the basic DE is much more sensitive to mutation rate scheduling than TS-DE, which is consistent with the original article's findings.
+
+\subsubsection{Fitness distribution shift}
+\textit{(CPU time: $\approx$ 3min)} supports \textbf{Claim 4}. This experiment supports the claim that fitness distribution shifts towards the optimal value over iterations. While the authors tested the claim on just a single evaluation, our experiment was run on 100 evaluations to make the claim validity more robust. Additionally, different time steps were used in the process due to differences between the original and reproduced results.
+
+
+
+\begin{figure}
+\begin{minipage}[c]{0.48\linewidth}
+\includegraphics[width=\linewidth]{figures/evolving_population_2d.png}
+\caption{Population evolution shown as KDE density contour plot of population mapped to 2D space using PCA method.}
+\label{evolving_population_2d}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.48\linewidth}
+\includegraphics[width=\linewidth]{figures/evolving_population_fitness.png}
+\caption{TS-DE shifting population fitness distribution towards optimal value over iterations of the TS-DE process.}
+\label{evolving_population_fitness}
+\end{minipage}%
+\end{figure}
+
+
+\subsubsection{Population evolution: diversification and convergence}
+\textit{(CPU time: < 1min)} supports \textbf{Claim 5}.
+In this task, we focus on reproducing the evolution trajectory of a population. Our end goal is to visualize multiple snapshots of high-dimensional populations and map them to 2D space using KDE density contour plot. With this plot, we support the claim from the original article and show how TS-DE balances the exploration-exploitation trade-off using initial diversification followed by approaching and concentrating on the optimal solution. Figure \ref{evolving_population_2d} shows how the population first diversifies in steps $t=5$, $t=10$, and then converges to the optimal solution in steps $t=20$, $t=35$.
+
+
+\subsection{Results beyond original paper} 
+\subsubsection{Population evolution: diversification and convergence} \textit{(CPU time: $\approx$ 4min)} supports \textbf{Claim 5}. While the left-hand side in Figure 6.2 in the original article well represents how TS-DE balances the exploration-exploitation trade-off, we decided to test this claim in a more robust environment by running 100 evaluations instead of just one. We decided that it might be interesting to show population evolution in terms of diversity as can be seen in Figure \ref{population_diversity}. In the plot, we see how population diversity first increases gradually and then starts to decrease as the population converges toward the optimal solution.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/population_diversity_evolution.png}
+    \caption{Population diversity evolution over iterations of the TS-DE process. We show the exploration-exploitation trade-off progress.}
+    \label{population_diversity}
+\end{figure}
+
+\section{Discussion}
+
+To conclude, we were able to support all the claims of the paper and provide the source code in addition with comprehensive documentation and test cases. Additionally, we managed to include uncertainty quantification in all the results. We also included a metric for nucleotide diversity (adapted for binary sequences of protein motifs) with which we attempt to clarify the exploration-exploitation trade-off in TS-DE. 
+
+\subsection{What was easy}
+The authors' pseudo-code was clearly written and the general concepts were easily translatable into Python code. Pseudo-code is written for multiple substeps and functions defined in the article. The notation in the article is clearly understood with some pre-knowledge of Bayesian statistics. The authors also did a very good job of documenting the pseudo-code with explanations and listing the hyperparameters used in experiments.
+
+\subsection{What was difficult}
+Even though pseudo-code was clearly written and explained, we want to stress the importance of sharing the source code and thoroughly documenting the experiments. Even a simple parameter, such as the seed of the random number generation process, can make it impossible to perfectly reproduce the results. Not sharing the source code results in the need to include every single detail in the article. We list some recommendations to authors to make the article more easily reproducible:
+\begin{enumerate}
+    \item In most experiments, authors show the maximal value or the optimal solution, however, it is unclear both how this is calculated. To reproduce the results, we would want to state the optimal solution or explain the process of how the optimal solution was retrieved. In our experiments, the optimal $\theta^*$ is sampled from the definition in Assumption 3.2 in the studied paper.
+    \item As mentioned before, we would recommend adding the complete hyperparameter setup for Figure 6.2. The $M$ definition is missing in the original article. We used $M=40$.
+    \item To reproduce the right-hand side of Figure 6.2 in the original article, it would be beneficial to learn what data was used to fit PCA to the population in the experiment. In our experiment, we used all the sequences from all the populations that were generated in the optimization process.
+    \item Additionally, we noted that the Bayesian regret definition does not include where to use $\theta^*$ and where to use $\Tilde{\theta}$. Even though this is derived later in the article in the proof of the regret bound in 5.2, we would recommend making this part clearer for the reader.
+    \item While authors write down the main differences between TS-DE and the basic DE, it would help to include the full definition with pseudo-code. Alternatively, the authors could publish the source code for the basic DE as well.  
+\end{enumerate}
+
+\subsection{Communication with original authors}
+We contacted the original authors on multiple occasions during our attempts to reproduce the studied article, however, there was no response. 
