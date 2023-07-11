@@ -1,0 +1,251 @@
+\newpage
+\appendix
+
+\section{Additional results beyond original paper}
+\subsection{Performance of OPeN on additional dataset and imbalance ratios}
+
+In addition to CIFAR-10-LT (IR=100) dataset, we compared the performance of OPeN \citep{PureNoise} to DRS \citep{LDAM-DRW}, RS, and ERM on CIFAR-10-LT (IR=50) and CIFAR-100-LT (IR=100,50) datasets. Consistent with claim 1, OPeN outperformed the baseline resampling schemes across all datasets. The original paper did not report the accuracy of deferred resampling (DRS) \citep{LDAM-DRW} for these additional datasets. Nonetheless, we compared OPeN with DRS because DRS provides a fair baseline, as OPeN uses the same deferred resampling schedule.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|cc|cc|cc}
+        Dataset & \multicolumn{2}{c|}{CIFAR-10-LT} & \multicolumn{4}{c}{CIFAR-100-LT} \\
+        IR & \multicolumn{2}{c|}{50} & \multicolumn{2}{c}{100} & \multicolumn{2}{c}{50} \\
+         & Reported \citep{PureNoise} & Ours & Reported \citep{PureNoise} & Ours & Reported \citep{PureNoise} & Ours \\
+        \hline
+        \multirow{1}*{ERM} & 84.9 & 84.9 & 47.0 & 47.1 & 52.4 & 52.7 \\
+        \multirow{1}*{RS} & 82.2 & 80.9 & 42.5 & 41.6 & 48.0 & 46.5 \\
+        \multirow{1}*{DRS} & - & 86.9 & - & 50.8 & - & 55.8 \\
+        \multirow{1}*{OPeN} & 87.9 & 87.8 & 51.5 & 52.1 & 56.3 & 56.5 \\
+    \end{tabular}
+    \caption{Comparison of accuracy on CIFAR-10-LT (IR=50) and CIFAR-100-LT (IR=100,50).}
+    \label{tab:accuracy_comparisons_extra}
+\end{table}
+
+
+\subsection{Hyperparameter Search}
+
+\subsubsection{Input normalization values}
+\label{sec:input_norm_values}
+
+The authors did not specify the mean and standard deviation used to normalize the dataset. We explored various prior works \citep{LDAM-DRW, M2m, MiSLAS} and discovered that they differed from the values we computed (Tables~\ref{tab:cifar10_input_norm_values}~and~\ref{tab:cifar100_input_norm_values}). Surprisingly, we found that many prior works use mean values from the full CIFAR-10/100 datasets instead of the values from the long-tailed variants. This could result in an unfair evaluation, as the statistics from the full training dataset may resemble the validation dataset, as they are both balanced.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|cc}
+        Source & Mean & Std \\ \hline
+        \citet{MiSLAS} & (0.4914, 0.4822, 0.4465) & (0.2023, 0.1994, 0.2010) \\
+        \citet{LDAM-DRW} & (0.4914, 0.4822, 0.4465) & (0.2023, 0.1994, 0.2010) \\
+        \citet{M2m} & (0.4914, 0.4822, 0.4465) & (0.2023, 0.1994, 0.2010) \\ \hline
+        CIFAR-10$^{\dagger}$ & (0.4914, 0.4822, 0.4465) & (0.2470, 0.2435, 0.2616) \\ 
+        CIFAR-10-LT (IR=50)$^{\dagger}$ & (0.4978, 0.5003, 0.4840) & (0.2505, 0.2477, 0.2722) \\
+        CIFAR-10-LT (IR=100)$^{\dagger}$ & (0.4989, 0.5044, 0.4926) & (0.2513, 0.2485, 0.2734) \\
+    \end{tabular}
+    \caption{Per-channel mean and standard deviations for experiments on CIFAR-10-LT. Values calculated in this paper are marked by $\dagger$.}
+    \label{tab:cifar10_input_norm_values}
+\end{table}
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|cc}
+        Source & Mean & Std \\ \hline
+        \citet{MiSLAS} & (0.4914, 0.4822, 0.4465) & (0.2023, 0.1994, 0.2010) \\
+        \citet{LDAM-DRW} & (0.4914, 0.4822, 0.4465) & (0.2023, 0.1994, 0.2010) \\
+        \citet{M2m} & (0.5071, 0.4867, 0.4408) & (0.2675, 0.2565, 0.2761) \\ \hline
+        CIFAR-100$^{\dagger}$ & (0.5071, 0.4866, 0.4409) & (0.2673, 0.2564, 0.2762) \\
+        CIFAR-100-LT (IR=50)$^{\dagger}$ & (0.5202, 0.4916, 0.4415) & (0.2676, 0.2609, 0.2778) \\
+        CIFAR-100-LT (IR=100)$^{\dagger}$ & (0.5228, 0.4929, 0.4420) & (0.2677, 0.2617, 0.2780) \\
+    \end{tabular}
+    \caption{Per-channel mean and standard deviations for experiments on CIFAR-100-LT. Values calculated in this paper are marked by $\dagger$.}
+    \label{tab:cifar100_input_norm_values}
+\end{table}
+
+We train a WideResNet network with the default experiment setting in Section~\ref{sec:hyperparameters} to investigate the effect of these values. As shown in Table~\ref{tab:cifar10_input_norm_perf}, using the calculated mean and standard deviation from the long-tailed dataset reduced performance. Regardless, we do find that OPeN still improves performance over ERM and DRS, supporting the central claim of \citet{PureNoise}.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|ccc}
+        Source & ERM & DRS & OPeN \\ \hline
+        Baseline \citep{MiSLAS, LDAM-DRW, M2m} & 81.18 & 83.22 & 85.04 \\
+        CIFAR-10$^{\dagger}$ & 80.50 & 82.39 & 84.72 \\ 
+        CIFAR-10-LT (IR=100)$^{\dagger}$ & 79.28 & 81.03 & 84.12 \\
+    \end{tabular}
+    \caption{Performance on different input normalization values on CIFAR-10-LT (IR=100). Values calculated in this paper are marked by $\dagger$.}
+    \label{tab:cifar10_input_norm_perf}
+\end{table}
+
+\subsubsection{Batch size}
+
+Before we communicated with the authors and confirmed that the batch size used was 128, we performed a hyperparameter search ourselves. In Table~\ref{tab:batch_size}, we list the batch sizes and their respective performance. Experiments show that 128 is the best batch size for the set of hyperparameters.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|ccc}
+        \multirow{2}{*}{Batch size} & \multicolumn{3}{c}{Accuracy} \\
+         & ERM & DRS & OPeN \\ \hline
+        32 & 74.38 & 80.15 & 80.50 \\
+        64 & 78.69 & 82.89 & 83.89 \\
+        128 & \textbf{81.18} & \textbf{83.22} & \textbf{85.04} \\
+        256 & 79.11 & 75.28 & 82.36 \\
+        512 & 75.19 & 71.39 & 79.22 \\
+    \end{tabular}
+    \caption{Hyperparameter search for batch size. Experiment was done on CIFAR-10-LT (IR=100) with the default setting in Table~\ref{tab:hyperparameters} except for the batch size. Results with highest accuracy for each method are boldfaced.}
+    \label{tab:batch_size}
+\end{table}
+
+\subsubsection{Noise ratio}
+
+The noise ratio is the hyperparameter that defines the probability of replacing an oversampled image with pure noise. The authors used a noise ratio of $\frac{1}{3}$ across all datasets. We compared the performance of OPeN across increasing levels of noise ratios. Surprisingly, replacing up to $\frac{2}{3}$ of the oversampled images with pure noise continued to provide higher validation accuracy than DRS, while the train accuracy dropped with increasing noise ratio, as expected.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{c|c|c|c|c|c|c}
+        Noise ratio & $\sfrac{1}{6}$ & \textbf{$\sfrac{2}{6}$} & $\sfrac{3}{6}$ & $\sfrac{4}{6}$ & $\sfrac{5}{6}$ & $\sfrac{6}{6}$ \\
+        \hline
+        Accuracy & 83.23 & \textbf{85.04} & 84.34 & 84.23 & 83.31 & 80.01
+    \end{tabular}
+    \caption{Hyperparameter search for noise ratio. Experiment was done on CIFAR-10-LT (IR=100) with the default setting in Table~\ref{tab:hyperparameters} except for the noise ratio. Result with highest accuracy is boldfaced.}
+    \label{tab:noise_ratio}
+\end{table}
+
+
+\newpage
+\section{Additional Figures}
+
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/venn.png}
+    \caption{Venn diagram showing the intersections of training dataset used by \citet{ClassBalancedLoss} (denoted \textbf{Cui}), \citet{LDAM-DRW} (\textbf{LDAM}), and \citet{M2m} (\textbf{M2m}) for CIFAR-10-LT (IR=100).}
+    \label{fig:cifar10_indices_venn}
+\end{figure}
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/only_cui.png}
+        \caption{Image used only by \citet{ClassBalancedLoss} for training}
+        \label{fig:cui_unique}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/only_m2m.png}
+        \caption{Image used only by \citet{M2m} for training}
+        \label{fig:m2m_unique}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/only_ldam.png}
+        \caption{Image used only by \citet{LDAM-DRW} for training}
+        \label{fig:ldam_unique}
+    \end{subfigure}
+    \caption{Examples of automobile images only found in one but not the other 2 CIFAR-10-LT (IR=100) datasets.}
+    \label{fig:cifar10_indices_differences}
+\end{figure}
+
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/group_accuracy_cifar10.png}
+        \caption{CIFAR-10-LT (IR=100)}
+        \label{fig:group_accuracy_cifar10}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/group_accuracy_cifar100.png}
+        \caption{CIFAR-100-LT (IR=100)}
+        \label{fig:group_accuracy_cifar100}
+    \end{subfigure}
+    \caption{Validation accuracy for CIFAR-10-LT and CIFAR-100-LT with IR=100. Classes partitioned into 5 groups, where Group 1 is the least frequent and Group 5 is the most frequent. Reproduction of Figure~\ref{fig:group_accuracy_original}.}
+    \label{fig:group_accuracy}
+\end{figure}
+
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{images/group_accuracy_original.png}
+    \caption{Figure from \citet{PureNoise} reporting validation accuracy for CIFAR-10-LT and CIFAR-100-LT with IR=100 where classes are partitioned into 5 groups. Group 1 is the least frequent and Group 5 is the most frequent.}
+    \label{fig:group_accuracy_original}
+\end{figure}
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/tsne_drs.png}
+        \caption{Each class colored differently}
+        \label{fig:tsne_drs}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/tsne_ternary_drs.png}
+        \caption{Only noise and OOD images colored differently}
+        \label{fig:tsne_ternary_drs}
+    \end{subfigure}
+    \caption{t-SNE of 50 examples from each class in the CIFAR-10 validation dataset, 50 out-of-distribution images from CIFAR-100 validation dataset, and 50 random pure noise. Images are embedded with model trained with DRS.}
+    \label{fig:tsne_parent_drs}
+\end{figure}
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_erm_noise.png}
+        \caption{ERM}
+        \label{fig:noise_image_classification_erm}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_drs_noise.png}
+        \caption{DRS}
+        \label{fig:noise_image_classification_drs}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_open_noise.png}
+        \caption{OPeN}
+        \label{fig:noise_image_classification_open}
+    \end{subfigure}
+    \caption{Histogram of predicted classes for 1000 noise images.}
+    \label{fig:noise_image_classification}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_erm_ood.png}
+        \caption{ERM}
+        \label{fig:ood_image_classification_erm}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_drs_ood.png}
+        \caption{DRS}
+        \label{fig:ood_image_classification_drs}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=1.1\textwidth]{images/prior_histogram_open_ood.png}
+        \caption{OPeN}
+        \label{fig:ood_image_classification_open}
+    \end{subfigure}
+    \caption{Histogram of predicted classes for 1000 out-of-distribution images.}
+    \label{fig:ood_image_classification}
+\end{figure}
+
