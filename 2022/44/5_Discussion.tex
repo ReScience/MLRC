@@ -1,0 +1,81 @@
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{The ambiguity of selecting a validation set}
+\label{sec:dis:hp-tuning}
+In \cref{sec:res:converge}, we observed that T5 converges in approximately the first 70\% of the optimization steps.
+This suggest that employing an early stopping strategy based on the performance on a validation set might help save compute resources. 
+%, especially that training T5 takes several days in the current setup.
+However, the selection of a validation set is far from trivial, especially when there are multiple splits of the same dataset. 
+\cite{shaw-etal-2021-compositional} initially tune hyperparameters on a random held-out set and then further select based on the performance on a validation set. 
+The resulting optimal set of hyperparameters are used for fine-tuning on all the other generalization splits -- it is possible that the hyperparameters that the in-domain validation set provides are sub-optimal for generalization sets.
+Prior work \cite{csordas2021devil} also discusses the necessity of an out-of-domain validation set.
+In sum, using an appropriate development set may seriously affect the results, but it may be difficult to choose an ideal development set that is suitable for differently distributed test sets.
+
+
+% In Section \ref{sec:res:converge}, we observe that T5 converges in approximately the first 70\% of the optimization steps.
+% This suggest that employing an early stopping strategy based on the performance on a development set will help save some computing resources. %, especially that training T5 takes several days in the current setup.
+% However, when there are multiple splits of the same dataset, the selection of development set can be ambiguous. 
+% In \cite{shaw-etal-2021-compositional}, the hyperparameters are initially tuned on a random split of the original dataset and the hyperparameters are selected based on the performance on the development set. Then, the resulting optimal set of hyperparameters are used for fine-tuning on all the other generalization splits - it is possible that these splits do not share the same set of decent hyperparameters.
+
+% For \textit{random} splits, one can easily follow the strategy of splitting the whole dataset into training, validation, and test set with a ratio of 8:1:1.
+% Nevertheless, in generalization splits such as \textit{length} split, the data distributions in the original training set and test set are completely different. 
+
+% In this case, we face the problem of where to derive a development set. 
+% If the development set is randomly selected from the training set, the distribution of development set may not even close to the distribution of test set and can trap the model in overfitting to the training distribution.
+% If we in turn sample the development set from the testing distribution, the model is exposed to the testing environment, thus making it hard to make conclusion about ``generalization", because the model has been implicitly shown the supposedly out-of-distribution data during validation.
+
+% Selecting a distribution that is between the training and testing distribution, i.e. choosing the instances that are medium length in the context of \textit{length} split, might be more reasonable.
+% On the other hand, tuning hyperparameters on all splits can be both computationally expensive and practically unrealistic. 
+% It is also unlikely that one can find an ideal validation set that will lead the model optimize towards all directions of generalization.
+
+\subsection{The implementation of exact match accuracy (EM)}
+\label{sec:em-amb}
+% The exact match accuracy that is used as evaluation metric has slightly different implementations across all three papers, and the seemingly small difference caused an non-negligible value difference, as discussed in Section \ref{sec:em-amb}.
+% \kaiser{TODO: If I have time, add a table of HF acc v.s. Exact String acc v.s. SPIDER acc for model predictions}
+To reproduce results as closely as possible, we use the implementation of exact-match (EM) accuracy from the respective papers -- with the exception of T5, for which we use the Huggingface EM implementation.\footnote{\url{https://huggingface.co/spaces/evaluate-metric/exact_match}}
+In doing so, we notice that seemingly small differences across EM implementations caused non-negligible differences in the results.
+In \cite{shaw-etal-2021-compositional}, SPIDER is evaluated with the EM accuracy evaluation script released by \cite{yu2018spider}, which is more tolerant to misplaced spaces; this should not affect the correctness of a prediction.
+For the other datasets, SCAN and GEOQUERY, the models are evaluated with exact string match (i.e. \texttt{output == prediction} in Python).
+\cite{kim2021sequencetosequence} also append the output words with space to enable more tolerant EM computation for SCAN.
+We find that, if we use exact string match in NQG for T5 in GEOQUERY, T5 has an extremely low EM accuracy, because T5 does not always append spaces before commas as in the original dataset. 
+% It is because that T5 will not always append a space before the comma as in the original dataset, although this does not affect the correctness of a prediction. 
+When we use the more lenient version of EM implementation that disregards the missing space before a comma, we observed an increase in EM as high as 80\%.
+
+% In addition, because SentencePiece tokenizer used in T5 does not include ``<" in its vocabulary, the output UNK tokens are converted as ``<" during evaluation, following the strategy of \cite{shaw-etal-2021-compositional}.
+
+\subsection{Alignment of compositional generalization datasets}
+All of the datasets and splits we investigate here are designed for assessing compositional generalization, but we find that high performance of some models on these datasets does not entail high performance on the others, even within the same ``natural data" type (Table \ref{tab:performance}).
+Several confounding factors contribute to these performance differences: for example, NQG does not produce any output on SPIDER, and \cite{shaw-etal-2021-compositional} explained that the SQL in SPIDER has a much more complex grammar than the FunQL in GEOQUERY, resulting in low performance. 
+Moreover, SPIDER instances are generally long, perhaps causing models to struggle more on this dataset than on the others.
+In this situation, it is difficult to claim that the model generalizes poorly if only the result on one dataset is given.
+Even if the model is evaluated on multiple datasets, what conclusions about generalizability can we draw when performance varies across datasets, as we find for SCAN, SPIDER, and GEOQUERY?
+We find it hard to draw any strict conclusion before a careful examination of datasets and confounding factor is conducted. Future work could focus on explicating the differences between these datasets.
+
+\subsection{Effort and Contact}
+\paragraph{What was easy.}
+The authors of all three previous works provide clearly-written code and helpful documentation that made it straight-forward for us to reproduce their results.
+Lists of hyperparameters are also directly included in their repositories.
+All three papers also have clearly written methodologies sections that are intuitive to understand. 
+It was slightly more difficult for us to understand how parameterization is done in \cite{kim2021sequencetosequence} from the paper text, but the provided code helped clarify the procedure.
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\vspace{-3mm}
+\paragraph{What was difficult.}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+It took more time than expected to generate the split in \cite{shaw-etal-2021-compositional}, because the datasets used are from different sources.
+%
+furthermore, the experiments with T5 cost an extensive amount of computing resources, especially for SPIDER. %, for which we fine-tuned for 10,000 steps, which is equivalent to 400 epochs in our setup. 
+It take several days to train one variant, and there is more than one split that will need to be fine-tuned on.
+
+%For NQG proposed in \cite{shaw-etal-2021-compositional} and Neural-QCFG proposed in \cite{kim2021sequencetosequence}, we attempted to train them on additional datasets, both of them lead to out-of-memory error. An attempt was made to resolve this issue by introducing truncation in the code of NQG and adjusting the maximal sequence length, but the model performance is not ideal and the grammar induced will also need to be modified due to the truncation of some sequences.
+
+\vspace{-3mm}
+\paragraph{Communication with original authors.}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+We contacted the authors of all three papers for feedback on this draft and received constructive suggestions: we experienced issues while replicating the results of NQG on GEOQUERY, the first author of \cite{shaw-etal-2021-compositional} provided us with detailed instructions for replication and helped with troubleshooting; the first authors of \cite{kim-linzen-2020-cogs} and \cite{kim2021sequencetosequence} pointed us to helpful related work and offered feedback on the draft.
+We thank all the authors for their thoughtful input and timely responses.

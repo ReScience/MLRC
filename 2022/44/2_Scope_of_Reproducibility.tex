@@ -1,0 +1,14 @@
+In this work, we aim to verify the following claims:
+
+\begin{itemize}\setlength\itemsep{0.1mm}
+    \item Claim 1. For T5 and NQG-T5, high performance on SCAN does not entail high performance on non-synthetic datasets \cite{shaw-etal-2021-compositional}.
+    \item Claim 2. NQG-T5 \cite{shaw-etal-2021-compositional} and Neural-QCFG \cite{kim2021sequencetosequence} match or exceed the accuracy of baselines for compositional generalization.
+    \item Claim 3. Compared to the baseline models that excel at synthetic datasets, NQG-T5 performs better on both synthetic and natural data. 
+    \item Claim 4. NQG can have issues generating predictions for some specific instances due to the limitation of grammar induction. But if NQG is able to generate predictions for test instances, it performs well on these instances.
+\end{itemize}
+
+Claim 1 is verified by our evaluations of T5 and NQG-T5 on SCAN, GEOQUERY, and SPIDER. %, the latter two of which are composed of natural data. 
+We extend Claim 1 by additionally measuring performance on COGS, a synthetic dataset proposed by \cite{kim-linzen-2020-cogs}, aiming to assess  whether the performance difference is specific to SCAN in particular or holds for synthetic datasets more generally (\cref{sec:res:perf}).
+For Claim 2, we reproduce the proposed models and compare them with the baseline models from \cite{shaw-etal-2021-compositional} and \cite{kim2021sequencetosequence} (\cref{sec:res:NQG-NQCFG-perf}).
+We also specifically explore the performance of NQG-T5 on both synthetic and realistic datasets overall to verify Claim 3 (\cref{sec:res:syn-nat}).
+Finally, we compute the precision and coverage of our NQG model in \cref{sec:coverage}.

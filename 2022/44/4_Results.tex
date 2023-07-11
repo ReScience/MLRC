@@ -1,0 +1,70 @@
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+\input{tables/performance.tex}
+Table \ref{tab:performance} shows replicated and original model performance on all datasets.
+Overall, the metric values we obtained are close to the values originally reported (within 5\%), with the exception of T5: on the \textit{template} and \textit{TMCD} split of SPIDER and on the \textit{length} split of GEOQUERY, T5 achieves a much higher EM than was reported in the original paper \cite{shaw-etal-2021-compositional}; and it obtains a 6\% lower EM on the \textit{AddPrimitive\_Jump} split of SCAN. 
+
+% \subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+
+\subsection{Result 1: High performance on SCAN does not entail high performance on non-synthetic datasets.}
+\label{sec:res:perf}
+NQG performs the best on all splits of SCAN with one exception on the \textit{template} split, see Table \ref{tab:performance}. However, it fails on SPIDER, and T5 outperforms it on GEOQUERY.
+The T5 results align with Claim 1: T5 performs well on SPIDER and GEOQUERY, but achieves scores as low as 13.6\% on some splits of SCAN.
+NQG-T5, while it performs almost perfectly on SCAN and achieves a respectable performance on SPIDER, is an ensemble whose performance on SCAN comes from its NQG module, whereas its performance on SPIDER comes from its T5 module, thus results on NQG-T5 cannot lead us to reject Claim 1. 
+We have thus verified that the performance on GEOQUERY and SPIDER is not predicable from the performance on SCAN.
+% To further understand whether the same observation holds on other synthetic datasets, we train Uni-LSTM and bidirectional LSTM (bi-LSTM) on the natural datasets in \cite{shaw-etal-2021-compositional}.
+% We observe similar results, both uni-LSTM and bi-LSTM perform poorly on most splits of SCAN compared to the other models, with the highest EM of 15.4\%, but perform approximately as well on GEOQUERY as NQG does.
+%
+It is worth noting, however, that even within the same dataset creation method, the model performance can be very different: our LSTMs perform well on the \textit{random} split of GEOQUERY, but perform poorly on \textit{random} split of SPIDER;  both datasets are natural datasets.
+In addition, T5 performs well on both the training and generalization set of COGS, but not on splits of SCAN; both SCAN and COGS are synthetic datasets.
+NQG also performs poorly on the \textit{template} split of SCAN, whose other splits NQG excels at.
+Overall, not only is it hard to predict anything based on model performance on SCAN, it appears to be difficult to predict the performance on any dataset, given the performance on another in our list.
+% In the meantime, for findings on T5, one can also question about the potential overestimation for its compositional generalization due to its prior lexical expousure to pre-training data, according to \cite{kim2022uncontrolled}.
+
+\subsection{Result 2: NQG-T5 and Neural-QCFG perform as well as or better than the baseline approaches for compositional generalization}
+\label{sec:res:NQG-NQCFG-perf}
+% \input{tables/nqg_t5_perf.tex}
+\input{tables/nqcfg_nqg_perf.tex}
+
+As an ensemble of NQG and T5, NQG-T5 undoubtedly achieves 100\% EM in most splits of SCAN. 
+It also performs better on SPIDER and GEOQUERY than the baseline models in Table \ref{tab:nqcfg-perf}).
+However, for splits of GEOQUERY, the performance of T5 exceeds that of NQG-T5.
+This is because NQG-T5 will only fallback to T5's prediction if NQG is unable able to generate one, suggesting that NQG either makes more mistakes on these splits or covers most instances that T5 predicts correctly. We will explore a possible reason for this in \cref{sec:coverage}.
+Therefore, NQG-T5 outperforms all baselines other than T5, and it performs comparably to T5.
+The claim that NQG-T5 performs better or comparably to baseline approaches holds.
+
+Neural-QCFG also shows a much higher performance than T5 on SCAN, although it is not able to achieve an EM as high as NQG-T5's.\footnote{
+\cite{kim2021sequencetosequence} evaluate Neural-QCFG is also on other compositional generalization tasks, we only present its result on SCAN here because the focus of this work is on semantic parsing.}
+Compared to the baseline approaches listed in Table \ref{tab:nqcfg-perf}, Neural-QCFG performs stably across splits. Although not beating other approaches that achieve nearly perfect performance, Neural-QCFG does not rely on SCAN-specific information, which might enable a more straight-forward application to natural domain, as explained by \citet{kim2021sequencetosequence}.\footnote{We intended to extend the experiments by training Neural-QCFG on the natural semantic parsing datasets, but during communication with an author of \cite{kim2021sequencetosequence}, we understood that a more careful design of data preprocessing to address the special tokens is required for these datasets.}
+
+
+\subsection{Result 3: Compared to the models that excel at synthetic datasets, NQG-T5 outperforms them in both synthetic and natural data.}
+\label{sec:res:syn-nat}
+
+Table \ref{tab:nqg-perf} shows NQG-T5 performance against the baseline models that are also evaluated on GEOQUERY.
+Although NQG-T5 is surpassed by T5 on splits of GEOQUERY by a slight amount, it outperforms the other baselines drastically on all datasets, with a perfect performance on SCAN (Table \ref{tab:nqcfg-perf}).
+Therefore, we are able to verify Claim 3 that NQG-T5 performs well on both synthetic and natural datasets compared to the baseline models, with a caveat of performing slightly worse than T5 on GEOQUERY.
+% \subsection{Results beyond original paper}
+% % Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+%  \kaiser{Tentative TODO: Table 3: NQG/Neural-QCFG on COGS, extending  claim 3 and 4}
+% \subsubsection{Additional Result 1}
+% \subsubsection{Additional Result 2}
+\subsection{Result 4: NQG presents high precision but struggles at coverage on some data splits.}
+\input{tables/nqg_precision.tex}
+\label{sec:coverage}
+
+Following \citet{shaw-etal-2021-compositional}, we compute the coverage (the percentage of examples where NQG is able to generate a prediction) and the precision (the accuracy of NQG among the instances that it can produce a prediction) in Table \ref{tab:nqg-precision}.
+Predictably from its overall performance, NQG covers all instances in SCAN and achieves 100\% precision.
+For GEOQUERY, all the numbers are within 5\% of those originally reported, except for the coverage of length split on GEOQUERY. 
+Like the original authors, we observe that the precision of our NQG is higher than its overall EM as shown in Table \ref{tab:performance}, suggesting that NQG struggles to cover more instances and it generally performs well if it can produce a prediction on that instance.
+Hence, the claim that NQG presents high precision but struggles with coverage holds on the splits of GEOQUERY; NQG already achieves high precision and high coverage on SCAN.
+
+\subsection{Result 5: T5 converges early on SPIDER and GEOQUERY, suggesting early stopping might help save compute resources.}
+\label{sec:res:converge}
+\input{figs/extra_training_curve.tex}
+
+While fine-tuning T5 on SPIDER and GEOQUERY, which is optimized for 10,000 steps and 2,400 steps respectively, we find that the model reaches a similar performance to originally reported at checkpoints earlier than those originally reported (\cref{fig:training-curve}). 
+T5 approximates final performance as early as at 7,000 steps in the template split of SPIDER and at 800 steps in multiple splits of GEOQUERY.
+The training curve implies that the model likely converges substantially earlier than \citet{shaw-etal-2021-compositional} estimate, thus suggesting that less epochs can be used with a careful early stopping strategy.
+
+% This refers back to our discussion of selecting the development set in Section \ref{sec:dis:hp-tuning}, which enables early stopping strategy that can reduce the training steps in this situation.

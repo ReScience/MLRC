@@ -1,0 +1,30 @@
+\begin{table*}[]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{p{7em}p{0.8\textwidth}}
+\toprule
+\textbf{COGS} \\
+\textbf{Input: } & Liam hoped that a box was burned by a girl . \\
+\textbf{Output: } & hope . agent ( x \_ 1 , Liam ) AND hope . ccomp ( x \_ 1 , x \_ 6 ) AND box ( x \_ 4 ) AND burn . theme ( x \_ 6 , x \_ 4 ) AND burn . agent ( x \_ 6 , x \_ 9 ) AND girl ( x \_ 9 ) \\
+\midrule
+\textbf{SCAN} \\
+\textbf{Input:} & jump opposite left thrice after look opposite right thrice
+\\
+\textbf{Output:} & I\_TURN\_RIGHT I\_TURN\_RIGHT I\_LOOK I\_TURN\_RIGHT I\_TURN\_RIGHT I\_LOOK I\_TURN\_RIGHT I\_TURN\_RIGHT I\_LOOK I\_TURN\_LEFT I\_TURN\_LEFT I\_JUMP I\_TURN\_LEFT I\_TURN\_LEFT I\_JUMP I\_TURN\_LEFT I\_TURN\_LEFT I\_JUMP
+\\
+\midrule
+\textbf{GEOQUERY} \\
+\textbf{Input:} & name all the rivers in m0 \\
+\textbf{Output:} & \texttt{answer ( intersection ( river , loc\_2 ( m0 ) ) )} \\
+\midrule
+\textbf{SPIDER} \\
+\textbf{Input: } & flight\_1: what is the average distance and price for all flights from la? | flight : flno , origin , destination , distance , departure\_date , arrival\_date , price , aid | aircraft : aid , name , distance | employee : eid , name , salary | certificate : eid , aid	 \\
+\textbf{Output: } & \texttt{select avg(distance) , avg(price) from flight where origin = "los angeles"}
+\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Examples of instances in each dataset.}
+\label{tab:instanceexample}
+
+\end{table*}
