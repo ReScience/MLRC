@@ -14,20 +14,19 @@ authors:
     orcid: 0000-0003-0206-3868
     email: sean.mcleish@warwick.ac.uk
     affiliations: 1,*
-    
+
   - name: Long Tran-Thanh
     orcid: 0000-0003-1617-8316
     email: long.tran-thanh@warwick.ac.uk
-    affiliations: 1      # * is for contact author
+    affiliations: 1 # * is for contact author
 
 # List of affiliations with code (corresponding to author affiliations), name
 # and address. You can also use these affiliations to add text such as "Equal
 # contributions" as name (with no address).
 affiliations:
-  - code:    1
-    name:    Department of Computer Science, University of Warwick
+  - code: 1
+    name: Department of Computer Science, University of Warwick
     address: Coventry, England
-
 
 # List of keywords (adding the programming language might be a good idea)
 keywords: rescience c, Algorithmic Reasoning, Deep Thinking, Algorithm Synthesis, Python, machine learning, Deep Learning
@@ -37,8 +36,8 @@ keywords: rescience c, Algorithmic Reasoning, Deep Thinking, Algorithm Synthesis
 #   see https://guides.github.com/activities/citable-code/
 code:
   - url: https://github.com/mcleish7/MLRC-deep-thinking
-  - doi: 
-  - swh: swh:1:dir:be1a763d08c1af34a2721fad6b9bfe8c99527220
+  - doi:
+  - swh: "swh:1:dir:be1a763d08c1af34a2721fad6b9bfe8c99527220"
 
 # Date URL and DOI (optional if no data)
 data:
@@ -47,53 +46,53 @@ data:
 
 # Information about the original article that has been replicated
 replication:
- - cite: "A. Bansal, A. Schwarzschild, E. Borgnia, Z. Emam, F. Huang, M. Goldblum, and T. Goldstein. “End-to-end Algorithm Synthesis with Recurrent Networks: Logical Extrapolation Without Overthinking.” In: Advances in Neural Information Processing Systems 35 (2022)" # Full textual citation
- - bib:  bansal2022endtoend # Bibtex key (if any) in your bibliography file
- - url:  https://arxiv.org/pdf/2202.05826.pdf # URL to the PDF, try to link to a non-paywall version
- - doi:  https://doi.org/10.48550/arXiv.2202.05826 # Regular digital object identifier
+  - cite: "A. Bansal, A. Schwarzschild, E. Borgnia, Z. Emam, F. Huang, M. Goldblum, and T. Goldstein. “End-to-end Algorithm Synthesis with Recurrent Networks: Logical Extrapolation Without Overthinking.” In: Advances in Neural Information Processing Systems 35 (2022)" # Full textual citation
+  - bib: bansal2022endtoend # Bibtex key (if any) in your bibliography file
+  - url: https://arxiv.org/pdf/2202.05826.pdf # URL to the PDF, try to link to a non-paywall version
+  - doi: https://doi.org/10.48550/arXiv.2202.05826 # Regular digital object identifier
 
 # Don't forget to surround abstract with double quotes
 abstract: "Scope of Reproducibility:
-           In this report, we aim to validate the claims of Bansal et al. These are that the recurrent 
-           architecture presented, with skip connections and a progressive loss function, prevent the 
-           original problem being forgotten or corrupted during processing allowing for the recurrent 
-           module to be applied indefinitely and that this architecture avoids the overthinking trap. 
-           We use both code released by the authors and newly developed to recreate many results 
-           presented in the paper. Additionally, we present analysis of the newly introduced alpha 
-           hyperparameter and investigate interesting perturbation behaviour of prefix sums models. 
-           Further, we conduct a hyperparameter search and provide an analysis of the Asymptotic 
-           Alignment scores of the models presented.
+  In this report, we aim to validate the claims of Bansal et al. These are that the recurrent
+  architecture presented, with skip connections and a progressive loss function, prevent the
+  original problem being forgotten or corrupted during processing allowing for the recurrent
+  module to be applied indefinitely and that this architecture avoids the overthinking trap.
+  We use both code released by the authors and newly developed to recreate many results
+  presented in the paper. Additionally, we present analysis of the newly introduced alpha
+  hyperparameter and investigate interesting perturbation behaviour of prefix sums models.
+  Further, we conduct a hyperparameter search and provide an analysis of the Asymptotic
+  Alignment scores of the models presented.
 
-           Methodology:
-           We use the PyTorch code released by the authors to replicate accuracy experiments. We then, 
-           independently, develop our own PyTorchFI to replicate perturbation experiments presented by 
-           Bansal et al. Overall, providing a replication of all results shown in the main body of the 
-           paper. We then extend these results, providing an analysis of the alpha hyperparameter, 
-           analysis of perturbation recovery, Asymptotic Alignment scores and a hyperparameter search. 
-           We used both a Nvidia RTX 2080Ti GPU and sets of three NVIDIA Quadro RTX6000 GPUs, taking a 
-           total of 982.2 GPU hours to create all results presented in the main body of this report.
+  Methodology:
+  We use the PyTorch code released by the authors to replicate accuracy experiments. We then,
+  independently, develop our own PyTorchFI to replicate perturbation experiments presented by
+  Bansal et al. Overall, providing a replication of all results shown in the main body of the
+  paper. We then extend these results, providing an analysis of the alpha hyperparameter,
+  analysis of perturbation recovery, Asymptotic Alignment scores and a hyperparameter search.
+  We used both a Nvidia RTX 2080Ti GPU and sets of three NVIDIA Quadro RTX6000 GPUs, taking a
+  total of 982.2 GPU hours to create all results presented in the main body of this report.
 
-           Results:
-           We verify the authors' claims by replicating the experiments presented by Bansal et al. All 
-           of our experiments show identical results to the ones presented in the paper, apart from 
-           perturbation testing for which we provide an additional in depth analysis. We also provide an 
-           analysis of the new alpha hyperparameter and a hyperparameter search.
+  Results:
+  We verify the authors' claims by replicating the experiments presented by Bansal et al. All
+  of our experiments show identical results to the ones presented in the paper, apart from
+  perturbation testing for which we provide an additional in depth analysis. We also provide an
+  analysis of the new alpha hyperparameter and a hyperparameter search.
 
-           What was easy:
-           The code provided by Bansal et al gave clear instructions on how to use it, along with 
-           pretrained models being available for all problems.
+  What was easy:
+  The code provided by Bansal et al gave clear instructions on how to use it, along with
+  pretrained models being available for all problems.
 
-           What was difficult:
-           Chess models required a considerable amount of time to train, putting a drain on resources. 
-           Also, code for reproducing perturbation results was not available so this had to developed 
-           from scratch.
+  What was difficult:
+  Chess models required a considerable amount of time to train, putting a drain on resources.
+  Also, code for reproducing perturbation results was not available so this had to developed
+  from scratch.
 
-           Communication with original authors:
-           We had good communication with the original authors, both emailing and meeting online."
+  Communication with original authors:
+  We had good communication with the original authors, both emailing and meeting online."
 
 # Bibliography file (yours)
 bibliography: bibliography.bib
-  
+
 # Type of the article
 # Type can be:
 #  * Editorial
@@ -108,17 +107,16 @@ domain: ML Reproducibility Challenge 2022
 # Coding language (main one only if several)
 language: Python
 
-  
 # To be filled by the author(s) after acceptance
 # -----------------------------------------------------------------------------
 
 # For example, the URL of the GitHub issue where review actually occured
-review: 
+review:
   - url: https://openreview.net/forum?id=WaZB4pUVTi
 
 contributors:
   - name:
-    orcid: 
+    orcid:
     role: editor
   - name: Anonymous Reviewers
     orcid:
@@ -129,19 +127,19 @@ contributors:
 
 # This information will be provided by the editor
 dates:
-  - received:  
+  - received:
   - accepted:
-  - published: 
+  - published:
 
 # This information will be provided by the editor
 article:
   - number: 1 # Article number will be automatically assigned during publication
-  - doi:    # DOI from Zenodo
-  - url:    # Final PDF URL (Zenodo or rescience website?)
+  - doi: # DOI from Zenodo
+  - url: # Final PDF URL (Zenodo or rescience website?)
 
 # This information will be provided by the editor
 journal:
-  - name:   "ReScience C"
-  - issn:   2430-3658
+  - name: "ReScience C"
+  - issn: 2430-3658
   - volume: 9
-  - issue:  2
+  - issue: 2
