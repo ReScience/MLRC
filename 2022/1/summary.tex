@@ -1,0 +1,25 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+This paper presents a novel augmentation method used for graph classification tasks: $\mathcal{G}$-Mixup. Our goal is to reproduce eight claims that the authors make in their paper. The first two claims relate to the properties of graphons estimated from graphs, which are the main components of the method. Claims three to eight relate to the superior performance of the method compared to other augmentation strategies.
+
+\subsubsection*{Methodology}
+
+To reproduce the results, we use the open-source implementation of the method provided by the authors, with a few modifications. We write from scratch all the experiments and pipelines needed to defend the claims of the paper. Additionally, we implement three out of four baseline augmentation methods that are compared to the novel method. For one part of the experiments, we use a local computer and run the experiments on a CPU, with a total of 31.7 CPU hours, while for other more demanding experiments, we use a GPU-accelerated machine for a total of 157.3 GPU hours.
+
+\subsubsection*{Results}
+
+Due to many missing implementation details, we were not able to reproduce all of the original results. Some claims can be supported by our results, but most results are very vague. Even though the new method outperforms the baselines in certain scenarios, we find that the superiority of the method is not as strong as presented in the original paper.
+
+\subsubsection*{What was easy}
+
+The novel augmentation method and its theoretical justification are presented intuitively in the paper, and it was easy to grasp the main ideas of the paper.
+
+\subsubsection*{What was difficult}
+
+While the code with the method implementation was given, the reproduction of all the results required much more code and details than what was provided in the paper. This means that we had to make a lot of educated guesses about the experimental settings, choices of hyperparameters, and details about the models used. 
+
+\subsubsection*{Communication with original authors}
+
+We contacted the authors on two occasions. We first inquired about the details of the graph estimation methods that they used and which weren't explained in the paper, to which they responded swiftly. On the second occasion, we asked about the experimental settings and hyperparameter details, but we did not receive a reply.
