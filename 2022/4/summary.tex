@@ -1,0 +1,35 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+This study is an analysis of the reproducibility of the paper \textit{Label-Free Explainability for Unsupervised Models} written by Jonathan Crabbe and Mihaela van der Schaar. The goal of this study is to verify the three main claims of the paper, which state that their new framework for label-free explainability is capable of extending (i) linear feature importance as well as (ii) example importance methods to the unsupervised setting, whilst guaranteeing crucial properties, such as completeness and invariance with respect to latent symmetries. Finally, they use their framework to (iii) challenge some common beliefs about the interpretability of disentangled VAEs.
+
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+The paper came with an extensive codebase containing all the necessary scripts to replicate the experiments in the paper. When comparing latent representations we also experimented with a different feature importance algorithm. Furthermore, we extended an experiment with the addition of a state-of-the-art encoder.
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+We find that the three main claims of the paper hold true as we were able to successfully reproduce each corresponding experiment. Our results differ in some minor aspects, but they do support the validity of the three main claims made in the paper. Furthermore, we also demonstrated that the framework proposed is expandable in new contexts, thus providing further support for its utility and applicability. 
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The authors provided a substantial and thorough explanation within their appendix about the mathematical concepts of their work. Their repository was also supplemented with rigorous documentation which gave an excellent explanation of how to carry out various experiments.  
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+Several experiments in the paper take multiple hours to execute, with one reproduction taking over 32 hours on the low-cost computational setup used. Moreover, a few setup bugs were found, which meant that reproducing the experiments was a more strenuous task than simply executing a series of command-line statements. 
+
+\subsubsection*{Communication with original authors}
+We initiated communication with the authors and inquired about specific experimental decisions made in their work. The authors provided a comprehensive response via email, addressing all questions raised.
+
+% Briefly describe how much contact you had with the original authors (if any).

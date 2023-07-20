@@ -1,0 +1,326 @@
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+\section{Introduction}
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+Contemporary machine learning models are notorious for not being transparent in their decision-making. These models are often referred to as black-boxes within the research literature \cite{blackboxPWK, blackboxPoon}. In high-pressure environments where the risk of serious complications is continually present, the opaqueness of these models actively impedes their usage because their bias can lead to unfair and even dangerous affairs \cite{RecidivismRandomForest, MedicalImagingFailure}. The lack of interpretability of deep models attracted scores of researchers to the field of \textit{explainable artificial intelligence} (XAI) \cite{NonAdditiveExplainability, EntropyBasedExplainability, GuidelinesXAI}. %% Check of de citaties goed zijn verwerkt in de bibliography, staat iig sowieso niet op alfabetische volgorde.%%
+% Ook fixen dat de line spacing kleiner wordt, is nu teveel whitespace
+
+A fundamental methodology applied within XAI is \textit{post-hoc explainability}. This collection of methods offers insight into complex model decisions in terms of interpretability and explainability. This study concentrates on two specific varieties of post-hoc explainability: \textit{feature importance} and \textit{example importance}. Feature importance highlights which features the black-box model attends to in order to make its decision. Example importance examines which samples from the training process influence the decision-making on newly observed test examples. % hier moeten nog citations en wellicht een serie aan voorbeelden van de 2 methodes zoals in het paper ook wordt gedaan
+
+The majority of post-hoc explainability research has been performed in a supervised learning setting. %\cite verschillende supervised modellen hier%. 
+Supervised learning exclusively concerns data where there is an explicit relationship between the input space $\mathcal{X}$ and the label space $\mathcal{Y}$; the model in question attempts to document the correspondence between these two spaces such that $\qvec{f}: \mathcal{X} \mapsto \mathcal{Y}$. There have been a broad number of studies that have focused on uncovering the black-box in a supervised setting \cite{ModelExplainability, ConceptActivationVectors}, especially in the medical field \cite{ching2018opportunities, tjoa2020survey}.
+However, analysis of black boxes in an unsupervised setting has remained largely unexplored. In an unsupervised setting, the model under examination maps the input space $\mathcal{X}$ to a hidden representation or latent space $\mathcal{H}$, such that $\qvec{f}: \mathcal{X} \mapsto \mathcal{H}$. 
+
+In their paper, \citet{LabelFreeExplainability} propose several adjustments to supervised explainability methods to conduct an analysis of explainability in the realm of unsupervised models. This study is a review and reproduction of their research while also implementing a few new features. Their work can be dissected into a few key claims which will be discussed in the following section together with the scope of reproducibility of their research. Thereafter follows a section in which the methodology of the execution of the experiments will be explored. This is followed by a results section which is accompanied by an interpretation of the outcomes. Lastly, a discussion section will reflect upon the reproducibility, the approach taken in this study and possible future endeavours.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+In their work, \citeauthor{LabelFreeExplainability} propose several extensions to transfer already existing feature and example importance methods from the supervised to the unsupervised domain. Making use of their newly proposed label-free explainability methods, they challenge the interpretability of disentangled representations. In this study we focus on the reproducibility of their paper and aim to verify the following claims:
+\begin{itemize}
+    \item \textbf{Claim 1 - Label-free feature importance (LFI)}: The extension that allows computing feature importance scores in the label-free setting provides sensible scores and consequently, selecting pixels with higher importance scores (according to the various explainability methods) to be perturbed yields significantly larger latent shifts than perturbing random pixels.
+    
+    \item \textbf{Claim 2 - Label-free example importance (LEI)}: The authors postulate two types of example importance: loss-based and representation based. The similarity rate is calculated between the ground truth label of the examples and the label of the test example. This respective similarity rate is higher for the most important examples compared to the least important examples, which indicates the effectiveness of the label-free example importance methods.
+    
+    \item \textbf{Claim 3 - Interpretability of disentangled VAEs (IDV)}: The saliency maps of individual latent units in  disentangled VAEs cannot be meaningfully interpreted on their own. The authors show that increasing the disentanglement in the VAE does not decrease the correlation between the saliency maps of different latent units. This is quantified by a study of the Pearson correlation coefficient between the saliency maps of different latent units. 
+
+ \end{itemize}
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+The authors provided an open-source implementation of their experiments on GitHub \footnote{Code 
+ published on GitHub at https://https://github.com/vanderschaarlab/Label-Free-XAI}. The repository is well-structured and contains a comprehensive README file, which explains the installation process for all necessary packages, as well as the steps required to run the scripts and reproduce the results reported in the paper. Aside from a few minor technical adjustments, namely the rectification of an import error and the correction of the order of two function arguments, the code supplied by the authors functioned as intended. As a result, we were able to generate an output for every experiment that the authors described in their research paper. 
+
+
+
+
+\subsection{Model descriptions}
+\label{sec:model_descriptions}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+% to do: DKNN uitleg/vermelding
+
+For the consistency checks of the label-free proposed feature and example importance methods, three different models are fit on three different datasets. The hardware is described in Appendix \ref{app:comp_req} and the datasets are described in Appendix \ref{app:datasets}. A denoising autoencoder CNN is fit on the MNIST dataset \cite{deng2012mnist}, an LSTM reconstruction autoencoder on the ECG5000 time series dataset \cite{goldberger2000physiobank} and a SimCLR \cite{chen2020simple} neural network with a ResNet-18 \cite{he2016deep} backbone on the CIFAR-10 dataset \cite{krizhevsky2009learning}. We extract an encoder, denoted by $\qvec{f}_e$, from each model for interpretation of their respective latent spaces.
+
+For the analysis of the disentangled VAEs, a $\beta$-VAE \cite{higgins2016beta} and a TC-VAE \cite{chen2018isolating} are set up and trained on the MNIST and dSprites \cite{dsprites17} datasets. The number of latent units ($d_H$) used is 6 for MNIST and 3 for dSprites. For both VAEs, 5 models are trained for each $\beta \in \{1,5,10\}$. This results in 6 different VAE configurations, with 30 models being trained in total.
+
+
+\subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+The pre-established hyperparameter settings from the source code and corresponding paper were used in our experimentation. However, the paper indicated that 20 runs of each VAE configuration were conducted, while the codebase only incorporated 5 runs. For the reproducibility study, we opted for 5 runs due to time constraints, see Table \ref{fig:compcost} in Appendix \ref{app:comp_req}. % andere verschillen in parameters nog?!  Tabel of alle settings nog expliciet vermelden of niet? Lijkt me meer iets voor de appendix maar idk.
+
+\subsection{Experimental setup and code}
+\label{experimentalsetup}
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+% TODO: + explain/mention the feature importance methods used!!
+% + Add more math/definitions, omly the essential equations!!
+% dit gedaan!
+
+The experiments outlined in the original paper are briefly discussed in this section. Subsequently, supplementary experiments to their study are explained. For a thorough comprehension of the used mathematical notation we refer the reader to Appendix \ref{appendix:math}.
+
+\subsubsection{Consistency checks} In the first experiment, consistency checks are conducted to ascertain the validity of the proposed example and feature importance methods for unsupervised models. To evaluate the feature importance explanations and verify the LFI claim, we compute for each image $\qvec{x}$ the label-free feature importance score $b_i(\qvec{f}_e, \qvec{x})$, making use of the existing feature importance methods Gradient Shap \cite{lundberg2017unified}, Integrated Gradients \cite{sundararajan2017axiomatic} and Saliency \cite{simonyan2013deep}. The top M features, as determined by these scores, are  masked using a mask $\qvec{m} \in \{0,1\}^{d_X}$, where $d_X$ is the dimensionality of the input space. % d_X definieren hier als het niet eerder gebeurd?
+The  latent shift resulting from replacing these most important features with a baseline value, represented as $\bar{x}$, is subsequently measured as follows: $|| \qvec{f}_e(\qvec{x}) - \qvec{f}_e(\qvec{m} \odot \qvec{x} + (1-\qvec{m})\odot \bar{\qvec{x}})||$. The baselines used for different models can be found in Appendix \ref{app:baselines_latent}. The average shift across the entire test set is reported for various values of M and different feature importance methods. If the LFI claim is valid, we expect the latent shift to be higher when more important features are masked.
+
+To evaluate the example importance methods and verify the LEI claim, a thousand training examples are sampled. For each training example the label-free example importance score $c^n(\qvec{f}_e,\qvec{x})$ is computed using several loss-based (Influence Functions \cite{koh2017understanding} and TracIn \cite{pruthi2020estimating}) and representation-based (Deep-KNN \cite{papernot2018deep} and SimplEx \cite{crabbe2021explaining}) example importance methods (the definition of these methods can be found in Appendices \ref{appendix:LEIdef1} and \ref{appendix:LEIdef2}). To verify the saliency of high-scoring examples, the M most important examples $(x^{n_1},..,x^{n_M})$ are selected and their ground truth labels $(y^{n_1},..,y^{n_M})$ are compared to the label $y$ of the to be explained test image $x$. Subsequently, the similarity rates are computed: $\frac{1}{M} \sum^M_{m=1} \delta_{y,y^{n_m}} $, where $\delta$ is the Kronecker delta. The same experiment is conducted for the M least important examples. The distribution of the similarity rates across a thousand test examples is computed for various values of $M$. If the LEI claim holds, the similarity between the most important examples is expected to be higher than for the least important examples.
+
+\subsubsection{Comparing representations from different pretext tasks}
+% om dit in te korten kunnen die additional models + descriptions in de appendix evt.
+To test the efficacy of the feature and example importance scores, \citeauthor{LabelFreeExplainability} introduce a specific use case. Neural models, in this particular case the autoencoder, can be adapted to be suitable for different pretext tasks on the MNIST dataset. The aim of this experiment is to establish how the latent representations from different pretext tasks compare to each other. The denoising autoencoder is used as described in Section \ref{sec:model_descriptions}. Furthermore, two additional pretext tasks with their autoencoders are considered: reconstruction and inpainting \cite{pandit2020inference}. Lastly, a classifier is trained that includes the same layers as the encoder, as well as an additional linear layer with an input dimension of 4 and an output dimension of 10, which uses a Softmax activation function to transform the latent representations into class probabilities. The hidden representations of the classifier are extracted from the penultimate layer. % check appendix voor evt nog meer uitleg toevoegen
+For each encoder $\qvec{f}_e$, the label-free Gradient Shap feature importance method (introduced in the consistency checks paragraph) is used to extract saliency maps from the feature importance scores $b_i(\qvec{f}_e, \qvec{x})$ for the test images. For the comparison of the saliency maps produced by the different models, the average Pearson correlation coefficient \cite{le2013methods} is computed across 5 runs.\\
+We use the label-free Deep-KNN example importance method (introduced in the consistency checks paragraph) to compute the example importance $c^n(\qvec{f}_e,\qvec{x})$ of a thousand training examples for a thousand test images. Again, the average Pearson coefficient across 5 runs is used to compare the example importance scores created by the different encoders.
+
+Besides the quantitative experiments above, qualitative experiments were conducted in the original paper. The top examples of the various encoders for a particular test image are displayed alongside its saliency maps to convey the qualitative differences between the autoencoders. % wat nog ?
+
+\subsubsection{Extensions of the pretext use case}
+In the results part of Section 4.1, \citeauthor{LabelFreeExplainability} state that `Label-free Integrated Gradients outperform other methods for each model', which is also confirmed in Figure \ref{fig:feature_figures}. Yet in the pretext task experiment described above, Gradient Shap is used, which the authors motivate by its better computational efficiency. 
+However, in our experience the Integrated Gradients feature importance method actually required less computational time compared to Gradient Shap (Table \ref{fig:compcost} in Appendix \ref{app:comp_req}). Since the former distinctly outperforms the latter (Figure \ref{fig:feature_figures}), we opted to therefore also repeat the pretext experiment from Section 4.2 of the original paper with the Integrated Gradients feature importance method.
+
+Furthermore, in their discussion section the authors propose that the analysis of the label-free feature and example based importance scores can be extended in several ways. One of the suggested methods is the addition of state-of-the-art (SOTA) autoencoders which can be utilised in comparison with the other pretext models. Examining the latent representation of a SOTA autoencoder in relation to the hidden representations of other autoencoders might yield interesting results. We opted for experimenting with the Stacked Capsule Autoencoder \cite{stackedcaps2019} (SCAE), which is detailed in Appendix \ref{app:scaesetup}.
+
+\subsubsection{Disentangled VAEs} In the original paper the interpretability of the latent units in disentangled VAEs is analysed using their saliency maps generated by a feature importance method. These units are exclusively sensitive to a single data generative factor, allowing for interpretable meanings. The aim of their experiments is to determine whether it is possible to identify the associated generative factor of each latent unit by analysing their generated saliency maps. To answer this question and verify the IDV claim, qualitative and quantitative experiments have been set up. \\
+The VAE models as described in Section \ref{sec:model_descriptions} are evaluated with Gradient Shap to get an importance score $a_i(\mu_j, \qvec{x})$ for each pixel $x_i$ from an image $\qvec{x}$ to predict the latent units $\mu_j \in 
+[d_H]$. For a quantitative result, the Pearson correlation between the saliency maps of different latent pairs is averaged over 5 runs. A low Pearson correlation indicates that the latent units attend to different parts of the image. Therefore, we pick the VAE configuration with the lowest average correlation for both datasets. For these selected VAEs, the saliency maps are shown for 2 test images on which we can perform a qualitative analysis.
+Lastly, the influence of $\beta$ (which regulates the degree of disentanglement in the VAEs) 
+on the Pearson correlation between the different latent units is evaluated by making boxplots of the correlations for various $\beta$ values. If the IDV claim holds, the Pearson correlation should not necessarily decrease as $\beta$ increases.
+
+%\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+%All our experiments are run on a cluster whose nodes are equipped with Nvidia Titan RTX GPUs. Running the reproducibility experiments comes at a total computational cost of 68 GPU hours. Our own experiments, which make use of the model checkpoints, come at a total computational cost of 1 GPU hour. (See Appendix \ref{fig:compcost} for details)
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections.
+The following section will enumerate the obtained results from reproducing the experiments done by \citeauthor{LabelFreeExplainability}. The results received from the additional experiments will be displayed subsequently. Each subsection will examine the original claim presented by the authors and show our obtained results.
+
+\subsubsection{Label-Free Feature Importance} 
+% In order to verify the LFI claim, we conduct a reproduction and evaluation of the consistency checks for label-free feature importance using the same four feature importance methods as employed in the original paper; Gradient Shap, Integrated Gradients, Saliency and Random as a baseline. 
+The results of this experiment are presented in Figure \ref{fig:feature_figures}, which illustrates that our LFI consistency checks for the MNIST and ECG5000 datasets are consistent with those of the original study. However, upon conducting LFI consistency checks for the CIFAR10 dataset, a deviation in trend was observed for all four feature importance methods, with a side-by-side comparison being depicted in Figure \ref{fig:difference_feature_figures} in Appendix \ref{section:repr diff LFI}. Nevertheless, the phenomenon where Integrated Gradients and Gradient Shap outperform the random baseline is similar to what was observed in the original paper, albeit with a different curve shape. 
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/mnist_consistency_features-1.jpg}
+    \caption{MNIST}
+    \label{fig:MNIST_feature_consistency}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/ecg5000_consistency_features-1.jpg}
+    \caption{ECG5000}
+    \label{fig:ECG5000_feature_consistency}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/cifar10_consistency_features-1.jpg}
+    \caption{CIFAR10}
+    \label{fig:cifar_feature_consistency}
+\end{subfigure}
+        
+\caption{Consistency check for label-free feature importance (average and 95\% confidence interval).}
+\label{fig:feature_figures}
+\end{figure}
+
+\subsubsection{Label-Free Example Importance} 
+% The verification of the claim of Label-free Example Importance (LEI) in the original paper was conducted by reproducing and evaluating the consistency checks for LEI using the same methods as the original paper. Specifically, the methods employed were influence functions, TracIn, SimplEx, and DKNN, on the MNIST and ECG5000 datasets, and SimplEx and DKNN on the CIFAR10 dataset. 
+Figure \ref{fig:ex_figures} showcases the results of this reproducibility experiment, which demonstrates that the LEI consistency checks for both the MNIST and ECG5000 dataset are consistent with those of the original study. However, similar to the observations made in the reproducibility experiment of LFI, the LEI consistency checks for the CIFAR10 dataset in our study deviate from the trend that was observed for the LEI consistency checks for the CIFAR10 dataset in the original paper. The main difference is the scale of the y-axis, the similarity rate, which is greater in our experiment, as illustrated side-by-side in Figure \ref{fig:difference_example_figures} in Appendix \ref{section:repr diff LFE}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/similarity_rates-1.png}
+    \caption{MNIST}
+    \label{fig:MNIST_ex_consistency}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/ecg5000_similarity_rates-1.png}
+    \caption{ECG5000}
+    \label{fig:ECG5000_ex_consistency}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{figures/cifar10_similarity_rates-1.png}
+    \caption{CIFAR10}
+    \label{fig:cifar_ex_consistency}
+\end{subfigure}
+        
+\caption{Consistency check for label-free example importance (only representation-based methods apply to SimCLR).}
+\label{fig:ex_figures}
+\end{figure}
+
+\subsubsection{Pretext use case comparison} 
+
+Table \ref{table:FI} contains information from two distinct experiments, namely the reproduction of the Pearson correlations displayed in the original paper acquired using Gradient Shap feature importance \textbf{and} our extension of applying the Integrated Gradients method, which will be discussed together with our addition of SCAE in Section \ref{section:extension_results}.
+
+\begin{table}[H]
+\renewcommand{\arraystretch}{1.2}
+\centering
+\begin{tabular}{|llllll|}
+\hline
+ \backslashbox{Int. Grad.}{\color{gray}Grad. Shap} & Recon.   & Denois. & Inpaint.      & Classif. & SCAE \\
+\hline
+ Reconstruction  & \tikzmark{start} & \color{gray}$.40 \pm .01$  &  \color{gray}$.33 \pm .03$ &  \color{gray}$.45 \pm .01$ &  \color{gray}$.39 \pm .01$  \\
+ Denoising      & $.47 \pm .06$ & & \color{gray}$.30 \pm .02$  & \color{gray}$.39 \pm .02$ & \color{gray} $.37 \pm .03$ \\
+ Inpainting     & $.45 \pm .07$  & $.43 \pm .05$ & & \color{gray}$.32 \pm .01$ & \color{gray}$.41 \pm .03$\\
+ Classification & $.42 \pm .01$  & $.38 \pm .04$ & $.35 \pm .03$ & & \color{gray}$.43 \pm .02$ \\
+ SCAE           & $.35 \pm .01$  & $.37 \pm .03$ & $.42 \pm .02$ & $.42 \pm .01$ & \tikzmark{end}\\
+\hline
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+\tikz[remember picture] \draw[overlay] ([xshift=-.5em, yshift=1em]pic cs:start) -- ([xshift=4.4em, yshift=-.4em]pic cs:end);
+
+\caption{Pearson correlation for saliency maps (avg +/- std) for feature importance methods {\color{gray}Gradient Shap (Reconstruction)} and Integrated Gradients.}
+\label{table:FI}
+\end{table}
+% IG 0.406 / GS 0.379
+
+
+Table \ref{table:EI} contains Pearson correlations for the Deep-KNN example importance method, which just like the Gradient Shap results from Table \ref{table:FI} are consistent with the correlation scores reported in the original study. 
+
+
+\begin{table}[H]
+\begin{tabular}{|llllll|}
+\hline
+                & Reconstruction   & Denoising       & Inpainting      & Classification   & SCAE            \\
+\hline
+ Reconstruction &&&&&\\
+ Denoising      & $.12 \pm .06$&&&&\\
+ Inpainting     & $.15 \pm .06$  & $.17 \pm .09$ &&&\\
+ Classification & $.08 \pm .03$  & $.07 \pm .03$ & $.08 \pm .04$ &&\\
+ SCAE           & $.08 \pm .02$  & $.10 \pm .03$  & $.10 \pm .02$  & $.05 \pm .01$ & \\
+\hline
+\end{tabular}
+\caption{Reproduced Pearson correlation (avg +/- std) for the Deep-KNN example importance method.}
+\label{table:EI}
+\end{table}
+
+
+The reproducibility results for the qualitative analysis of the label-free explainability framework are presented in Figure \ref{fig:examplesplussaliency} and are coherent with the results of the original study. Specifically for feature importance, the saliency maps for different pretext tasks vary heavily, which is consistent with the original study. Furthermore, the top examples are rarely similar, as is also suggested by the quantitative analysis done by \citeauthor{LabelFreeExplainability}.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.535\textwidth}
+    \includegraphics[width=\textwidth]{figures/top_examples (1).png}
+    \caption{Top Examples}
+    \label{fig:topexamples}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.455\textwidth}
+    \includegraphics[width=\textwidth]{figures/factsaliencymaps.drawio.png}
+    \caption{Saliency Maps}
+    \label{fig:saliencymaps}
+\end{subfigure}
+\caption{Label-Free explanations for varying pretext tasks.}
+\label{fig:examplesplussaliency}
+\end{figure}
+
+\subsubsection{Disentangled VAEs} 
+To qualitatively comment on the saliency maps of different latent units, we pick the combination of VAE type and corresponding $\beta$ value that lead to the lowest average Pearson correlation to display. Differently from the original study, the lowest correlation (Appendix \ref{section:disvae_correlations}) was achieved by a TC-VAE with $\beta=10$ for MNIST, and a $\beta$-VAE with $\beta=5$ for the dSprites dataset.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.37\textwidth}
+    \includegraphics[width=\textwidth]{figures/MNISTTCVAEBeta10.png}
+    \caption{MNIST (TC-VAE, $\beta = 10$)}
+    \label{fig:mnisttcvaebeta10}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.615\textwidth}
+    \includegraphics[width=\textwidth]{figures/dspritesbetavaebeta5.png}
+    \caption{dSprites ($\beta$-VAE, $\beta = 5$)}
+    \label{fig:dspritesbetavaebeta5}
+\end{subfigure}
+\caption{Saliency maps of the models with lowest Pearson Correlation.}
+\label{fig:saliencymapsvae}
+\end{figure}
+
+Figure \ref{fig:saliencymapsvae} displays the feature importance per latent unit for two different images for both datasets, using the VAE configurations above. We observe that it is difficult to meaningfully interpret the saliency maps for a given latent unit. Looking at the MNIST results, latent unit 3 has moderate to strong feature activation for the first test image while having no feature activation for the second image; nevertheless, both images represent the same digit. Moreover, feature activation does not appear to be region bound for each latent unit. The second test image in the dSprites case shows similar feature activation for different latent units. Therefore, we cannot reach a conclusion about the activation of a latent unit with regard to certain features being present in an image based on these saliency maps, which supports the IDV claim.
+
+The boxplots in Figure \ref{fig:boxplotsvae} display an increase of correlation between the saliency maps of latent units as $\beta$ grows. Only the TC-VAE for the MNIST dataset does not exhibit this trend. This refutes the concept that increasing disentanglement leads to less correlation between the latent units of a disentangled VAE. However, it is significant to mention that the boxplots in Figure \ref{fig:boxplotsvae} are fairly different than the boxplots produced by \citeauthor{LabelFreeExplainability}. Combined with the large margins of uncertainty of each box, it can be argued that drawing a specific conclusion from these plots might be unproductive.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/MnistBoxPlot.png}
+    \caption{MNIST}
+    \label{fig:mnistboxplot}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/DSpritesBoxPlot.png}
+    \caption{dSprites}
+    \label{fig:dspritesboxplot}
+\end{subfigure}
+\caption{Pearson Correlation for the saliency maps of differing values of $\beta$.}
+\label{fig:boxplotsvae}
+\end{figure}
+
+\subsection{Results beyond original paper}
+\label{section:extension_results}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+% IG 0.406 / GS 0.379
+\subsubsection{Integrated Gradients} 
+Our results for feature importance using Integrated Gradients are compared to the results of the original paper, which uses Gradient Shap. These findings are presented in Table \ref{table:FI}, which shows an average Pearson correlation for Integrated Gradients and Gradient Shap of 0.406 and 0.379 respectively. Combining this with the lower computational cost for Integrated Gradients (see Table \ref{fig:compcost} in Appendix \ref{app:comp_req}) would suggest that Integrated Gradients is a better feature importance method.
+
+\subsubsection{Addition of SCAE} It becomes apparent from Table \ref{table:FI} that the important features denoted by the SCAE correlate relatively weakly to the important features produced by reconstruction and denoising. This might possibly be due to the fact that the pretext tasks of reconstruction and denoising are significantly different from the task of the SCAE. We can observe that the SCAE correlates better with inpainting. Moreover, we can notice that Table \ref{table:EI} displays a weak correlation between the chosen training examples by the SCAE and the training examples of all other models. Lastly, the saliency maps displayed in Figure \ref{fig:saliencymaps} show that the SCAE's highlighted features significantly vary from the important features of the other pretext tasks. 
+
+\section{Discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper
+
+Firstly, the reproduced results in Figure \ref{fig:feature_figures} and Table \ref{table:FI} support the LFI claim. Using the label-free feature importance framework proposed by \citeauthor{LabelFreeExplainability}, the three different methods significantly outperform the random baseline in the consistency checks. However, some deviations from the results of the original study were found for the CIFAR-10 dataset with the SimCLR model. This different curve shape is most likely caused by small differences in the SimCLR model, according to the original authors. Nonetheless, the conclusions that can be drawn from either figure remain the same. The consistency checks indicated that the label-free feature framework performs best on the Integrated Gradients method, for both the reproduced and original results.
+\\
+Secondly, the experimental results of this paper support the LEI claim; the results for the consistency checks for the label-free example importance methods align with the results of the original paper.\\
+Moreover, the results in this paper also substantiate the IDV claim since the Pearson correlation between latent units does not decrease as the disentanglement parameter $\beta$ is increased. Thus we can conclude that more disentanglement does not cause deterioration of the similarity between the saliency maps of varying latent units.\\
+Lastly, the addition of the SCAE autoencoder in this paper demonstrates that the provided label-free framework also works on other autoencoders, which further strengthens the LFI and LEI claims. Further dissection of the results specific to the SCAE model can be found in Appendix \ref{app:scaediscussion}.
+
+% dit komt uit results!
+% Furthermore, our ability to reproduce a quantitative analysis for these representations confirms the validity of the framework proposed by the authors, as it demonstrates their capability to provide label-free explainability in the context of unsupervised learning, thus supporting the claims of LFI and LEI.
+
+% We can thus conclude that the presented framework for label-free explainability for unsupervised models also allows us to appreciate qualitative differences between the different encoders, thereby supporting the claims of LFI and LEI. 
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+The codebase provided by the authors was extensive and easy to execute with a command line interface. Moreover, the paper itself had a large appendix in which the authors explained the mathematics behind their label-free feature and example importance methods in considerable detail. This appendix also contained additional results of the experiments which made for a seamless comparison with our reproduction of the research. 
+
+\subsection{What was difficult}
+Even though the source code was vast and thoroughly documented, we encountered several software-breaking bugs which needed to be resolved before reproduction was possible. The errors ranged from simply recovering a missing import to improper function arguments for example importance methods such as DKNN. Furthermore, the mathematics behind both Gradient Shap and TracIn required a solid understanding of fairly complicated multivariate calculus and statistics.
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+Contact with the original authors of the paper was established through email. We have posed a series of questions regarding the reproducibility of the original results. First of all, the LFI results reproduced for CIFAR-10 in Figure \ref{fig:cifar_feature_consistency} differed from the paper to an extent where only Integrated Gradients truly matched. The response was that SimCLR's weight initialisation might have differed in both studies and therefore created a different baseline for the results. Furthermore, we noticed the authors applied Gradient Shap to the pretext use case, regardless of the fact that Integrated Gradients displayed better performance in the consistency checks. The authors utilised Gradient Shap because they stated the method is less computationally expensive than Integrated Gradients. In our reproduction however, we observed the converse to be the case (see Appendix \ref{app:comp_req} Table \ref{fig:compcost}). Finally, the obtained boxplots for the IDV claim differed significantly. The authors mentioned that VAEs are extremely unstable and difficult to seed, thus giving a high likelihood of dissimilarity between runs.

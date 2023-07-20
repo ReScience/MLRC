@@ -1,0 +1,195 @@
+\appendix
+
+\section{Mathematical definitions}
+The following definitions are directly quoted from the original paper \cite{LabelFreeExplainability}.
+\label{appendix:math}
+\subsection{Definition 1 (Label-Free Feature Importance)}
+\label{appendix:LFIdef1}
+Let $\qvec{f} : \mathcal{X} \rightarrow \mathcal{H}$ be a black-box latent map and for all $i \in [d_X]$ let $a_i(·, ·) : \mathcal{A}(\mathbb{R}^\mathcal{X}) \times \mathcal{X} \rightarrow \mathbb{R}$ be a feature importance score linear w.r.t. its first argument. We define the label-free feature importance as a score $b_i(·, ·) : \mathcal{A}(\mathcal{H}^\mathcal{X}) \times \mathcal{X} \rightarrow \mathbb{R}$:
+\begin{equation*}
+b_i(\qvec{f}, \qvec{x}) \equiv a_i(g_x,\qvec{x}) \newline
+\end{equation*}
+
+\begin{equation*}
+\begin{aligned}
+& g_x: \mathcal{X} \rightarrow \mathbb{R} \textnormal{  such that for all  } \Tilde{\qvec{x}} \in \mathcal{X} : \\
+& g_x(\Tilde{\qvec{x}}) = \langle \qvec{f}(\qvec{x}), \qvec{f}(\Tilde{\qvec{x}}) \rangle_\mathcal{H},\\
+& \textnormal{where$\langle \cdot , \cdot \rangle_{\mathcal{H}} $ denotes an inner product for the space $\mathcal{H}$.}
+\end{aligned}
+\end{equation*}
+
+
+\subsection{Definition 2 (Label-Free loss-based example importance)}
+\label{appendix:LEIdef1}
+Let $f_{\theta_r} : \mathcal{X} \rightarrow \mathcal{H}$ be a black-box latent map trained to minimize a loss $L :  \mathcal{X} \times \Theta \rightarrow \mathbb{R}$ on a training set $\mathcal{D}_{train} = \{ \qvec{x}^n | n \in [\textit{N}] \}$ ($N$ is the length of the training set). To measure the impact of removing example $\qvec{x}^n$ from $\mathcal{D}_{train}$ with $n \in [\textit{N}]$, we define the \textit{Label-Free loss-based example importance} as a score $c^n(\cdot,\cdot) : \mathcal{A}(\mathcal{H}^\mathcal{X}) \times \mathcal{X} \rightarrow \mathbb{R}$ such that:
+\begin{equation}
+    c^n(\qvec{f}_{\theta_r}, \qvec{x}) = \mathbf{\delta}^n_{\theta_r}L(\qvec{x}, \mathbf{\theta}_*).
+\end{equation}
+Where $ \delta^n_{\theta_r}L(\qvec{x}, \theta_*)$ is an estimation of the loss shift that can be evaluated by using the Influence Functions method\cite{koh2017understanding} or the TracIn method \cite{pruthi2020estimating}.
+
+\subsection{Definition 3 (Label-Free representation-based example importance)}
+\label{appendix:LEIdef2}
+Besides the loss based-example importance methods, representation-based example importance methods are used to attribute an importance score to examples.\\
+
+To quantify the affinity between $\qvec{x}$ and the training set examples, we
+attempt a reconstruction of $\qvec{f}_e(\qvec{x})$ with training representations from $\qvec{f}_e(D_{train})$: $\qvec{f}_e(\qvec{x}) \approx
+\sum_{n=1}^N w_n(\qvec{x}) \cdot \qvec{f}_e(\qvec{x}_n)$. The first approach \cite{papernot2018deep} to define weights $w^n(\qvec{x})$ is to identify the indices
+$KNN(x) \subset [N]$ of the $K$ nearest neighbours (DKNN) of
+$\qvec{f}_e(\qvec{x})$ in $\qvec{f}_e(D_{train})$ and weigh them according to a Kernel
+function $\kappa : \mathcal{H}^2 \rightarrow \mathbb{R}^+$:
+\begin{equation}
+   w^n(\qvec{x}) = \textbf{1} [n \in KNN(x)] \cdot \kappa [\qvec{f}_e(\qvec{x}_n), \qvec{f}_e(\qvec{x})],
+\end{equation}
+Where \textbf{1} denotes the indicator function.\\
+A second method (SimplEx) to learn the weights \cite{crabbe2021explaining} is by solving:
+\begin{equation}
+    \qvec{w}(\qvec{x}) = argmin_{\lambda \in [0,1]^N} \left\|\qvec{f}_e(\qvec{x}) - \sum_{n=1}^N \lambda^n \qvec{f}_e(\qvec{x}^n)\right\|_\mathcal{H},
+\end{equation}
+where $\sum_{n=1}^N \lambda^n = 1$.
+For the Label-Free setting, we can take $c^n = w^n$ without any additional work and thus compute the Label-Free example importance score this way.
+
+\newpage
+
+\section{Datasets}
+\label{app:datasets}
+
+Three different datasets are used for the quantitative and qualitative experiments regarding label-free feature and example importance. An additional fourth dataset is used for the study on disentangled VAEs. The datasets will be briefly discussed below.
+
+% CODE NOG NAGAAN OP PREPROCCESSING!!
+
+\subsubsection{MNIST} The MNIST dataset is a commonly used dataset for image classification tasks. It comprises 60,000 training and 10,000 test images of handwritten digits in the range 0-9, each with corresponding labels. All images are in grayscale and have a size of 28x28 pixels. We corrupt each
+training image with random noise $\epsilon \sim \mathcal{N}(0,\frac{1}{3} \textbf{I})$ where $\mathbf{I}$ is the identity matrix. % dit staat in de appendix, waarom ze het done, geen idee
+% Is het niet handiger om dit 1/3 * I te maken? ja
+
+
+\subsubsection{ECG5000} This dataset contains 5000 univariate time series, each describing the heartbeat of a patient. Each time series comes with a binary label indicating whether the heartbeat is normal or not. %(met Tim nog ff bespreken hoe ze dit precies done, in de originele dataset waren 5 labels?) 
+
+
+\subsubsection{CIFAR-10} A dataset consisting of 60,000 32x32 color images in 10 classes, with 6,000 images per class. There are 50,000 training images and 10,000 test images. The 10 classes are: airplane, automobile, bird, cat, deer, dog, frog, horse, ship, and truck. 
+
+\subsubsection{dSprites} The dSprites dataset, which is commonly used to assess the disentanglement properties of unsupervised models, consists of 2D shapes that are procedurally generated from 6 ground truth independent latent factors: color, shape, scale, rotation and x and y positions of a sprite. All possible combinations of the latent variable values add to a total of 737.280 64x64 black and white images. 
+
+\section{Baselines latent shift}
+\label{app:baselines_latent}
+To compute the latent shift, several baselines $\Tilde{x}$ are used for different models. As a baseline for determining feature importance in the MNIST dataset, a black image is used represented by $\Tilde{\qvec{x}} = 0$. In the ECG5000 dataset, the average normal heartbeat is used as the baseline represented by $\Tilde{\qvec{x}} = \sum_{\qvec{x} \in \mathcal{D}_{train}} \frac{\qvec{x}}{|\mathcal{D}_{train}|}$. In the CIFAR-10 dataset, a blurred version of the image being explained is used as the baseline, represented by $\Tilde{\qvec{x}}=  G_{\sigma} \otimes \qvec{x}$, where $G_{\sigma}$ is a Gaussian blur of kernel size 21 with width $\sigma = 5$ and $\otimes$ represents the convolution operator.
+
+\section{Stacked Capsule Autoencoder (SCAE)}
+\label{app:scae}
+
+\subsection{SCAE setup}
+\label{app:scaesetup}
+The Stacked Capsule Autoencoder \cite{stackedcaps2019} (SCAE) employs geometric relationships between parts of objects to make a reasonable reconstruction while also estimating which object parts are present within a given image. The SCAE comprises of two separate models, the Part Capsule Autoencoder (PCAE - regarded as the encoder) and the Object Capsule Autoencoder (OCAE - regarded as the decoder). The PCAE receives an input image $\mathbf{y}$ and transforms it into an $M$ number of capsules. Each capsule $m$ contains a pose vector $\mathbf{x}_m$ which denotes spatial information about a part of the image, a presence probability $d_m \in [0, 1]$ and a vector of special features $\mathbf{z}_m$. The special features are a distinguishable attribute of that specific part of the image; in the paper, the authors simply use colour as the special feature. Alongside colour, the special features $z_m$ for a particular capsule also track the level of transparency of a given object to simulate occlusions. Each of these capsules is then applied to a template $T_m$ to create a transformed template $\hat{T}_m$. These templates are learned sets of parameters. The core concept is that the received geometric information from the part capsules and the transformed templates are sufficient for the reconstruction of the image by the OCAE. Each capsule is only allowed for a single usage, meaning that an image can be reconstructed as a weighted combination of $M$ capsules containing geometrical information and a single template. The output of the PCAE is therefore a capsule plus a flattened transformed template for each capsule in $M$.
+
+For this research, we flatten the capsules to create a $Z$ dimensional latent representation when computing the feature and example importance scores (not during initial training) because the methods of importance attribution enforce this form of latent representation. This essentially does not harm the information stored in the latent space, since the $Z$ dimensional latent space now just comprises of $M \times (\mathbf{x}_m, d_m, \mathbf{z}_m, \hat{T}_m)$ vectors stacked on top of each other and we can still evaluate the latent shift accordingly.
+
+\subsection{SCAE discussion}
+\label{app:scaediscussion}
+Table \ref{table:FI} displayed that the SCAE has the strongest measure of correlation with an inpainting autoencoder. As mentioned in the previous subsection, the part capsules track the level of transparency of the corresponding parts to inform the decoder about possible occlusions. The main concept of inpainting is reconstructing parts of an image hidden by specific occlusions. This might cause the models to more deeply correlate in their hidden representation.
+
+Furthermore, there is an overall weak correlation with the other pretext tasks for the example importance case (shown in Table \ref{table:EI}). The latent space of SCAE's encoder is specifically modelled towards a given structure. The hidden representation is dissected in part capsules which all contain information about separate locations of the image plus an additional template which it deforms with that same information. This strongly distinct manner of organising the latent space might explain the low correlation of selected top examples to top examples of other models. 
+
+Lastly, the saliency maps of the SCAE (Figure \ref{fig:saliencymaps}) vary substantially from the other models' saliency maps. This is more evidence that the task of the SCAE greatly differs from the tasks presented in the original paper. The SCAE pays attention to alternative pixels within the MNIST digits, presumably because it is attempting to obtain geometric objects from the images rather than performing a more standard task such as reconstruction.
+
+\newpage 
+
+\section{Computational requirements}
+\label{app:comp_req}
+All our experiments are run on a cluster whose nodes are equipped with Nvidia Titan
+RTX GPUs. Running the reproducibility experiments comes at a total computational
+cost of 68 GPU hours. Our own experiments, which make use of the model checkpoints,
+come at a total computational cost of 4.5 GPU hours. A further breakdown of the computational costs is presented in Table \ref{fig:compcost}.
+
+\begin{table}[H]
+\resizebox{\textwidth}{!}{
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{llllll}
+\hline
+\textbf{Experiment type}  & \textbf{Experiment name}  & \textbf{Section}  & \textbf{Dataset} & \textbf{Dataset specific GPU hours} & \textbf{Total GPU hours} \\ 
+\hline
+\multirow{9}{*}{Reproducibility}  & \multirow{3}{*}{Consistency features}  & \multirow{3}{*}{4.1} & MNIST  & 0.376  & \multirow{3}{*}{0.765}   \\
+ &    &  & ECG5000     & 0.033    &    \\
+ &   &  & CIFAR10     & 0.356   &   \\ 
+ \arrayrulecolor{gray}\cline{2-6}  & \multirow{3}{*}{Consistency examples}  & \multirow{3}{*}{4.1} & MNIST      & 3.212  & \multirow{3}{*}{23.791}  \\
+ &  &  & ECG5000      & 20.567    &  \\
+ &   &      & CIFAR10        & 0.012      &  \\
+ \arrayrulecolor{gray}\cline{2-6} & \begin{tabular}[c]{@{}l@{}}Use Case: representations\\ learned with different pretext\\ tasks\end{tabular}  & 4.2     & MNIST     & 3.550 & 3.550  \\ \arrayrulecolor{gray}\cline{2-6} & \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Challenging our assumptions\\ with disentangled VAEs\end{tabular}}  & \multirow{2}{*}{4.3} & MNIST    & 7.725  & \multirow{2}{*}{39.941}\\
+ &   &  & dSprites      & 32.216          &  \\
+ \arrayrulecolor{black}\hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Additional\\ experiments\end{tabular}} & \begin{tabular}[c]{@{}l@{}}Extension 1 of the pretext use\\ case: The Stacked Capsule\\ Autoencoder (SCAE)\end{tabular}            & -       & MNIST         & 1.106  & 1.106  \\ 
+\arrayrulecolor{gray}\cline{2-6}  & \begin{tabular}[c]{@{}l@{}}Extension 2 of the pretext use\\ case: Integrated Gradients\\ instead of Gradient Shap for\\ feature attribution\end{tabular} & -  & MNIST   & 3.386  & 3.386 \\
+\arrayrulecolor{black}\hline
+\end{tabular}
+}
+\caption{Overview of the computational cost, in terms of GPU hours, for each experiment.}
+\label{fig:compcost}
+\end{table}
+
+\section{Reproducability differences}
+\label{section:repr diff}
+While reproducing the experiments from the original paper some differences were encountered with respect to the original figures in the study. Since our main report only details the results obtained when replicating the experiment, this section also highlights the original figures copied from the paper by \citeauthor{LabelFreeExplainability}.
+
+\subsection{Label-Free feature importance}
+\label{section:repr diff LFI}
+While the three different feature importance methods and the random baseline showed the same effect in representation shift on the MNIST and ECG5000 datasets as the original study, our results differed quite substantially on the CIFAR10 dataset. This different curve shape is most likely caused by the difference in weight initialisation for the SimCLR model.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.495\textwidth}
+    \includegraphics[width=\textwidth]{figures/original_CIFAR10.png}
+    \caption{Result original paper}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.495\textwidth}
+    \includegraphics[width=\textwidth]{figures/cifar10_consistency_features-1.jpg}
+    \caption{Reproducibility study result}
+\end{subfigure}
+
+        
+\caption{Differences between the original paper and our reproducibility study for the consistency check for label-free feature importance on the CIFAR10 dataset (average and 95\% confidence interval).}
+\label{fig:difference_feature_figures}
+\end{figure}
+
+\subsection{Label-Free example importance}
+\label{section:repr diff LFE}
+While the shape of the original and reproduced sets of graphs in figure \ref{fig:difference_example_figures} match, the similarity rates of our results are scaled up compared to the original study, in a very consistent manner. Again, this deviation is most likely caused by a difference in weight initialisation for the SimCLR model.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.495\textwidth}
+    \includegraphics[width=\textwidth]{figures/examples_CIFAR.png}
+    \caption{Result original paper}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.495\textwidth}
+    \includegraphics[width=\textwidth]{figures/cifar10_similarity_rates-1.png}
+    \caption{Reproducibility study result}
+\end{subfigure}
+
+        
+\caption{Differences between the original paper and our reproducibility study for the consistency check for label-free example importance on the CIFAR10 dataset (average and 95\% confidence interval). Notice the difference in scale for the similarity rate on the y-axis. }
+\label{fig:difference_example_figures}
+\end{figure}
+
+\subsection{Saliency correlations for different disentangled VAEs}
+\label{section:disvae_correlations}
+In the final experiment of the paper, different combinations of two types of disentangled VAEs and corresponding $\beta$ values are trained for multiple runs. For a qualitative analysis, the authors state they showcase saliency maps for the configurations with the lowest Pearson correlation coefficient, as that corresponds to latent units paying attention to distinct parts of the images, which is desirable for disentanglement. It is reported that this entails a $\beta$-VAE with $\beta$ = 10 for MNIST and a TC-VAE with $\beta$ = 1 for dSprites, but the actual Pearson scores this decision is based on are not reported. In our reproduction study however, the criterion of using the lowest Pearson score, averaged over 5 runs, leads to a different conclusion for the configuration to use for both datasets. Therefore selecting a TC-VAE with $\beta$ = 10 for MNIST and a $\beta$-VAE with $\beta$ = 5, as per table \ref{table:disvae_configurations}.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+        \textbf{VAE Type} & $\mathbf{\beta}$ &  \multicolumn{2}{|c|}{\textbf{Average Pearson (n=5)}} \\\cline{3-4}
+         & & \textbf{MNIST} & \textbf{dSprites} \\
+         \hline
+        Beta & 1 & 0.024426 & 0.303969 \\
+        TC & 1 & 0.023251 & 0.266775\\
+        Beta & 5 & 0.026577 & \textbf{0.237737}\\
+        TC & 5 & 0.024480 & 0.283371\\
+        Beta & 10 & 0.028552 & 0.369678\\
+        TC & 10 & \textbf{0.018717} & 0.403007\\
+        \hline
+    \end{tabular}
+    \caption{Averaged Pearson correlation coefficient for different types of VAEs and values of $\beta$.}
+    \label{table:disvae_configurations}
+\end{table}
