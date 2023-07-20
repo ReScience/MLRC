@@ -1,0 +1,86 @@
+\documentclass[12pt]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\usepackage{enumitem,amssymb}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+
+\title{To-Do}
+
+\begin{document}
+
+\section{Draft Report}
+
+\begin{enumerate}
+    \item Reproducibility Summary (max 1 page, at least one sentence in each section)
+    \begin{todolist}
+        \item Scope.
+        \item Methodology.
+        \item Results.
+        \item Easy.
+        \item Difficult.
+        \item Communication with Authors.
+    \end{todolist}
+    \item Introduction (full draft, p2 of template)
+    \begin{todolist}
+        \item Paper introduction.
+        \begin{todolist}
+            \item Add citations to previous work.
+        \end{todolist}
+        \item Scope of reproducibility.
+    \end{todolist}
+    \item Methodology (preliminary, p2-3 of template)
+    \begin{todolist}
+        \item Model descriptions.
+        \item Datasets.
+        \begin{todolist}
+            \item Link to datasets.
+            \item Statistics for datasets.
+        \end{todolist}
+        \item Hyperparameters.
+        \item Experimental Setup and Code.
+        \textbf{Note/Partial Progress:} The paper says figure 4 comes from 10 experiments, but the code only has 8 seeds.
+        \item Computational Requirements and Runtimes.
+    \end{todolist}
+    \item Two results from original paper reproduced
+    \begin{todolist}
+        \item Proofs of theorem 4.2 and 4.3.
+        \begin{todolist}
+            \item Define $e(F)$.
+            \item Justify changing definition of cut norm.
+            \item Define homomorphism density for graphs.
+            \item Reference for L-S.
+        \end{todolist}
+        \item Reproduce figure 4 (include original plot side by side).
+
+        \textbf{Notes/Partial Progress:} 
+
+        \begin{itemize}
+            \item I (Shelby) ran out of RAM on Google Colab trying to run the REDDIT-BINRARY gmixup -- we will probably need to use GreatLakes.
+        \end{itemize}
+    \end{todolist}
+    \item One result beyond the original paper.
+    
+    \textbf{Notes/Partial Progress:}
+    \begin{itemize}
+        \item I ran the data for PROTEINS dataset -- the vanilla model had ~90\% accuracy, gmixup had ~60-70\% accuracy. This is strange.
+        \item This paper: \href{https://grlplus.github.io/papers/79.pdf}{link to paper} establishes baseline datasets and GNN results. We could compare g-mixup to these results, in addition to drop-edge and the other interpolation method they compare to in the paper.
+        \item I (Shelby) could not find any of the ``mid-size" datasets in pytorch -- we could import them. \textbf{Correction:} all the datasets from TUDataset are in pytorch-geometric, just not listed on the cheatsheet.
+        \item This paper (and the pytorch-geometric docs) suggest that having data sets without multiple copies of isomorphic graphs could be important: \href{https://arxiv.org/abs/1910.12091}{Understanding Isomorphism Bias in Graph Data Sets}. TUDataset datasets are cleaned to remove non-isomorphic data, so maybe we should mention this in why we picked these datasets.
+    \end{itemize}
+    \begin{todolist}
+        \item Apply the model to a new dataset.
+    \end{todolist}
+    \item Discussion
+    \begin{todolist}
+        \item What we have done so far.
+        \item What we plan to do.
+    \end{todolist}
+\end{enumerate}
+
+\end{document}

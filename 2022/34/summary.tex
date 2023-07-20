@@ -1,0 +1,23 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+We study the graph data mixup method \textbf{$\mathcal{G}$-Mixup} developed by Han, Jiang, Liu, and Hu \cite{Han:2022}. We investigate their claims that $\mathcal{G}$-Mixup theoretically produces synthetic graphs that contain a mixture of key graph topologies of source graphs, experimentally improves the performance of graph neural networks (GNNs), and experimentally performs better than another graph data augmentation methods.
+
+\subsubsection*{Methodology}
+For the theoretic claims, we give more detailed proofs of the authors' theorems by using results from \cite{Lovasz:2006}. For the experimental claims, we utilize the authors' publicly available code and our own implementation of the GCN neural network. We run experiments on the datasets IMDB-B, REDDIT-B, and PROTEINS. For the IMDB-B and PROTEINS datasets, we use Google Colab, which provides a NVIDIA P100 and Tesla T4 GPU and up to 32GB of RAM. Each experiments took approximately $10$ GPU minutes. For the REDDIT-B dataset, we used the campus computing cluster, which gives a Tesla V100 GPU with up to $90$ GB RAM. It took about $20$ minutes each of these experiments.
+
+\subsubsection*{Results}
+We verify their theoretical claims that $\mathcal{G}$-Mixup indeed leads to a mixture of ``key graph topologies." We reproduce their experimental results on classification accuracy for REDDIT-B to within about $6\%$ of the reported value, and for IMDB-B to within about $2\%$ of the reported value. However, our experimental results do not provide statistically significant evidence to support the paper's experimental claims that $\mathcal{G}$-Mixup improves the performance of GNNs or performs better than other graph data augmentation methods.
+
+\subsubsection*{What was easy}
+The authors provided sufficient mathematical background and useful citations to fill in the gaps in their proofs. The authors' code was fairly easy to run with the scripts provided, once we installed the correct packages. It was easy to run the code on other datasets from PyTorch Geometric.
+
+\subsubsection*{What was difficult}
+Setting up the code environment was difficult. We also initially faced memory limits when generating the graphons for the REDDIT-B dataset.
+
+\subsubsection*{Communication with original authors}
+We have communicated with the corresponding author over email about our memory usage and neural network architecture.
+
