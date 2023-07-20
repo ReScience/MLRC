@@ -1,0 +1,51 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} on the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it into the abstract input field, where the sections must be separated with a blank line.
+%}
+
+\subsubsection*{Scope of Reproducibility}
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+The main claim of the paper being reproduced is that the proposed Variational Neural Cellular Automata (VNCA) architecture, composed of a convolutional encoder and a Neural Cellular Automata (NCA)-based decoder, is able to generate high-quality samples.
+The paper presents two variants of this VNCA decoder: the doubling VNCA variant that is claimed to have a simple latent space, and the non-doubling VNCA variant that is claimed to be optimized for damage recovery and stability over many steps.
+ %The performance of the decoder is shown by reporting its achieved importance-weighted Evidence lower bound (IWELBO) on the MNIST dataset and by visually 
+
+%results of the paper show that the VNCA models are able to generate high-quality images and have a lower memory footprint compared to a fully-convolutional baseline.
+
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use the author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+To reproduce the results, we re-implemented all of the VNCA models and a fully-convolutional baseline in JAX, by using the descriptions given in the paper. We then followed the same experimental setup and hyperparameter choices as in the original paper. 
+%The original PyTorch code was consulted after our implementation for verifying correctness.
+%This means that the performance of the new models was shown by calculating its achieved Importance-Weighted Evidence lower bound (IWELBO) on the binarized MNIST dataset and by visually showing reconstructed images and producing samples. The claim about the simplicity of the latent space of the doubling variant was probed using a linear interpolation and doing a T-SNE reduction. To test the claim about the stability and damage recovery, the cellular automata was run for a varying amount of steps, and damage was introduced to the image. 
+All of the models were trained on a TPU v3-8 provided by Kaggle, with a total budget of around 4 TPU hours, not counting unreported experiments.
+
+
+\subsubsection*{Results}
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgment to decide if your results support the original claim of the paper.
+
+All but one of the figures and results from the original study were possible to reproduce. The obtained Evidence Lower Bound (ELBO) of the doubling VNCA was within $0.3\%$ of the stated and for the non-doubling VNCA the ELBO was within $1.8\%$ and the observed damage recovery was similar. We were however not able to reproduce the t-SNE reduction experiment for the baseline and were therefore not able to show the VNCA decoder having a cleaner t-SNE separation than the baseline.
+
+\subsubsection*{What was easy}
+
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The implementation of the convolutional baseline and most parts of the NCA-based decoder were straightforward to re-implement based on the description provided in the paper.
+
+
+\subsubsection*{What was difficult}
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+One of the difficulties faced in the reproduction study was obtaining the labels of the binarized MNIST dataset used in the original paper since it officially is provided without labels. This made it unclear how the original paper got the labels for the latent space visualization. 
+Additionally, implementing the pool for the non-doubling version of the VNCA model with a distributed training setup was challenging as it required operations between TPU cores. %This was, however, only due to the re-implementation using a distributed training configuration. 
+
+\subsubsection*{Communication with original authors}
+
+%Briefly describe how much contact you had with the original authors (if any).
+
+No communication was made with the original authors.

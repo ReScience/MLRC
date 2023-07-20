@@ -1,0 +1,25 @@
+\section*{Appendix}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/viz_latent.png}
+        \caption{}
+        \label{fig:viz_latent}
+    \end{subfigure}
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/t-sne_NonDoublingVNCA_5000points.png}
+        \caption{}
+        \label{fig:t-sne_NonDoublingVNCA}
+    \end{subfigure}
+\caption{Figure \textbf{\ref{fig:viz_latent}} Visualization of the latent vectors of the VNCA. The figure shows slices with the values of the seven first channels of the latent vectors. The first channel of the latent vector is trained to be the logits for a Bernoulli distribution. Figure \textbf{\ref{fig:t-sne_NonDoublingVNCA}} t-SNE reduction of 5000 encoded images from the test set using the encoder from the non-doubling VNCA.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.55\textwidth]{Images/NonDoubling.drawio1.pdf}
+    \caption{Overview of the non-doubling VNCA model. \textbf{Left}: Whole reconstruction process, input image $x$ is encoded using the convolutional encoder and $z_0$ is sampled from the distribution $\mathcal{N}(\mu, \sigma)$ and then fed into the NCA decoder. \textbf{Middle}: The decoder consists of repeating the initial sample over the grid followed by $T$ NCA steps.}
+    \label{fig:NonDoublingVNCAOverview}
+\end{figure}
