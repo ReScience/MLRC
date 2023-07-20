@@ -1,0 +1,41 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} on the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% \cite{kolek2022cartoon}
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+ In this reproducibility study, we verify the claims and contributions in {\it Cartoon Explanations of Image Classifiers} by Kolek et al. \cite{kolek2022cartoon}. These include (i) A proposed technique named CartoonX used to extract visual explanations for predictions via image classification networks, (ii) CartoonX being able to reveal piece-wise smooth regions of the image, unlike previous methods, which extract relevant pixel-sparse regions, and (iii) CartoonX achieving lower distortion values than these methods.
+% In this reproducibility study, we validate the assertions and advancements put forth in "Cartoon Explanations of Image Classifiers" by Kolek et al. \cite{kolek2022cartoon}. These encompass (i) The introduction of a new methodology named CartoonX which extracts explicative visualizations for image classification network predictions, (ii) The novel capability of CartoonX to uncover piece-wise continuous regions of the image, in contrast to prior techniques that merely extract pertinent, sparsley pixelated regions, and (iii) The demonstration of CartoonX's superiority in terms of lower distortion values compared to these existing methods.
+
+
+%Namely, these include (i) an implementation of the rate-distortion explanation (RDE) methodology as a sparse representation of interpretable explanations, (ii) their methodology that extracts the piece-wise smooth portions of an image relevant for explainability known as CartoonX, and (iii) that their CartoonX methodology achieves lower distortion values than other methodologies.
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+The authors provide their substantial codebase via Git Hub, which played a vital role initially. However, it was discovered that several figures would require additional scripts to reproduce them. Additionally, the GPUs used consisted of several different CUDA-enabled GPU models, including a GTX 2060 Ti and an RTX 3060.
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+We verified the main claims of the paper and offered extensions. Our qualitative CartoonX and PixelRDE visualization results were similar to the original paper's. From visualizing them, we saw that CartoonX could reveal piece-wise information in the image relevant to the classifier. Our quantitative distortion plots followed trends similar to the original plots, allowing us to verify their claims, but only after adjustments to the unclear '$\lambda$' and 'number of steps' hyperparameters the paper provides. 
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The initial implementation of the provided script was simple as the code provided included instructions on dependency installation procedures and how to run the script for an initial qualitative assessment.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+While the qualitative result reproduction was simple, quantitative reproduction remained difficult. The main issue was the experiment specifications needed to create the quantitative results. Lastly, CartoonX's predictions depend on the hyperparameter choices, mainly '$\lambda$' and the number of 'iteration steps'. 
+
+\subsubsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+We reached out to the authors with several questions regarding the quantitative results. While they could answer several questions posed in time, some clarifications needed to be included. New questions arose after this interaction but were left unanswered due to the limited timeline of this reproduction.
