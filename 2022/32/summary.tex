@@ -1,0 +1,27 @@
+\section*{\centering Reproducibility Summary}
+
+\textit{We investigate the results of \cite{yan_if_2021} in the field of data valuation. We repeat their experiments and conclude that the (Monte Carlo) Least Core is sensitive to important characteristics of the ML problem of interest, making it difficult to apply.}
+
+\subsubsection*{Scope of Reproducibility}
+
+We test all experimental claims about Monte Carlo approximations to the \textit{Least Core} and their application to standard data valuation tasks.
+
+\subsubsection*{Methodology}
+
+We use the open source library \cite{transferlab_pydvl_2022} for all valuation algorithms. We document all details on dataset choice and generation in this paper, and release all code as open source in \cite{benmerzoug_mlrc22_2022}.
+
+\subsubsection*{Results}
+
+We were able to reproduce the results on Least Core approximation. For the task of low-value point identification we observed similar performance for least core and (Truncated Monte Carlo) Shapley values, whereas for high-value identification, the least core outperformed other methods. In two experiments, we must depart from the original paper and arrive at different conclusions. Overall, we find that the Least Core offers similar results to other game-theoretic approaches to data valuation, but it does not overcome the main drawbacks of computational complexity and sensitivity to randomness that such techniques have.
+
+\subsubsection*{What was easy}
+
+Open source libraries like DVC and ray enabled efficiently designing and running the experiments.
+
+\subsubsection*{What was difficult}
+
+Data generation was difficult for dog-vs-fish because no code was available. Computing the Monte Carlo Least Core was very sensitive to the choice of utility function. Reproducing some experiments was difficult due to lack of details.
+
+\subsubsection*{Communication with original authors}
+
+We asked the authors for details on the experimental setup and they kindly and promptly sent us the code used for the paper. This was very useful in understanding all steps taken and in uncovering some weaknesses in the experiments.
