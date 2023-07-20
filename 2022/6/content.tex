@@ -1,0 +1,318 @@
+%\textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+%\\
+%Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+%For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+%}}
+\section{Introduction}
+% A few sentences placing the work in high‐level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+Contrastive learning has recently become a well-received component in self-supervised learning for computer vision, natural language processing (NLP), and other domains. It aims at embedding augmented versions of the same sample close to each other while trying to push away embeddings from different samples \cite{jaiswal2020survey}.
+
+
+In 2020, Chen et al. \cite{simclr} proposed SimCLR, a self-supervised learning method for visual representations, which is based on the contrastive loss between two views of the same image, which are transformed by a learned feature representation. 
+    
+In 2021, Chen et al. \cite{chen2021intriguing} reported three intriguing properties of contrastive learning by using SimCLR. First, they generalized the standard loss to a broader family of losses and found that variants of contrastive losses perform similarly when a multi-layer non-linear projection head is used. Secondly, they studied whether instance-based contrastive learning can learn well on images with multiple objects. 
+    Additionally, they showed that easily learned features can inhibit the learning of more discriminative ones.
+
+
+\section{Scope of reproducibility}
+\label{section:scope_of_reproducibility} 
+    This paper reproduces some of the experiments of \cite{chen2021intriguing}. The first experiment of \cite{chen2021intriguing} compares the performance of different instantiations of generalized contrastive losses for SimCLR with varying batch sizes using the linear evaluation protocol. Their work shows that changing the batch size has a negligible impact on the linear evaluation top-1 accuracy when having a fixed number of layers in the projection head and when the base encoder is trained for a fixed number of epochs. The authors also claimed that this is especially true when the projection head has more layers.
+    
+    One of the main findings of \cite{chen2021intriguing} is that the instance-based objective widely used in existing contrastive learning methods can learn meaningful local features despite operating on global image representation (e.g. dogs' facial components, as shown in Figure \ref{fig:orig_paper} in Appendix \ref{appendix:old}). In this paper, we mainly study this property and also perform experiments beyond this finding. Specifically, we evaluate the following claims:
+    \begin{itemize}
+    \item[\textit{(i)}]
+    The differences in linear evaluation top-1 accuracy among different batch sizes are minimal when having a deep projection head with a fixed number of layers. 
+    
+    
+    \item[\textit{(ii)}] SimCLR learns local features that exhibit hierarchical properties. 
+    \end{itemize}
+    Furthermore, we test the following additional claims:
+    \begin{itemize}
+    \item[\textit{(iii)}] 
+    The learning of local features does not depend on K-Means, but is also obtained with other clustering algorithms.
+    \item[\textit{(iv)}]
+    SimCLR recognizes features with the same semantic meaning among multiple images.
+    \end{itemize}
+
+
+
+
+
+\section{Methodology}
+% Explain your approach ‐ did you use the author’s code, or did you aim to re‐implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+We re‐implement the proposed experiments from the description in \cite{chen2021intriguing}. In particular, the original paper's repository\textsuperscript{\ref{original_repo}} does not provide any code for the experiments that we reproduce.  We use Python3 for the implementation with PyTorch \cite{NEURIPS2019_9015} as the deep learning library, and OpenCV \cite{opencv_library} for image manipulation. We use the pre-trained SimCLRv2 models of the authors by converting the Tensorflow checkpoints into PyTorch ones by using two repositories \footnote{https://github.com/tonylins/simclr-converter\label{checkpoints:1}} \footnote{https://github.com/Separius/SimCLRv2-Pytorch\label{checkpoints:2}} linked in the original repository\footnote{https://github.com/google-research/simclr/tree/master/colabs/intriguing\_properties\label{original_repo}}. In particular, the provided checkpoints are of three types: for SimCLR, for SimCLRv2, and for supervised ResNet-50 2X. We decided to present the results with the latest version, i.e. SimCLRv2. However, we implemented both versions.
+
+The additional clustering algorithms tested in experiment 3 are Ward hierarchical clustering and Bisecting K-Means.
+
+    \subsection{Model descriptions}
+    % Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it’s pretrained).
+    SimCLR is a simple framework
+    for contrastive learning of visual representations introduced by Chen et al. \cite{simclr} that considerably outperformed previous
+    methods for self-supervised and semi-supervised
+    learning on ImageNet. It consists of four major components: \textit{(i)} a stochastic data augmentation module that transforms
+    any given data example randomly resulting in two correlated views of the same example, \textit{(ii)} a neural network base encoder 
+    that extracts representation vectors from augmented data examples (a ResNet \cite{he2016deep} is used in the original paper), \textit{(iii)} a small neural network projection head 
+    that maps
+    representations to the space where contrastive loss is
+    applied, \textit{(iv)} a contrastive loss function defined for a contrastive prediction task.
+
+    We use SimCLRv2 \cite{chen2020big}, which is an improved version of SimCLR \cite{simclr} that uses larger ResNet \cite{he2016deep} models and selective kernels \cite{li2019selective}.
+    In Experiment 1 we use ResNet-18 as the base encoder instead of ResNet-50 due to computational and time constraints, and a logistic regression classifier to perform the linear evaluation. For Experiments 2, 3, and 4 we set up a pre-trained ResNet-50 2X model on ImageNet with its checkpoints provided by the author's repository\textsuperscript{\ref{original_repo}}.
+
+    \subsection{Datasets}
+    % For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+    %Chen et al. \cite{chen2021intriguing} used CIFAR-10 and ImageNet to train their model. 
+    To reproduce Experiment 3.2 we do not need a dataset to train SimCLRv2 on since the pre-trained models on ImageNet are available. We use some input images of Imagenette\footnote{https://github.com/fastai/imagenette}, which is a subset of 10 ImageNet classes. In particular, we use ten English springer and five truck images. We also use ten images from the Stanford Dogs Dataset by Khosla et al. \cite{KhoslaYaoJayadevaprakashFeiFei_FGVC2011}. The dataset contains images of 120 dog breeds. In particular, two images of five different dog breeds are used. For experiment 1 we use CIFAR-10 \cite{krizhevsky2010cifar}. 
+    
+    Additionally, we reproduce the construction of two out of three datasets of Chen et al. \cite{chen2021intriguing} with explicit and controllable competing features that can be used to reproduce the other experiments of the original work that we did not replicate.
+
+    \subsection{Hyperparameters}
+    % Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best‐found results).
+
+    
+    For experiment 1, we use ResNet-50 2X as the base encoder network, and an $n$-layer MLP projection head ($n=1\dots4$) to project the representation to a 64-dimensional latent space. We use NT-Xent as loss, optimized using LARS optimizer \cite{you2017large} with learning rate equal to 0.3 × BatchSize/256 and weight decay of $10e−6$. We train with batch sizes of 128, 256, and 512 for 100 epochs. The linear classifier is trained for 800 epochs with Adam \cite{kingma2014adam} as optimizer and learning rate of $0.0003$. For the last three experiments, the hyperparameters of KMeans\textsuperscript{\ref{scklearn: K-Means}} are set to their default values, except for \textit{init}="k-means++", \textit{n\_init}=10, \textit{max\_iter}=300, \textit{tol}=$1.0 \cdot e^{-4}$. The hyperparameters of Ward hierarchical clustering and Bisecting K-Means are set to their default values, respectively reported in \textsuperscript{\ref{scklearn:Ward}} and \textsuperscript{\ref{bisecting}}.
+    
+    \subsection{Experimental setup and code}
+    % Include a description of how the experiments were set up that’s clear enough a reader could replicate the setup. Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). Provide a link to your code.
+
+
+    By performing inference on input images with a pre-trained ResNet-50 2X model (SimCLRv2's base encoder network), we extract the l2-normalized features from its intermediate block groups (block groups 2,3,4 of ResNet-50 2X).
+    
+    We then apply K-Means \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html\label{scklearn: K-Means}} with 2, 4, 6, and 8 clusters
+    on the extracted features of SimCLRv2 to paint each pixel of the feature map, which we call cluster assignment mask throughout the report. We use a pre-defined order depending on which cluster each pixel belongs to. However, K-Means is not guaranteed to return the clusters in the same order when applied more than once on the same feature map.
+    
+    After that, we upsample the cluster assignment masks to the size of the input image. To upsample the mask, we provide both the bilinear and the nearest neighbors interpolation option, as the authors of \cite{chen2021intriguing} provided in their blog \footnote{https://contrastive-learning.github.io/intriguing/\label{SimCLR_Properties:blog}}. We use bilinear interpolation in the main text and defer other methods in Appendix \ref{appendix:nni}. We then overlay the upsampled cluster assignment mask with a gray-scale version of the input image, with the help of \textit{addWeighted}\footnote{https://docs.opencv.org/3.4/d2/de8/group\_\_core\_\_array.html\#gafafb2513349db3bcff51f54ee5592a19\label{opencv:addWeighted}} function from \textit{opencv}.
+
+    We repeat the same steps for the features extracted from the supervised learning setting (i.e. from a pre-trained supervised Resnet-50 2X network).
+
+    Following Chen et al. \cite{chen2021intriguing}, we also apply K-Means clustering on the raw pixels of input images.
+    To this end, we downsample the input image to 14x14 pixels, the size of the feature maps extracted from Block Group 4 of the ResNet-50 2X. We then apply K-Means.
+    After that, we upsample the image containing the clustered pixels and overlay it with the original image as we did with the extracted feature maps of SimCLRv2.
+        
+    The reason for applying K-Means clustering also on the raw pixels of input images is to visually compare the cluster assignment masks of raw images against the ones obtained by SimCLRv2's learned features to evaluate if the second ones show the learning of meaningful features. 
+    
+    For the linear evaluation experiment, we first train SimCLRv2's base encoder for 100 epochs on CIFAR-10 without using labels. 
+    Secondly, we perform inference on CIFAR-10 with the pre-trained SimCLRv2 model and save the output representations.
+    The projection head is removed before computing the output representations. 
+    Then, using CIFAR-10 training labels as targets, a logistic regression model is trained with the cross entropy loss function using SimCLRv2's output representations as input.
+    
+    
+    
+    
+    
+    \subsection{Computational requirements}
+    % Include a description of the hardware used, such as the GPU or CPU the experiments were run on. For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size). For each experiment, include the total computational requirements (e.g. the total GPU hours spent). (Note: you’ll likely have to record this as you run your experiments, so it’s better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper — list what they would find useful.
+    For training SimCLRv2 and extracting features from it when performing inference we used NVIDIA GPU T4 x 2 provided by Kaggle Notebooks. On average, performing the linear evaluation of SimCLRv2, given a batch size and a number of layers in the projection head, took 2 hours and 34 minutes.  
+    
+    All the computations needed to visualize the features learned by SimCLRv2 (features and images manipulations, clustering, etc.) were executed by the \nth{4} Generation Intel Core i7-4810MQ CPU with 4 cores and a base frequency of 2.80 GHz. On average, visualizing the features learned on a single input image took 32 seconds, while it took 10 minutes and 8 seconds to visualize the features learned on a batch of input images.
+    
+
+\section{Results and Discussion}
+%Start with a high‐level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next ”Discussion” section.
+
+Our results support all the claims of Section \ref{section:scope_of_reproducibility}.
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section 2 it supports, and 2) if it successfully reproduced the associated experiment in the original paper. For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline. Logically group related results into sections.
+This section discusses the two experiments that test claims \textit{(i)} and \textit{(ii)} of Section \ref{section:scope_of_reproducibility}, respectively.
+
+    \subsubsection{Experiment 1: Linear Evaluation of SimCLR}
+    \label{exp_1}
+
+    Experiment 1 tests claim \textit{(i)} of Section \ref{section:scope_of_reproducibility}.
+    We reproduce the original experiment on CIFAR-10 instead of ImageNet. We also use ResNet-18 instead of ResNet-50 as the base encoder and use smaller batch sizes compared to the original ones (512, 1024, 2048) due to limited computational resources.
+    Table \ref{table:lin_eval} shows the results.
+    
+    
+    
+
+
+\begin{table}[H]
+\centering
+\scalebox{0.60}{
+\begin{tabular}{cc|c}
+Projection head           & Batch size            & Epoch \\
+\multicolumn{1}{l}{}      & \multicolumn{1}{l|}{} & 100   \\ \hline
+\multirow{3}{*}{2 layers} & 128                   & 51.17 \\
+& 256                   & 52.86 \\
+                          & 512                   & 53.22 \\ \hline
+\multirow{3}{*}{3 layers}& 128                   & 51.26 \\
+& 256                   & 52.47 \\
+                          & 512                   & 53.11 \\ \hline
+\multirow{3}{*}{4 layers} & 128                   & 51.69 \\
+& 256                   & 52.44 \\
+                          & 512                   & 52.25 \\ \hline
+\end{tabular}}
+\caption{Linear eval accuracy of ResNet-18 on CIFAR-10.}
+\label{table:lin_eval}
+\end{table}
+
+The linear evaluation top-1 accuracy results obtained with different batch sizes differ in a range between 0.19\% and 2.05\%, while the differences in the original paper differ in a range between 0.20\% and 0.80\%. Although the range of our differences is broader, we believe that claim \textit{(i)} is verified for two reasons. First, the extended range could be due to differences in the choice of the dataset, batch sizes, and base encoder. Secondly, the range of differences substantially increases when the projection head is not deep (i.e. 1 layer), as shown in Table \ref{table:lin_eval_1_layer}.
+     
+
+
+
+\begin{table}[H]
+\centering
+\scalebox{0.60}{
+\begin{tabular}{cc|c}
+Projection head           & Batch size            & Epoch \\
+\multicolumn{1}{l}{}      & \multicolumn{1}{l|}{} & 100   \\ \hline
+\multirow{3}{*}{1 layer} & 128                   & 50.38 \\
+& 256                   & 51.94 \\
+                          & 512                   & 53.82 \\\hline 
+\end{tabular}}
+\caption{Linear eval accuracy of ResNet-18 on CIFAR-10 with a non deep projection head.}
+\label{table:lin_eval_1_layer}
+\end{table}
+
+
+    
+    \subsubsection{Experiment 2: Reproducing experiment 3.2 of Chen et al. \cite{chen2021intriguing}}
+    \label{subsec:exp_1}
+        The second experiment evaluates claim \textit{(ii)} of Section \ref{section:scope_of_reproducibility}, i.e. it evaluates the ability of SimCLR to learn meaningful local features.
+        Some examples of cluster assignment masks of SimCLRv2 and of the supervised learning setting are respectively shown in the first and last two rows of Figure \ref{fig:exp3.2_ours_bi}.
+    
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.50\textwidth]{pdfs/exp_1/sup/sup_vs_simclrv2.pdf}
+            \caption{Visualizing features on an image with K-means clustering. Each row denotes a type of local feature. The first two are extracted from SimCLRv2, and the last two from a ResNet-50 2X trained with a supervised setting. Each column denotes the number of clusters.}
+            \label{fig:exp3.2_ours_bi}
+        \end{figure}
+
+        
+        Following Chen et al. \cite{chen2021intriguing}, we also apply K-Means clustering on the raw pixels of an image. The results of an input image can be seen in Figure \ref{fig:exp3.2_ours_raw_pixels_bi}.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.60\textwidth]{pdfs/exp_1/exp_1_raw_pixels_bi.pdf}
+            \caption{Visualizing clustered pixels on an image with K-means clustering. Each column denotes the number of clusters.}
+            \label{fig:exp3.2_ours_raw_pixels_bi}
+        \end{figure}
+        
+        Figure \ref{fig:exp3.2_ours_bi} shows that as the number of clusters increases, the learned representations tend to group image regions based on parts of the object (i.e. facial components of the dog). This phenomenon appears in both SimCLRv2 and supervised learned features, but not with raw pixel features (Figure \ref{fig:exp3.2_ours_raw_pixels_bi}), confirming the claim of Chen et al. \cite{chen2021intriguing}. However, the colors of our cluster assignment masks (Figure \ref{fig:exp3.2_ours_bi}) do not fit the dog's facial components as the ones illustrated in the original paper (Figure \ref{fig:orig_paper}), especially in the case of 8 clusters.
+
+        
+    
+\subsection{Results beyond original paper}
+% Often papers don’t include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won’t be necessary for all reproductions.
+This section discusses the two experiments that test claims \textit{(iii)} and \textit{(iv)} of Section \ref{section:scope_of_reproducibility}, respectively.
+
+    \subsubsection{Experiment 3: Using different clustering methods}
+    \label{subsec:exp_2}
+    
+        Experiment 3 tests claim \textit{(iii)} of Section \ref{section:scope_of_reproducibility}. Namely, its aim is to ensure that the learning of local features is also achieved with other clustering methods, not only with K-Means.
+        
+        We apply two other clustering methods: Ward hierarchical clustering\footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html\label{scklearn:Ward}} 
+        and Bisecting K-Means\footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.BisectingKMeans.html\label{bisecting}}. K-means is a cluster analysis technique that groups observations by trying to cluster samples in $n$ groups of equal variance and uses a predetermined number of clusters. On the other hand, Hierarchical clustering is a family of clustering algorithms that creates nested clusters by progressively merging (agglomerative) or splitting (divisive) them \footnote{https://scikit-learn.org/stable/modules/clustering.html\#hierarchical-clustering\label{scklearn:hierarchical_clustering}}.
+        In particular, Ward hierarchical clustering\textsuperscript{\ref{scklearn:Ward}} is an agglomerative hierarchical clustering algorithm, in which every observation initially belongs to a separate cluster, and clusters are gradually combined. Ward hierarchical clustering\textsuperscript{\ref{scklearn:Ward}} minimizes the sum of squared differences within all clusters. Similarly to the K-Means objective, it also minimizes the variance but it uses an agglomerative hierarchical strategy to solve the problem \textsuperscript{\ref{scklearn:hierarchical_clustering}}.
+        
+        Bisecting K-Means \textsuperscript{\ref{bisecting}} is an iterative version of KMeans that use divisive hierarchical clustering. Centroids are selected progressively depending on prior clustering rather than all at once. Until the desired number of clusters is obtained, a cluster is repeatedly divided into two new clusters \footnote{https://scikit-learn.org/stable/modules/clustering.html\#bisecting-k-means}.
+
+        
+        As in the previous experiment, we apply the two additional clustering algorithms to the extracted features of SimCLRv2. The cluster assignment masks of the three methods can be seen in Figure \ref{fig:exp3.2_all_methods_simclr_v2_bi_block3}.
+        In particular, Figure \ref{fig:exp3.2_all_methods_simclr_v2_bi_block3} shows the cluster assignment masks of a feature extracted from block group 3 of SimCLRv2. The cluster assignment masks corresponding to the features of the other block groups can be seen in Appendix \ref{appendix:exp2}. In Figure \ref{fig:exp3.2_all_methods_simclr_v2_bi_block3} we can notice, in general, that the cluster assignment masks seem consistent across the three clustering methods. However, in some cases, Ward hierarchical clustering seems to give a visually more distinguishable clustering assignment mask than the other two methods. For example, with 6 clusters (third column), Ward hierarchical clustering clusters the dog's eyes in a more fine-grained way.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.65\textwidth]{pdfs/exp_2/exp1_simclrv2_all_methods_bi.pdf}
+            \caption{Visualizing features on an image with different clustering methods. The features are  extracted from block group 3 of SimCLRv2. Each row denotes a clustering method, and each column denotes the number of clusters.}
+            \label{fig:exp3.2_all_methods_simclr_v2_bi_block3}
+        \end{figure}
+        We continue using K-Means in the last experiment for two reasons. First, because the result of clustering is almost visually identical among the three clustering methods. Secondly, to be consistent with Chen et al. \cite{chen2021intriguing}.
+    \subsubsection{Experiment 4: Cross-image clustering}
+        Experiment 4 evaluates claim \textit{(iv)} of Section \ref{section:scope_of_reproducibility}. Particularly, it goes beyond the scope of the claim of Chen et al. \cite{chen2021intriguing} by applying K-Means to the features extracted from batches of  samples instead of single samples. We call the batch version of the cluster assignment mask cross-image cluster assignment masks. This way, the cluster centers are shared among different feature maps. This experiment aims to see if features with the same semantic meaning are shared between different images or not.
+        
+        The result of this experiment on a batch of dog images is shown in Figure \ref{fig:exp_3_kmeans_bi_all_dogs_similar_breed}. The colors are spread among the batch, but not all colors are displayed on each single batch image.
+        In cross-image clustering, some features with the same semantic meaning have the same color. For instance, some of the dogs' faces and the dogs' ears are respectively colored light blue and red.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=1.0\textwidth]{pdfs/exp_3/dog_batch_similar_breed/exp3_kmeans_nni_block_4_cropped.pdf}
+            \caption{Visualizing features extracted from block group 4 of SimCLRv2 on a batch of images with K-means cross-image clustering with 8 clusters using nearest-neighbors interpolation. Each column represents a batch sample.}
+            \label{fig:exp_3_kmeans_bi_all_dogs_similar_breed}
+        \end{figure}
+        
+        
+        We then apply cross-image clustering on a batch of dogs images of different breeds to see if SimCLRv2 is able to learn features with the same semantic meaning but in images that are more diverse than the case of a single dog breed.
+        
+        Figure \ref{fig:exp_3_kmeans_bi_dog_faces} shows the results of cross-image clustering on a batch of images of dog faces of different breeds. SimCLRv2 seems to have learned the eyes and noses of a dog as features. This can be seen in the case with two clusters (first row, except for the second image).
+        In the last row, the last two husky images have eyes colored blue, while most of the other dog images on the same row have eyes colored violet. This could be possibly due to the different real colors of the eyes of these husky dogs (blue) compared to the other dogs (brown or black). This difference can be seen in Figure \ref{fig:exp_3_raw_images_dog_faces}.
+        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=1.0\textwidth]{pdfs/exp_3/dog_faces/exp3_kmeans_bi_block_4_cropped.pdf}
+            \caption{Visualizing features extracted from block group 4 of SimCLRv2 on a batch of images with K-means cross-image clustering. Each row denotes the number of K-means clusters, and each column represents a batch sample.}
+            \label{fig:exp_3_kmeans_bi_dog_faces}
+        \end{figure}        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=1.0\textwidth]{pdfs/exp_3/dog_faces/exp3_raw_images-cropped.pdf}
+            \caption{Batch of dog faces.}
+            \label{fig:exp_3_raw_images_dog_faces}
+        \end{figure}
+
+        We intentionally took input images where  dogs show off their tongue. We can see that block group 4 of SimCLRv2 does not seem to have learned tongue as a feature (Figure \ref{fig:exp_3_kmeans_bi_dog_faces}). 
+        However, the tongue is a feature identified by SimCLRv2 in block group 3 (Figure \ref{fig:exp_3_block_3_dog_faces}). In particular, this cross-image cluster assignment mask contains more semantic features compared to block group 4. The cross-image cluster assignment masks of block group 3 seem also to be more consistent between images. For instance, the dogs' eyes have all the same color.  
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=1.0\textwidth]{pdfs/exp_3/dog_faces/exp3_kmeans_bi_block_3_tongue_diff-cropped.pdf}
+            \caption{Visualizing features extracted from block group 3 of SimCLRv2 on a batch of images with K-means cross-image clustering with 8 clusters.}
+            \label{fig:exp_3_block_3_dog_faces}
+        \end{figure}
+        We then apply cross-image clustering on a batch containing two different classes: dogs and trucks.
+        Figure \ref{fig:exp_3_kmeans_bi_dog_trucks} shows the cross-image cluster assignment masks of block group 4. Looking at the last row (8 clusters), green pixels characterize the dogs' noses, violet pixels characterize the dogs' eyes, and blue pixels characterize the interiors of the trucks' cabs. However, yellow pixels characterize both dogs' bodies and truck cabs. One possible explanation could be that the dogs' fur color and the trucks' cabs have similar colors (black and white), but it is difficult to determine.
+        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=1.0\textwidth]{pdfs/exp_3/dog_trucks/exp3_kmeans_bi_block_4_cropped.pdf}
+            \caption{Visualizing features extracted from block group 4 of SimCLRv2 on a batch of images with K-means cross-image clustering. Each row denotes the number of K-means clusters, and each column represents a batch sample.}
+            \label{fig:exp_3_kmeans_bi_dog_trucks}
+        \end{figure}
+        Features with the same semantic meaning were recognized as similar when having \textit{(i)} different images of the one single dog breed, \textit{(ii)} different images of different dog breeds \textit{(iii)} images of two different classes (dogs and trucks).
+        Therefore, we claim that SimCLRv2 learns features with the same semantic meaning among multiple images.
+        
+    
+
+\section{Conclusion}
+% Give your judgement on if your experimental results support the claims of the paper. 
+%Discuss the strengths and weaknesses of your approach ‐ perhaps you didn’t have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+The purpose of this paper was to reproduce experiment 3.2 of \cite{chen2021intriguing} and provide additional insights about one of the properties claimed in \cite{chen2021intriguing}. We verified the claim of the original paper that states that hierarchical local features can be learned even though contrastive learning operates on global instance-level features. Due to time constraints and a lack of sufficient computation resources, this paper only reproduced the property of SimCLR learning local features despite operating on global image representation.
+
+Next, we showed that the learning of local features does not depend on K‐Means, but is also obtained
+with other clustering algorithms. 
+
+By applying cross-image clustering, we claim that SimCLRv2 learns features with the same semantic meaning among multiple images.
+
+
+
+
+\subsection{What was easy}
+    The original paper is well-written, which facilitated the implementation. Moreover, the checkpoints are available, making inference straightforward to perform. After implementing the code, it was not difficult to test the last three claims because we just had to input images into a trained network and visually inspect the cluster assignment masks.
+\subsection{What was difficult}
+%Challenges you faced when reimplmenting the paper and conducting the experiments. Were all details in the paper? Or did you have to look in the authors code or contact authors to find about some details (you are encouraged to contact the authors)? Was parts of the code quite hard to get them to work as intended? Did you have optimize and tune several hyperparameters? Which ones? Did the framework you used  make the implementation difficult in some ways?
+    At first, we had issues finding a way to use TensorFlow checkpoints in PyTorch for the last three experiments. We also did not find information about which version was used in \cite{chen2021intriguing}, if SimCLR \cite{simclr} or SimCLRv2 \cite{chen2020big}.
+
+    While conducting Experiment 1, we were not sure if the number of epochs reported in Table 2 of \cite{chen2021intriguing} referred to the number of epochs that SimCLR or the linear classifier was trained for. In the first experiment, we also had to train with a smaller architecture and for fewer epochs due to  our limited computational resources.
+    
+    Lastly, we did not find how the authors upsampled the cluster assignment masks to the size of input images when reproducing Experiment 3.2 of \cite{chen2021intriguing}, neither in the paper nor in the code. We assumed they used bilinear interpolation. 
+    
+    
+    
+\subsection{Communication with original authors}
+We contacted the authors twice by email. 
+First, we asked if they used SimCLRv1 \cite{simclr} or SimCLRv2 \cite{chen2020big}, and the first one was used.
+Nonetheless, we present the results of SimCLRv2 to show that it also satisfies the proposed claims. However, we tested all the claims and provide code for both versions.
+
+Secondly, we asked if the number of epochs reported in Table 2 in the original paper referred to the number of epochs used to train SimCLR or the linear classifier. The authors replied that it refers to the number of epochs to train SimCLR.
+
+Thirdly, we were unsure of our interpretation of the claim of the linear evaluation accuracy experiment of the original paper. 
+From what we understood, with a fixed number of layers in the projection head, the top-1 accuracy is similar when having different batch sizes.
+The authors confirmed it and added that that is true especially when the projection head is deep.
+
+Lastly, we asked from which network the “supervised learned features” were extracted in experiment 3.2 of \cite{chen2021intriguing}. It was ResNet-50 2X, which was the same architecture used for the self-supervised case.
+
+
+
+
+
+
