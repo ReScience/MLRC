@@ -1,0 +1,28 @@
+\section*{\centering Reproducibility Summary}
+\subsubsection*{Scope of Reproducibility}
+We examine the reproducibility of compositional generalization results from the task of semantic parsing. We aim to reproduce results from \cite{shaw-etal-2021-compositional}, \cite{kim2021sequencetosequence}, and \cite{kim-linzen-2020-cogs} and seek to verify the claims that 1. A model shouldn't be expected to perform well on non-synthetic datasets just because it performs well on SCAN \cite{shaw-etal-2021-compositional}, 
+2. The approaches from \cite{shaw-etal-2021-compositional} and \cite{kim2021sequencetosequence} meet or exceed baseline performance on compositional generalization tests, and 
+3. NQG-T5 \cite{shaw-etal-2021-compositional} outperforms baselines on both synthetic and natural data.
+4. NQG \cite{shaw-etal-2021-compositional} performs well on the instances that it is able to generate a prediction, but it faces the barrier of not being able to generate predictions for all instances.
+
+\subsubsection*{Methodology}
+
+We reuse the authors' code along with additional code to run extra experiments, and we re-implement scripts whose support is deprecated. Eight 32GB GPUs were used for experiments, with a detailed description in Section~\ref{sec:comp-requirements}. 
+
+\subsubsection*{Results}
+
+Claim 1 is verified: the model with the highest performance on SCAN does not maintain its high performance on other datasets (Section \ref{sec:res:perf}). Claims 2 and 3 are verified, with a comparison of performance between NQG-T5 and the selected baseline models in \cite{shaw-etal-2021-compositional} and \cite{kim2021sequencetosequence}. Claim 4 is also verified by computing the coverage and precision of NQG in Section~\ref{sec:coverage}.
+Overall, accuracy for most experiments reaches within 2\% of that reported in the original paper, with a deviation that our T5 achieves higher performance on some splits and slightly lower performance on one split than reported previously.
+
+\subsubsection*{What was easy}
+All papers provide clearly-written code and informative documentation, as well as lists of hyperparameters that are used for experiments.
+The papers also describe their approaches clearly, making the experimental workflow easy to follow.
+
+\subsubsection*{What was difficult}
+
+The exact match evaluation metric is formulated somewhat differently across all three papers, leading to non-negligible value differences, as discussed in Section \ref{sec:em-amb}.
+We also had to re-implement some training scripts because an original dependency is no longer supported.
+Moreover, some experiments are computationally expensive: \cite{shaw-etal-2021-compositional} used TPUs for experiments, while our replication with GPUs takes several days to train a single T5 model.
+
+\subsubsection*{Communication with original authors}
+The authors of all three papers provided us with useful instruction to work with their methods and constructive feedback on the draft.

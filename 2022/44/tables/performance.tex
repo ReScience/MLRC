@@ -1,0 +1,311 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \begin{table}[]
+% \scriptsize
+% \centering
+% \begin{tabular}{|ll|ll|ll|ll|ll|ll|}
+% \toprule
+% \multicolumn{2}{|c|}{Model} &
+%   \multicolumn{2}{c|}{\textbf{LSTM-Uni}} &
+%   \multicolumn{2}{c|}{\textbf{LSTM-Bi}} &
+%   \multicolumn{2}{c|}{\textbf{T5}} &
+%   \multicolumn{2}{c|}{\textbf{NQG}} &
+%   \multicolumn{2}{c|}{\textbf{Neural-QCFG}} \\
+% \textbf{Dataset} &
+%   \textbf{Split} &
+%   EM &
+%   Orig-EM &
+%   EM &
+%   Orig-EM &
+%   EM &
+%   Orig-EM &
+%   EM &
+%   Orig-EM &
+%   EM &
+%   Orig-EM \\
+%   \midrule
+% \multirow{2}{*}{COGS}     & Test                & 99 & 0  &  &   &      & -    &      & -    &      & -    \\
+%                           & Gen                 & 32 & 32 &  &   &      & -    &      & -    &      & -    \\
+% \midrule
+% \multirow{4}{*}{SCAN}     & Rand.              &    & -  &  & - & 77.8 &      & 100  &      & 95.2 & 96.9 \\
+%                           & Length              &    & -  &  & - &      &      & 100  &      & 91.6 &      \\
+%                           & AddPrimitive (Jump) &    & -  &  & - & 81.5 &      & 100  &      & 94.3 &      \\
+%                           & MCD                 &    & -  &  & - &      &      &      &      &      &      \\
+% \midrule
+% \multirow{4}{*}{GEOQUERY} & Stan.            &    & -  &  & - & 92.1 &      & 81.8 & 76.3 &      & -    \\
+%                           & Length              &    & -  &  & - & 45.5 &      & 36.1 & 37.4 &      & -    \\
+%                           & Temp.            &    & -  &  & - & 91.1 &      & 80.9 & 61.9 &      & -    \\
+%                           & TMCD                &    & -  &  & - & 52.3 &      & 39.1 & 41.1 &      & -    \\
+% \midrule
+% \multirow{4}{*}{SPIDER}   & Stan.            &    & -  &  & - & 75.3 & 76.5 & 0    & 1.3  &      & -    \\
+%                           & Length              &    & -  &  & - & 70.9 & 42.5 & 0    & 0    &      & -    \\
+%                           & Temp.            &    & -  &  & - & 44.5 & 45.3 & 0    & 0.5  &      & -    \\
+%                           & TMCD                &    & -  &  & - & 74.8 & 42.3 & 0    & 0.5  &      & -    \\
+% \bottomrule
+% \end{tabular}
+% \caption{Model performance on each dataset, evaluated by exact-match accuracy. Orig-EM represents the EM values reported by the original paper. \kaiser{Any formatting tip for this table?}}
+% \label{tab:performance}
+% \end{table}
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[]
+\scriptsize
+\centering
+\begin{tabular}{llrlrlrrrrrrll}
+\toprule
+\multicolumn{2}{c}{\textbf{Model}} &
+  \multicolumn{2}{c}{\textbf{LSTM-Uni}} &
+  \multicolumn{2}{c}{\textbf{LSTM-Bi}} &
+  \multicolumn{2}{c}{\textbf{T5}} &
+  \multicolumn{2}{c}{\textbf{NQG}} &
+  \multicolumn{2}{c}{\textbf{NQG-T5}} &
+  \multicolumn{2}{c}{\textbf{Neural-QCFG}} \\
+\textbf{Dataset} &
+  \textbf{Split} &
+  \multicolumn{1}{l}{\textbf{EM}} &
+  \textbf{Orig} &
+  \multicolumn{1}{l}{\textbf{EM}} &
+  \textbf{Orig} &
+  \multicolumn{1}{l}{\textbf{EM}} &
+  \multicolumn{1}{l}{\textbf{Orig}} &
+  \multicolumn{1}{l}{\textbf{EM}} &
+  \multicolumn{1}{l}{\textbf{Orig}} &
+  \multicolumn{1}{l}{\textbf{EM}} &
+  \multicolumn{1}{l}{\textbf{Orig}} &
+  \textbf{EM} &
+  \textbf{Orig} \\
+  \midrule
+\multirow{2}{*}{\textbf{COGS}} &
+  Test &
+  99.0 &
+  \multicolumn{1}{r}{0.0} &
+  99.0 &
+  \multicolumn{1}{r}{99.0} &
+  98.7 &
+  \multicolumn{1}{l}{-} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{-} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{-} &
+   &
+  - \\
+ &
+  Gen &
+  32.0 &
+  \multicolumn{1}{r}{32.0} &
+  23.0 &
+  \multicolumn{1}{r}{16.0} &
+  80.7 &
+  \multicolumn{1}{l}{-} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{-} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{-} &
+   &
+  - \\
+  \midrule
+\multirow{6}{*}{\textbf{SCAN}} &
+  Rand. &
+  13.3 &
+  - &
+  14.5 &
+  - &
+  77.8 &
+  \multicolumn{1}{l}{-} &
+  100.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  \multicolumn{1}{r}{96.1} &
+  \multicolumn{1}{r}{96.9} \\
+ &
+  Length &
+  15.3 &
+  - &
+  11.8 &
+  - &
+  13.6 &
+  14.4 &
+  100.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  \multicolumn{1}{r}{91.6} &
+  \multicolumn{1}{r}{95.7} \\
+ &
+  Jump &
+  0.4 &
+  - &
+  0.0 &
+  - &
+  93.5 &
+  99.5 &
+  100.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  \multicolumn{1}{r}{94.3} &
+  \multicolumn{1}{r}{96.8} \\
+ &
+  Turn L. &
+  61.1 &
+  - &
+  34.1 &
+  - &
+  61.9 &
+  62.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  \multicolumn{1}{r}{76.2} &
+  - \\
+ &
+  Temp. &
+  0.2 &
+  - &
+  0.3 &
+   - &
+  37.6 &
+  \multicolumn{1}{l}{-} &
+  0.0 &
+  \multicolumn{1}{l}{-} &
+  0.0 &
+  \multicolumn{1}{l}{-} &
+  \multicolumn{1}{r}{96.9} &
+  \multicolumn{1}{r}{98.7} \\
+ &
+  MCD &
+  7.1 &
+  - &
+  8.6 &
+  - &
+  23.3 &
+  15.4 &
+  100.0 &
+  100.0 &
+  100.0 &
+  100.0 &
+  - &
+  - \\
+  \midrule
+\multirow{4}{*}{\textbf{GEOQ.}} &
+  Stan. &
+  72.8 &
+  - &
+  80.1 &
+  - &
+  92.9 &
+  92.9 &
+  72.5 &
+  76.3 &
+  90.7 &
+  92.9 &
+   &
+  - \\
+ &
+  Length &
+  17.3 &
+  - &
+  15.8 &
+  - &
+  48.0 &
+  39.1 &
+  25.7 &
+  37.4 &
+  46.6 &
+  52.2 &
+   &
+  - \\
+ &
+  Temp. &
+  46.5 &
+  - &
+  55.9 &
+  - &
+  91.3 &
+  87.0 &
+  59.2 &
+  61.9 &
+  85.6 &
+  88.8 &
+   &
+  - \\
+ &
+  TMCD &
+  35.8 &
+  - &
+  37.1 &
+  - &
+  54.1 &
+  54.3 &
+  39.1 &
+  41.1 &
+  50.2 &
+  56.6 &
+   &
+  - \\
+  \midrule
+\multirow{4}{*}{\textbf{SPIDER}} &
+  Rand. &
+  33.6 &
+  - &
+  37.3 &
+  - &
+  77.5 &
+  76.5 &
+  0.0 &
+  1.3 &
+  79.1 &
+  81.8 &
+   &
+  - \\
+ &
+  Length &
+  12.7 &
+  - &
+  14.1 &
+  - &
+  44.3 &
+  42.5 &
+  0.0 &
+  0.0 &
+  44.3 &
+  49.0 &
+   &
+  - \\
+ &
+  Temp. &
+  1.3 &
+  - &
+  2.3 &
+  - &
+  53.2 &
+  45.3 &
+  0.0 &
+  0.5 &
+  53.2 &
+  59.2 &
+   &
+  - \\
+ &
+  TMCD &
+  4.7 &
+  - &
+  6.2 &
+  - &
+  57.0 &
+  42.3 &
+  0.0 &
+  0.5 &
+  57.0 &
+  60.8 &
+   &
+  - \\
+  \bottomrule
+\end{tabular}
+\caption{Model performance on each dataset, evaluated by exact-match accuracy (EM). `Orig' represents the EM values reported by the original paper.}
+\label{tab:performance}
+\end{table}
