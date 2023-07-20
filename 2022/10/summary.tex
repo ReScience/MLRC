@@ -1,0 +1,40 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+CartoonX \cite{cartoonX} is a novel explanation method for image classifiers.
+%It operates in the wavelet domain, contrary to conventional methods, which operate in the pixel domain. 
+In this reproducibility study, we examine the claims of the original authors of CartoonX that it: (i) extracts relevant piece-wise smooth parts of the image, resulting in explanations which are more straightforward to interpret for humans; (ii) achieves lower distortion in the model output, using fewer coefficients than other state-of-the-art methods; (iii) is model-agnostic. Finally, we examine how to reduce the runtime.
+
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+The original authors' open-sourced implementation has been used to examine (i). We implemented the code to examine (ii), as there was no public code available for this. We tested claim (iii) by performing the same experiments with a Vision Transformer instead of a CNN. To reduce the runtime, we extended the existing implementation with multiple enhanced initialization techniques. All experiments took approximately $38.4$ hours on a single NVIDIA Titan RTX. %The open-source repository of this study is publicly available at \url{https://github.com/JonaRuthardt/MLRC-CartoonX}. 
+
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+Our results support the claims made by the original authors. (i) We observe that CartoonX produces piece‐wise smooth explanations. Most of the explanations give valuable insights. (ii) Most experiments, that show how CartoonX achieves lower distortion outputs compared to other methods, have been reproduced. In the cases where exact reproducibility has not been achieved, claim (ii) of the author still holds. (iii) The model-agnosticism claim still holds as the overall quality of the ViT-based explanations almost matches that of the CNN-based explanations. Finally, simple heuristical initializations did not improve the runtime.
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The mathematical background and intuition of CartoonX were clearly explained by the original authors. Moreover, the original author's code was well structured and documented, which made it straightforward to run and extend.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+Some hyperparameter settings and implementation details needed to reproduce the experiments were not clear or transparent from the original paper or code. This made it difficult to implement and reproduce these experiments.
+
+\subsubsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+We have been in brief communication with the original authors. They were able to address most of our points, providing us with some additional clarifications about the exact implementation and hyperparameter settings.
