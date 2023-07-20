@@ -1,0 +1,259 @@
+\section{Introduction}
+The usage of machine learning has increased significantly in recent years. However, fairness in machine learning is only a recent research topic and has not much extended to advanced concepts, such as graphs. Graphs are widely applicable and have great potential in many fields. Hence, it is crucial that fairness is implemented in such algorithms. The paper ‘CrossWalk: Fairness-Enhanced Node Representation Learning’ that will be reproduced and reviewed introduces an extension upon existing graph algorithms that use the concept of random walks to obtain node embeddings \cite{khajehnejad2022crosswalk}. 
+
+Graph representation learning algorithms map a graph to a vector space while preserving its structural information. Some frequently used approaches are based on DeepWalk, a random-walk approach to graph representation learning. Fairness in these graphs can be enhanced by motivating the random walks to take steps that cross group boundaries. The Fairwalk method (Rahman et al.) \cite{rahman2019fairwalk} introduced this concept by increasing the weights of edges between nodes of distinct groups. Khajehnejad et al. take it a step further by additionally increasing the weights of edges that are close to group boundaries, thereby blurring group boundaries and improving fairness while preserving the structure. Originally, CrossWalk is tested only on graphs including no more than three groups. However, in many practical scenarios, graphs with a larger number of distinct groups may be encountered. In order to test CrossWalk's ability to generalize, we will test the performance of its embeddings on influence maximization on synthetic graphs containing more groups. Additionally, to improve CrossWalk's generalization to graphs containing more groups, a new measure of proximity is proposed. The core idea of this proposed measure is that for graphs with a larger number of groups, nodes that lie around several boundaries influence several groups and their edges should be weighted more heavily.
+
+\section{Scope of reproducibility}
+
+\subsection{Original paper}
+To evaluate the effectiveness of CrossWalk, we compare its node embeddings with formerly introduced approaches DeepWalk and FairWalk.  We test the following claim: fairness is enhanced while performance is preserved using node embeddings obtained by CrossWalk as opposed to benchmark methods DeepWalk and FairWalk considering the following metrics:\textit{Influence maximization\label{claim1}(1)},
+\textit{Node classification\label{claim2}(2) and }\textit{Link prediction \label{claim3}(3)}
+\subsection{Extension}
+To extend the existing research we explore the application of CrossWalk on graphs that are made up of more groups and consider a tuned version of the measure of proximity. To do so we introduce the following hypotheses:
+\begin{itemize}
+    \item \parbox{11cm}{The superiority of CrossWalk, compared to FairWalk and DeepWalk,  is maintained on graphs containing a larger number of groups.} {\makebox[1cm]{\hfill} \label{claim4}(4)}
+    \item \parbox{11cm}{We propose a novel approach for fairness-enhanced node learning MoonWalk improving upon the existing CrossWalk method.} {\makebox[1cm]{\hfill} \label{claim5}(5)}
+\end{itemize}
+\section{Methodology}
+\subsection{Embedding Methods}
+\subsubsection{Node2Vec}
+Node2Vec \cite{node2vec} is an algorithm that creates latent embeddings for a given graph. It will return an embedding $v \in \mathbb{R}^d$ for every node, with the objective of maintaining the internal structure of the original graph.\\
+First, Node2Vec initiates random walks, by stepping stochastically through the graph. When considering a weighted graph, this happens according to the edge weights. Another way of guiding the random walk is by introducing a search bias $\alpha$. Suppose the random walk just stepped from node $t$ to node $v$, then the transition probability from $v$ to $x$, becomes $\pi_{vx} = \alpha(t, x) w_{vx}$, with $\alpha$ defined as follows:
+\begin{equation}
+\alpha(t,x)=
+    \begin{cases}
+      \frac{1}{q} & \text{if $d_{tx} = 0$}\\
+      1 & \text{if $d_{tx} = 1$}\\
+      \frac{1}{q} & \text{if $d_{tx} = 2$}
+    \end{cases} 
+    \label{eq:node2vec}
+\end{equation}
+Here, $d_{tx}$ represents the shortest path distance between node $t$ and node $x$. Intuitively, $p$ gives a measure for how likely the random walk will return to the previous node (Breadt First Search, BFS), whereas $q$ represents to what extent the random walk will explore nodes far away from the root node (Depth First Search, DFS)\cite{node2vec}.\\
+With the sequences of nodes, produced by the random walks, a Skip-Gram \cite{skipgram} model is trained. Here, the nodes are interpreted as words and the walks are interpreted as sentences. The Skip-Gram model will output the embeddings for each node.
+
+\subsubsection{DeepWalk}
+Deepwalk is a special case of the Node2Vec algorithm. More specifically, parameters $p, q$ are set to $1$, such that $\alpha = 1$. In this case, the chances of a transition in the random walk are purely decided on the edge weights. \\
+For simplicity, we (and the original paper) mainly use DeepWalk for creating embeddings in the experiments shown.
+
+\subsection{Re-weigthing algorithms}
+The fairness of graph embeddings can be enhanced by modifying the existing weights. This will guide the random walks differently through the graph, and will therefore create different embeddings. The key idea is that edges that are closer to the group boundary are up-weighted, such that the random walks will cross groups more often. In this section, we will cover three re-weighting algorithms that attempt to enhance the fairness of the node representations.
+
+\subsubsection{FairWalk}
+FairWalk \cite{ijcai2019p456} was first introduced by Rahman et al. The FairWalk algorithm only re-weights inter-group connections. And does so, such that from a boundary node, each group is equally likely to be visited. This method is viewed as a benchmark method for re-weighing graph edges.
+
+\subsubsection{CrossWalk}
+CrossWalk \cite{khajehnejad2022crosswalk} is claimed to be an improvement upon FairWalk by the authors of the original paper.
+CrossWalk not only reweighs edges in between different groups but changes weights based on the distance to a group boundary. \\
+This distance to the boundary of node $v$, $m(v)$, is measured by the fraction of times $r$ truncated random walks of length $d$, starting from root node $v$, visit a node $u$ for which $l_v \neq l_u$. Where we define $l_w$ to be the group that node $w$ belongs to. Written more precisely as:
+
+\begin{equation}
+    m(v) = \frac{\sum_j^r\sum_{u \in W_v^j, l_u \neq l_v}1}{rd}
+    \label{eq:1}
+\end{equation}
+
+Here we used $W_v^j$ to be the set of nodes visited by the $j_{th}$ random walk from node $v$. When $m(v)$ is obtained for every node $v$ in the graph, CrossWalk adjusts edge weights $w_{uv}$ to $\tilde{w}_{uv}$ as follows:
+
+\begin{equation}
+    \Tilde{w}_{uv} = 
+    \begin{cases}
+    w_{vu}(1-\alpha)\frac{m(u)^p}{\sum_{z\in N_v}w_{vz}m(z)^p}  & \text{if $l_u = l_v$}\\\\
+    w_{vu}\alpha\frac{m(u)^p}{|R_v|\sum_{z\in N_v^c}w_{vz}m(z)^p}  & \text{if $l_v \neq l_u =c$}\\
+    \end{cases}
+    \label{eq:2}
+\end{equation}
+
+Where we define $N_v = \{u \in \mathpzc{N}(v) : l_u = l_v\}$ and $N_v^c = \{u \in \mathpzc{N}(v) : l_v \neq l_u=c\}$, with $\mathpzc{N}(v)$ being the set of neighbouring nodes of $v$. $R_v$ is the set of nodes in the neighbourhood of $v$, that belong to a different class: $R_v = \{u \in \mathpzc{N}(v): l_v \neq l_u\}$. Here parameter $\alpha$ will influence the chance of crossing a group boundary in the random walk, while $p$ parametrizes the importance of the distance to the boundary.
+
+
+\subsubsection{MoonWalk}
+
+In this paper, we propose MoonWalk, an extended version of CrossWalk. The difference with respect to CrossWalk is embedded in the calculation of the distance to the group boundary $m(v)$. Originally, this is measured by counting the number of times a random walk visits a node in another group (See \eqref{eq:1}). However, we propose an alternative measure $\mu_P(v)$, that also captures the number of different groups a random walk falls upon.\\
+
+Let $M^c(W_v)$ be the number of times a random walk $W_v$ visits a node in group $c$, excluding the class of node $v$. More formally this becomes:
+
+\begin{equation}
+    M^c(W_v) = |\{u \in W_v : l_v \neq l_u = c\}|
+\end{equation}
+
+Now, for every iterated random walk we measure the following quantity:
+
+\begin{equation}
+    \xi_P(W_v) = \frac{(\sum_c M^c(W_v))^2}{\sqrt[\leftroot{-3}\uproot{3}P]{\sum_c M^c(W_v)^P} }
+\end{equation}
+
+Where $P$, a parameter that occurs in the denominator, as the P-norm of $M(W_v)$.\\
+The expression for $\mu_P(v)$ will then be written as:
+
+\begin{equation}
+    \mu_P(v) = \frac{1}{rd}\sum_j^r \xi_P(W^j_v)
+\end{equation}
+
+With again $r$, the number of random walks, and $d$, length of each walk. The weights would then be updated according to \eqref{eq:2}, with $m(v)$ replaced by $\mu_P(v)$. Note that for $p=1$ MoonWalk reduces to Crosswalk: $\mu_1(v) = m_(v)$. Also, if the graph consists of 2 groups only, MoonWalk will be equivalent to CrossWalk:$\mu_P(v) = m_(v)  \quad \forall P$.\\
+
+When considering 3 groups or more, MoonWalk will up-weight edges to nodes that are closer to multiple boundaries. CrossWalk, on the other hand, will not distinguish between one boundary or multiple boundaries.\\\\
+Notice that, as opposed to $m(u)$, $\mu_P(u)$ is not necessarily bounded from above by $1$. One might expect that this is problematic since we raise this value to a power $p$. We argue however, that the result will be equivalent with the use of a $\mu^{'}_P(u)=\frac{1}{C}\mu_P(u) \leq 1 \quad \forall u$,  since any normalization factor $\frac{1}{C}$ would be factored out by the denominator of equation \eqref{eq:2}. This argument also shows the redundancy of the denominator $rd$ in equation \eqref{eq:1}.
+
+
+\begin{figure}[H]
+  \begin{minipage}[c]{0.6\textwidth}
+    \includegraphics[width=.7\textwidth]{graph_walks.png}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.4\textwidth}
+    \caption{
+In this figure a graph with 3 groups (red, green, blue) is shown. $W_1$ and $W_2$ depict two different random walks of length 4. Both $W_1$ and $W_2$ visit 4 nodes that belong to other groups. However, for $p>1$: $\xi_P(W_1)\neq\xi_p(W_1)$. For example: $\xi_2(W_2)=\frac{4^2}{\sqrt{4^2}} = 4$ and $\xi_2(W_1)=\frac{4^2}{\sqrt{1^2+3^2}} = \frac{16}{\sqrt{10}} > 4$. CrossWalk, would weigh these walks equally well.
+    } \label{fig:03-03}
+  \end{minipage}
+\end{figure}
+
+
+
+
+\subsection{Metrics}
+
+The node representations, created by the methods described above, are evaluated on three different metrics. The fairness is measured by the disparity between the given groups and is defined below.
+ 
+
+\subsubsection{Influence Maximization} Starting at a certain node in the graph, the influence of that node could be measured as the infected individuals through an Independent Cascade model \cite{ICmodel}. In order to get a measure that represents the influence of the whole graph well, the most influential nodes, are used as starting node(s). The algorithm used for for finding these points is $k$-medoids which randomly initiates k medoids and iteratively assigns nodes to clusters and updates the medoids accordingly. These most influential nodes serve as seeds for the IC model to obtain the number of infected individuals. In this setting, influence is measured as the percentage of foreign nodes reached \cite{chen2009efficient}.
+
+\subsubsection{Link Prediction} Node embeddings can be used to predict edges in a graph. This can be implemented as a logistic regression model on the edges where the feature vector of a certain edge between nodes $v$ and $u$, with their node embeddings $\vec{v}$ and $\vec{u}$, is formulated as $(\vec{v}-\vec{u})^{\circ2}$, denoting the Hadamard power with $\circ$. Performance of this task is measured as the accuracy of the model where it is evaluated on positive samples that have been excluded while training, and on an equal amount of generated negative samples.
+
+\subsubsection{Node Classification} Node embeddings can be used to identify their corresponding node through node classification where a model maps from the embedding space to the original space. This can be done semi-supervised with the machine learning algorithm Label Propagation, whose performance is measured by its accuracy. 
+
+\subsubsection{Disparity} The fairness of a task can be measured with the metric disparity. Intuitively, an algorithm is said to be fair when its performance on the different groups of the graph is consistent. Let $A$ be an algorithm and $Q\in \mathbb{R}$ and $Q_i\in \mathbb{R}$ be its overall performance and performance on group $i$ respectively. Then $A$ is said to be fair when $Q_i$ is similar to $Q_j$ for all the groups in the graph. This similarity will be calculated as the variance:\\
+
+\begin{center}
+disparity($A$)$=Var({Q_i}:i\in[C])$
+\end{center}
+
+Decreasing the disparity for different metrics will make the model's decisions less responsive to a sensitive attribute, which can be seen as a form of demographic parity. \cite{Hardt}
+\subsection{Datasets}
+The utilization of the datasets will be briefly outlined below, with further details available in the original Crosswalk paper.
+\subsubsection{Rice-Facebook} The real-world Rice-Facebook dataset \cite{mislove2010you} includes Facebook friendship connections between students of Rice university. This graph is made up of two groups separated by age 
+\subsubsection{Twitter} The real-world Twitter dataset is a subgraph of a large Twitter dataset \cite{Twitter} in which users are connected through tweets. The graph is made up of three groups based on the user's political standpoint. 
+\subsubsection{Synthetic} Besides these real-world datasets, the original paper considers two synthetic datasets characterised by the number of classes $k\in\{2,3\}$
+
+\subsubsection{Additional datasets} 
+Furthermore, we test on synthetic datasets with more than three groups. The motivation for this extension of research is twofold. Firstly, increasing the number of clusters in the synthetic graphs covers a regime of real-life graphs that have not yet been explored in the published research. Real-life graphs are often subdivided into many small clusters rather than a few larger ones. A priori, it is not obvious whether the reported superiority of CrossWalk extends to this regime. No mention of the possible effects of increasing the number of groups is made in the original paper. Importantly, by merely increasing the number of groups we compromise on realism as well since the number of nodes per group decreases. To counter this effect, we accordingly increase the number of nodes with respect to the synthetic graphs used in the original paper.\\
+Besides providing a new testing ground for CrossWalk, graphs with three or more groups allow us to compare it to our proposed MoonWalk. In general, we expect the effect of MoonWalk with respect to CrossWalk to increase when increasing the number of groups.\\
+ As a minor difference with the original approach, we allow for some randomness by drawing the intra- and intergroup probabilities from uniform probability distributions $p^{i}_{INTRA} \sim \mathcal{U}(p_{hom, min}, p_{hom, max})$ and $p^{i,j}_{INTER} \sim \mathcal{U}(p_{het, min}, p_{het, max})$ for all groups ${i}$ and ${j}$.
+
+
+
+\subsection{Hyperparameters}
+\subsubsection{Hyperparameters for Node2Vec/Deepwalk}
+Throughout this research, we have constricted ourselves to use an embedding dimension of size $d = 128$, in correspondence with the original paper.
+Furthermore, we set the values of $p,q$, as defined in equation \eqref{eq:node2vec}, to $p=1, q=1$ such that we work solely with DeepWalk unless specifically mentioned.
+We fix the random walk length for DeepWalk to a value of $40$, and the number of walks to $30$. The window size is set to equal $10$.
+
+\subsubsection{Hyperparamaters for CrossWalk}
+For CrossWalk we have set the random walk length to $d=5$, and the number of walks to $r=500$. The parameters $\alpha$ and $p$ are varied among our experiments and are explicitly mentioned.
+In the comparison to MoonWalk, we increase the random walk length to $d=8$, in order to capture the difference.
+
+\subsubsection{Hyperparameters for MoonWalk}
+MoonWalk has the additional parameter $P$. In this research we have used the following values: $P \in\{1,2,3,4\}$. Where $P=1$ gives an equivalent method to CrossWalk and is therefore useful as a sanity check for interpreting the results. In the results, MoonWalk with $P=3$ is shown.
+
+\subsubsection{Hyperparameters for Influence Maximization}
+Activation probability is set to $0.03$ for synthetic data experiments and $0.01$ for real-world data (Twitter, Facebook).
+We take the number of K-Medoids to be 40.
+
+
+\subsection{Implementation}
+Khajehnejad et al. published an open GitHub page along with their paper including source code and datasets. The GitHub repository can be found at \hyperlink{https://github.com/ ahmadkhajehnejad/CrossWalk}{https://github.com/ ahmadkhajehnejad/CrossWalk}, which includes the following directories: \textbf{\slash data}, \textbf{\slash deepwalk}, \textbf{\slash influence\_maximization}, \textbf{\slash link\_prediction} and \textbf{\slash node\_classification}. Inside the \textbf{\slash data} folder, the authors provided implementations for FairWalk and CrossWalk.\\
+On top of that, a notebook is given, that shows figures of hard-coded data. In this project, we aim to re-calculate all embeddings using the code provided. All results given are based on the average performance on 5 independent runs. The experiments were run on a CPU, taking ~10 minutes at most per setting.
+
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Results reproducing original paper}
+
+\subsubsection{Result 1}
+Figure ~\ref{fig:IMall4} shows the performance of influence maximization on embeddings obtained by DeepWalk, FairWalk, and CrossWalk. The same trend is observed as in the original paper where CrossWalk experiences a larger decrease in disparity while the influence stays consistent, and thereby supports \hyperref[claim1]{statement 1}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{influence_max_plots/IM_ALL4.pdf}
+    \caption{Influence Maximization on datasets used in original paper}
+    \label{fig:IMall4}
+\end{figure}
+
+ Additionally, we apply FairWalk and CrossWalk on Node2Vec, with $p=q=0.5$, on the Rice Facebook data and observe that CrossWalk outperforms FairWalk again as it experiences a larger decrease in disparity, see results in Figure ~\ref{fig:IMnode2vec}
+ \subsubsection{Result 2} 
+The results of Khajehnejad et al. on node classification are reproducible. Showed in Figure ~\ref{fig:IMnode2vec}, CrossWalk outperforms FairWalk using Node2Vec as a baseline as was the case in the original paper and confirms \hyperref[claim2]{statement 2}.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}[H]{0.475\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{node_classification/NC_rice.pdf}
+  \caption{Node classification on the Rice Facebook dataset}
+  \label{fig:IM3grouped}
+\end{minipage}\hfill
+\begin{minipage}[H]{0.475\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{influence_max_plots/IM_rice_node2vec.pdf}
+  \caption{Influence maximization on embeddings obtained by Node2Vec}
+  \label{fig:IMnode2vec}
+\end{minipage}
+\end{figure}
+
+
+
+\subsubsection{Result 3}
+
+The performance of embeddings generated by DeepWalk, FairWalk, and CrossWalk is evaluated on link prediction. From Figure ~\ref{fig:linkpred} can be concluded that we were unable to reproduce the results from Khajehnejad et al. For both datasets, we can't substantiate the claim made by Khajehnejad et al. that CrossWalk outperforms FairWalk as it reduces disparity at the expense of only a slight decrease in accuracy. Hence we are unable to verify \hyperref[claim3]{statement 3}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{link_prediction/reproduced_linkpred_rice_twitter.pdf}
+    \caption{Link prediction on Rice-Facebook and Twitter datasets}
+    \label{fig:linkpred}
+\end{figure}
+
+\subsection{Results beyond original paper}
+ 
+\subsubsection{Additional Result 1}
+Figure ~\ref{fig:6} shows the influence maximization on a 3-grouped, 5-grouped, and  10-grouped synthetic graph. Overall, CrossWalk's superiority is preserved which verifies CrossWalk's ability to generalize as stated in \hyperref[claim4]{statement 4}. The results using a constant group size are shown in sub-figure ~\ref{fig:6c} whereas sub-figure ~\ref{fig:6d} shows results using different group sizes. Notable is that the gap in performance is much higher for FairWalk than it is for CrossWalk. Presumably, this is due to the fact that when group sizes become more equal, a larger fraction of nodes lives on the boundary rather than in the interior of a large group and thus FairWalk is impacted more.
+
+\subsubsection{Additional Result 2}
+Figure ~\ref{fig:6} shows the performance of influence maximization on a 3-grouped, 5-grouped, and 10-grouped synthetic graph for the proposed method MoonWalk using p-norm 3. For all graphs, MoonWalk is able to outperform CrossWalk in decreasing disparity while preserving the total influence. 
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+    \begin{figure}[H]
+  \begin{subfigure}[H]{0.475\textwidth}
+    \includegraphics[width=\linewidth]{MoonWalk/results_3grouped.pdf}
+    \caption{3-grouped graph with a constant group size of 300, 125, 75}
+    \label{fig:6a}
+  \end{subfigure}\hfill
+  \begin{subfigure}[H]{0.475\textwidth}
+    \includegraphics[width=\linewidth]{MoonWalk/results_5grouped.pdf}
+    \caption{5-grouped graph with constant group size of 350 (1x),125 (2x) 75 (2x)}
+    \label{fig:6b}
+  \end{subfigure}\hfill
+  \begin{subfigure}[H]{0.475\textwidth}
+    \includegraphics[width=\linewidth]{MoonWalk/results_10grouped_same.pdf}
+    \caption{10-grouped graph with a constant group size of 150}
+    \label{fig:6c}
+  \end{subfigure}\hfill
+  \begin{subfigure}[H]{0.475\textwidth}
+    \includegraphics[width=\linewidth]{MoonWalk/results_10grouped_diff.pdf}
+    \caption{10-grouped graph with group sizes of 400 (1x), 150 (4x) 100 (5x)}
+    \label{fig:6d}
+  \end{subfigure}
+  \caption{Influence maximization on synthetic graphs containing more groups} 
+  \label{fig:6}
+\end{figure}
+\end{minipage}
+\end{center}
+\section{Discussion}
+We were pleased to reproduce a significant portion of the original paper. Through a rigorous examination of the results, we managed to formally question the original findings. However, the reliability and credibility of these findings remain uncertain, given the stochastic nature of the random walks and Node2Vec algorithms and the lack of specification of random seeds and hyperparameters by the authors. 
+In our belief, investing time in identifying the appropriate hyperparameters could have facilitated the reproduction of, for instance, the link prediction results. Although the hyperparameters were not specified by the authors, a comprehensive grid search could have enabled their retrieval. Unfortunately, time constraints prevented us from pursuing this aspect in this project, and will be addressed in future work. The same issue was encountered in the search for a suitable Twitter dataset. The Twitter dataset as described in the paper differed significantly from the one found in the provided source code. Given the significant discrepancy in the reproducibility results on the Twitter dataset, it is probable that the difference in this dataset was responsible for the varying results.  \\ \\
+Moreover, the implementation of the MoonWalk algorithm produced noteworthy results. As anticipated, MoonWalk demonstrated superior performance when the number of groups increased. Figure ~\ref{fig:7} in the Appendix also presents intriguing results when different values of the P-norm are considered. Further investigation is necessary to confirm the superiority of the MoonWalk with regard to disparity without sacrificing performance. Overall, theoretical concepts were explained comprehensibly which made understanding easy compared to the technical implementation that was deficiently documented. The authors were unable to respond in time for elaborating on certain implementation details. However, we did receive additional data which was crucial to obtaining certain results.
+
+
+% The authors made a substantial effort to clarify the mathematical and technical aspects of their proposed strategy while maintaining a comprehensive perspective. They provided insightful and straightforward explanations of the key concepts and algorithms, making the information accessible to a broad audience of both researchers and practitioners. The clear and concise writing style and well-organized structure of the paper also contributed to its ease of comprehension.\\
+% The source code may not have been designed with the principle of reproducibility in mind. Some portions of the code appear to be partially completed or inadequately implemented. Furthermore, the authors failed to clearly specify crucial hyperparameters, which leads to ambiguity in interpreting some of the results presented. This deficiency presents significant difficulties in making valid conclusions based on the available sources and raises concerns about the validity of the results claimed.
+% \\
+% The authors were unable to respond in time for elaborating on certain implementation
+% details. However, we did receive additional data which was crucial to obtaining certain results.
