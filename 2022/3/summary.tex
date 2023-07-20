@@ -1,0 +1,37 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+In this report, we aim to validate the claims of Bansal et al \cite{bansal2022endtoend}. These are that the recurrent architecture presented, with skip connections and a progressive loss function, prevent the original problem being forgotten or corrupted during processing, allowing for the recurrent module to be applied indefinitely and that this architecture avoids the overthinking trap. We use both code released by the authors and newly developed to recreate many results presented in \cite{bansal2022endtoend}.
+Additionally, we present analysis of the newly introduced alpha hyperparameter and investigate interesting perturbation behaviour of prefix sums models. Further, we conduct a hyperparameter search and provide an analysis of the Asymptotic Alignment scores \cite{anil2022path} of the models presented.
+
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+We use the PyTorch code released by the authors to replicate accuracy experiments. We then, independently, develop our own code using PyTorchFI \cite{PytorchFIMahmoudAggarwalDSML20} to replicate perturbation experiments presented in \cite{bansal2022endtoend}. Overall, providing a replication of all results shown in the main body of \cite{bansal2022endtoend}. We then extend these results, providing an analysis of the alpha hyperparameter, analysis of perturbation recovery, Asymptotic Alignment scores \cite{anil2022path} and a hyperparameter search. We used both a Nvidia RTX 2080Ti GPU and sets of three NVIDIA Quadro RTX6000 GPUs, taking a total of 982.2 GPU hours to create all results presented in the main body of this report.
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+We verify the authors' claims by replicating the experiments presented in \cite{bansal2022endtoend}. All of our experiments show identical results to the ones presented in \cite{bansal2022endtoend}, apart from perturbation testing for which we provide an additional in depth analysis. We also provide an analysis of the new alpha hyperparameter and a hyperparameter search.
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The code provided by Bansal et al gave clear instructions on how to use it, along with pretrained models being available for all problems.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+Chess models required a considerable amount of time to train, putting a drain on resources. Also, code for reproducing perturbation results was not available so this had to developed from scratch.
+
+\subsubsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+We had good communication with the original authors, both emailing and meeting online.

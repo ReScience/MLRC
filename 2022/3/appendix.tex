@@ -1,0 +1,161 @@
+
+\appendix
+\section{Appendix}
+\subsection{Asymptotic Alignment Score}
+
+Bansal et al. looked to find models which are able to extrapolate from small to larger problems. In \cite{anil2022path}, Anil et al. define the notion of path independence for equilibrium models. The models developed by Bansal et al. in \cite{bansal2022endtoend} are a subset of equilibrium models. This allows us to view the problem from another perspective knowing how our models behave in practice, we can relate this to the theory. Calling the process of training on an ``easy'' set of problems and testing on a ``harder'' set of problems upwards generalisation. Anil et al. define path independence of a model to be ``converg[ing] to the same limiting behaviour regardless of the current state.'' 
+We have already seen examples of the path independence property being displayed by the Deep Thinking models, with the models recovering from perturbation, converging to the same solution from the initial start point and after perturbation. Anil et al. propose the Asymptotic Alignment score (AA score) to quantitatively measure path independence, which is detailed in Algorithm \ref{alg:aascore}, where $f_w$ is a network which in the case of the Deep Thinking models is run for many iterations on each input. Overall, an AA score of 1 indicates high path independence and lower values less so, as a score of 1 means that the two solutions found from two different start points converged to the same point.
+
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\begin{algorithm}[h]
+\caption{Asymptotic Alignment score}\label{alg:aascore}
+\begin{algorithmic}
+\Require $X=\begin{bmatrix} x_{1}, x_{2},\hdots,x_{n}\end{bmatrix}$, $f_w$
+\Comment{Each $x_i$ is an input to $f_w$}
+\State Z = $\begin{bmatrix} 0, 0,\hdots,0\end{bmatrix}$ \Comment{The same shape as x}
+\State $Z' \gets f_w(X,Z)$ \Comment{Run the input network on input}
+\text{\hspace{280pt} X(i) starting from Z(i)}
+\State $Z_p \gets $permute \; Z' \;so \;$Z'(i) \neq Z_p(i)$
+\State $Z'' \gets f_w(X,Z_p)$\\
+\Return average(cosDistance($Z'(i),Z''(i)$) 
+\vspace{10pt}
+\Procedure{cosDistance}{$x_1,x_2$}\\
+ \hspace*{\algorithmicindent}\Return $\frac{x_1}{\|x_1\|_2}\cdot \frac{x_2}{\|x_2\|_2}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.75\textwidth]{figures/hyper_analysis_replot/mazes_AA_score_corrected.png}\hfill
+    \\[\smallskipamount]
+    \caption{
+    The AA scores of DT-Recall-Prog models for all three problems with varying alphas}
+    \label{figs:AAscore}
+\end{figure}
+
+Linking back to Section \ref{subsec:newresults} - Alpha Value Analysis, we looked at how the AA score is impacted as the alpha value changes; this can be seen in Figure \ref{figs:AAscore}. Here we see the AA score inferring to an extent the accuracy of the models for the larger extrapolations; a low AA score also indicates low accuracy as if a model does not converge, it will also be inaccurate. The maze models have higher AA scores for lower alpha values for which we expect high accuracy and the chess models have higher AA scores for higher alpha values, for which we also see high accuracy in testing. Interestingly, the AA scores are high for all values of alpha for prefix sums models. This may infer as the problem becomes harder, the choice of alpha parameter is more important to achieving high accuracy; obviously this cannot be verified without extending the networks to solve more problems.
+Overall, we have empirically analysed at the link between the AA score and the accuracy of the models by comparing to the link between alpha value and the models accuracy.
+
+\subsection{Hyperparameter Search}
+\label{sec:hyperparameters}
+As we were using the default hyperparameters given by Bansal et al., we felt it was important to try some variations of these hyperparameters. The authors did note that this is the third iteration of these models to be produced, so many of the hyperparameters have been well tuned over time. For clarity, we include Table \ref{table:hyperparams} detailing the original hyperparameters used by Bansal et al.
+
+Due to the cost of training chess and maze models compared to prefix sums models the majority of our search is done over prefix sums models. For each of the tests only the stated hyperparameters are varied and all others remain the same, meaning we can compare to the plots shown in Section \ref{subsec:resultsrepro} to see the impact. We do not vary the number of epochs as the DT-Recall-Prog models maintain high accuracy once it is achieved, due to their architecture as shown in Section \ref{sec:results}. All prefix sums experiments shown are trained on 32 bit data and tested on 512 bit data. All mazes experiments shown are trained on 9x9 data and tested on 59x59 data. We show a subset of alpha values for each experiment, for prefix sums higher alpha values are used and for mazes lower alpha values are used, as evidence shown suggests these are the most likely alpha values to consistently achieve high accuracy. Each experiment has been repeated multiple times to verify the results shown. 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ & Prefix Sums & Mazes & Chess \\\hline
+ Alpha & 1 & 0.01 & 0.5 \\ \hline
+ Epochs & 150 & 50 & 130 \\\hline
+ Learning Rate & 0.001 & 0.001 & 0.01 \\\hline
+ LR Decay & step & step & step \\\hline
+ LR Factor & 0.1 & 0.1 & 0.1 \\\hline
+ LR Schedule & 60,100 & 100 & 100,115 \\\hline
+ LR Throttle & False & True & False \\\hline
+ Optimiser & Adam & Adam & SGD \\\hline
+ Clip & 1 & N/A & N/A \\\hline
+ Train Batch Size & 100 & 50 & 300 \\\hline
+ Test Batch Size & 500 & 25 & 300 \\\hline
+\end{tabular}
+\caption{The default hyperparameters from \cite{bansal2022endtoend}.}
+\label{table:hyperparams}
+\end{table}
+
+\subsubsection{Learning Rate}
+For prefix sums the default learning rate is 0.001, we tested both 0.01 and 0.0001 over a range of alpha values. The learning rate of 0.01 led to vanishing gradients for all alpha values and the learning rate of 0.0001 made no discernible difference when compared to the learning rate of 0.001. This is shown in Left of Figure \ref{figs:lrandlrfac}. We have not included plots for models which experienced vanishing gradients as they fail to achieve any noticeable accuracy.
+
+\subsubsection{Optimiser}
+We tested stochastic gradient descent (SGD), RAdam \cite{RAdam} and AdamW \cite{AdamW} as alternatives to the default Adam optimiser for prefix sums models. We varied alpha values and used learning rates of 0.01, 0.001 and 0.0001 for SGD and a learning rate of only 0.001 for both variations of the Adam optimiser. Interestingly, the SGD optimiser led to vanishing gradients for all learning rates and all alpha values, we spoke to Bansal et al. and they said they had experienced the same problem with SGD leading them to use Adam. For both RAdam and AdamW we saw no discernible difference to the normal Adam optimiser in the accuracy of the models produced, still seeing high variability in the time taken by the models to reach high accuracy. These results can be seen in Figure \ref{figs:adams}.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/test_sums_lr_0001.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/test_sums_factor_01.png}
+    \caption{
+    Left: Accuracy of prefix sums models with varying alpha values and learning rate of 0.0001. \\
+    Right: Accuracy of prefix sums models with varying alpha values and learning rate factor of 0.01.}
+    \label{figs:lrandlrfac}
+\end{figure}
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/test_sums_radam_replot.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/test_sums_adamw.png}
+    \caption{
+    Left: Accuracy of prefix sums models with varying alpha values and RAdam optimiser. \\
+    Right: Accuracy of prefix sums models with varying alpha values and AdamW optimiser.}
+    \label{figs:adams}
+\end{figure}
+
+\subsubsection{Learning Rate Factor}
+Next in our hyperparameter search on prefix sums models, we looked at learning rate factor, this is the amount the learning rate is multiplied by at each step, sometimes referred to as the gamma hyperparameter. We tested a factor of 0.01, ten times smaller than the default value; we did not test values smaller as we felt the difference each iteration would then make to the overall optimisation would be too small. This did not lead to any noticeable change in the overall accuracy or time taken to reach peak accuracy of the models. This result is shown in Right of Figure \ref{figs:lrandlrfac}.
+
+\subsubsection{Learning Rate Scheduler}
+We also experimented by changing the scheduler from a mutli-step scheduler to a cosine annealing scheduler on prefix sums. We used the PyTorch default values for torch.optim.lr\_scheduler.CosineAnnealingLR scheduler. The result of this can be seen in Figure \ref{figs:cosine}. The evidence suggests changing the scheduler does not impact the ability of the prefix sums models to extrapolate, therefore either scheduler can be used for these Deep Thinking models.
+
+\begin{figure}[h]
+\centering
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/sums_cosine_schedule_replot.png}
+    \caption{
+    Accuracy of prefix sums models with varying alpha values and cosine annealing scheduler}
+    \label{figs:cosine}
+\end{figure}
+\subsubsection{Training Batch Size}
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/sums_batch_size_50_replot.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/sums_batch_size_150_replot.png}
+    \caption{
+    Left: Accuracy of prefix sums models with varying alpha values and training batch size of 50. \\
+    Right: Accuracy of prefix sums models with varying alpha values and training batch size of 150.}
+    \label{figs:sumstrainbatch}
+\end{figure}
+To complete our hyperparameter search for prefix sums models we look at the batch size when training models. This is often limited by memory when training on GPUs but is non the less a crucial hyperparameter and often impacts accuracy. We tested training batch sizes of 50 and 150, i.e. ±50 from the default train batch size suggested by Bansal et al. The results of this experiment can be seen in Figure \ref{figs:sumstrainbatch}; this suggests that the batch size can be increased or decreased during training whilst maintaining high accuracy when extrapolating. This is a positive result as if the GPU being used has enough memory we can increase the speed of training by increasing the batch size and if the GPU has limited memory we can decrease the batch size; increasing the accessibility of the models.
+
+% \begin{figure}[h]
+%     \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/sums_batch_size_50_replot.png}\hfill
+%     \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/sums_batch_size_150_replot.png}
+%     \caption{
+%     Left: Accuracy of prefix sums models with varying alpha values and training batch size of 50. \\
+%     Right: Accuracy of prefix sums models with varying alpha values and training batch size of 150.}
+%     \label{figs:sumstrainbatch}
+% \end{figure}
+
+We also changed the batch size during training for maze models. We tested training batch sizes of 25 and 75, i.e. ±25 from the default train batch size suggested by Bansal et al. As you can see in Figure \ref{figs:mazestrainbatch}, the maze models, which we already know to be less stable than prefix sums, are even less stable when varying the training batch size. The bound of 0.1, previously found Section \ref{subsec:newresults} - Alpha Value Analysis, is broken by the models with alpha values of 0.1 failing to gain high accuracy in both cases. However, the default hyperparameter value of alpha being 0.01 suggested by Bansal et al. still gains high accuracy in both cases.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/mazes_train_batch_25_replot.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis_replot/mazes_train_batch_75_replot.png}
+    \caption{
+    Left: Accuracy of maze models with varying alpha values and training batch size of 25. \\
+    Right: Accuracy of maze models with varying alpha values and training batch size of 75.}
+    \label{figs:mazestrainbatch}
+\end{figure}
+
+\subsubsection{Learning Rate Schedule}
+For maze models the default learning rate schedule is higher than the number of epochs meaning it is never used when training. We trialled learning rate schedules of [35] and [14,30,45] over the default 50 epochs and varying alpha values. The results, shown in Figure \ref{figs:schdules}, show that these trials lead to worse accuracy than the default. Implying any schedule for maze models only decreases the accuracy, as even models with alpha values above the threshold of 0.1 found in Section \ref{subsec:newresults} - Alpha Value Analysis fail to reach noticeable accuracy in both cases. We also turned the learning rate throttle to false, when turned on the error is only backpropagated once for the recurrent module instead of once for each time the recurrent module is used. Mazes were the only one of the three problems to have this hyperparameter set to true by default. This led to the training process failing to gain any noticeable accuracy, so this result is not shown graphically.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/test_mazes_schedule_1.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/test_mazes_schedule_2.png}
+    \caption{
+    Left: Accuracy of maze models with varying alpha values and [35] learning rate schedule. \\
+    Right: Accuracy of chess models with varying alpha values and [14,30,45] learning rate scheduler.}
+    \label{figs:schdules}
+\end{figure}
+
+\subsubsection{Chess Training Range}
+When discussing the direction of research with Bansal et al. in a meeting, they mentioned that they did limited testing around which data is used to train chess models. The default set is [0,600k] of the 1.5 million available examples. We decided to test values of 400k, 500k, 700k and 800k with the default alpha value of 0.5. In Left of Figure \ref{figs:chesstrainrange}, we see that in an extrapolation of 100,000 from the training range, the lower training range values achieve higher accuracy but still only similar to that seen by the default value. In Right of Figure \ref{figs:chesstrainrange}, when testing on [1M, 1.1M] we see the higher training range values achieve higher accuracy, slightly higher than that of the default value but this also a smaller extrapolation for those higher training range values, so this is expected. Overall, we see no evidence to suggest the training range should be changed from these experiments but are encouraged to see that similar observations hold with different training ranges.
+
+\begin{figure}[h]
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/chess_test.png}\hfill
+    \includegraphics[width=.5\textwidth]{figures/hyper_analysis/chess_test_hard.png}
+    \caption{
+    Left: Accuracy of chess models with train ranges 0 to 400k, 500k, 700k and 800k tested on the next 100k examples after their train ranges respectively. \\
+    Right: Accuracy of chess models with train ranges 0 to 400k, 500k, 700k and 800k tested on [1M,1.1M].}
+    \label{figs:chesstrainrange}
+\end{figure}
+
+To conclude, after testing five of the hyperparameters there was no evidence to suggest that any of the default hyperparameters provided by Bansal et al. should be changed. However, evidence does suggest that some of these hyperparameters can be varied without impacting accuracy.
