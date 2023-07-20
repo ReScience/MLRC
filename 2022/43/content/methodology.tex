@@ -1,0 +1,132 @@
+\section{Methodology}
+
+\subsection{Datasets}\label{sec:dataset}
+
+\citet{shafiullah2022behavior} run experiments in four environments of varying complexity.
+For each environment, they use a dataset of trajectories with different modes and a gym \cite{gym} environment to deploy trained models and generate rollouts.
+We briefly summarize the datasets below and refer the reader to appendix \ref{app:datasets} for more details.
+
+\textbf{Point mass} is a toy dataset to showcase the limitations of different baselines and the representational power of BeT in faithfully capturing the different modes.
+
+\textbf{CARLA}~\cite{dosovitskiy_carla_2017} has similar multi-modality complexity to Point mass but features higher-dimensional observations.
+We do not use the CARLA self-driving environment \cite{dosovitskiy_carla_2017} due to limitations in computational resources and explain our choice in appendix \ref{app:datasets}.
+
+\textbf{Blockpush}~\cite{florence_implicit_2021} is a multi-modal dataset whose stochasticity adds extra complexity.
+
+\textbf{Kitchen}~\cite{gupta_relay_2019} is the most complex environment due to its large action space and longer trajectories coming from real human demonstrations.
+
+The authors provide all the datasets and the implementations of their environments, except for the Point mass dataset and environment.
+In all experiments, we follow the original paper in using 95\% of the dataset for training and the remaining 5\% for testing. 
+
+\subsection{Model description}\label{sec:model-desc}
+
+\subsubsection{Behavior Transformer}\label{model:bet}
+To model a context-based policy that outputs multi-modal continuous actions with a transformer architecture, \citet{shafiullah2022behavior} proceed by first decomposing an action, $a$, into two components: a \emph{center}, $A_{\lfloor a \rfloor}$, and an \emph{offset}, $\langle a \rangle$, such that $a \coloneqq A_{\lfloor a \rfloor} + \langle a \rangle$.
+The action centers are found by running a $k$-means clustering algorithm on all the actions in the dataset, with $k$ defined \textit{a priori}, giving a set of $k$ action centers $\{A_1, A_2, \ldots, A_k\} \subset A$ fixed for the rest of the process. 
+The offsets are uniquely defined by assigning the center of $a$ to the closest action center $\lfloor a \rfloor \coloneqq \mathrm{arg\,min}_i \|a - A_i \|_2$.
+We use the term ``encode" to mean the decomposition of an action into its center and offset and ``decode" to its reconstruction (sum) from its components (see Figure \ref{fig:bet_architecture} (A)).
+
+In this setup, the Transformer takes as input a sequence of continuous observations $(o_i, o_{i+1}, \ldots, o_{i+h-1})$ and learns a sequence-to-sequence mapping of each observation to a categorical distribution over the $k$ action centers (i.e., a $1 \times k$ probability vector) and $k$ proposed action offsets, one for each action center (shape: $k \times \mathrm{dim}(A)$).
+The action center probability distribution head is trained to the ground truth action centers with the focal loss~\cite{lin_focal_2018}, a simple modification to the standard cross entropy loss that helps model low-probability classes in imbalanced datasets.
+The offset head loss consists of the squared error to the ground truth offset, but only for the one corresponding to the true action center.
+These two losses are then summed, with the offset rescaled to make both terms similar in magnitude at initialization (see Figure \ref{fig:bet_architecture}). 
+
+After training, BeT interacts with the environment by first sampling an action center given its observation history so far, where the probability of picking each action center is given by the action center head output.
+Then, by adding the sampled action center with the corresponding offset in the offset head, it recovers (decodes) the action to be performed (see Figure \ref{fig:bet_architecture} (C)).
+
+
+\subsection{Experimental setup and code}\label{sec:exp-and-code}
+
+\subsubsection{Code}\label{sec:code}
+The authors provide a codebase \cite{shafiullah2022behavior} for training and generating rollouts for BeT.
+However, neither the scripts required to run the experiments presented in the paper nor those to compute and report the evaluation metrics and run the ablations are available.
+Moreover, the development environment (a \texttt{conda} environment) released by the authors was platform-specific and could not be reproduced due to unpinned dependencies, making it difficult to get started with the reproducibility task and obtain the relevant metrics to verify the paper's numbers and assess its contribution.
+In what follows, we detail our efforts in extending the implementation provided by the authors to provide a complete pipeline supporting all the experiments performed in this report, from a reproducible development environment to reproducible reporting of evaluation metrics.
+
+First, we address the development environment setup.
+We use Cresset~\cite{noauthor_cresset_2022}, a simple MLOps template designed for research purposes.
+It supplies a flexible and reproducible development environment that can be used in heterogeneous computing environments.
+It provides configurable options for the OS, CUDA, and PyTorch versions, which are necessary as different computing environments and hardware require different combinations of libraries.
+It also includes various options, such as providing an easy way to compile PyTorch from source.
+This feature is necessary on GPUs that available PyTorch binaries were not compiled for, such as the GPU we use for this reproduction.
+We adapt Cresset for our use case, pin all versions of our direct and indirect dependencies, and make the generated Docker image publicly available for others to reproduce our work.
+
+Second, we aggregate the code in the authors' repository to include the evaluation metrics for every experimental environment in the reproducibility pipeline.
+We investigated critical design choices made in the evaluation metrics and noticed discrepancies between the metrics reported in the paper and how they were computed in the code.
+Both of these findings are described in appendix \ref{app:metrics}, addressing point \ref{claim:evaluation-metrics} of our reproducibility scope.
+
+Finally, the numbers reported in the paper are all measured for single runs, which could be subject to cherry-picking and high variance.
+To have a more informed evaluation of BeT, we include cross-validation runs in our pipeline.
+For each cross-validation run, we train for the number of epochs specified by the authors and evaluate the model which attained the lowest test loss, computed at the end of every epoch.
+The authors mention using early stopping for some baselines but do not mention whether they perform such validation for BeT.
+In addition, we perform a hyperparameter search in the pipeline, which involved either a grid search/sweep or using the \textit{Optuna}~\cite{akiba_optuna_2019} library.
+These changes were supported by refactoring the design of the \textit{Hydra}~\cite{yadan_hydra_2019} configurations.
+
+A notable contribution we make is to vectorize the rollout generation code to have several copies of the environment running asynchronously in parallel, all consulting the same model to leverage batching.
+With this, we achieve a speedup of Nx (20x in our case) by running N environments in parallel.
+
+\subsubsection{Experiments}\label{sec:experiments}
+
+We perform all the experiments done with the BeT model in the original paper on the subset of datasets described in section \ref{sec:dataset}.
+These correspond to tables 1 and 2 in the original BeT paper and directly assess the two main claims of the paper (claims \ref{claim:author-1} and \ref{claim:author-2} in our reproducibility scope).
+They include training BeT on all the datasets, rolling out the policies on their respective environments, and computing the relevant metrics.
+Each environment features a set of performance metrics and diversity metrics.
+We describe the metrics in detail in appendix \ref{app:metrics} and describe the results in section \ref{sec:results}.
+
+Although the authors only reported the relative performance (in terms of reward) of the BeT ablations they considered, we go beyond by carrying out a more granular analysis. We report the full set of \emph{performance} and \emph{diversity} metrics of each environment for all the ablations addressing point \ref{claim:ablation} in our reproducibility scope.
+This is straightforward with the pipeline we built.
+The relevant results are reported in section \ref{sec:results}.
+
+Finally, we experiment with BeT with an LSTM trunk.
+Whereas \citet{shafiullah2022behavior} reported it having a very low performance, we believe it to be a strong candidate for this context‐based multi‐modal prediction task, as it has a similar representational power to a Transformer trunk and test it on the Point mass environment.
+
+Unlike the single-run numbers reported by the authors, we report averages (with standard deviation) across cross-validation runs.
+Every command needed to run any of the experiments is readily available as a shell script in our GitHub repository.
+They are listed in the \emph{reproducibility\_scripts} directory and described in the \texttt{readme}.
+In addition, we share a link in our \texttt{readme} to download the model weights, rollouts, and logs of all runs we performed.
+These are also tracked on \textit{Weights \& Biases}\footnote{We provide a link to a \emph{W\&B} project in the readme of our GitHub repository.}\cite{wandb}.
+This allows the inspection and reproduction of every single result in this report.
+
+\subsection{Ablations}\label{section:bet_ablations}
+In addressing point \ref{claim:ablation} of our reproducibility scope, we focused on testing BeT's architectural design choices (\emph{binning}, \emph{offsets}, \emph{history}, and \emph{focal loss}) and representational power (replacing its Transformer trunk with an MLP). These ablations are detailed below\footnote{Novel ablations not considered by the authors are prefixed \textbf{[new]}.}.
+
+\textbf{No offsets.} The model only predicts action centers and uses them without offset correction at rollout time.
+This ablation tests the need for learning an offset correction.
+
+\textbf{No binning.} The model has a single action center ($k=1$).
+With this, all the predictive power of BeT is then put in the offset head. This ablation tests the fact that the discrete action centers are responsible for the multi-modal modeling capability of BeT.
+
+\textbf{No history.} The model has a window size $h=1$.
+It tests how the lack of historical context harms BeT's performance, recovering the standard Markovian model in BC.
+
+\textbf{[new] No focal loss.} In the original paper, the focal loss is presented as a relevant component for appropriate learning of the action center Transformer head.
+However, no ablations were conducted in the original work to confirm this.
+We test this claim by setting the focal loss parameter $\gamma$ to zero, recovering the standard binary cross entropy loss.
+This addresses point \ref{claim:ablation} in our reproducibility scope.
+
+\textbf{Trunk MLP.} The model has an MLP trunk instead of a Transformer.
+This tests the relevance of the Transformer architecture in the final performance.
+We follow the original paper in setting the MLP with the same number of hidden layers and layer width as the corresponding MinGPT.
+
+\textbf{[new] Trunk MLP (Opt).} We noticed that the proposed MLP trunk ablation is under-parameterized when compared to the corresponding MinGPT.
+In particular, MinGPT had $\approx 2.6\mathrm{e}{5}$ and $\approx 1.1\mathrm{e}{6}$ parameters for Blockpush and Kitchen, respectively.
+The corresponding values for MLP were $\approx 4.8\mathrm{e}{4}$ and $\approx9.2\mathrm{e}{5}$.
+Therefore, we performed a hyperparameter search using the Optuna~\cite{akiba_optuna_2019} framework in a domain where the largest possible model has a similar number of parameters to those of MinGPT.
+The total number of configurations tried by Optuna was 25 for both environments. The domain explored is shown in Table \ref{tab:mlp_optuna}. From that exploration, we pick the best-performing model with the smallest total loss in the validation set.
+
+\subsection{Hyperparameters}
+We adopt the hyperparameters proposed in the original paper in all the experiments.
+This includes BeT and its ablations, except for the MLP ablation, for which we performed a hyperparameter search described in the ablation study.
+In addition, we performed two independent linear searches on two critical hyperparameters of the proposed approach: the number of action centers, $k$, and the window size, $h$.
+These experiments tested the sensitivity of the BeT architecture to those hyperparameters, assessing point \ref{claim:hyperparameters} in our reproducibility scope, and are described in detail in section \ref{sec:results}.
+
+\subsection{Computational requirements}
+In this work, we used a single \href{https://www.dropbox.com/s/0k1zi6h9x6iqgxq/redhawk.jpg?dl=0}{NVIDIA GeForce GTX 780 GPU} for all the experiments.
+The runtime required to obtain a trained model in different environments is 1 minute for Point mass, 1 hour for Blockpush, and 1 hour for Kitchen.
+Considering all experiments, this takes 276 GPU hours.
+We performed the training runs for Blockpush and Kitchen in parallel on the same GPU, amounting to 128h in wall-clock time.
+
+We performed the online rollouts on 2 Intel Xeon E5‐2680 v3.
+A full online rollout takes 5 seconds for Point mass, 10 minutes for Blockpush (speedup: 20x), and 10 minutes for Kitchen (speedup: 20x).
+Hence, it takes 55 CPU hours in total.
+Again, we divided the work into 2 groups of 20 threads, yielding a total of 27.5h of actual run time.

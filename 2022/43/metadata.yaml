@@ -1,0 +1,120 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reproducibility Study of Behavior Transformers"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Skander Moalla
+    orcid: 0000-0002-8494-8071
+    email: skander.moalla@epfl.ch
+    affiliations: 1,3,*
+  - name: Manuel Madeira
+    orcid: 0000-0002-8205-404X
+    email: manuel.madeira@epfl.ch
+    affiliations: 1,3
+  - name: Lorenzo Riccio
+    orcid: 0000-0002-7999-7282
+    email: lorenzo.riccio@usi.ch
+    affiliations: 1,3
+  - name: Joonhyung Lee
+    orcid: 0000-0002-2853-9433
+    email: veritas9872@gmail.com
+    affiliations: 2,3
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code: 1
+    name: EPFL
+    address: Switzerland
+  - code: 2
+    name: Independent Researcher
+  - code: 3
+    name: Equal contributions
+
+# List of keywords (adding programming language might be a good idea)
+keywords: rescience c, machine learning, reinforcement learning, imitation learning, behavior cloning, transformer, pytorch, python
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/skandermoalla/bet-reproduction
+  - doi: 10.5281/zenodo.7937169
+  - swh: swh:1:dir:4a562f75c0fd44672b806498e18b67690a5baabd
+
+# Data URL and DOI (optional if no data)
+data:
+  - url: https://github.com/skandermoalla/bet-reproduction
+  - doi: 10.5281/zenodo.7937169
+
+# Information about the original article that has been replicated
+replication:
+  - cite: 'Shafiullah, Nur Muhammad, et al. "Behavior transformers: Cloning \$ k \$ modes with one stone." Advances in neural information processing systems 35 (2022): 22955-22968.'
+  - bib: shafiullah2022behavior
+  - url: https://proceedings.neurips.cc/paper_files/paper/2022/file/90d17e882adbdda42349db6f50123817-Paper-Conference.pdf
+  - doi: 10.48550/arXiv.2206.11251 # Only found Arxiv, NeurIPS version does not seem to have
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility - In this work, we analyze the reproducibility of 'Behavior Transformers: Cloning $k$ modes with one stone'. In assessing the Behavior Transformer (BeT) model, we analyze its ability to generate performant and diverse rollouts when trained on data containing multi-modal behaviors, the relevance of each of its components, and its sensitivity to critical hyperparameters. Methodology - We use the open-source PyTorch implementation released by the authors to train and sample rollouts for BeT. However, the implementation does not include all the environments, evaluation metrics, or ablations studied in the paper. Consequently, we extend it by following the details in the paper and filling in the missing parts to have a complete pipeline and support all the experiments performed in this report. We conducted our experiments on an NVIDIA GeForce GTX 780 GPU, requiring 276 GPU hours to train our models. Results - Running the code released by the authors does not produce an evaluation of BeT according to the metrics reported in the paper. After extending the implementation with the proper evaluation metrics, we obtain results that support the main claims of the paper in a significant subset of the experiments but that also diverge in many of the actual values obtained. Therefore, we conclude that the paper is largely replicable but not readily reproducible. What was easy - It was easy to identify the main claims of the paper and the experiments supporting them. Moreover, thanks to the open-source implementation released by the authors, training the model and sampling rollouts were straightforward tasks. What was difficult - Setting up the development environment was hard due to dependencies not being pinned. Not having the code for evaluation metrics available hindered our efforts to achieve similar numbers. Assessing the sources of discrepancies in our numbers was also difficult, as training curves and model weights were not accessible. Communication with original authors - We communicated via email with the authors throughout the project. They provided clarifications and resources that helped us with our study. However, the communication was insufficient to reach a complete reproduction."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=E0qO5dI5aEn
+
+contributors:
+  - name: Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2023
+  - accepted:  April 19, 2023
+  - published:  July 20, 2023
+
+# This information will be provided by the editor
+article:
+  - number: 43
+  - doi: # DOI from Zenodo
+  - url: # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name: "ReScience C"
+  - issn: 2430-3658
+  - volume: 9
+  - issue: 2

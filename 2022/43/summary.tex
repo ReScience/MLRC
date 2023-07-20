@@ -1,0 +1,39 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+In this work, we analyze the reproducibility of
+``Behavior Transformers: Cloning $k$ modes with one stone''~\cite{shafiullah2022behavior}.
+In assessing the Behavior Transformer (BeT) model, we analyze its ability to generate performant and diverse rollouts when trained on data containing multi-modal behaviors,
+the relevance of each of its components,
+and its sensitivity to critical hyperparameters.
+
+\subsubsection*{Methodology}
+
+We use the open-source PyTorch~\cite{NEURIPS2019_pytorch} implementation released by the authors to train and sample rollouts for BeT.
+However, the implementation does not include all the environments, evaluation metrics, or ablations studied in the paper.
+Consequently, we extend it by following the details in the paper and filling in the missing parts to have a complete pipeline and support all the experiments performed in this report.
+We conducted our experiments on an NVIDIA GeForce GTX 780 GPU, requiring 276 GPU hours to train our models.
+
+\subsubsection*{Results}
+
+Running the code released by the authors does not produce an evaluation of BeT according to the metrics reported in the paper.
+After extending the implementation with the proper evaluation metrics, we obtain results that support the main claims of the paper in a significant subset of the experiments but that also diverge in many of the actual values obtained.
+Therefore, we conclude that the paper is largely \href{http://rescience.github.io/faq/#whats-the-difference-between-replication-and-reproduction}{replicable} but not readily \href{http://rescience.github.io/faq/#whats-the-difference-between-replication-and-reproduction}{reproducible}.
+
+\subsubsection*{What was easy}
+
+It was easy to identify the main claims of the paper and the experiments supporting them.
+Moreover, thanks to the open-source implementation released by the authors, training the model and sampling rollouts were straightforward tasks.
+
+\subsubsection*{What was difficult}
+
+Setting up the development environment was hard due to dependencies not being pinned.
+Not having the code for evaluation metrics available hindered our efforts to achieve similar numbers.
+Assessing the sources of discrepancies in our numbers was also difficult, as training curves and model weights were not accessible.
+
+\subsubsection*{Communication with original authors}
+
+We communicated via email with the authors throughout the project.
+They provided clarifications and resources that helped us with our study.
+However, the communication was insufficient to reach a complete reproduction.

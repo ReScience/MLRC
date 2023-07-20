@@ -1,0 +1,64 @@
+\section{Discussion}\label{sec:discussion}
+
+In the following section, we use the terms \textit{reproduction} and \textit{replication} as defined in \href{http://rescience.github.io/faq/#whats-the-difference-between-replication-and-reproduction}{ReScience C} to evaluate the reproducibility of the BeT paper.
+In short, we use
+\begin{itemize}
+    \item \textit{reproduction} to mean ``running the same computation on the same input data, and then checking if the results are the same...
+    Reproduction can be considered as software testing at the level of a complete study...
+    [It] verifies that a computation was recorded with enough detail that it can be analyzed later or by someone else''.\label{def:reproduction}
+    \item \textit{replication} to mean ``repeating a published protocol, respecting its spirit and intentions but varying the technical details [...] that everyone believes shouldn’t matter, and see if the scientific conclusions are affected or not''.
+    \label{def:replication}
+\end{itemize}
+
+Overall, we conclude that the work presented in \citetitle{shafiullah2022behavior} is largely replicable but is not readily reproducible.
+
+Indeed, although the authors open source their code and data and describe how to use their model, they do not provide a reproducible way to obtain the numbers reported in the paper.
+Using their code is not enough, and extending it according to the specification in the paper yields numbers that diverge from theirs in multiple experiments, hence our conclusion on the reproducibility of the paper.
+
+However, most of our experiments support the paper's main claims.
+From the Blockpush and Kitchen experiments, the proposed method exhibits the representational power desired for multi-model behavior cloning.
+Indeed, our Blockpush results beat all baselines reported by the authors.
+
+Regarding the ablations,
+we have observed that the model without offsets performed almost as well as the base configuration when the action dimension space is low, such as in Blockpush.
+However, offsets proved essential in Kitchen, where the action space is higher dimensional, and the action centers are much less expressive.
+For the no-binning ablation where only a single bin is used, we obtain precisely the inverse situation: the model underperforms in Blockpush but is the best model for Kitchen, both in performance and diversity.
+We conjecture that this behavior is due to the model overfitting to a single mode and thus being less prone to confound different modes and go out-of-distribution.
+The runs where the model was given no history performed well in Blockpush, as they stick to one performant modality, but less well in Kitchen when history is needed to stick to one task.
+They also show a decrease in diversity.
+For the two MLP ablations, we see that having a MinGPT trunk is critical as the MLPs fail to exhibit the representation power to correctly model the sequence of received observations despite being fine-tuned.
+Finally, we found that the focal loss decreased the variance of the reported metrics, confirming the authors' claim that it would help with unbalanced splits, but at the same time, the model with no focal loss outperformed BeT in some runs.
+Practitioners must, therefore, carefully consider the tradeoff between variance reduction and performance.
+
+\subsection{Limitations}
+Our replication is limited by sources of discrepancies that we could not mitigate, such as a slightly different development environment due to the unreproducible environment provided by the authors, different ways of computing evaluation metrics not provided by the authors, and in one case, incorrectly described, and limited computational budget, which limited our ability to investigate more experiments.
+
+
+\subsection{What was easy}
+It was very easy to identify and understand the main claims of the paper and the experiments which supported them.
+Once we had the development environment set up, it was easy to train models on the Blockpush and Kitchen datasets, thanks to the authors sharing a link to their datasets and providing the code for the data loaders, model definition, and training routine.
+Generating rollouts for the trained models with the provided code was also easy.
+
+
+\subsection{What was difficult}
+The authors provide a development environment specification via a \href{https://docs.conda.io/en/latest/}{conda} environment configuration file but only pin the direct dependencies.
+However, these dependencies have sub-dependencies whose versions were unpinned and made the environment unusable when we started the reproduction, with some libraries crashing at runtime.
+This in itself made the computations made in the paper non-reproducible.
+Building our own environment created an initial source of divergence between our methods and made it difficult to isolate this divergence.
+Moreover, it was very hard to get the first evaluation metrics and be confident that those were the ones computed by the authors as they did not provide the code to do so, nor did they describe the exact formulas or the design choices of the metrics in the paper.
+We had to get those from hints in the codebase and clarifications from the authors, making the replication much more time-consuming.
+Finally, the paper did not provide model weights or training curves and reported single-run numbers without error bars, making it very hard to judge the extent of the discrepancy in our results and investigate its sources.
+As computations in machine learning are subject to randomness and non-determinism, it is crucial to report evaluation metrics on multiple runs with a central tendency (e.g. mean) \& variations (e.g. error bars) \cite{pineau2020machine} to hope for similar numbers during a reproducibility test.
+
+\subsection{Communication with original authors}
+We communicated with the original authors throughout the reproducibility project.
+They helped us identify relevant parts in the code that we leveraged to complete our reproducible pipeline.
+When we got drastically different results for some metrics, they shared the Jupyter notebooks they used to compute their numbers which allowed us to identify discrepancies between how they were computing and reporting them.
+We greatly appreciate their effort in helping us reproduce their paper.
+However, we feel that many of their clarifications should have been documented in the code or the paper.
+
+
+\subsection{Acknowledgements}
+We thank the teaching team of the EPFL Machine Learning course \href{https://www.epfl.ch/labs/mlo/machine-learning-cs-433/}{(CS-433)} for encouraging us to conduct this project and for their review of a preliminary version of this work.
+We thank Prof. Tanja Käser for providing CPUs to run the evaluation.
+We thank Nur Muhammad (Mahi) Shafiullah for the multiple exchanges about details in the BeT project.
