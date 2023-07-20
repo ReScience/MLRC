@@ -1,0 +1,233 @@
+% \newpage
+\appendix
+\newpage
+
+\section{Relevant methods used in the paper}
+\label{sec.models}
+
+\textbf{DeepWalk}: DeepWalk \cite{deepwalk} learns latent representations of nodes in a network G by iteratively initiating truncated random walks starting from randomly sampled positions and updating the node representations by optimizing the Skip-gram likelihood objective as outlined by Mikolov et al. \cite{word_representations} using a hierarchical soft-max. \\
+
+\textbf{Fairwalk}: Introduced by Rahman et al. \cite{fairwalk}, Fairwalk is a modified random walk algorithm extended from Node2Vec \cite{node2vec}, which creates a more \textit{diverse network neighborhood representation} by optimizing for statistical parity and equality of representation at both user and network level. \\
+
+\textbf{Adversarial AutoEncoder}: Another proposed method examined by the authors is the Adversarial AutoEncoder \cite{aae} to generate node representations instead of random walk-based methods. We make use of the paper's publicly available implementation and make modifications to its implementation to accommodate our input structure. \\
+
+\textbf{Greedy baseline}: This is a greedy method used for selecting the most influential nodes in a graph based on heuristics, and it does not use node embeddings.\\
+
+\section{Background Self-Avoiding Walks}
+\label{sec:saw}
+Self-avoiding walks (SAWs) are paths within an $d$-dimensional integer lattice $\mathcal{Z}^{d}$, without self-intersections \cite{saw-1}. An $n$-step self-avoiding walk is defined to be the ordered set of $n+1$ nodes in the $\mathcal{Z}^{d}$ manifold, in which each consecutive edge does not appear more than once. In the context of the random walk algorithms, self-avoiding walks are useful since they model random movements that do not allow for self-intersection, which can better capture the locality and structural characteristics of a given graph \cite{saw-2}. This property is important for applications where the random walk must avoid certain regions or paths. In such cases, SAWs can be used as a way of generating a random path that satisfies these constraints. For example, in computer simulations of physical and chemical systems, SAWs can be used to model the random movement of a polymer chain or a molecule, avoiding any self-intersection that would represent a physically unrealistic behaviour \cite{saw-3}.
+
+\section{Complexity analysis of Soft Self-Avoiding CrossWalk}
+\label{app:complexity}
+
+Our proposed addition to the CrossWalk algorithm stimulates the random walk towards avoiding recurrently traversing a limited number of edges, by using a discounting function $\gamma^{c(u, v)}$. Our implementation uses a HashMap initialized per random walk for storing the counts of the previously visited edges, which has a worst-case \textbf{time and space complexity} of $\mathcal{O}(K)$, where $K$ represents the preset random walk length. Thus, our proposed method scales with $K$, which \textbf{supports scalability}, as $K << |E|$, where $E$ is the set of graph edges for a given graph.
+
+\section{Ablation Study}
+ \label{sec.ablation}
+
+The Crosswalk algorithm is highly sensitive to the choice of the hyperparameters $\alpha$ and $p$ as we have already shown in the Results section. Considering this, we decided to do an ablation study on these hyperparameters to see if we are able to make Crosswalk achieve a lower disparity for all tasks. In the figures below, we show the results for each pair of hyperparameters, where the values for $\alpha$ and $p$ respectively are presented in Table \ref{tab:params}. As you can see, choosing the right pair of hyperparameters is crucial, as for all the tasks, there exists a pair that yields in the lowest disparity compared to the other methods.
+
+\begin{figure}[h]
+\centering
+\scalebox{0.8}{
+\hskip-2cm\begin{tabular}{c c c c c c c}
+     & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+   \includegraphics[width=3.0cm] {influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_1.0_greedy.pdf}  &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_8.0_greedy.pdf}  \\ 
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_8.0_greedy.pdf} \\ \addlinespace
+  \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+  \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_1.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_2.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_4.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_6.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_8.0_greedy.pdf} \\ \addlinespace
+\end{tabular}
+}
+\caption{Influence maximization ablation on Rice-Facebook dataset, using the hyperparameters mentioned under \ref{sec:hyperparams}. The yellow bar on the plot represents the disparity metric, while the purple bar indicates the total influence percentage.}
+\label{fig:infmax-rice-ablation}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\scalebox{0.8}{
+\hskip-2cm\begin{tabular}{c c c c c c c}
+     & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+   \includegraphics[width=3.0cm] {influence_maximization/twitter_random_walk_5_bndry_0.1_exp_1.0_greedy.pdf}  &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.1_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.1_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.1_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.1_exp_8.0_greedy.pdf}  \\ 
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.3_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.3_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.3_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.3_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.3_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.7_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.7_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.7_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.7_exp_8.0_greedy.pdf} \\ \addlinespace
+  \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+  \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.9_exp_1.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.9_exp_2.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.9_exp_4.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.9_exp_6.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.9_exp_8.0_greedy.pdf} \\ \addlinespace
+\end{tabular}
+}
+\caption{Influence maximization ablation study on the Twitter dataset, using the hyperparameters mentioned under \ref{sec:hyperparams}. The yellow bar on the plot represents the disparity metric, while the purple bar indicates the total influence percentage.}
+\label{fig:infmax-twitter-ablation}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\scalebox{0.8}{
+\hskip-2cm\begin{tabular}{c c c c c c c}
+     & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+   \includegraphics[width=3.0cm] {influence_maximization/synth2_random_walk_5_bndry_0.1_exp_1.0_greedy.pdf}  &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.1_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.1_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.1_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.1_exp_8.0_greedy.pdf}  \\ 
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.3_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.3_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.3_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.3_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.3_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.5_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.5_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.5_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_8.0_greedy.pdf} \\ \addlinespace
+  \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.9_exp_1.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.9_exp_2.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.9_exp_4.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.9_exp_6.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.9_exp_8.0_greedy.pdf} \\ \addlinespace
+\end{tabular}
+}
+\caption{Influence maximization ablation study on the 2-grouped dataset, using the hyperparameters mentioned under \ref{sec:hyperparams}. The yellow bar on the plot represents the disparity metric, while the purple bar indicates the total influence percentage.}
+\label{fig:infmax-synth2-ablation}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\scalebox{0.8}{
+\hskip-2cm\begin{tabular}{c c c c c c c}
+     & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+   \includegraphics[width=3.0cm] {influence_maximization/synth3_random_walk_5_bndry_0.1_exp_1.0_greedy.pdf}  &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.1_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.1_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.1_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.1_exp_8.0_greedy.pdf}  \\ 
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.3_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.3_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.3_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.3_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.3_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.5_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.5_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.5_exp_8.0_greedy.pdf} \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_1.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_2.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_6.0_greedy.pdf} &
+   \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_8.0_greedy.pdf} \\ \addlinespace
+  \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.9_exp_1.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.9_exp_2.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.9_exp_4.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.9_exp_6.0_greedy.pdf} &
+  \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.9_exp_8.0_greedy.pdf} \\ \addlinespace
+\end{tabular}
+}
+\caption{Influence maximization ablation study on the 3-grouped dataset, using the hyperparameters mentioned under \ref{sec:hyperparams}. The yellow bar on the plot represents the disparity metric, while the purple bar indicates the total influence percentage.}
+\label{fig:infmax-synth3-ablation}
+\end{figure}
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\hskip-2cm\begin{tabular}{c c c c c c c}
+     & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+   \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.1_exp_1.0.png}  &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_2.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_4.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_6.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_8.0.png}  \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+   \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.3_exp_1.0.png}  &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_2.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_4.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_6.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_8.0.png}  \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+   \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.5_exp_1.0.png}  &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_2.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_4.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_6.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_8.0.png}  \\ \addlinespace
+    \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+   \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.7_exp_1.0.png}  &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_2.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_4.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_6.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_8.0.png}  \\ \addlinespace
+  \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+  \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.9_exp_1.0.png}  &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_2.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_4.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_6.0.png} &
+   \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_8.0.png}  \\ \addlinespace
+\end{tabular}
+}
+\caption{Node classification ablation study on Rice-Facebook dataset, using the hyperparameters mentioned under \ref{sec:hyperparams}. The yellow bar on the plot represents the disparity metric, while the purple bar indicates the total obtained accuracy.}
+\label{fig:clasif-ablation}
+\end{figure}

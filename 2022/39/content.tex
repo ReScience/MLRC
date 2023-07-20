@@ -1,0 +1,562 @@
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+\section{Introduction}
+The increasing use of machine learning algorithms has led to concerns about their potential to amplify social inequalities and unfairness \cite{10.1145/3494672}. To address this, researchers have been working on developing algorithmic tools to detect and mitigate such unfairness \cite{DBLP:journals/corr/abs-1908-09635} \cite{DBLP:journals/corr/abs-1901-10002}. In the reviewed study, the authors propose a new method called CrossWalk, which aims to improve the fairness of various graph algorithms, namely influence maximization, link prediction, and node classification, when applied to node embeddings. CrossWalk is a general method that can be applied to any random walk-based node representation learning algorithm, such as DeepWalk and Node2Vec. 
+\vspace{1mm}
+
+% This work will examine the results demonstrated in the CrossWalk \cite{crosswalk} paper through the reproduction of their experiments. Furthermore, we bring our own contributions to the analysis of the proposed method, which consist of an ablation study on the hyperparameters used in CrossWalk, a graph visualization that shows the fact that CrossWalk allows the random walks to visit more groups, and an improved CrossWalk method. In addition to the aforementioned contributions, the original code has been improved by refactorization and the creation of Bash and Python scripts that allow for easy reproduction of the results of the original paper and this work's contributions.
+
+This work aims to address the following goals:
+
+\begin{enumerate}
+    \item \textbf{[Reproducibility Study] Reproducing the results from the original paper:} We were able to partially reproduce the claim that Crosswalk enhances fairness, namely for the tasks of node classification and influence maximization. The second claim, which is that the proposed method preserves the higher-order proximity of the graph was successfully reproduced.
+    \item \textbf{[Extended Work] Improvement of the original code:} The original code is not easily runnable, so we had to refactor it and implement our own Bash and Python scripts such that the experiments can be more easily reproduced. Further, we provide a master Python script that allows for the reproducibility of the experiments presented in this report by running only a single terminal command.
+    \item \textbf{[Extended Work] Ablation study:} CrossWalk does not usually yield the expected results out of the box, but by carefully picking the right hyperparameters we managed to make CrossWalk behave as presented in the original paper.
+    \item \textbf{[Extended Work] CrossWalk visualization:} We perform additional visualizations of the edge reweighting procedure and random walk trajectories to investigate the claims proposed by the original authors. 
+    \item \textbf{[Proposed Enhancement] Soft Self-Avoiding CrossWalk:} We propose an extension to the algorithm proposed by Khajehnejad et al. \cite{crosswalk} which yields better node representations and higher fairness.
+\end{enumerate}
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+This work aims to investigate the reproducibility of the original paper by Khajehnejad et al. \cite{crosswalk}, which addresses the problem of assessing and mitigating unfairness in graph algorithms by introducing fairness-enhanced node representation learning. Enhancing fairness in machine learning algorithms is receiving growing attention and is becoming an active topic in Ethical Machine Learning \cite{DBLP:journals/corr/abs-2201-06921} \cite{DBLP:journals/corr/abs-2009-10576}. The authors propose a novel edge re-weighting method that enhances fairness by biasing random walks initiated in a given group towards visiting nodes on the group boundary and eventually crossing the boundaries between groups. For a detailed overview of the methodology, datasets, and metrics used by the authors, we invite the reader to consult Section \ref{sec:method}. \\
+
+The \textbf{main claims} proposed in the original paper can be summarised as follows:
+
+\begin{enumerate}
+    \item \textbf{Fairness-enhanced node representational learning}. The authors claim that by applying CrossWalk to learn node representations through any stochastic traversal algorithm (such as DeepWalk \cite{deepwalk} or Node2Vec \cite{node2vec}), disparity values significantly decrease for Node Classification, Influence Maximization, and Link Prediction, while only suffering from small decreases in accuracy.
+    
+    \item \textbf{Preserving higher-order proximity of the graph}. The claim is that CrossWalk is able to preserve the necessary structural properties of the graph while bringing peripheral nodes towards neighboring nodes from other groups in the embedding space.
+\end{enumerate}
+\vspace{-1mm}
+
+
+
+In addition to reproducing the results showcased in the original paper, we perform further experimentation in order to validate the robustness of the algorithm and to test the claimed effectiveness of the methodology in producing representations with higher fairness and smaller discrepancy between different groups. 
+
+% \todo{add a comment about visualization}
+
+
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+\label{sec:method}
+The original CrossWalk implementation is publicly available in their GitHub repository. However, not all experiments are perfectly reproducible based on the author's code, therefore we had to make minor adjustments to how we use CrossWalk for our research. Furthermore, we build upon the work of Khajehnejad et al. \cite{crosswalk} by reorganizing the code to make our experiments more reproducible and by providing supplementary updates to CrossWalk.
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+\subsection{Model description}
+% \textbf{Node2Vec}: Node2Vec is a deep learning algorithm that creates representations of nodes in a network. It uses two parameters, the size of the embedding vector and the number of walks to take. It is trained on a corpus of random walks over the graph and uses a skip-gram model to learn the embeddings of each node.\\
+
+% The Node2Vec and DeepWalk/RandomWalk algorithms are both used to learn node representations.
+\textbf{CrossWalk} is a re-weighting method that is used to bias random walk-based algorithms towards visiting multiple groups, which in turn enhances fairness. This is mainly done by re-weighting the probabilities associated with the graph edges as follows:
+\vspace{-1mm}
+
+\begin{enumerate}
+\item CrossWalk increases the weights of edges \textbf{near the group boundaries}.
+\item CrossWalk increases the weights of edges \textbf{that connect nodes from different groups}. 
+\end{enumerate}
+\vspace{-1mm}
+
+The mathematical formulas that describe the re-weightings from points 1 and 2 are the following: 
+\vspace{-1mm}
+
+\begin{equation}
+w_{vu}^{'} = \begin{cases} w_{vu}(1-\alpha) \times \frac{m(u)^p}{\sum\limits_{z \in N_v} w_{vz}m(z)^p} & \text{if } u \in N(v), l_v = l_u \\
+w_{vu}\alpha \times \frac{m(u)^p}{|R_{v}| \times \sum\limits_{z \in N_{v}^c} w_{vz}m(z)^p} & \text{if } u \in N(v), l_v \neq l_u = c.
+\end{cases}
+\end{equation}
+\vspace{-1mm}
+
+where $w_{vu}$ is the initial weight of the edge $(u,v)$, $\alpha$ and $p$ are hyperparameters, $R_{v}$ the set of groups in the neighbourhood of $v$, $l_{x}$ the group that node $x$ is part of, and $m(z)$ is the proximity of a node as described in the original paper.
+We have also elaborated in Appendix \ref{sec.models} the algorithms that are relevant towards fully understanding the ideas presented in this report.\vspace{-2.8mm}
+
+
+% \begin{table}
+%     \scalebox{0.7}{
+%     \begin{tabular}{l c c c ccc c c}
+%         \toprule 
+%          & & & \multicolumn{3}{c}{\textbf{Samples per group}} & & &  \\
+%         \cmidrule(lr){4-6}
+        
+%         \textbf{Dataset} & \textbf{Task}  & \textbf{Num samples} & \textit{Class 0} & \textit{Class 1} & \textit{Class 2} & \textbf{Train-Test split ratio } & \textbf{Description}\\
+%         \midrule
+%                                &       & 80.23\% &  1.69 & 74.12\%  & 6.66  & 92.58\% & 86.66\%  \\
+%         Rice-Facebook          & 11.9     & 64.7\% & 11.89  & 57.42\%  & 18.86 & 78.74\%  & 83.32\%  \\
+%                                & 9.15     & 85.68\% & 8.6   & 81.22\%  & 18.59 & 91.58\% & 84.96\%  \\
+%         \midrule
+%         Twitter        & 11.9     & 64.7\% & 11.89  & 57.42\%  & 18.86 & 78.74\%  & 83.32\%  \\
+%         \midrule
+%         2-grouped Synthetic & Rice     & 441 & 344  & 97  & 18.86 & 78.74\%  & 83.32\%  \\
+%         \midrule
+%         3-grouped Synthetic & Rice     & 441 & 344  & 97  & 18.86 & 78.74\%  & 83.32\%  \\
+%         \bottomrule
+%     \end{tabular}
+%     }
+%     \centering
+%     \caption{Datasets}
+%     \label{datasets}
+% \end{table}
+
+
+\subsection{Datasets}
+We follow the outline of the original paper and work towards reproducing the experiments supporting each of the two claims. We present the relevant datasets along with further information related to them, including the underlying task using the dataset, sample size and distribution, and a description in Table \ref{tab:datasets}.
+
+\begin{table}[H]
+    \scalebox{0.9}{
+    \begin{tabular}{l c c c c c}
+        \toprule
+        \textbf{Dataset} & \textbf{Num. samples} & \textbf{Num. groups} & \textbf{Samples/Group} & \textbf{Description} \\
+        \midrule
+        Rice-Facebook & 441 & 2 & 344/97 & Social relations \\
+        Twitter & 3560 & 3 & 2598/782/180 & Political learning \\
+        2-Grouped Synthetic & 500 & 2 & 350/150 & Synthetic network\\
+        3-Grouped Synthetic & 500 & 3 & 300/125/75 & Synthetic network &\\
+        \bottomrule
+    \end{tabular}
+    }
+    \centering
+    \caption{Summary of the datasets used in our experimentation. For each of the tasks, the following train/test ratios are used: \textbf{Node Classification}: 0.5 (Rice), \textbf{Link Prediction}: 0.1 (Rice Twitter), \textbf{Influence Maximization}: n/a (Rice 2,3-Grouped Synthetic, Twitter).}
+    \label{tab:datasets}
+\end{table}
+
+% todo one paragraph + graph for datasets
+% The datasets from table 1 are used in the experiments in the following form:
+% \begin{table}[H]
+% \centering
+% \caption{Datasets used for Tasks}
+% \label{tab:Datasets}
+% \begin{tabular}{@{}lll@{}}
+% \toprule
+% Task & Datasets & Train/Test Split \\ \midrule
+% Node classification & Rice & 50/50 \\
+% Influence Maximization & Rice & - \\
+%  & Synthetic & - \\
+% Link Prediction & Rice & 90/10 \\ 
+%  & Twitter & 90/10 \\ \bottomrule
+% \end{tabular}
+% \end{table}
+% \textbf{Rice-Facebook Dataset}: The dataset contains 1205 nodes and 42443 edges. There are 344 nodes in group A, 97 nodes in group B, and 7441 innergroup connections for group A, 513 innergroup connections for group B, and 1779 connections between the two groups. This dataset is provided in the CrossWalk GitHub page, however, the original dataset is owned by Stanford. Stanford download page: \href{https://snap.stanford.edu/data/ego-Facebook.html}{Social circles: Facebook} \\
+
+% \textbf{Twitter Dataset}: The dataset contains 3560 nodes, which can be divided into three groups based on their political learning: neutrals (group A) with 2598 nodes, (group B) liberals with 782 nodes, and (group C) conservatives with 180 nodes. There are 3724 intra-group and inter-group connections for group A, 950 intra-group connections for group B, 74 intra-group connections for group C, 1461 inter-group connections between groups A and B, 359 inter-group connections between groups A and C, and 109 inter-group connections between groups B and C. This dataset can be found in the CrossWalk GitHub page.\\
+
+% \textbf{Synthetic Datasets}: The first synthetic network consists of two groups with 350 nodes in group A and 150 nodes in group B. The nodes are connected with intra-group probabilities of P
+% Aintra = PBintra - 0.025 and intergroup probability of PABintere = 0.001. The second synthetic network consists of three groups with 300 nodes in group A, 125 nodes in group B, and 75 nodes in group C. The nodes are connected with intra-group probabilities of PAintra = PBintra = PCintra = 0.025 and inter-group probabilities of PABinter = 0.001 and PACinter = PBCinter = 0.0005. This dataset can be found in the CrossWalk GitHub page.\\
+
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+\subsection{Hyperparameters}
+To reproduce the results of the paper, we identify and primarily use the same hyperparameters as in the original paper. However, we set out to further investigate the robustness of the originally proposed approach by performing ablation studies for the parameters listed in Table \ref{tab:params} for each task.
+
+\label{sec:hyperparams}
+
+\begin{table}[H]
+    \begin{tabular}{l c c}
+        \toprule
+        \textbf{Task} & \textbf{$\alpha$} & \textbf{$p$} \\
+        \midrule 
+        Node Classification   & [0.1, 0.3, \textbf{0.5}, 0.7, 0.9] & [\textbf{1}, 2, 4, 6, 8] \\
+        Link Prediction       & [0.1, 0.3, \textbf{0.5}, 0.7, 0.9] & [1, \textbf{2}, 4, 6, 8]  \\
+        Influence Maximization & [0.1, 0.3, \textbf{0.5}, \textbf{0.7}, 0.9] & [1, \textbf{2}, \textbf{4}, 6, 8]  \\
+        \bottomrule
+    \end{tabular}
+    \centering
+    \caption{Summary of the hyperparameter values used in our experimentation. The parameter values in bold font represent the default values within the original experiments.}
+    \label{tab:params}
+\end{table}
+
+\subsection{Experimental setup and code}
+
+This work presents a restructured version of the CrossWalk repository, a collection of Python-based code for performing various graph-based tasks. Our main contribution is the development of shell files that can be used to reproduce all experiments on a given device, with parameters specified by the user. The most commonly used metrics for evaluation are accuracy as a percentage and disparity, which is used to measure the fairness between different groups. The disparity is calculated as the variance of the performance of a model (Q) between different groups (C).
+\vspace{-1mm}
+
+\begin{equation}
+    disparity(A) = Var(\{Q_{i}\} : i \in [C])
+\end{equation}
+
+The code is provided in the GitHub repository \href{https://anonymous.4open.science/r/FACT-AI-4674}{FACT-AI}. We acknowledge that not anybody might have access to the required computational resources to generate the necessary embeddings, and thus we provide them in the HuggingFace repository \href{https://huggingface.co/datasets/lucapantea/fact-ai}{fact-ai}.
+
+
+
+% in a supplementary \href{https://huggingface.co/datasets/lucapantea/fact-ai}{HuggingFace dataset
+
+
+\subsection{Computational requirements}
+We perform all experiments locally, using an AMD Ryzen 7 5800H CPU, with 16 threads and an Apple M1 Max chip with 10 CPU cores. For training the adversarial autoencoder, an Nvidia GeForce RTX 3080 GPU was used. The total computational cost for running all experiments comes at a total of roughly 160 CPU hours and 10 GPU hours. 
+
+\section{Results}
+\label{sec:results}
+% de spus ca facem average ul pe iterations ca sa para ca e reliable - am notat sa avem aici poti sa zici si de seeduri ca folosim 40 etc etc ; da astea ar trb spuse la fiecare sectiune in parte nu aici
+
+The results reproduced from the original paper show that CrossWalk does not usually yield the expected results out of the box, but rather it is highly sensitive to the choice of the hyperparameters $\alpha$ and $p$. In Appendix \ref{sec.ablation}, we provide an extensive ablation study of the hyperparameters and explain what impact they have on the performance of CrossWalk. While this is true for the tasks of node classification and influence maximization, for link prediction CrossWalk seems to be showing worse results than Fairwalk and vanilla DeepWalk using the provided source code. One important mention is that all of the results of the experiments involving the 3 graph algorithms presented are obtained by averaging the performance across 5 distinct runs.
+
+
+\subsection{Results reproducing original paper}
+\subsubsection{Claim 1: Fairness-enhanced node representational learning
+}
+\textit{\textbf{Partially correct}}\\
+Table \ref{tab:reproducibility} displays an overview of all tasks, data sets, and their reproducibility. 
+
+
+\begin{table}[!htb]
+\centering
+\begin{minipage}{0.4\textwidth}
+    \scalebox{0.6}{
+    \begin{tabular}{l c c}
+        \toprule
+        \textbf{Task} & \textbf{Dataset} & \textbf{Reproducible?}  \\
+        \midrule
+        \textbf{Visualization} & Rice-Facebook & \greencheck \\
+        \textbf{IM} & Rice-Facebook & \greencheck \\
+        \textbf{IM} & 2-grouped synthetic & \greencheck \\
+        \textbf{IM} + Node2Vec & Rice-Facebook & \redcross \\
+        \textbf{IM} & 3-grouped synthetic & \greencheck \\
+        \textbf{IM} & Twitter & \greencheck \\
+        \textbf{LP} & Rice-Facebook & \redcross \\
+        \textbf{LP} & Twitter & \redcross \\
+        \textbf{NC} & Rice-Facebook & \greencheck \\
+        \bottomrule
+    \end{tabular}
+    }
+    \centering
+    \caption{Overview of the performed experimentation. \greencheck - that similar values were obtained, while \redcross - the values obtained did not match the paper.}
+    \label{tab:reproducibility}
+\end{minipage}
+\qquad
+\begin{minipage}[c]{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/classification_rice_LP_bar.png}
+    \captionof{figure}{Node classification accuracy and disparity on the Rice-Facebook Dataset ($\alpha = 0.5, p = 1$)(Sub-figure a), comparing our results against the CrossWalk's authors.}
+    \label{fig:node-classification}
+\end{minipage}
+\end{table}
+
+As we already mentioned in the introduction of the Results section, the results for \textbf{link prediction} were not reproducible using the original source code, and this is shown in Figure \ref{fig:link-prediction}.
+
+% link prediction
+\begin{figure}[H]
+    \centering
+    \subfloat[\centering Our results - Rice-Facebook ($\alpha = 0.5, p = 2$)]{{\includegraphics[width=4cm]{images/link_prediction_rice.png} }}
+    \hfill
+    \subfloat[\centering Our results - Twitter  ($\alpha = 0.5, p = 2$)]
+    {{\includegraphics[width=4cm]{images/link_prediction_twitter.png} }}
+    \hfill
+    \subfloat[\centering Khajehnejad et al.'s \cite{crosswalk} results - Twitter ($\alpha = 0.5, p = 2$)]{{\includegraphics[width=4cm]{images/image.png} }}
+    \caption{Link prediction accuracy and disparity on the Rice-Facebook Dataset (Sub-figure a) and Twitter Dataset (Sub-figure b) for DeepWalk, Fairwalk, and CrossWalk, and the CrossWalk's authors results in Sub-figure c) for comparison.}%
+    \label{fig:link-prediction}%
+\end{figure}
+
+Figure \ref{fig:infmax} shows the attempt to reproduce the original results of influence maximization experiments. The methods used were a Greedy algorithm baseline, Deepwalk with node re-weighting, Fairwalk, and Crosswalk. Crosswalk was expected to show the lowest disparity, but this was not the case, and it was shown in the Appendix \ref{sec.ablation} that choosing the right hyperparameters is crucial. Overall, the results were reproducible, but hyperparameter tuning was necessary. Unfortunately, no code was provided for the Node2Vec experiments, so they could not be reproduced. \\
+\begin{figure}[h]
+\centering
+\scalebox{1}{
+    \begin{tabular}{c c c c}
+       \includegraphics[width=3.0cm] {influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf}  &
+       \includegraphics[width=3.0cm]{influence_maximization/synth2_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+       \includegraphics[width=3.0cm]{influence_maximization/twitter_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+       \includegraphics[width=3.0cm]{influence_maximization/synth3_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf}  \\
+       Rice-Facebook &  2-grouped synthetic & Twitter & 3-grouped synthetic  \\
+       $\alpha = 0.5, \ p = 4$ & $\alpha = 0.7, \ p = 4 $& $\alpha = 0.5, \ p = 2$ & $\alpha = 0.7, \ p = 4$ \\
+    \end{tabular}
+}
+\caption{Influence maximization disparity and total influence percentage on the Rice-Facebook Dataset (Sub-figure 1), 2 and 3-grouped synthetic datasets (Sub-figure 2 and 4) and the Twitter Dataset (Sub-figure 3) for the Greedy algorithm,  DeepWalk, Fairwalk, CrossWalk and an Adversarial autoencoder \cite{aae}.}
+\label{fig:infmax}
+\end{figure}
+
+Moreover, we were successful in reproducing the node classification experiment on Rice-Facebook using the provided hyperparameters $\alpha$ and $p$. As we can see from Figure \ref{fig:node-classification}, the results are similar to the original paper, only with some really small differences in the actual disparity values.
+
+% \begin{figure}[h]
+%     \centering
+%     \subfloat[\centering Rice-Facebook Dataset ($\alpha = 0.5, p = 1$)]{{\includegraphics[width=4.5cm]{images/classification_rice_LP_bar.png} }}
+%     \caption{Node classification accuracy and disparity on the Rice-Facebook Dataset (Sub-figure a) for DeepWalk, Fairwalk, and CrossWalk, comparing our results against the CrossWalk's authors'.}
+%     \label{fig:node-classification}%
+% \end{figure}
+
+% Link prediction accuracy and disparity on the Rice-Facebook Dataset (Sub-figure a) and Twitter Dataset (Sub-figure b) for DeepWalk, Fairwalk, and CrossWalk, and the CrossWalk's authors result in Sub-figure c) for comparison.
+
+\subsubsection{Claim 2: Preserving high-order proximity of the graph}
+\textit{\textbf{Correct}} \\
+Our work shows that CrossWalk is able to preserve the structural properties of the graph while bringing nodes from different groups closer together in the embedding space. Figures \ref{fig:tsne}(a-c) demonstrate this, as peripheral nodes from two groups are closer together after applying edge re-weighting.
+\begin{figure}[H]
+    \subfloat[\centering Rice-Facebook Dataset DeepWalk]{{\includegraphics[width=3.5cm]{images/TSNE_rice_subset.unweighted.png} }}
+    \qquad
+    \subfloat[\centering Rice-Facebook Dataset CrossWalk ($\alpha = 0.5, p = 2$)]{{\includegraphics[width=3.5cm]{images/TSNE_rice_subset.random_walk_5_bndry_0.5_exp_2.0.png} }}
+    \qquad
+    \subfloat[\centering Rice-Facebook Dataset CrossWalk ($\alpha = 0.5, p = 4$)]{{\includegraphics[width=3.5cm]{images/TSNE_rice_subset.random_walk_5_bndry_0.5_exp_4.0.png} }}
+    \centering
+    \caption{Distribution of the embedded nodes from the two groups generated by DeepWalk - Sub-figure a), and with edge re-weighting b) and c) .}%
+    \label{fig:tsne}
+\end{figure}
+
+% node classification
+% \begin{figure}%
+%     \centering
+%     \subfloat[\centering Rice-Facebook Dataset ($\alpha = 0.5, p = 1$)]{{\includegraphics[width=4.5cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_1.0.png} }}
+%     \caption{Node classification}
+%     \label{fig:node-a}%
+% \end{figure}
+
+\subsection{Results beyond original paper}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+
+% \subsubsection{Ablation study for node classification} 
+
+\subsubsection{Ablation study on the CrossWalk hyperparameters}
+% todo
+
+We have conducted an ablation study to see how different combinations of the hyperparameters $\alpha$ and $p$ (Table \ref{sec:hyperparams}) affect the results in the influence maximization and node classification tasks. This study has been elaborated more in Appendix \ref{sec.ablation} and it was pivotal towards reproducing the paper as it allowed us to see that choosing the right pair of hyperparameters allows Crosswalk to outperform all of the other random walk-based algorithms.
+
+
+\subsubsection{Explainability analysis of CrossWalk}
+\label{sec:vis}
+The experiments outlined above (Figure \ref{fig:tsne}) replicating the results of the original paper offer a certain degree of evidence for the second claim, primarily by visual comparison of the DeepWalk projection of the node embeddings both using the weighted (via CrossWalk) and unweighted graphs. However, these qualitative experiments do not offer a clear overview of the modified edge distribution, the behaviour of biased random walks, and the correlation to a decrease in accuracy to support the second claim. We, therefore, carry out a more in-depth analysis by \textbf{combining} both \textbf{quantitative} and \textbf{qualitative analysis} of CrossWalk, as depicted in Figure \ref{fig:beyond-crosswalk-visualisation}, and in Table \ref{beyond-crosswalk-table}, which will serve as the motive behind our proposed extension. \\
+
+\textbf{\textit{Motivation for extension of CrossWalk}}: CrossWalk's re-weighting mechanism achieves the desired behaviour of increasing the edge weights near and on the group boundaries. However, this leads to \textbf{undesired random walk trajectories}, where the random walks initiative by the algorithm appear to travel back and forth between the edges located at group peripheries. This is an important limitation to take into consideration, as it \textbf{limits the ability to capture structural information and retain higher-order proximity} between nodes. From our experimentation, we observe that throughout training, CrossWalk visits about \textbf{30\% fewer distinct nodes} than DeepWalk. Our stated considerations about the limitations of CrossWalk motivate the need for an extension of the original algorithm, which stimulates the random walk to avoid ineffective path trajectories.
+
+% \subfloat[\centering SSA CrossWalk random walk] {{\includegraphics[width=6cm]{images/visualization/soft_synth2_c0.3_random_walk_5_bndry_0.5_exp_2.0_d32_1.png} }}
+
+\begin{figure}[h]
+    \subfloat[\centering Graph edge weights (Left) DeepWalk random walk (Right)]{{\includegraphics[width=6.6cm]{images/visualization/unweighted.png}}}
+    \hfill
+    \subfloat[\centering Re-weighted graph edge weights (Left) CrossWalk random walk (Right) ]{{\includegraphics[width=6.6cm]{images/visualization/crosswalk.png} }}
+    \caption{\textbf{Explainability analysis of CrossWalk}: Sub-figures a) and b) present the differences between the two methods, DeepWalk and CrossWalk, respectively on the 2-grouped Synthetic dataset. Node color determines the group. Lighter edge colors represent higher weights, while darker colors indicate smaller weights. Nodes colored in green and red indicate the source and destination of a given path, respectively.}
+    \label{fig:beyond-crosswalk-visualisation}
+\end{figure}
+
+\begin{table}
+    \scalebox{0.9}{
+    \begin{tabular}{l cc cc ccc}
+        \toprule
+         & \multicolumn{2}{c}{\textbf{Synthetic 2}} & \multicolumn{2}{c}{\textbf{Synthetic 3}} & \multicolumn{3}{c}{\textbf{Rice-Facebook}}\\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-8}
+        \textbf{Methods}       & \textit{avg. cross.} & \textit{\% vis.} & \textit{avg. cross.} & \textit{\% vis.} & \textit{avg. cross.}   & \textit{\% vis.} & \textit{Acc$^\ast$} \\
+        \midrule
+        DeepWalk       & 1.6      & 80.23\% &  1.69 & 74.12\%  & 6.66  & 92.58\% & 86.66\%  \\
+        CrossWalk      & 11.9     & 64.7\% & 11.89  & 57.42\%  & 18.86 & 78.74\%  & 83.32\%  \\
+        \textbf{SSA CrossWalk}  & \textbf{9.15}     & \textbf{85.68\%} & \textbf{8.6}   & \textbf{81.22\%}  & \textbf{18.59} & \textbf{91.58\%} & \textbf{84.96\%}  \\
+        \bottomrule
+    \end{tabular}
+    }
+    \centering
+    \caption{Quantitative comparison of the discussed node representation methodologies on three datasets. The average number of crossings (\textit{avg. cross.}) indicates the mean number of times the random walk has crossed a group boundary throughout training. The visited percentage (\textit{\% vis.}) represents the  fraction of distinct nodes visited in a path throughout training. Finally, the \textit{node classification} accuracy is reported for each method for the Rice-Facebook dataset. Our proposed method is highlighted with a heavier (bolded) font.}
+    \label{beyond-crosswalk-table}
+\end{table}
+
+
+
+
+
+\subsubsection{Soft Self-Avoiding CrossWalk}
+
+Upon further examining CrossWalk's random walk trajectories (Figure \ref{fig:beyond-crosswalk-visualisation}), we encountered an issue not mentioned in the original paper. During the edge re-weighting process, the edges bordering or crossing group boundaries would attain significantly higher values in comparison to other edges, thus biasing the random walk to recurrently traverse a limited number of edges. As a result, the \textbf{structural properties of the graph are not fully utilized}, leading to \textbf{decreased representation quality}. This can be observed both in Figure \ref{fig:beyond-crosswalk-visualisation} and in Table \ref{beyond-crosswalk-table}, where the number of distinct visited nodes is significantly smaller than DeepWalk. \\
+
+Therefore, we have proposed a solution based on Self-Avoiding Walks \cite{saw} (Background in Appendix \ref{sec:saw}) which steers the random walks towards avoiding previously visited edges by using a discounting function, parameterized by $\gamma$, as presented in Equation \ref{eq:ssa-crosswalk}. 
+
+\begin{equation}
+P(u_i = u \lvert u_{i-1} = v) = \left\{
+        \begin{array}{ll}
+            \pi_{uv} \cdot \gamma^{c(u,v)}  & \quad \text{if} \ (u, v) \in E \\
+            0 & \quad \text{otherwise}
+        \end{array}
+    \right.
+\label{eq:ssa-crosswalk}
+\end{equation}
+\vspace{1mm}
+
+
+Where $c(u, \ v)$ stores the number of times the walk has traversed the edge between node $u$ and $v$. We provide an overview of the space and time complexity in Appendix \ref{app:complexity}. As $\gamma \in [0, \ 1]$, if $\gamma \rightarrow 1$, the behaviour is similar to CrossWalk, while $\gamma \rightarrow 0$ stimulates the random walk to avoid already visited edges.  We perform initial trials with larger values of $\gamma$, yet observe a meaningful effect only in the range $[0.2, \ 0.4]$. We carry out experiments with the entire hyperparameter space of CrossWalk (Section \ref{sec:hyperparams}), with added $\gamma \in [0.2, 0.3, 0.35, 0.4]$, showcase the results in Figures \ref{fig:ssa-visualisations} and \ref{fig:ssa-visualisations-infmax}, and provide performance metrics in Table \ref{beyond-crosswalk-table}. \\
+
+The results indicate that the proposed extension \textbf{consistently outperforms} the original implementation of CrossWalk on the two reproducible tasks - Link Prediction and Node Classification. We validate the effectiveness of our extension via Figures \ref{fig:ssa-visualisations}b and \ref{fig:ssa-visualisations-infmax}, where we demonstrate that the Soft Self-Avoiding CrossWalk \textbf{not only achieves better accuracy and influence percentage} but \textbf{additionally minimizes the disparity} (thus maximizing fairness) for each task.
+
+
+
+% \question{For TA: Do I talk about the results here? aka. say that our approach beats crosswalk?}
+
+% why? we observed that the implementation of crosswalk suffers from high, saturating values for edges around the border of groups. And thus achieves the unwanted behaviour of going back and forth between a few number of edges (ref table and the fact that this effect can be visually observed as well in ...). Thus, we perform experimentation with different combinations of $\gamma$ to identify the best parameter combinations. With only a minimal decrease in the average number of boundary crossings, $\gamma$ = 3 yields make crosswalk retain the same %vis as deepwalk, and increases the overall accuracy on node classification. Furthermore, we carry out experiments with the entire hyperparameter set of CrossWalk mentioned in section \ref, and observe that our proposed approach consistently outperforms crosswalk along an accuracy-disparity Pareto frontier (visual of walk, that appears to go along the border). 
+
+
+\begin{figure}[h]
+    \centering
+    \subfloat[\centering SSA CrossWalk random walk] {{\includegraphics[width=6cm]{images/visualization/soft_synth2_c0.3_random_walk_5_bndry_0.5_exp_2.0_d32_1.png} }}
+    \qquad
+    \subfloat[\centering Pareto optimal solutions for SSA CrossWalk vs Default CrossWalk for Node Classification.  ]{{\includegraphics[width=6cm]{images/visualization/rice_subset_pareto_front.png} }}
+    \caption{\textbf{Soft Self-Avoiding CrossWalk}: A visualization of the Soft Self-Avoiding random walk is presented in Sub-figure a), and the individual Node classification results for all combinations of hyperparameters are plotted in Sub-figure b). The Pareto front is highlighted for each method (The utopian objective is Top-Left). }
+    \label{fig:ssa-visualisations}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \subfloat[\centering Pareto optimal solutions for SSA CrossWalk vs Default CrossWalk on the 2-grouped synthetic dataset] {{\includegraphics[width=6.6cm]{images/visualization/synth2_pareto_front.png} }}
+    \hfill
+    \subfloat[\centering Pareto optimal solutions for SSA CrossWalk vs Default CrossWalk on the 2-grouped synthetic dataset]{{\includegraphics[width=6.6cm]{images/visualization/synth3_pareto_front.png} }}
+    \caption{\textbf{Soft Self-Avoiding CrossWalk}: Influence maximization - comparison analysis of the proposed method for all hyperparameter configurations on the 2-grouped and 3-grouped synthetic datasets (Utopian objective is Top-Left).}
+    \label{fig:ssa-visualisations-infmax}
+\end{figure}
+
+
+% \begin{table}[]
+%     \begin{tabular}{l cc cc cc}
+%         \toprule
+%          & \multicolumn{2}{c}{Synthetic 2} & \multicolumn{2}{c}{Synthetic 3} & \multicolumn{2}{c}{Rice-Facebook}\\
+%         \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+%         Methods       & \textit{inf. \%} & \textit{disp.} & \textit{inf. \%} & \textit{disp.} & \textit{inf. \%}  & \textit{disp.} \\
+%         \midrule
+%         DeepWalk       & 1.6      & 80.23\% &  1.69 & 74.12\%  & 6.66  & 92.58\%  \\
+%         CrossWalk      & 11.9     & 64.7\% & 11.89  & 57.42\%  & 18.86 & 88.7\%   \\
+%         SSA CrossWalk  & 9.15     & 85.68\% & 8.6   & 81.22\%  & 18.59 & 91.58\%  \\
+%         \bottomrule
+%     \end{tabular}
+%     \centering
+%     \caption{Influence Maximization }
+% \end{table}
+
+\newpage
+\section{Discussion}
+In this work, several experiments were conducted in order to attempt to reproduce the findings of \text{CrossWalk} \cite{crosswalk}. Most of the experiments in the original CrossWalk paper were \textbf{feasible to reproduce}. The claims were found to be \textbf{largely valid}, however, \textbf{with a few caveats}. \vspace{2mm}
+
+The first claim states that \textbf{CrossWalk results in a lower disparity} for all three graph algorithms investigated. Our findings show that CrossWalk was \textbf{successful in reducing disparity} in two of the three graph algorithms investigated, namely \textbf{influence maximization and node classification}.  \vspace{1mm}
+
+The second claim, which states that CrossWalk preserves the higher-order proximity of the graph, was found to be supported. We expanded our research methodology to include an explainability analysis to further demonstrate the validity of the claim. The results of the explainability analysis showed an \textbf{undesired behavioural property of CrossWalk}, where the random walk goes back and forth between edges on the group peripheries, causing the algorithm to \textbf{visit on average 30\% fewer nodes}. This finding prompted the creation of the \textbf{SSA CrossWalk}, a method incorporating a discount function, that aims to stimulate the trajectories of the walks to visit more distinct edges. The results obtained show that SSA CrossWalk increases accuracy and decreases disparity independent of the hyperparameter configurations used for the original algorithm, as shown in Figure \ref{fig:ssa-visualisations-infmax}. \vspace{2mm}
+
+
+\textit{\textbf{Limitations}}: Our contributions suffer from three main drawbacks. First, due to time constraints, we were unable to resolve the outstanding issues regarding link predictions, yet we were able to obtain results that follow the same trends for the other tasks. Second, the re-implementation of the original base significantly decelerated the reproduction process. And finally, the proposed approach is independent of the underlying graph characteristics, which encourages future work in the direction of estimating $\gamma$ via a non-linear function approximation (i.e. neural network-based approaches). 
+
+
+% - time constraints
+% - computational resources
+% - missing important dataset files
+% - refactoring of code
+% - lambda parameter is fixed, further research into estimating this parameter based on grahp heuristics [insert reference] 
+
+
+% Unfortunately, we did encounter some difficulties during the reproduction process. First, since our model was trained on IN-mini, we were not able to reproduce the exact same results as the original paper. However, despite the slightly deviating results, the overall trends in the results seem to correspond well with the original results. Second, as some experimental setup information was missing from the original paper, we had to rely on the default parameter configuration files that were provided in the original code implementation, even though we can not be completely certain that these parameters were used for the original experiments.
+
+%Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{What was easy}
+ The original paper contained the necessary information about the edge re-weighting mechanism and the values of the hyperparameters, which coupled with the publicly available repository, made it straightforward to refactor the code and understand the idea of the proposed method. \\
+
+\subsection{What was difficult}
+Despite having access to the original code for CrossWalk, the process of reproducing the results took significantly more time than initially expected due to a lack of comments, poor code structure, and no documentation. Furthermore, obtaining similar results for the reproducible experiments proved to be not trivial due to the time constraints.
+
+% Nonetheless, reproducing the original results turned out to be far from trivial as the setup of some of the experiments
+% 254 required severe modifications to the provided code. Additionally, some details required for the implementation are not
+% 255 specified in the paper or inconsistent with the specifications in the code
+
+
+%Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\subsection{Communication with original authors}
+The authors cleared up discrepancies in our results and provided additional details through email correspondence. More specifically, we were able to reproduce the results for Node Classification with an additional file provided by the authors, which was initially missing from their repository. 
+
+\newpage
+
+% For example, for Node classification there was a missing file from the Rice-Facebook dataset provided in the original Github repository which contained the labels of the nodes. At first, our results without that file were completely different from the ones in the paper. Furthermore, when running the Crosswalk method, we had at first some problems with passing the hyperparameters used for re-weighting and they helped us clear that out as well. However, the issues with the link prediction task could not be addressed in time by the authors due to time constraints.
+
+% . The missing file in the Rice-Facebook dataset affected the Node classification results, and the authors helped with hyperparameters for the Crosswalk method. The issues with link prediction could not be addressed due to time constraints.
+
+% \begin{table}
+% \hskip-3.5cm\begin{tabular}{c c c c c c c}
+%      & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+%    \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.1_exp_1.0.png}  &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_2.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_4.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_6.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.1_exp_8.0.png}  \\ \addlinespace
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+%    \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.3_exp_1.0.png}  &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_2.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_4.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_6.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.3_exp_8.0.png}  \\ \addlinespace
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+%    \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.5_exp_1.0.png}  &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_2.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_4.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_6.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.5_exp_8.0.png}  \\ \addlinespace
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+%    \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.7_exp_1.0.png}  &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_2.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_4.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_6.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.7_exp_8.0.png}  \\ \addlinespace
+%   \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+%   \includegraphics[width=3.0cm] {node_classification/rice_subset_random_walk_5_bndry_0.9_exp_1.0.png}  &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_2.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_4.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_6.0.png} &
+%    \includegraphics[width=3.0cm]{node_classification/rice_subset_random_walk_5_bndry_0.9_exp_8.0.png}  \\ \addlinespace
+% \end{tabular}
+% \caption{Node classification ablation}
+% \end{table}
+
+% \subsubsection{Ablation study for influence maximization}
+
+% \begin{table}
+% \hskip-3.5cm\begin{tabular}{c c c c c c c}
+%      & $p = 1.0$ & $p = 2.0$ & $p = 4.0$ & $p = 6.0$ & $p = 8.0$  \\
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.1$}\end{tabular}}  &
+%    \includegraphics[width=3.0cm] {influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_1.0_greedy.pdf}  &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_2.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_4.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_6.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.1_exp_8.0_greedy.pdf}  \\ 
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.3$}\end{tabular}} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_1.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_2.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_4.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_6.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.3_exp_8.0_greedy.pdf} \\ \addlinespace
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.5$}\end{tabular}} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_1.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_2.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_4.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_6.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.5_exp_8.0_greedy.pdf} \\ \addlinespace
+%     \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.7$}\end{tabular}} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_1.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_2.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_4.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_6.0_greedy.pdf} &
+%    \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.7_exp_8.0_greedy.pdf} \\ \addlinespace
+%   \raisebox{8mm}{\begin{tabular}{c}\textbf{$\alpha=0.9$}\end{tabular}} &
+%   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_1.0_greedy.pdf} &
+%   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_2.0_greedy.pdf} &
+%   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_4.0_greedy.pdf} &
+%   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_6.0_greedy.pdf} &
+%   \includegraphics[width=3.0cm]{influence_maximization/rice_subset_random_walk_5_bndry_0.9_exp_8.0_greedy.pdf} \\ \addlinespace
+% \end{tabular}
+% \caption{Influence maximization ablation}
+% \end{table}
+% }
+% \begin{figure}%
+%     \centering
+%     \subfloat[\centering DeepWalk]{{\includegraphics[width=3.5cm]{images/synth2_unweighted_d32_edge_vis.png} }}%
+%     \subfloat[\centering DeepWalk]{{\includegraphics[width=3.5cm]{images/synth2_unweighted_d32.png} }}%
+%     \qquad
+%     \subfloat[\centering CrossWalk]{{\includegraphics[width=3.5cm]{images/synth2_random_walk_5_bndry_0.5_exp_2.0_d32_edge_vis.png} }}%
+%     \subfloat[\centering CrossWalk]{{\includegraphics[width=3.5cm]{images/synth2_random_walk_5_bndry_0.5_exp_2.0_d32.png} }}%
+%     \caption{Reweighting visualisation.}
+%     \label{fig:tsne}%
+% \end{figure}
+
