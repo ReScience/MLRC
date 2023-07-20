@@ -1,0 +1,97 @@
+\appendix
+
+
+\section{Model Specifications}
+\label{appendix:Model}
+
+The optimization algorithms evaluated in this study were applied on several models/dataset combinations, as shown in Table \ref{tab:models}. A different model was used for each dataset, depending on the task.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lllr}\toprule
+    \textbf{Dataset} & \textbf{Model} & \textbf{Pretrained} & \textbf{Parameters}\\\midrule
+Simple & Linear Binary Classifier & False & 6 \\
+MNIST & ResNet18 & False & 11M \\
+CMNIST & ResNet18 & True & 11M\\
+WaterBirds & ResNet50 & True & 25M\\
+CelebA & ResNet50 & True & 25M\\
+MultiNLI & DistilBERT-uncased & True & 66M \\
+CivilComments & DistilBERT-uncased & True & 66M \\
+PovertyMap & Resnet18$_{\text{MS}}$  & True & 11M \\
+FMoW & DenseNet121 & True & 76M \\
+Camelyon17    & DenseNet121 & True & 76M \\\bottomrule
+\end{tabular}
+
+\caption{The datasets, alongside the model selection, if they use or not pretrained weights and the number parameters. $\text{Resnet18}_\text{MS}$ refers to Resnet18 Multi-Spectral.}
+\label{tab:models}
+\end{table}
+
+
+\section{Training Group Selection}
+\label{appendix:qualitative_group_sel}
+
+Even though CGD is generally consistent with the group choice, in the Simple-Rotation setup, the group the algorithm focuses on varies, as shown in Figure \ref{fig:rot_per_seed} plots. While for seed 3 CGD correctly identifies the center group for seeds 13 and 42, it focuses on the left group. In comparison, Group-DRO shows a more consistent group choice.
+
+% Although in most cases CGD is consistent in the choice of the group it trains on, we observed that, for the setup with the rotation, depending on the seeds, the group with the biggest alpha changes. This observation is presented on Figure \ref{fig:rot_per_seed}: we can see that for seed 13, the left group is the chosen one for some epochs, and more evidently, for group 42, CGD trains solely group left, focusing on the noisy group, like G-DRO.
+
+\begin{figure}[H]
+   \includegraphics[width=0.95\textwidth]{media/rotation-3-13-42.png}
+   \centering
+   \caption{\texttt{Group-DRO} and \texttt{CGD} group weights $\alpha$ for seeds 3, 13, and 42 over epochs for the Simple dataset and the Rotation setup. While \texttt{Group-DRO} shows a consistent behavior \texttt{CGD} either focuses on the center group as expected (seed 3) or on a mix of the center and left groups}
+   \label{fig:rot_per_seed}
+\end{figure}
+
+\vspace{-20pt}
+
+\section{Hyperparameter Sensitivity}
+\label{appendix:hyps-sensitivity}
+
+We evaluated the hyperparameter sensitivity for \texttt{CGD} with respect to the group adjustment parameter $C$ and the step size $\eta$, using the values in Table \ref{tab:hyps} for the other hyperparameters. While a more throughout evaluation on real-world datasets is recommended, the evaluation was conducted using CMNIST, which allowed us to test multiple values and average the results over three seeds with limited compute.
+
+\begin{figure}[H]
+   \includegraphics[width=\textwidth]{media/cmnist-hyp-c.png}
+   \centering
+   \caption{The average and worst group accuracies obtained by \texttt{CGD} on CMNIST with respect to the group adjustment parameter $C$. The results are averaged over three seeds.}
+   \label{fig:cmnist_hyp_c}
+\end{figure}
+
+To evaluate the effect of $C$ we fixed the step size $\eta$ to $0.05$ and trained the model using $C \in \{0,1,2,5,10,20\}$. By observing the plots in Figure \ref{fig:cmnist_hyp_c} we can notice that large increases of $C$ lead to a degradation of training performance for the average and worst group accuracy but, interestingly, this effect is not replicated in the validation set, which instead reveals that both small and large values of $C$ cause instabilities in the validation metrics. This is confirmed by the test set results in Table \ref{tab:cmnist-hyps}, for which $C \in \{5, 10\}$ perform best with regards to the average and worst group accuracies.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Step Size $\eta$} & \textbf{Avg. Acc.} & \textbf{W.g. Acc.} \\ 
+        \midrule
+        0.001 & 0.973 & 0.968 \\
+        0.01 &  0.978 & 0.973 \\
+        0.05 &  0.976 & 0.963 \\
+        0.1 &   0.980 & 0.972 \\
+        1 &     0.978 & 0.971 \\
+    \bottomrule
+    \end{tabular}
+    \hspace{30pt}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{$C$} & \textbf{Avg. Acc.} & \textbf{W.g. Acc.} \\ 
+        \midrule
+        0 & 0.974 & 0.964 \\
+        1 &  0.974 & 0.962 \\
+        2 &  0.976 & 0.963 \\
+        5 &  0.975 & 0.972 \\
+        10 &  0.976 & 0.972 \\
+        20 &  0.974 & 0.966 \\
+    \bottomrule
+    \end{tabular}    
+    \caption{The average and worst group accuracies for the test set of CMNIST obtained by \texttt{CGD} with respect to the group adjustment parameter $C$ and the step size $\eta$}
+    \label{tab:cmnist-hyps}
+\end{table}
+
+As for the step size hyperparameter $\eta$ we fixed $C = 2$ and evaluted the performance of \texttt{CGD} over the set $\{1,0.1,0.05,0.01,0.001\}$. With regards to the training performance the different values performed similarly, but as can be seen in figure \ref{fig:cmnist_hyp_eta} the validation set accuracy shows that smaller values result in a more unstable training, and, as confirmed by the test set metrics in Table \ref{tab:cmnist-hyps}, $\eta \in \{0.1, 1\}$ work best for this dataset.
+
+\begin{figure}[H]
+   \includegraphics[width=\textwidth]{media/cmnist-hyp-eta.png}
+   \centering
+   \caption{The average and worst group accuracies obtained by \texttt{CGD} on CMNIST with respect to the step size parameter $\eta$. The results are averaged over three seeds.}
+   \label{fig:cmnist_hyp_eta}
+\end{figure}
