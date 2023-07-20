@@ -1,0 +1,38 @@
+\section*{\centering Reproducibility summary} 
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+This paper analyses the reproducibility of the study \textit{Proto2Proto: Can you recognize the car, the way I do?} \cite{keswani2022proto2proto}. The main contributions and claims of the study are: 1) Using Proto2Proto, a shallower student model is more faithful to the teacher in terms of interpretability than a baseline student model while also showing the same or better accuracy; 2) Global Explanation loss forces student prototypes to be close to teacher prototypes; 3) Patch-Prototype Correspondence loss enforces the local representations of the student to be similar to those of the teacher; 4) The proposed evaluation metrics determine the faithfulness of the student to the teacher in terms of interpretability. 
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments.
+
+A public code repository was available for the paper, which provided a working but incomplete and minimally documented codebase. With some modifications we were able to carry out the experiments that were best supported by the codebase. We spent a total of 60 computational GPU hours on reproduction. 
+%The authors provided a conda environment file and code for training a teacher and student model, but only for a single experiment setting. ((((The environment did not install properly on Windows and no weights were provided)))) , forcing us to train every model ourselves, which required a lot of time. TBD LIST GPU SPECS
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+The results we were able to produce support claim 1, albeit weakly. Further results are in line with the paper, but we found them to go against claim 3. In addition, we carried out a theoretical analysis which provides support for claim 4. Finally, we were unable to carry out our intended experiment to verify claim 2.
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The original paper was clearly structured and understandable. The experiments for which configurations were provided were simple to conduct.
+
+\subsubsection*{What was difficult}
+The public codebase contained minimal documentation. Moreover, the use of variable names did not correspond between the code and the paper. Furthermore, the codebase lacked elements vital to reproducing some experiments. Another significant constraint were the computational requirements needed to reproduce the original experiments. Finally, the code required to reproduce one of the visualizations was not provided.
+
+%There was minimal documentation, the code did not work on the CPU, and the codebase was incomplete. Furthermore, the necessary computational resources to train the models with the provided hyperparameters were beyond our capacity.
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsubsection*{Communication with original authors}
+We contacted the authors to ask for trained model weights and missing hyperparameters for several experiments. We did not receive a response.
+% Briefly describe how much contact you had with the original authors (if any).
