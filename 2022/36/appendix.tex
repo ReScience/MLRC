@@ -1,0 +1,88 @@
+\newpage
+\appendix
+
+\textbf{\huge Appendices}
+\vspace{0.15in}
+
+
+\section{The age-annotated dataset}
+\label{app:dataset}
+
+To run the additional experiments of the LIC metric for bias in captioning models introduced in \cite{Hirota2022}, we needed a captioned images dataset annotated for the protected attribute we wanted to study: age. \par
+
+We decided to use the same images and captions used in the original paper, that is, a subset of the MSCOCO dataset \cite{MSCOCO}. As we were unable to find age annotations for this dataset, we manually classified 7,036 images as either "young" or "old" to use in our experiments. These images correspond to a subset of the intersection of the images used in the original paper by the models we wanted to study (SAT \cite{SAT}, OSCAR \cite{OSCAR}, NIC+ \cite{Burns2018} and NIC+Equalizer \cite{Burns2018}).\par
+
+
+\begin{figure}[bht]
+     \centering
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/young1.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/old1.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/young2.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/old2.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/young3.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{img/old3.png}
+     \end{subfigure}
+\caption{Some examples of elements of the age-annotated caption dataset. Each elements contains the id of the corresponding image, a label (either "young" or "old", five captions written by human annotators (one of which is shown) and captions predicted by the studied models: SAT, OSCAR, NIC+ and NIC+Equalizer. These examples have already had their agewords masked.}
+\end{figure}
+
+\section{List of age-related words}
+\label{app:agewords}
+
+To better asses the usefulness of the LIC metric for measuring age bias, we masked some words related to age in the captions, and substituted them with a special token. The list of words we masked is: \par
+
+child, children, young, baby, babies, kid, kids, little, boy, boys, girl, girls, old, man, men, woman, women, lady, ladies, gentleman, gentlemen, person, people, guy, guys, teenager, teenagers, teen, teens, adult, adults, elderly, elder.
+
+
+\section{Using different vocabularies}
+
+One of the problems that arises when comparing human-generated and AI-generated captions is that humans tend to use a much richer vocabulary. The experiments conducted in the original paper \cite{Hirota2022} and the age extension presented in this study solve this by masking all words which do not appear in the model vocabulary with a special token when presenting them to the classifier.
+
+However, we also tried a different approach. Instead of using the model vocabulary, we tried using the most common words in the human captions, that is, masking every word not among the $n$ most common where $n$ is the size of the vocabulary used by the studied model. Table \ref{table:age-vocab} shows the LIC scores obtained when using this vocabulary.
+
+\begin{table}[hbt]
+\footnotesize
+\centering
+\addtolength{\leftskip} {-3cm}
+\addtolength{\rightskip}{-3cm}
+
+\begingroup
+\setlength{\tabcolsep}{3pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.2} % Default value: 1
+
+\begin{tabular}{lccccccccccc}
+\hline
+\multirow{2}{*}{Model} & \multicolumn{3}{c}{LSTM} & & \multicolumn{3}{c}{BERT-ft} & & \multicolumn{3}{c}{BERT-pre} \\ \cline{2-4} \cline{6-8} \cline{10-12} 
+                               & LIC$_M$        & LIC$_D$ & LIC & & LIC$_M$  & LIC$_D$  & LIC & & LIC$_M$  & LIC$_D$  & LIC  \\ \hline
+SAT \cite{SAT}                 & 48.7 $\pm$ 1.8 & 43.2 $\pm$ 1.1 & 5.5 & & 51.7 $\pm$ 1.5 & 48.9 $\pm$ 1.3 & 2.8 & & 37.0 $\pm$ 1.4 & 33.2 $\pm$ 0.8 & 3.8 \\
+OSCAR  \cite{OSCAR}            & 53.3 $\pm$ 1.7 & 43.2 $\pm$ 1.0 & \textbf{\color{red}10.1} & & 55.9 $\pm$ 2.0 & 50.3 $\pm$ 2.0 & \textbf{\color{red}5.6} & & 39.6 $\pm$ 1.8 & 33.5 $\pm$ 0.8 & \textbf{\color{red}6.1} \\
+NIC+ \cite{Burns2018}          & 43.1 $\pm$ 1.5 & 43.3 $\pm$ 1.1 & \textbf{\color{green}-0.2} & & 46.6 $\pm$ 1.7 & 48.9 $\pm$ 1.2 & \textbf{\color{green}-2.4} & & 35.5 $\pm$ 1.1 & 33.3 $\pm$ 0.7 & 2.1 \\
+NIC+Equalizer \cite{Burns2018} & 43.2 $\pm$ 1.6 & 43.0 $\pm$ 1.1 & 0.2 & & 46.7 $\pm$ 1.6 & 48.8 $\pm$ 1.3 & -2.1 & & 34.8 $\pm$ 1.8 & 33.3 $\pm$ 0.8 & \textbf{\color{green}1.5} \\ \hline
+\end{tabular}
+\caption{Age bias scores according to LIC, LIC$_M$, and LIC$_D$ for several image captioning models, when using vocabularies consisting on the most common words in the human-produced captions. Captions are encoded with LSTM \cite{LSTM}, BERT-ft (fine-tuned) or BERT-pre (pre-trained) \cite{BERT}.}
+\label{table:age-vocab}
+\endgroup
+\end{table}
+
+We notice that these results also support the claims stated in the original paper, even if the LIC scores are noticeably different. Further research may be conducted on how the use of different vocabularies affect the LIC score.

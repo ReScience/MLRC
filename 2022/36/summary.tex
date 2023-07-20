@@ -1,0 +1,28 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+In this work we reproduce and extend the results presented in ``Quantifying Societal Bias Amplification in Image Captioning" by Hirota et al. \cite{Hirota2022}. 
+ This paper introduces LIC, a metric to quantify bias amplification by image captioning models, which is tested for gender and racial bias amplification. 
+
+The original paper claims that this metric is robust, and that all models amplify both gender and racial bias. It also claims that gender bias is more apparent than racial bias, and the Equalizer variation of the NIC+ model \cite{Burns2018} increases gender but not racial bias. We repeat the measurements to confirm these claims. We extend the analysis to whether the method can be generalized to other attributes such as bias in age.
+
+\subsubsection*{Methodology}
+
+The authors of the paper provided a repository containing the necessary code. We had to modify it and add several scripts to be able to run all the experiments. The results were reproduced using the same subset of COCO \cite{zhao2021captionbias} as in the original paper. Additionally, we manually labeled images according to age for our specific experiments. All experiments were ran on GPUs for a total of approximately 100 hours.
+
+\subsubsection*{Results}
+
+All claims made by the paper \cite{Hirota2022} seem to hold, as the results we obtained follow the same trends as those presented in the original paper even if they do not match exactly.
+However, the same cannot always be said of the additional experiments.
+
+\subsubsection*{What was easy}
+
+The paper was clear and matched the implementation. The code was well organized and was easy to run using the command interface provided by the authors. This also made it easy to replicate and expand upon it by adding our own new features. The data was also readily available and could be easily downloaded with no need for preprocessing.
+
+\subsubsection*{What was difficult}
+ 
+We had to run several iterations of the same code, using different seeds and models, to get the results with the same conditions as in the original paper, which made use of time and resources. Our own experiments required additional time to hand-annotate data due to lack of data for new features.
+
+\subsubsection*{Communication with original authors}
+There was no contact with the authors, since the code and the experiments were clear and did not need any additional explanation.

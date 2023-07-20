@@ -1,0 +1,229 @@
+
+\section{Introduction} 
+It has been shown that large-scale computer vision models are often biased \cite{GenderShades}, and detecting and addressing these biases is nowadays an active research field. It has also been shown \cite{Data-feminism} that the bias in the results originates not only from biased data, but also from the models themselves.
+
+Even though these biases are well known, there is no standard metric to measure them. The paper we aim to reproduce \cite{Hirota2022} introduces the \it Leakage for Image Captioning \rm metric (LIC), which measures how much bias is introduced by the model considering the bias present in the dataset as a baseline.
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+The original paper \cite{Hirota2022} introduces the LIC score as a measure of how much bias is introduced by the model. It makes some claims on the performance of this metric.
+\begin{itemize}
+    \item \bf Claim 1: \rm LIC is robust against encoders. Its overall tendency is maintained across all language models (LSTM \cite{LSTM}, BERT-ft, BERT-pre \cite{BERT}). This claim is supported by the data presented on Tables \ref{table:gender-bias} and \ref{table:race-bias}.
+    \item \bf Claim 2: \rm All models amplify both gender and race bias. This is supported by the results presented in Section \ref{sec:results-op}.
+    \item \bf Claim 3: \rm Racial bias is not as apparent as gender bias. This can be concluded by comparing the data presented in Table \ref{table:gender-bias} and Table \ref{table:race-bias}.
+    \item \bf Claim 4: \rm NIC + Equalizer \cite{Burns2018} increases gender bias, but not racial bias, with respect to the baseline (NIC+). This effect is shown by the data presented in the last row of Tables \ref{table:gender-bias} and \ref{table:race-bias}.
+\end{itemize}
+
+\section{Methodology}
+
+To replicate the results of the original paper \cite{Hirota2022}, we used the source code provided by the authors, only making minimal changes. We also used the same datasets (Section \ref{sec:datasets}). We ran the experiments on a GPU.
+
+For the experiments beyond the original paper, we re-used the code provided by the authors of the paper and prepared our own dataset. The data was processed to match the input data format so that the modifications in the code were minimal.
+
+\subsection{Model descriptions}
+
+The aim of this study is to test the use of LIC introduced in the original paper \cite{Hirota2022} as a metric for bias in captioning models. This score is defined as
+\begin{equation}
+\textup{LIC} = \textup{LIC}_M - \textup{LIC}_D
+\end{equation}
+where
+\begin{equation}
+\textup{LIC}_M = \frac{1}{|\hat{\mathcal{D}}|} \sum_{(\hat{y}, a) \in \hat{\mathcal{D}}} \hat{s}_a(\hat{y})\mathbf{1}[\hat{f}(\hat{y}) = a]\text ,
+\end{equation}
+
+\begin{equation}
+\textup{LIC}_D = \frac{1}{|\mathcal{D}|} \sum_{(y^*, a) \in \mathcal{D}} s^*_a (y^*) \mathbf{1}[f^*(y^*) = a]\text .
+\end{equation}
+
+$\mathcal{D}$ represents the set of samples, $y$ represents their provided caption annotations, $f$ is a classifier and $s$ is a confidence score \cite{Hirota2022}. All variables with $\,\hat{ }\,$ apply to the captions predicted by the captioning models, while those with $^*$ apply to the human-captioned database. The ground truth of the protected attribute of the image is represented by $a$.
+
+
+We computed the LIC score of nine image captioning models: NIC \cite{NIC}, SAT \cite{SAT}, FC \cite{Rennie2017}, Att2in \cite{Rennie2017}, UpDn  \cite{UpDn}, Transformer \cite{Transformer}, OSCAR \cite{OSCAR} (which is transformer-based), NIC+ \cite{Burns2018}, and NIC+Equalizer \cite{Burns2018}, which is a variation of NIC+ which aims to reduce gender bias. We didn't use these models directly, but the captions produced by them available in the source code of the original paper.
+
+
+We limited our experiments on age to the models SAT, OSCAR, NIC+ and NIC+Equalizer. These models give a good overview of the trends when applied to other attributes.
+
+To obtain the predicted protected attribute, we use three different classifiers. We first use an LSTM  \cite{LSTM} without pre-computed word embeddings. We then use BERT \cite{BERT}, both fine-tuned for this task and its pre-trained version.
+
+\subsection{Datasets}
+\label{sec:datasets}
+
+We used the same dataset as the original paper, that is, a subset of the MSCOCO dataset \cite{MSCOCO} with binary gender and race annotations provided in \cite{zhao2021captionbias}. For further experiments we used a subset of the original data which had to be hand-annotated for age. Further description of the dataset can be found in the experiments section (Section \ref{sec:results-beyond}) and Appendix \ref{app:dataset}. Links to download these datasets are available in the link to the code provided in Section \ref{sec:code}.
+
+The data we used consists of 10,780 images for gender; 10,969 for race and 7,036 for age. Instead of the whole available dataset, we used a balanced split for each attribute, which consisted of 6,628 total images for gender; 2,192 for race and 4,870 for age. These subsets where then randomly divided into train and test splits with 90\% being used for training and 10\% for testing in all cases.
+
+\subsection{Hyperparameters}
+
+We used the same hyperparameters described in the original paper \cite{Hirota2022}, which are learning rate of 1 $\cdot 10^{-5}$ and batch size of 64. \par
+
+For the LSTM model, we used embeddings of dimension 100 and 2 layers with 256 hidden dimensions, with a dropout rate of 0.5, and ran it for 20 epochs. \par 
+
+For both variants of the BERT model \cite{BERT}, we used the Adam optimizer with $\beta_1 = $0.9, $\beta_2 =$ 0.98 and $\varepsilon$ = 1 $\cdot 10^{-6}$. We limited the sequence length to 64 and ran the model for 5 epochs.
+
+\subsection{Experimental setup and code}
+\label{sec:code}
+
+The code used to replicate and extend the experiments can be found in our GitHub repository\footnote{
+\url{https://github.com/eggonz/relic-caption-bias}}. It contains all the scripts, pipelines and instructions necessary to replicate the results.
+
+\subsection{Computational requirements}
+
+Due to our limited resources, we did not train the captioning models in order to replicate the experiments presented in the original paper. We instead used the data provided in its source code. We did, however, fine-tune a version of BERT \cite{BERT} and compared its performance to the pre-trained version. We ran every experiment with 10 seeds and present the results as the mean and standard deviation of all runs.
+
+Half of the experiments on both BERT versions were performed using the GPUs available on \it Google Colab\rm, while the other half was ran using an NVIDIA Titan RTX GPU. This took approximately 14 hours for gender bias and 5 hours for racial bias for the pre-trained version and  34 hours for gender bias and 13 hours for racial bias for fine-tuning and experimenting on the fine-tuned version. 
+
+The experiments on an LSTM were run locally on an NVIDIA GeForce MX150 GPU. This took approximately 22 hours for gender bias and 6 hours for racial bias.
+
+The additional experiments ran using age as a protected attribute were all ran on an NVIDIA Titan RTX GPU, which took approximately 1 hour for LSTM, 5.5 hours for the fine-tuned version of BERT and 2 hours for the pre-trained version.
+
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Results reproducing original paper}
+\label{sec:results-op}
+All claims made by the authors are also supported by our experiments. We notice that even though the results obtained do not match those in the original paper \cite{Hirota2022}, the overall trends present do support the claims stated in Section \ref{sec:claims}.
+
+\subsubsection{Gender bias scores according to LIC}
+The results we obtained by replicating the experiments on gender bias are shown in Table \ref{table:gender-bias}.
+
+\begin{table}[H]
+
+\footnotesize
+\centering
+\addtolength{\leftskip} {-3cm}
+\addtolength{\rightskip}{-3cm}
+
+\begingroup
+\setlength{\tabcolsep}{3pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.2} % Default value: 1
+
+\begin{tabular}{lccccccccccc}
+\hline
+\multirow{2}{*}{Model} & \multicolumn{3}{c}{LSTM} & & \multicolumn{3}{c}{BERT-ft} & & \multicolumn{3}{c}{BERT-pre} \\ \cline{2-4} \cline{6-8} \cline{10-12} 
+                               & LIC$_M$        & LIC$_D$ & LIC & & LIC$_M$  & LIC$_D$  & LIC & & LIC$_M$  & LIC$_D$  & LIC  \\ \hline
+NIC \cite{NIC}                  & 42.4 $\pm$ 0.8 & 39.6 $\pm$ 0.9 & \textbf{\color{green}2.8} & & 49.0 $\pm$ 1.5 & 48.0 $\pm$ 1.1 & 1.0 & & 38.0 $\pm$ 0.7 & 35.1 $\pm$ 0.4 & \textbf{\color{green}2.9} \\
+SAT \cite{SAT}                  & 45.7 $\pm$ 1.6 & 39.3 $\pm$ 1.0 & 6.4 & & 48.6 $\pm$ 1.0 & 47.5 $\pm$ 1.3 & 1.1 & & 39.4 $\pm$ 1.0 & 35.9 $\pm$ 0.7 & 3.5 \\
+FC \cite{Rennie2017}            & 46.3 $\pm$ 1.1 & 37.9 $\pm$ 0.9 & 8.4 & & 48.5 $\pm$ 1.9 & 45.9 $\pm$ 1.3 & 2.6 & & 41.1 $\pm$ 1.4 & 35.1 $\pm$ 0.6 & \textbf{\color{red}6.0} \\
+Att2in \cite{Rennie2017}        & 45.7 $\pm$ 0.8 & 38.4 $\pm$ 1.0 & 7.2 & & 47.7 $\pm$ 1.6 & 46.8 $\pm$ 1.2 & \textbf{\color{green}0.9} & & 40.4 $\pm$ 1.2 & 35.3 $\pm$ 0.6 & 5.1 \\
+UpDn  \cite{UpDn}               & 48.3 $\pm$ 1.5 & 39.0 $\pm$ 0.8 & 9.3 & & 52.6 $\pm$ 1.2 & 47.5 $\pm$ 1.2 & 5.1 & & 41.8 $\pm$ 1.5 & 35.8 $\pm$ 0.7 & \textbf{\color{red}6.0} \\
+Transformer \cite{Transformer}  & 48.7 $\pm$ 1.5 & 39.8 $\pm$ 0.9 & 9.0 & & 53.7 $\pm$ 1.7 & 48.4 $\pm$ 1.2 & 5.2 & & 40.0 $\pm$ 1.9 & 36.1 $\pm$ 0.6 & 3.9 \\
+OSCAR \cite{OSCAR}              & 49.0 $\pm$ 1.4 & 39.3 $\pm$ 0.9 & 9.7 & & 52.4 $\pm$ 1.6 & 47.7 $\pm$ 1.3 & 4.7 & & 40.8 $\pm$ 1.1 & 35.1 $\pm$ 0.6 & 5.7 \\
+NIC+ \cite{Burns2018}           & 46.8 $\pm$ 1.6 & 39.4 $\pm$ 0.8 & 7.4 & & 49.9 $\pm$ 2.2 & 47.7 $\pm$ 1.2 & 2.2 & & 39.1 $\pm$ 1.5 & 35.0 $\pm$ 0.6 & 4.1 \\
+NIC+Equalizer \cite{Burns2018}  & 51.5 $\pm$ 1.5 & 39.4 $\pm$ 0.9 & \textbf{\color{red}12.2} & & 54.6 $\pm$ 1.5 & 47.6 $\pm$ 1.4 & \textbf{\color{red}7.0} & & 39.9 $\pm$ 1.5 & 35.1 $\pm$ 0.6 & 4.8 \\ \hline
+\end{tabular}
+\caption{Gender bias scores according to LIC, LIC$_M$, and LIC$_D$ for several image captioning models. Captions are encoded with LSTM \cite{LSTM}, BERT-ft (fine-tuned) or BERT-pre (pre-trained) \cite{BERT}.}
+\label{table:gender-bias}
+\endgroup
+\end{table}
+
+We can see that these results support the claims presented in Section \ref{sec:claims}. We see that, as the first claim states, the overall tendency of LIC values for gender bias is consistent across language models.
+
+We also notice that all models increase gender bias, as claim 2 maintains. In particular, NIC+Equalizer \cite{Burns2018} has a higher LIC score than NIC+ \cite{Burns2018}, which supports claim 4.
+
+\subsubsection{Racial bias scores according to LIC}
+The results we obtained by replicating the experiments on racial bias are shown in Table \ref{table:race-bias}.
+
+\begin{table}[hbt]
+
+\footnotesize
+\centering
+\addtolength{\leftskip} {-3cm}
+\addtolength{\rightskip}{-3cm}
+
+\begingroup
+\setlength{\tabcolsep}{3pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.2} % Default value: 1
+
+\begin{tabular}{lccccccccccc}
+\hline
+\multirow{2}{*}{Model} & \multicolumn{3}{c}{LSTM} & & \multicolumn{3}{c}{BERT-ft} & & \multicolumn{3}{c}{BERT-pre} \\ \cline{2-4} \cline{6-8} \cline{10-12} 
+                               & LIC$_M$        & LIC$_D$ & LIC & & LIC$_M$  & LIC$_D$  & LIC & & LIC$_M$  & LIC$_D$  & LIC  \\ \hline
+NIC  \cite{NIC}                & 32.4 $\pm$ 1.5 & 27.8 $\pm$ 1.1 & \textbf{\color{green}4.6} & & 36.4 $\pm$ 1.7 & 36.8 $\pm$ 1.1 & \textbf{\color{green}-0.5} & & 28.3 $\pm$ 2.0 & 29.0 $\pm$ 0.9 & \textbf{\color{green}-0.7} \\
+SAT \cite{SAT}                 & 32.4 $\pm$ 1.9 & 26.8 $\pm$ 0.8 & 5.5 & & 37.0 $\pm$ 2.0 & 36.5 $\pm$ 1.1 & 0.5 & & 28.9 $\pm$ 1.8 & 28.6 $\pm$ 0.7 & 0.3 \\
+FC \cite{Rennie2017}           & 33.5 $\pm$ 2.4 & 26.2 $\pm$ 0.7 & 7.3 & & 39.2 $\pm$ 2.7 & 36.3 $\pm$ 1.2 & 2.9 & & 30.4 $\pm$ 1.9 & 28.4 $\pm$ 0.8 & 1.9 \\
+Att2in \cite{Rennie2017}       & 35.3 $\pm$ 2.5 & 26.8 $\pm$ 0.8 & \textbf{\color{red}8.5} & & 40.6 $\pm$ 2.7 & 36.3 $\pm$ 1.0 & \textbf{\color{red}4.3} & & 31.0 $\pm$ 2.1 & 28.3 $\pm$ 0.9 & \textbf{\color{red}2.7} \\
+UpDn   \cite{UpDn}             & 34.4 $\pm$ 2.3 & 26.8 $\pm$ 1.0 & 7.6 & & 41.0 $\pm$ 2.7 & 36.7 $\pm$ 0.9 & \textbf{\color{red}4.3} & & 31.0 $\pm$ 1.3 & 28.7 $\pm$ 1.1 & 2.3 \\
+Transformer \cite{Transformer} & 33.6 $\pm$ 1.9 & 27.3 $\pm$ 0.6 & 6.4 & & 40.3 $\pm$ 2.1 & 37.4 $\pm$ 1.5 & 2.8 & & 30.4 $\pm$ 1.6 & 28.9 $\pm$ 0.8 & 1.5 \\
+OSCAR  \cite{OSCAR}            & 33.1 $\pm$ 1.8 & 27.2 $\pm$ 1.2 & 5.9 & & 39.0 $\pm$ 2.1 & 36.7 $\pm$ 1.2 & 2.3 & & 30.2 $\pm$ 2.8 & 28.6 $\pm$ 1.0 & 1.6 \\
+NIC+ \cite{Burns2018}          & 34.8 $\pm$ 2.1 & 27.4 $\pm$ 1.3 & 7.4 & & 41.7 $\pm$ 5.4 & 39.9 $\pm$ 5.0 & 1.8 & & 30.2 $\pm$ 2.2 & 28.7 $\pm$ 1.1 & 1.5 \\
+NIC+Equalizer \cite{Burns2018} & 35.1 $\pm$ 2.3 & 27.3 $\pm$ 0.8 & 7.8 & & 43.4 $\pm$ 8.0 & 39.5 $\pm$ 5.0 & 3.9 & & 30.2 $\pm$ 2.0 & 28.9 $\pm$ 0.7 & 1.3 \\ \hline
+\end{tabular}
+\caption{Racial bias scores according to LIC, LIC$_M$, and LIC$_D$ for several image captioning models. Captions are encoded with LSTM \cite{LSTM}, BERT-ft (fine-tuned) or BERT-pre (pre-trained) \cite{BERT}.}
+\label{table:race-bias}
+\endgroup
+\end{table}
+
+These results also show that the LIC metric is consistent across models, and that all models (with small exceptions only when using BERT as a language model) do increase racial bias, as stated in claims 1 and 2.
+
+Regarding claim 3, it is supported by comparing Table \ref{table:gender-bias} and Table \ref{table:race-bias}. As can be seen, the bias scores are consistently lower for all models for racial bias then for gender bias.
+
+We notice that claim 4 also holds. Unlike in the case of gender bias, we can see that NIC+Equailizer \cite{Burns2018} does not increase bias with respect to NIC+ \cite{Burns2018}.
+
+
+\subsection{Results beyond original paper}
+\label{sec:results-beyond}
+
+After running the experiments for gender and racial bias, we decided to study whether the same results are also obtained for a new protected attribute, age. We want to determine if the trends that we observed in the previous experiments and the main claims of the original paper hold true when considering age bias. To do this, we computed the LIC score of SAT \cite{SAT} and OSCAR \cite{OSCAR} as representative models of classical and state-of-the-art image captioning, respectively; and NIC+ \cite{Burns2018} and NIC+Equalizer \cite{Burns2018}, to be able to compare the results of the fourth claim applied to age bias. We used the same three classifiers LSTM \cite{LSTM}, BERT fine-tuned and BERT pre-trained \cite{BERT}, all with the same hyperparameters as described above. 
+ 
+\subsubsection{Additional Result 1}
+
+We observe that some of the claims of the original paper \cite{Hirota2022} exposed in section \ref{sec:claims} hold when using age as a protected attribute, while others do not. \par
+
+
+\begin{table}[hbt]
+
+\footnotesize
+\centering
+\addtolength{\leftskip} {-3cm}
+\addtolength{\rightskip}{-3cm}
+
+\begingroup
+\setlength{\tabcolsep}{3pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.2} % Default value: 1
+
+\begin{tabular}{lccccccccccc}
+\hline
+\multirow{2}{*}{Model} & \multicolumn{3}{c}{LSTM} & & \multicolumn{3}{c}{BERT-ft} & & \multicolumn{3}{c}{BERT-pre} \\ \cline{2-4} \cline{6-8} \cline{10-12} 
+                               & LIC$_M$        & LIC$_D$ & LIC & & LIC$_M$  & LIC$_D$  & LIC & & LIC$_M$  & LIC$_D$  & LIC  \\ \hline
+SAT \cite{SAT}                 & 48.5 $\pm$ 1.4 & 42.2 $\pm$ 1.3 & 6.4 & & 52.1 $\pm$ 1.9 & 48.0 $\pm$ 1.4 & 4.1 & & 37.0 $\pm$ 1.4 & 33.3 $\pm$ 0.5 & 3.7 \\
+OSCAR  \cite{OSCAR}            & 52.9 $\pm$ 1.9 & 43.6 $\pm$ 4.1 & \textbf{\color{red}9.3} & & 55.9 $\pm$ 2.0 & 48.1 $\pm$ 0.8 & \textbf{\color{red}7.8} & & 39.6 $\pm$ 1.8 & 33.4 $\pm$ 0.9 & \textbf{\color{red}6.2} \\
+NIC+ \cite{Burns2018}          & 43.0 $\pm$ 1.6 & 42.1 $\pm$ 1.0 & \textbf{\color{green}0.9} & & 46.6 $\pm$ 1.7 & 47.5 $\pm$ 1.1 & -0.9 & & 35.1 $\pm$ 1.1 & 32.9 $\pm$ 1.6 & 2.2 \\
+NIC+Equalizer \cite{Burns2018} & 43.3 $\pm$ 1.5 & 42.0 $\pm$ 1.1 & 1.3 & & 46.7 $\pm$ 1.6 & 47.9 $\pm$ 1.1 & \textbf{\color{green}-1.1} & & 34.8 $\pm$ 1.8 & 33.0 $\pm$ 0.9 & \textbf{\color{green}1.9} \\ \hline
+\end{tabular}
+\caption{Age bias scores according to LIC, LIC$_M$, and LIC$_D$ for several image captioning models. Captions are encoded with LSTM \cite{LSTM}, BERT-ft (fine-tuned) or BERT-pre (pre-trained) \cite{BERT}.}
+\label{table:age-bias}
+\endgroup
+\end{table}
+
+We first notice that claim 1 holds, as the LIC scores are consistent across classifiers for all studied models. The data also implies that claim 4 holds beyond the use of only race as an alternative protected attribute to gender, as NIC+Equalizer \cite{Burns2018} does not significantly increase age bias with respect to the baseline. This supports the claim that it only increases gender bias.
+
+On the other hand, we can observe that the data does not support claim 2, as not all models increase age bias. This opens the possibility of further study on whether the different models increase bias for different protected attributes.
+
+Regarding claim 3, we see that age bias is not consistently more or less apparent than either gender or race bias. 
+
+\section{Discussion}
+
+Although the results from the experiments do not replicate the exact results which the authors of the original paper \cite{Hirota2022} obtained, they do follow the same trend that is observed in the original results of the paper. The results obtained in our experiments therefore support the claims made by the authors. The source code was also hardly modified to run the experiments and the same seeds were used to reproduce the results.
+
+For the experiments beyond the original paper, we could not find a dataset which contained images with captions which were annotated for age. This led us to hand-annotating the dataset for age. Due to a lack of time most images that were annotated were not checked and only annotated by a single person. The results of the experiments were also run on different GPU's which might cause inconsistency. The LIC scores obtained by running the experiments on this dataset also support most of the claims stated in the original paper, with the exception of claim 2.
+
+\subsection{What was easy}
+
+The original paper \cite{Hirota2022} was clear in stating the claims supported by the results they obtained, which made it easy for us to identify what we should be looking for when replicating them.
+
+It also provided us with the source code needed to reproduce the experiments and extensive instructions on how to run it, which made the work easier. We only needed to make minor changes to be able to reproduce the given results. The source code was also clear enough that we were able to easily identify the parts that needed to be modified to run the experiments on a new protected attribute (age) and update them. 
+
+\subsection{What was difficult}
+
+The main difficulty of this study was the amount of hours needed to run all of the experiments. As we did not always have reliable access to a GPU, we had to run them in small batches over the course of weeks, which was time-consuming. In addition, even running the same seeds, we still got noticeably different results than the original paper \cite{Hirota2022}, even if our results still support their claims on the LIC metric.
+
+In the beginning we also had a bit of trouble with installing the environment needed to run the code. Although worked for some of us locally, we had some trouble getting it to work on the more powerful GPUs we had available, which made running the code take even longer since we had to run it on \it Google Colab\rm.
+
+We also notice that the results of the experiments vary greatly when ran using different seeds, which led to us running them many times and increasing the number of hours of GPU access needed. 
+
+Another difficulty we encountered was the lack of age annotations in the provided dataset, which we needed in order to perform the additional experiments. We solved this by annotating ourselves the subset of the MSCOCO dataset \cite{MSCOCO} for which we had the captions produced by the models we wanted to study.
+
+\subsection{Communication with original authors}
+
+ There was no contact with the authors, since the code and the experiments were clear and did not need any additional explanation. 
