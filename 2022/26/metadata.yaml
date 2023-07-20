@@ -1,0 +1,121 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: '[Re] Reproducibility Study of "Quantifying Societal Bias Amplification in Image Captioning"'
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Farrukh Baratov
+    orcid: 0009-0008-7997-2668
+    email: farrukh.baratov@student.uva.nl
+    affiliations: 1,2,*
+
+  - name: Göksenin Yüksel
+    orcid: 0009-0005-5045-0522
+    email: goksenin.yuksel@student.uva.nl
+    affiliations: 1,2 # * is for contact author
+
+  - name: Darie Petcu
+    orcid: 0009-0006-5780-0780
+    email: darie.petcu@student.uva.nl
+    affiliations: 1,2
+
+  - name: Jan Bakker
+    orcid: 0009-0002-9085-8491
+    email: jan.bakker@student.uva.nl
+    affiliations: 1,2
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code: 1
+    name: University of Amsterdam
+    address: The Netherlands
+
+  - code: 2
+    name: Equal contributions
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x, python, machine learning, deep learning, reproducibility, bias, gender bias, racial bias, age bias, bias estimation, bias amplification, leakage in image captioning
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/fbaratov/mlrc-lic-plus-age
+  - swh: swh:1:dir:42a11dd6a0c47c1ad4d57649d08238230c570fb3;origin=https://github.com/fbaratov/mlrc-lic-plus-age;visit=swh:1:snp:222b530d4c368546db5fe7ae6ef7d18e4f949429;anchor=swh:1:rev:32f722b1d60dfd9412a3c98b7e874f679536ac77
+
+# Data URL and DOI (optional if no data)
+data:
+  - url: https://drive.google.com/drive/folders/1PI03BqcnhdXZi2QY9PUHzWn4cxgdonT-
+  - doi: 10.48550/arXiv.2106.08503
+
+# Information about the original article that has been replicated
+replication:
+  - cite: 'Y. Hirota, Y. Nakashima, and N. Garcia. "Quantifying Societal Bias Amplification in Image Captioning." In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2022, pp. 1345013459.' # Full textual citation
+  - bib: hirota # Bibtex key (if any) in your bibliography file
+  - url: https://arxiv.org/pdf/2203.15395.pdf # URL to the PDF, try to link to a non-paywall version
+  - doi: https://doi.org/10.48550/arXiv.2203.15395 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: 'Scope of Reproducibility: We study the reproducibility of the paper "Quantifying Societal Bias Amplification in Image Captioning" by Hirota et al. In this paper, the authors propose a new metric to measure bias amplification, called LIC, and evaluate it on multiple image captioning models. Based on this evaluation, they make the following main claims which we aim to verify: (1) all models amplify gender bias, (2) all models amplify racial bias, (3) LIC is robust against encoders, and (4) the NIC+Equalizer model increases gender bias with respect to the baseline. We also extend upon the original work by evaluating LIC for age bias. Methodology: For our reproduction, we were able to run the code provided by the authors without any modifications. For our extension, we automatically labelled the images in the dataset with age annotations and adjusted the code to work with this dataset. In total, 38 GPU hours were needed to perform all experiments. Results: The reproduced results are close to the original results and support all four main claims. Furthermore, our additional results show that only a subset of the models amplifies age bias, while they strengthen the claim that LIC is robust against encoders. However, we acknowledge that our extension to age bias has its limitations. What was easy: The author''s code and the data needed to run it are publicly available. The code required no modification to run and the scripts were provided with an extensive argument parser, allowing us to quickly set up our experiments. Moreover, the details of the original experiments were clearly stated in the appendix. What was difficult: We found that it was difficult to interpret the author''s code as the provided documentation contained room for improvement. Also, the scripts contained repetitive code. While the authors retrained all image captioning models, they did not share the model weights, making it difficult to extend upon their work. Communication with original authors: No (attempt at) communication with the original authors was performed.'
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: "ML Reproducibility Challenge 2022"
+
+# Coding language (main one only if several)
+language: Python
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=eJmQJT0Dtt
+
+contributors:
+  - name: Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2023
+  - accepted:  April 19, 2023
+  - published:  July 20, 2023
+
+# This information will be provided by the editor
+article:
+  - number: 26
+  - doi: # DOI from Zenodo
+  - url: # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name: "ReScience C"
+  - issn: 2430-3658
+  - volume: 9
+  - issue: 2
