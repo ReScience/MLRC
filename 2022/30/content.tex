@@ -1,0 +1,579 @@
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+\section{Introduction}\label{sec:introduction}
+%A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+In critical domains such as loan applications \cite{khandaniloans}, crime risk assessments \cite{brennancrimes} and human resources \cite{tambehr}, decisions are increasingly being made by deep learning models. The decisions made by these data-driven models can have wide-ranging impacts and consequences on individuals and society as a whole. Recent studies, however, found that these models and datasets can be biased \cite{buolamwini2018gender, klare2012face}, resulting in discrimination based on sensitive attributes such as race or gender \cite{hleg2019ethics, act2021proposal, jillson2021aiming}. The field of fairness in artificial intelligence attempts to reduce the biases in decision-making algorithms to ensure a fair treatment of groups and individuals. \newline
+
+% A lot of AI models such as deep learning models are increasingly used in the society. The models are indispensable for banks, the government or even social media. Because of the widely use, you would expect that these models behave ethical and fair. However this is not always the case, a lot of examples are known about biased models. \cite{buolamwini2018gender} \cite{klare2012face} Which results in unfair treatment of individuals based on race or gender. \cite{hleg2019ethics} \cite{act2021proposal} \cite{jillson2021aiming} With this in mind, fair treatment of individuals is an important criteria that these deep learning models must meet.\\
+
+In order to ensure that similar individuals are treated similarly Peychev et al. \cite{peychev2022latent} propose LASSI: a novel representation learning method that is able to certify individual fairness on high-dimensional data. This is done by using recent advances in generative models \cite{kingmaglow} and the scalable certification of deep models \cite{cohendeeplearning}. On multiple image classification tasks, the authors claim that LASSI increases certified individual fairness compared to the baselines, while keeping prediction accuracies high. In addition the authors claim that through transfer learning, the representations obtained by LASSI can be used to solve tasks that were unseen during the training of the model.
+
+% Didier
+
+% In order to ensure that similar individuals are treated similarly Peychev et al. \cite{peychev2022latent} propose LASSI: a novel representation learning method that is able to certify individual fairness on high-dimensional data. This is done by using recent advances in generative models [41!] to define input similarity by varying continuous attributes such as pale skin (FIG 1). LASSI is then able to learn representations that map similar individuals closer together using adversarial learning and smoothing. On multiple image classification tasks, the authors claim a certified individual fairness of up to 90\% more than the baselines. In addition the authors claim that through transfer learning, LASSI can be used to solve tasks that were unseen during training. \newline
+
+% Boaz
+
+% In the original paper, Peychev et all\cite{peychev2022latent} discussed LASSI, a cutting-edge technique for ensuring individual fairness in high-dimensional data such as images. By defining a set of similar individuals in the latent space of generative Glow models, LASSI is able to capture and manipulate complex continuous attributes. Through the use of adversarial learning and center smoothing, LASSI learns representations that maps similar individuals closer together. Additionally, randomized smoothing is utilized to verify the robustness of downstream applications, ultimately resulting in an individual fairness certification for the overall model. \\
+
+\subsubsection{Our contributions}
+
+In this paper we aim to reproduce the results and verify the claims presented in the original paper by Peychev et al. \cite{peychev2022latent} In addition, we aim to extend their research by performing additional experiments to validate the robustness of their claims and investigate the encountered outliers.
+
+% One of the big reasons why we reproduce this paper is that unfair individual fairness, as mentioned earlier, has a big impact on the society. And thus the solution for individual fairness , could contribute to a new standard where everyone is treated equally. So we need to carefully evaluate such new implementations and reproducing this paper is the first step. The goal of this paper is to first reproduce the results that supports the claims that the original paper made to verify if these claims are valid. Secondly further experiments are done to validate if the model is robust. Here different attributes and tasks are used to verify if LASSI always gets a high fairness. Our contributions has led that claim 1 is not always valid. 
+
+\section{Scope of reproducibility}\label{sec:scope_of_rep}
+
+% Adapting individual fairness and providing similar decisions for similar individuals in machine learning algorithms has proven to be difficult \cite{dworkindfairness}. This is mainly due to the subjectivity of a similarity metric, and the high domain dependence of such a similarity metric \cite{yurochkin2019training}. In the original paper the authors use the generative Glow model \cite{kingmaglow} to define input similarity by varying a continuous sensitive attribute of an image (fig. 1). In addition, using center- and randomized smoothing \cite{kumarcentersmoothing, cohendeeplearning} LASSI learns representations that are robust and provably map similar individuals close together. \newline
+
+Adapting individual fairness and providing similar decisions for similar individuals in machine learning algorithms has proven to be difficult \cite{dworkindfairness}. This is mainly due to the subjectivity and high domain dependence of such a similarity metric \cite{yurochkin2019training}. In their paper Peychev et al. \cite{peychev2022latent} present a novel input similarity metric, together with LASSI: a representation learning method with certified individual fairness. \newline
+
+The main goal of this reproducibility studies is to reproduce and verify the following three main claims made by Peychev et al. \cite{peychev2022latent}:
+ 
+% Research about fairness is done in multiple papers. However, those solutions still have some shortcomings. Group fairness may still discriminate against individuals \cite{dwork2012fairness} or subgroups \cite{kearns2018preventing}. While the adaptation of individual fairness is difficult because of the lack of a suitable similarity metric \cite{yurochkin2019training}. Defining such a metric for high-dimensional data, such as images, is one of the key contributions of the original paper. The claims that the original paper \cite{peychev2022latent} made are the following:
+
+%Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+\begin{itemize}
+    \item \textbf{Claim 1:} LASSI significantly increases certified individual fairness compared to the naive baseline model, while keeping prediction accuracies high. 
+    \item \textbf{Claim 2:} LASSI can handle various sensitive attributes and attribute vectors and increase certified individual fairness compared to the naive baseline model.
+    \item \textbf{Claim 3:} LASSI representations transfer to unseen tasks and can still achieve high certified individual fairness when the downstream tasks are not known.
+\end{itemize}
+% Claim 1 is supported by experiment ...... in figure 1...
+% Claim 2 is supported by experiment ....... in figure 2....
+% Claim 3 is supported by experiment ....... in figure 3.....
+
+We extend the verification of these claims by executing additional experiments, testing the robustness of the claims, and taking a deeper dive into possible outliers of the model. \newline
+
+% In section \ref{sec:methodology} a short theoretical background on LASSI is given, combined with a detailed methodology of this reproducibility studies. In section \ref{sec:reproduced_results} we present the results of the reproduced experiments and in section \ref{sec:own_contrib} the results of the additional experiments are shown. To conclude, in section \ref{sec:discussion} we discuss the results and workflow of this research.
+
+In Section \ref{sec:methodology}, a short theoretical background on LASSI is given, combined with a detailed methodology of the reproducibility studies. In Section \ref{sec:reproduced_results} and \ref{sec:own_contrib} we present the results of the reproduced experiments and our own contributions respectively. To conclude, in Section \ref{sec:discussion} we discuss the results and workflow of this research.
+
+% Boaz
+
+% Besides reproducing the results, multiple experiments are done to expand the paper. One of such experiment is that different sensitive attributes and attribute vectors are used to verify claim 2. In section 4.1 a more detailed approach is explained and the results can be found in table 2,3,4 6,7 and 8.
+% To verify claim 3, different unseen tasks are used, as explained in 4.2 with table 9 as result. 
+
+% This summarize our contributions to the original paper. Since we do not only reproduce their results, but also uses different features to verify the claims that are made.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}\label{sec:methodology}
+
+In this section we will describe the two models that are used in the fair representation learning method proposed by Peychev et al. \cite{peychev2022latent}: GLOW and LASSI. The datasets used for training and evaluating will be explained and a definition of fairness will be covered. To conclude the methodology, there will be a description of our experimental set up, together with the computational requirements. 
+
+% Motivation, short background (extensive in appendix), bold celeba and fairface, 
+
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+\subsection{Model descriptions}\label{subsec: model_description}
+
+In order to ensure fairness, similar individuals that only differ in one or more sensitive attributes such as race or age, need to be treated similar by the LASSI model. To do this, we want to ignore these sensitive attributes in the classification process. This is achieved by using the generative model GLOW \cite{kingmaglow}, which allows us to alter the input data in the latent space, along a specific attribute vector. The images generated by GLOW, shown in figure \ref{fig:glow_input}, contain faces that only differ in one or more sensitive attributes and are treated similarly during the training process of the LASSI model.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{figures/biglips.png}
+  \caption{\texttt{Big\_Lips}}
+  \label{fig:biglips}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{figures/narrow_eyes.png}
+  \caption{\texttt{Narrow\_Eyes}}
+  \label{fig:narroweyes}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{figures/chubby.png}
+  \caption{\texttt{Chubby}}
+  \label{fig:chubby_example}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{figures/bald.png}
+  \caption{\texttt{Bald}}
+  \label{fig:bald_example}
+\end{subfigure}
+\caption{Visualizations of the input generated by the GLOW model for a face in the CelebA dataset. The attributes in these figures are the sensitive attributes we use in our additional experiments.}
+\label{fig:glow_input}
+\end{figure}
+
+The training process involves balancing fairness, accuracy, and transferability to unknown tasks by finding the optimal value of different loss functions. Once the fair representation of the data is learned, it can be used to train a classifier for any downstream task. The method is compared to a fairness-unaware (naive) baseline model for evaluation. For a more detailed explanation about the models, see Appendix Section \ref{subsec: appendix_1}.
+
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+\subsection{Datasets}
+
+This reproducibility research focusses on two datasets used in the original paper. The first is the \textbf{CelebA} \cite{liu2015deep} dataset, which contains 202,599 images of faces of real-world celebrities and is annotated with 40 features. The other dataset used is the \textbf{FairFace} \cite{karkkainen2021fairface} dataset, which contains 97,698 images of faces annotated with their race, age and gender. As opposed to the CelebA dataset, the FairFace dataset is balanced, meaning that every race is equally represented. More information about the two datasets is given in appendix Section \ref{subsec: appendix_2}.
+
+% The same datasets are used as the original paper, however only 2 datasets are selected. The first one is the \textbf{CelebA} \cite{liu2015deep} dataset. This dataset contains 202,599 face images of real-world celebrities and are annotated with 40 features such as \texttt{Blond\_Hair}, \texttt{Smiling} and   \texttt{Oval\_Face}. Since this dataset is imbalanced, the authors also used the \textbf{FairFace} \cite{karkkainen2021fairface} dataset, which is balanced and contains 97,698 images consisting of 7 different races such as \texttt{Indian} and \texttt{Black}, and 9 different age groups. More information about the dataset can be found in the Appendix Section \ref{subsec: appendix_2}. \newline
+
+% \footnote{To download the dataset, please go to \url{https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html}}
+
+% \footnote{To download the dataset, please go to \url{https://github.com/joojs/fairface}}
+
+% The ratio between the the training set and the validation set is 0.8:0.2 and is randomly assigned. Because of the fact that the test set is not shared, the evaluation is done on the validation set. An overview of the dataset and its attributes are shown in the table below.
+% \begin{table} [H]
+% \small
+% \begin{tabular}{|l|l|l|l|}
+% \hline \textbf{Dataset } & \textbf{Size} & \textbf{Features}& \textbf{Description}  \\ \hline
+% \textbf{CelebA} & 202,599 & 40 & Annotated face images of real-world celebrities\\
+% \textbf{FairFace} & 97,698 & 3 & Images with annotated race, age and gender \\
+% \hline
+% \end{tabular}
+% \caption{\label{font-table} Datasets that are used. }
+% \end{table}
+
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+\subsection{Metrics}
+The LASSI model is evaluated using two metrics: accuracy and fairness. Accuracy is calculated by dividing the amount of correct predictions by the total amount of predictions that has been made. 
+
+\subsubsection{Fairness} The fairness metric for high dimensional data is a key contribution of the original paper, as described in Section \ref{sec:scope_of_rep}. To calculate this metric, the following definition is given: A model $\textit{M} : \mathbb{R}^n \to Y$ is individually fair at $\textbf{x} \subset \mathbb{R}^n $ if it classifies all individuals similar to $\textbf{x}$ the same \cite{ruoss2020learning}.
+
+%i.e. \\        
+%\begin{equation}
+%\forall \textbf{x}' \subset \mathbb{R}^n : \phi (\textbf{x},\textbf{x}') \Longrightarrow M(\textbf{x}) = M(\textbf{x}')
+%\end{equation}
+
+\subsubsection{Metric of similarity} As described in Section \ref{subsec: model_description} images should be treated similarly, when they only differ in the direction of a certain attribute vector within the latent space. \newline
+
+%The set of images similar to image x is formulated as: S(x) := $\{z_{G} + t \cdot a\:|\:|t| \leq \epsilon \} \subseteq \mathbb{R}^{q}$. Here, $z_{G}$ denotes the position of the image in the latent space, $a$ defines the direction of the attribute vector and $\epsilon$ denotes the maximum perturbation level applied to the attribute. $S^{in}$ is then obtained by converting S back to the input space by decoding the latent representations in S(x).
+%This leaves us with the input similarity metric $\phi$ to satisfy
+%$\phi(\textbf{x}, \textbf{x}') \Longleftrightarrow \textbf{x}′ \subset S^{in} (\textbf{x})$. Which means that the LASSI model %should classify the different generated images the same.\\
+
+To develop this similarity metric, center smoothing is applied to the representation of each input image and its similarity set generated by GLOW, in order to bound the distance between these representations by a radius, $d_{cs}$. The classifier is also randomly smoothed to obtain its $l_2$ radius, $d_{rs}$. If $d_{cs}$ is less than $d_{rs}$, the model provably classifies similar images in the same manner, which is considered as certified individual fairness for an image. The overall fairness of the model is then calculated as the percentage of images that have been certified as 'fair' predictions.
+
+\subsection{Experimental setup and hyperparameters}\label{subsec: setup}
+
+To reproduce the original results, the guidelines explained by the original authors in their GitHub repository \cite{peychev2022latent} are followed. Due to the usage of a Windows machine, the shell-files are executed manually up until the training of the LASSI model, which is done on a Linux machine. \newline
+
+Because of the limited GPU capacity and budget, we do not reproduce all results from the original paper and discard the data-augmentation model, which serves as a model between the naive baseline model and LASSI. The reproduced experiments that are discarded are those deemed least relevant to contribute to a final conclusion. For the CelebA dataset, the model was trained on the tasks \texttt{Smiling} and \texttt{Earrings} using the sensitive attributes \texttt{Pale\_Skin}, \texttt{Young}, \texttt{Blond\_Hair} and their combinations. For the FairFace dataset, the model was trained on the tasks \texttt{Age-2}, which aims to predict if an individual is younger or older than 30 and \texttt{Age-3}, which has three target age ranges: [0-19], [20-39] and [40+].
+
+\subsubsection{Additional attributes} To test the robustness of the model, the performance of LASSI was evaluated on additional sensitive attributes and tasks not included in the original work. These included \texttt{Bald}, \texttt{Big\_Lips}, \texttt{Chubby}, \texttt{Narrow\_Eyes} for the CelebA dataset and \texttt{Race=Indian} for the FairFace dataset. The visualizations of these can be seen in figure \ref{fig:glow_input} and in a larger size in the Appendix, Section \ref{sec:extra_vis}.
+
+%These features can then be added in the 'compute\_attribute\_vector' file. Then in the 'pipelines' folder, these new attributes are assigned as new --perturb. Here you can manually type the correct feature name after the --perturb command.
+
+\subsubsection{Additional Tasks}
+
+The additional tasks we trained the model on are Wearing\_Hat, Attractive and Wearing\_Necklace for the CelebA dataset.
+
+%These features does need to be added to the 'compute\_attribute\_vector' file, because it is the prediction task. Here the name of the correct feature only needs to be added after the --classify\_attributes command in the 'pipelines' folder. \newline.
+
+\subsubsection{Hyperparameters} To decrease the run time of all experiments, we run the experiments using two different random seeds, as opposed to the five random seeds used by Peychev et al. \cite{peychev2022latent}. The other hyperparameters were identical to the parameters used by the original authors. The full details and the code of our reproducibility research can be found on our dedicated GitHub page (\url{https://mametchiii.github.io/lassi-reproducibility/)}.
+
+
+
+% The new transfer task must be assigned after the --classify\_attribute variable. \\ 
+% The hyperparemeters are the same as the original paper and thus are not changed.
+
+
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+\subsection{Computational requirements}
+To reduce the training time, we cache the image representations in the latent space of the generative models. This is done with a build-in GPU in series NVIDIA Quadro P1000 which combines a 640 CUDA core Pascal GPU and a 4 GB GDDR5 on-board memory. The total run time of caching the data takes approximately 15 hours. The experiments of training the LASSI model are executed on a LISA cluster with an NVIDIA Titan RTX with a total budget of 20 hours per job and 3233 SBUs compute units. 
+
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\newpage
+
+\section{Results}\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+In this section we report the results of the reproducibility studies. These results are two-fold: in Section \ref{sec:reproduced_results} we present minimal differences between the reproduced experiments and the original research by Peychev et al. [10], supporting the three main claims. In Section \ref{sec:own_contrib} experiments beyond the original research demonstrate that the claims made about the LASSI model are generally robust and possible flaws are explained.
+
+% In this section we report t
+
+% As discussed in \ref{sec:claims} three main claims were identified in the research done by Peychev et al. [10]. In section 4.1 it is shown that comparable results were found when the experiments of the original paper where reproduced; supporting the three main claims. In section 4.2 the results of additional experiments are shown, which support and strengthen the claims made by Peychev et al. [10].
+
+% In section 4.1 the reproduced results are shown. The results of the reproduction experiments are very similar to the original paper. So the three claims are valid. The first claim is supported by table 2 and 3, the second claim is supported by table 4 and the third claim is supported by table 5. Section 4.2 shows the results of our own experiments that is used to verify if the model is robust. ........... (additional experiments may be added in final version)
+
+\subsection{Results reproducing original paper}\label{sec:reproduced_results}
+
+Using the code from Peychev et al. \cite{peychev2022latent} we are able to reproduce the experiments exploring the three main claims of the original paper. We present the results of these reproduced experiments claim by claim in the following subsections.
+
+\subsubsection{Definition} \textit{All reproduced results within a 5\% range of the original results are considered to be 'similar' and displayed in \colorbox{mygreen}{green}; values outside this range are 'dissimilar' and shown in \colorbox{myred}{red}.}
+
+% claims will be handled in the following subsections
+
+% In the original paper three main claims were made and supported by multiple experiments. To verify these claims, we made an attempt to reproduce the experiments done by Peychev et al. [10], the results of which will be displayed in the following subsections.
+
+\subsubsection{Claim 1} The first main claim of the original paper states that LASSI significantly increases certified individual fairness, while keeping prediction accuracies high. To verify this claim, we reproduce the experiments by evaluating the performance of the baseline naive model and the LASSI model on two different datasets and multiple tasks. \newline
+
+% In table \ref{tab:main_results} the results of the reproduced experiments are shown, together with the corresponding values found by Peychev et al. [10] in \textit{italics}. Here, all the reproduced values that are within a 5\% window of the original research are marked in green.  
+
+% These include the accuracy and fairness of both the naive and LASSI model. As explained in section \ref{sec:model_description} our results are averaged over two runs with random seeds, as opposed to the five runs with random seeds used in the original research. The results found in our reproduction are similar to the results of the original paper, with all values within 5\% of the original marked in green.
+
+In table \ref{tab:main_results} the reproduced performance of both the naive and LASSI model on two datasets is shown, together with the corresponding values found by Peychev et al. [10] in \textit{italics}. As explained in Section \ref{subsec: setup}, our results are averaged over two runs with random seeds, as opposed to the five runs with random seeds used in the original research. We measure a similar performance compared to the original paper. \newline
+
+These results indicate that the LASSI model significantly improves certified fairness compared to the naive model, with only a minor loss in accuracy on the \texttt{Smiling} task. It even acts as a regularizer on the imbalanced \texttt{Earrings} task, where an improved accuracy is measured.
+
+% In table \ref{tab:main_results} our evaluation of both these models on the CelebA dataset are shown, in combination with the results from the original paper in \textit{italics}. As mentioned in section ?.? the original results are averaged over five runs with random seeds, where our results are averaged over two runs with random seeds. The results found are similar to the results found by Peychev et al.  [10]; the LASSI model significantly improves certified fairness compared to the naive model, with only a minor loss in accuracy on the \texttt{Smiling} task. It even acts as a regularizer on the imbalanced \texttt{Earrings} task, where an improved accuracy is measured.
+
+% Table 1: CELEBA
+
+% First effort of table
+
+% \begin{table}[H]
+% \centering
+% \resizebox{\columnwidth}{!}{\begin{tabular}{llcccccccc}
+% \toprule
+% \multicolumn{2}{c}{} & \multicolumn{4}{c}{\textbf{Peychev et al. [10]}} & \multicolumn{4}{c}{\textbf{Our reproduction}} \\
+% \multicolumn{2}{c}{} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} \\
+% \cmidrule(rl){3-4} \cmidrule(rl){5-6} \cmidrule(rl){7-8} \cmidrule(rl){9-10}
+% Task & Sensitive attribute(s) & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% % \midrule
+% \multirow{5}{*}{\texttt{Smiling}} & \texttt{Pale\_Skin} & \textbf{86.3} & 0.6 & 85.9 & \textbf{98.0} & \textcolor{blue}{\textbf{85.4}} & 0.3 & 84.9 & \textcolor{blue}{\textbf{97.3}}\\
+% & \texttt{Young} & \textbf{86.3} & 38.2 & \textbf{86.3} & \textbf{98.8} & \textcolor{blue}{\textbf{85.3}} & 54.8 & 85.1 & \textcolor{blue}{\textbf{98.6}} \\
+% & \texttt{Blond\_Hair} & 86.3 & 3.4 & \textbf{86.4} & \textbf{94.7} & 85.6 & 5.6 & \textcolor{blue}{\textbf{86.4}} & \textcolor{blue}{\textbf{97.0}} \\
+% & \texttt{Pale+Young} & \textbf{86.0} & 0.4 & 85.8 & \textbf{97.3} & 85.1 & 0.3 & \textcolor{blue}{\textbf{85.3}} & \textcolor{blue}{\textbf{97.4}} \\
+% & \texttt{Pale+Young+Blond} & \textbf{86.2} & 0.0 & 85.5 & \textbf{86.5} & 85.3 & 0.0 & \textcolor{blue}{\textbf{85.7}} & \textcolor{blue}{\textbf{91.8}} \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% % \midrule
+% \multirow{3}{*}{\texttt{Earrings}} & \texttt{Pale\_Skin} & 81.3 & 24.3 & \textbf{85.5} & \textbf{98.5} & 83.3 & 10.6 & \textcolor{blue}{\textbf{85.7}} & \textcolor{blue}{\textbf{97.0}} \\
+% & \texttt{Young} & 81.4 & 59.2 & \textbf{84.5} & \textbf{98.0} & 83.3 & 30.3 & \textcolor{blue}{\textbf{86.7}} & \textcolor{blue}{\textbf{99.0}} \\
+% & \texttt{Blond\_Hair} & 81.4 & 9.2 & \textbf{84.8} & \textbf{96.2} & 83.3 & 4.3 & \textcolor{blue}{\textbf{86.4}} & \textcolor{blue}{\textbf{97.4}} \\
+% \bottomrule
+% \end{tabular}}
+% \caption{\label{tab:main_results} Evaluation of the Naive and LASSI models on the CelebA dataset. The left half of the table contains the results from the original paper. We show our reproduced results in the right side of the table. Highlighted in bold and blue are the highest values between the Naive and LASSI models for the orginal results and our results respectively. The table shows similar results between the two researches, supporting the first main claim.}
+% \end{table}
+
+% Second effort of table
+
+% \begin{table}[H]
+% \centering
+% \resizebox{\columnwidth}{!}{\begin{tabular}{llcccccccc}
+% \toprule
+% \multicolumn{2}{c}{} & \multicolumn{4}{c}{\textbf{Naive model}} & \multicolumn{4}{c}{\textbf{LASSI model}} \\
+% \multicolumn{2}{c}{} & \multicolumn{2}{c}{Acc} & \multicolumn{2}{c}{Fair} & \multicolumn{2}{c}{Acc} & \multicolumn{2}{c}{Fair} \\
+% \cmidrule(rl){3-4} \cmidrule(rl){5-6} \cmidrule(rl){7-8} \cmidrule(rl){9-10}
+% Task & Sensitive attribute(s) & {[10]} & {Ours} & {[10]} & {Ours} & {[10]} & {Ours} & {[10]} & {Ours} \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% % \midrule
+% \multirow{5}{*}{\texttt{Smiling}} & \texttt{Pale\_Skin} & \textbf{86.3} & \textcolor{blue}{\textbf{85.4}} & 0.6 & 0.3 & 85.9 & 84.9 & \textbf{98.0} & \textcolor{blue}{\textbf{97.3}}\\
+% & \texttt{Young} & \textbf{86.3} & \textcolor{blue}{\textbf{85.3}} & 38.2 & 54.8 & \textbf{86.3} & 85.1 & \textbf{98.8} & \textcolor{blue}{\textbf{98.6}} \\
+% & \texttt{Blond\_Hair} & 86.3 & 85.6 & 3.4 & 5.6 & \textbf{86.4} & \textcolor{blue}{\textbf{86.4}} & \textbf{94.7} & \textcolor{blue}{\textbf{97.0}} \\
+% & \texttt{Pale+Young} & \textbf{86.0} & 85.1 & 0.4 & 0.3 & 85.8 & \textcolor{blue}{\textbf{85.3}} & \textbf{97.3} & \textcolor{blue}{\textbf{97.4}} \\
+% & \texttt{P + Y + B} & \textbf{86.2} & 85.3 & 0.0 & 0.0 & 85.5 & \textcolor{blue}{\textbf{85.7}} & \textbf{86.5} & \textcolor{blue}{\textbf{91.8}} \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% % \midrule
+% \multirow{3}{*}{\texttt{Earrings}} & \texttt{Pale\_Skin} & 81.3 & 83.3 & 24.3 & 10.6 & \textbf{85.5} & \textcolor{blue}{\textbf{85.7}} & \textbf{98.5} & \textcolor{blue}{\textbf{97.0}} \\
+% & \texttt{Young} & 81.4 & 83.3 & 59.2 & 30.3 & \textbf{84.5} & \textcolor{blue}{\textbf{86.7}} & \textbf{98.0} & \textcolor{blue}{\textbf{99.0}} \\
+% & \texttt{Blond\_Hair} & 81.4 & 83.3 & 9.2 & 4.3 & \textbf{84.8} & \textcolor{blue}{\textbf{86.4}} & \textbf{96.2} & \textcolor{blue}{\textbf{97.4}} \\
+% \bottomrule
+% \end{tabular}}
+% \caption{\label{tab:main_results2} Evaluation of the Naive and LASSI models on the CelebA dataset. The left half of the table contains the results from the original paper. We show our reproduced results in the right side of the table. Highlighted in bold and blue are the highest values between the Naive and LASSI models for the orginal results and our results respectively. The table shows similar results between the two researches, supporting the first main claim.}
+% \end{table}
+
+% TABLE 2 FAIRFACE
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{lcccccccc}
+% \toprule
+% \multicolumn{1}{c}{} & \multicolumn{4}{c}{\textbf{Peychev et al. [10]}} & \multicolumn{4}{c}{\textbf{Our reproduction}} \\
+% \multicolumn{1}{c}{} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} \\
+% \cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \cmidrule(rl){8-9}
+% Task & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} \\
+% \cmidrule(rl){1-1} \cmidrule(rl){2-5} \cmidrule(rl){6-9}
+% \multirow{1}{*}{\texttt{Age-2}} & 69.0 & 5.7 & \textbf{72.0} & \textbf{95.0} & 66.1 & 5.5 & \textcolor{blue}{\textbf{70.8}} & \textcolor{blue}{\textbf{95.3}} \\
+% \multirow{1}{*}{\texttt{Age-3}} & \textbf{67.0} & 0.0 & 65.1 & \textbf{90.8} & 64.1 & 0.0 & \textcolor{blue}{\textbf{64.6}} & \textcolor{blue}{\textbf{93.4}} \\
+% \bottomrule
+% \end{tabular}
+% \caption{\label{tab:main_fairface} Evaluation of the Naive and LASSI models on the FairFace dataset. Demonstrating that LASSI also increases certified individual fairness on a balanced dataset. The results of the reproducibility studies and the original paper are similar, supporting the first main claim made by Peychev et al. [10] }
+% \end{table}
+
+% Third and final effort of table
+
+\begin{table}[h]
+\centering
+\resizebox{\columnwidth}{!}{\begin{tabular}{lllcccc}
+\toprule
+\multicolumn{3}{c}{} & \multicolumn{2}{c}{\textbf{Naive model}} & \multicolumn{2}{c}{\textbf{LASSI model}} \\
+\cmidrule(rl){4-5} \cmidrule(rl){6-7}
+Dataset & Task & Sensitive attrib. & {Acc} & {Fair} & {Acc} & {Fair} \\
+\cmidrule(rl){1-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+% \midrule
+\multirow{8}{*}{CelebA} & \multirow{5}{*}{\texttt{Smiling}} & \texttt{Pale\_Skin} & \colorbox{mygreen}{\textbf{85.4}} | \textbf{\textit{86.3}} & \colorbox{mygreen}{0.3} | \textit{0.6} & \colorbox{mygreen}{84.9} | \textit{85.9} & \colorbox{mygreen}{\textbf{97.3}} | \textbf{\textit{98.0}} \\
+& & \texttt{Young} & \colorbox{mygreen}{\textbf{85.3}} | \textbf{\textit{86.3}} & \colorbox{myred}{54.8} | \textit{38.2} & \colorbox{mygreen}{85.1} | \textbf{\textit{86.3}} & \colorbox{mygreen}{\textbf{98.6}} | \textbf{\textit{98.8}} \\
+& & \texttt{Blond\_Hair} & \colorbox{mygreen}{85.6} | \textit{86.3} & \colorbox{mygreen}{5.6} | \textit{3.4} & \colorbox{mygreen}{\textbf{86.4}} | \textbf{\textit{86.4}} & \colorbox{mygreen}{\textbf{97.0}} | \textbf{\textit{94.7}} \\
+& & \texttt{Pale+Young} & \colorbox{mygreen}{85.1} | \textbf{\textit{86.0}} & \colorbox{mygreen}{0.3} | \textit{0.4} & \colorbox{mygreen}{\textbf{85.3}} | \textit{85.8} & \colorbox{mygreen}{\textbf{97.4}} | \textbf{\textit{97.3}} \\
+& & \texttt{P + Y + B} & \colorbox{mygreen}{85.3} | \textbf{\textit{86.2}} & \colorbox{mygreen}{0.0} | \textit{0.0} & \colorbox{mygreen}{\textbf{85.7}} | \textit{85.5} & \colorbox{myred}{\textbf{91.8}} | \textbf{\textit{86.5}} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+% \midrule
+& \multirow{3}{*}{\texttt{Earrings}} & \texttt{Pale\_Skin} & \colorbox{mygreen}{83.3} | \textit{81.3} & \colorbox{myred}{10.6} | \textit{24.3} & \colorbox{mygreen}{\textbf{85.7}} | \textbf{\textit{85.5}} & \colorbox{mygreen}{\textbf{97.0}} | \textbf{\textit{98.5}} \\
+& & \texttt{Young} & \colorbox{mygreen}{83.3} | \textit{81.4} & \colorbox{myred}{30.3} | \textit{59.2} & \colorbox{mygreen}{\textbf{86.7}} | \textbf{\textit{84.5}} & \colorbox{mygreen}{\textbf{99.0}} | \textbf{\textit{98.0}} \\
+& & \texttt{Blond\_Hair} & \colorbox{mygreen}{83.3} | \textit{81.4} & \colorbox{mygreen}{4.3} | \textit{9.2} & \colorbox{mygreen}{\textbf{86.4}} | \textbf{\textit{84.8}} & \colorbox{mygreen}{\textbf{97.4}} | \textbf{\textit{96.2}} \\
+% \midrule
+% \midrule
+\cmidrule(rl){1-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \\
+\cmidrule(rl){1-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+\multirow{2}{*}{FairFace} & \texttt{Age-2} & \texttt{Race=Black} & \colorbox{mygreen}{66.1} | \textit{69.0} & \colorbox{mygreen}{5.5} | \textit{5.7} & \colorbox{mygreen}{\textbf{70.8}} | \textbf{\textit{72.0}} & \colorbox{mygreen}{\textbf{95.3}} | \textbf{\textit{95.0}} \\
+& \texttt{Age-3} & \texttt{Race=Black} & \colorbox{mygreen}{64.1} | \textbf{\textit{67.0}} & \colorbox{mygreen}{0.0} | \textit{0.0} & \colorbox{mygreen}{\textbf{64.6}} | \textit{65.1} & \colorbox{mygreen}{\textbf{93.4}} | \textbf{\textit{90.8}} \\
+\bottomrule
+\end{tabular}}
+\caption{\label{tab:main_results} Evaluation of the Naive and LASSI models on the CelebA and FairFace datasets. The results are reported as 'our results | \textit{original results \cite{peychev2022latent}}'. Highlighted in bold are the highest accuracy and fairness between the naive and LASSI model. The reproduced values that are similar to the original values ($\Delta \leq 5\%$) are marked in green, the dissimilar values in red.}
+\end{table}
+
+% In table \ref{tab:main_results} we show the results of the evaluation of the Naive and LASSI models on the FairFace dataset. This balanced dataset is used to verify whether LASSI similarly improves certified fairness in different settings. In this experiment \texttt{Race=Black} is selected as a sensitive attribute on two \texttt{Age} prediction tasks. The \texttt{Age-2} tasks aims to predict whether an individual is younger or older than 30, and \texttt{Age-3} extends this with three target age ranges: [0 - 19], [20 - 39] and [40+]. The results found in our reproduction are similar to the results of the original paper.
+
+
+% Together, our reproduction results in table \ref{tab:main_results} and table \ref{tab:main_fairface} support the claim that LASSI increases certified individual fairness, while keeping the accuracy of predictions high.
+
+\subsubsection{Claim 2} The second claim made by Peychev et al. \cite{peychev2022latent} states that LASSI can correctly handle various sensitive attributes and attribute vectors. \newline
+
+The first part of this claim is supported by the results in table \ref{tab:main_results}. These results indicate that LASSI increases the certified individual fairness using multiple different sensitive attributes: \texttt{Pale\_Skin}, \texttt{Young}, \texttt{Blond\_Hair} and combinations of two or more of these sensitive attributes. In addition LASSI keeps the prediction accuracies high, and even increases them for unbalanced tasks. \newline
+
+% This claim can be divided into two sub-claims. The first part states that LASSI can correctly handle various sensitive attributes, which is supported by the reproduction results we show in table \ref{tab:main_results}. Here, we demonstrate that LASSI increases the certified individual fairness using multiple different sensitive attributes: \texttt{Pale\_Skin}, \texttt{Young}, \texttt{Blond\_Hair} and combinations of two or more of these sensitive attributes. In addition LASSI keeps the prediction accuracies high, and even increases them for unbalanced tasks. \newline
+
+To examine whether LASSI is independent of the computation of the attribute vector \textbf{$a$}, we evaluate the performance of the LASSI model by using two different attribute vector types. In table \ref{tab:diff_a_vectors} we show that the results of the reproduced experiments are similar to the values found in the original paper, supporting the claim that LASSI correctly handles various different attribute vector types.
+
+% The second half of this second claim implies that LASSI is independent of the computation of the attribute vector \textbf{$a$} and is able to improve certified individual fairness using various different attribute vector types. To examine this claim the performance of LASSI is evaluated using two different attribute vectors. The first vector is proposed by Denton et al. [11] and is orthogonal to the linear decision boundary of the sensitive attribute. The second attribute vector is calculated as described by Ramaswamy et al. [67], by averaging sample-specific vectors \textbf{$a_i$} to obtain a global attribute vector \textbf{$a$}. The results of our evaluation are presented in table \ref{tab:diff_a_vectors}, alongside the original results of Peychev et al. [10]. 
+
+% TABLE 3: DIFFERENT ATTRIBUTE VECTORS
+
+% \begin{table}[H]
+% \centering
+% \resizebox{\columnwidth}{!}{\begin{tabular}{llcccccccc}
+% \toprule
+% \multicolumn{2}{c}{} & \multicolumn{4}{c}{\textbf{Peychev et al. [10]}} & \multicolumn{4}{c}{\textbf{Our reproduction}} \\
+% \multicolumn{2}{c}{} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} \\
+% \cmidrule(rl){3-4} \cmidrule(rl){5-6} \cmidrule(rl){7-8} \cmidrule(rl){9-10}
+% \textbf{$a$}-vector type & Sensitive attribute & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} & {Acc} & {Fair} \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% \multirow{3}{*}{\texttt{Orthogonal}} & \texttt{Pale\_Skin} & 85.3 & 57.5 &  86.4 & 34.0 & 85.3 & 98.4 & 86.5 & 98.8 \\
+% & \texttt{Young} & 85.3 & 74.5 & 86.3 & 73.1 & 84.9 & 98.6 & 86.8 & 97.9 \\
+% & \texttt{Blond\_Hair} & 85.3 & 76.5 & 86.2 & 71.4 & 84.6 & 97.4 & 86.7 & 98.8 \\
+% \cmidrule(rl){1-2} \cmidrule(rl){3-6} \cmidrule(rl){7-10}
+% \multirow{3}{*}{\texttt{Sample-specific}} & \texttt{Pale\_Skin} & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 \\
+% & \texttt{Young} & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 & 00.0 \\
+% & \texttt{Blond\_Hair} & 85.3 & 87.8 & 85.1 & 98.1 & 85.3 & 87.8 & 85.1 & 98.1 \\
+% \bottomrule
+% \end{tabular}}
+% \caption{\label{tab:diff_a_vectors} Evaluation of the Naive and LASSI models using \textbf{$a$} orthogonal to the linear decision boundary of the sensitive attributes [13](Sec. \ref{sec:experimental_setup}) and an \textbf{$a$} calculated from sample-specific vectors \textbf{$a_i$} [67]. The results of the reproducibility studies are similar to the original results, supporting the claim that LASSI is not limited to specific attribute vector types.}
+% \end{table}
+
+\begin{table}[H]
+\centering
+\resizebox{\columnwidth}{!}{\begin{tabular}{llcccc}
+\toprule
+\multicolumn{2}{c}{} & \multicolumn{2}{c}{\textbf{Naive model}} & \multicolumn{2}{c}{\textbf{LASSI model}} \\
+\cmidrule(rl){3-4} \cmidrule(rl){5-6}
+\textbf{$a$}-vector type & Sensitive attrib. & {Acc} & {Fair} & {Acc} & {Fair} \\
+\cmidrule(rl){1-2} \cmidrule(rl){3-4} \cmidrule(rl){5-6}
+% \midrule
+\multirow{3}{*}{\texttt{orthogonal}} & \texttt{Pale\_Skin} & \colorbox{mygreen}{\textbf{85.3}} | \textit{86.4} & \colorbox{myred}{57.5} | \textit{34.0} & \colorbox{mygreen}{\textbf{85.3}} | \textbf{\textit{86.5}} & \colorbox{mygreen}{\textbf{98.4}} | \textbf{\textit{98.8}} \\
+& \texttt{Young} & \colorbox{mygreen}{\textbf{85.3}} | \textit{86.3} & \colorbox{mygreen}{74.5} | \textit{73.1} & \colorbox{mygreen}{84.9} | \textbf{\textit{86.8}} & \colorbox{mygreen}{\textbf{98.6}} | \textbf{\textit{97.9}} \\
+& \texttt{Blond\_Hair} & \colorbox{mygreen}{\textbf{85.3}} | \textit{86.2} & \colorbox{mygreen}{76.9} | \textit{71.4} & \colorbox{mygreen}{84.6} | \textbf{\textit{86.7}} & \colorbox{mygreen}{\textbf{97.4}} | \textbf{\textit{98.8}} \\
+\cmidrule(rl){1-2} \cmidrule(rl){3-4} \cmidrule(rl){5-6}
+% \midrule
+\multirow{1}{*}{\texttt{sample avg}} & \texttt{Blond\_Hair} & \colorbox{mygreen}{\textbf{85.3}} | \textit{86.2} & \colorbox{mygreen}{87.8} | \textit{90.8} & \colorbox{mygreen}{85.1} | \textbf{\textit{86.8}} & \colorbox{mygreen}{\textbf{98.1}} | \textbf{\textit{98.8}} \\
+\bottomrule
+\end{tabular}}
+\caption{\label{tab:diff_a_vectors} Evaluation of the Naive and LASSI models on the CelebA dataset using two different attribute vectors. The results are reported as 'our results | \textit{original results \cite{peychev2022latent}}'. Highlighted in bold are the highest accuracy and fairness between the naive and LASSI model. The reproduced values that are similar to the original values ($\Delta \leq 5\%$) are marked in green.}
+\end{table}
+
+% The results presented in tables \ref{tab:main_results} and \ref{tab:diff_a_vectors} support the claim that LASSI correctly handles various different sensitive attributes and attribute vector types.
+
+% In addition to these experiments, we have conducted an additional experiment by evaluating if LASSI also increased certified individual fairness for sensitive attributes other than \texttt{Race=Black} on the FairFace dataset. The results of this experiment are further detailed in section \ref{sec:own_contrib} and table \ref{tab:fairface_indian}. \newline
+
+\subsubsection{Claim 3} The third main claim made in the original paper is that LASSI can learn transferable representations and still achieve high certified individual fairness, also when the downstream tasks are not known. To examine this, consistent with prior work [55] and similar to the original research, we turn off the classification loss and enable the reconstruction loss. \newline
+
+In table \ref{tab:transf_repr} we report the performance of the LASSI model on the downstream tasks \texttt{Smiling} and \texttt{High\_Cheeks}, using \texttt{Pale\_Skin} and \texttt{Young} as the sensitive attributes. Our reproduced results are similar to the results from Peychev et al. [10], indicating that the models perform slightly worse than when the tasks are known, but still maintaining high individual fairness. The claim that LASSI can achieve high certified individual fairness even when the downstream tasks are not known is supported by these results.
+
+% Transfer learning table
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{lcccccccccc}
+% \toprule
+% \multicolumn{1}{c}{} & \multicolumn{4}{c}{\textbf{Peychev et al. [10]}} & \multicolumn{4}{c}{\textbf{Our reproduction}} \\
+% \multicolumn{1}{c}{Sensitive attrib.:} & \multicolumn{2}{c}{\texttt{Pale}} & \multicolumn{2}{c}{\texttt{Young}}  & \multicolumn{2}{c}{\texttt{Pale}} & \multicolumn{2}{c}{\texttt{Young}} \\
+% \cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \cmidrule(rl){8-9}
+% Transfer task & Acc & Fair & Acc & Fair & Acc & Fair & Acc & Fair \\
+% \cmidrule(rl){1-1} \cmidrule(rl){2-5} \cmidrule(rl){6-9}
+% \texttt{Smiling} & 82.1 & 96.3 & 86.2 & 93.1 & 85.7 & 96.2 & 86.0 & 95.4 \\
+% \texttt{High\_Cheeks} & 76.9 & 96.2 & 81.7 & 92.6 & 81.2 & 97.4 & 82.3 & 96.0  \\
+% \bottomrule
+% \end{tabular}
+% \caption{\label{tab:transf_repr} Results of the accuracy and fairness of LASSI using transfer learning, showing that also according to our reproduced results LASSI increases certified individual fairness even when the downstream tasks are not known.}
+% \end{table}
+
+% Transfer table
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\multicolumn{1}{c}{Sensitive attrib.:} & \multicolumn{2}{c}{\texttt{Pale\_Skin}} & \multicolumn{2}{c}{\texttt{Young}} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5}
+\textbf{Transfer task} & Acc & Fair & Acc & Fair \\
+\cmidrule(rl){1-1} \cmidrule(rl){2-3} \cmidrule(rl){4-5}
+\texttt{Smiling} & \colorbox{mygreen}{82.1} | \textit{86.2} & \colorbox{mygreen}{96.3} | \textit{93.1} & \colorbox{mygreen}{85.7} | \textit{86.0} & \colorbox{mygreen}{96.2} | \textit{95.4} \\
+\texttt{High\_Cheeks} & \colorbox{mygreen}{79.6} | \textit{81.7} & \colorbox{mygreen}{96.2} | \textit{92.6} & \colorbox{mygreen}{81.2} | \textit{82.3} & \colorbox{mygreen}{97.4} | \textit{96.0}  \\
+\bottomrule
+\end{tabular}
+\caption{\label{tab:transf_repr} Evaluation of the accuracy and fairness of LASSI when the downstream tasks are not known, using transfer learning. The results are reported as 'our results | \textit{original results \cite{peychev2022latent}}'. The reproduced values that are similar to the original values ($\Delta \leq 5\%$) are marked in green.}
+\end{table}
+
+\subsection{Results beyond original paper}\label{sec:own_contrib}
+
+\subsubsection{Robustness of LASSI}\label{subsec:robustness} 
+
+In order to assess the robustness of LASSI, we conducted additional experiments using the CelebA and FairFace datasets. The scope of the experiments was expanded to include a wider range of sensitive attributes and tasks. These experiments serve to further complete the experimental setup presented in the original paper by incorporating nearly all relevant options for sensitive attributes and tasks. \newline 
+
+The results of the experiments are reported in Table \ref{tab:new_results} and \ref{tab:new_results_translearning}. Table \ref{tab:new_results} shows that LASSI increases fairness scores on all examined sensitive attributes, while maintaining high prediction accuracies. The results in this table are similar to those presented earlier in table \ref{tab:main_results}, supporting the robustness of claim 1 and 2. Table \ref{tab:new_results_translearning} shows that LASSI achieves high individual fairness on two additional transfer tasks, further strengthening claim 3. \newline
+
+% The results of the experiments are reported in Table \ref{new_results} and Table \ref{new_results_translearning}. Table \ref{new_results} shows increased fairness scores and maintained accuracy with the LASSI model compared to the baseline naive model, across various sensitive attributes. This supports the robustness of Claims 1 and 2 and is comparable to results in Table \ref{tab:main_results}. Table \ref{new_results_translearning} shows high accuracy and fairness scores in two additional transfer tasks, further supporting Claim 3. \\
+
+Two surprising values to \colorbox{myred}{note} are the low individual fairness scores for the LASSI model on the \texttt{Attractive} task with the sensitive attributes \texttt{Bald} and \texttt{Chubby}, highlighted in red in table \ref{tab:new_results}. This decrease, however, does not necessarily compromise the robustness of the model. Further investigation of these outliers will follow in Section \ref{subsec:vis} and we will discuss the consequent results in Section \ref{sec:discussion} and Appendix Section \ref{sec:appendix_outliers}.
+
+% It is important to note that the fairness scores for the LASSI model decreased to 10.9\% and 5.6\% for the task \texttt{Attractive} and sensitive attributes \texttt{Bald} and \texttt{Chubby}, as indicated in red in Table \ref{new_results}. This decrease, however, does not necessarily compromise the robustness of the LASSI model. Further investigation of this conclusion will follow in Section \ref{subsec: vis} and the discussion of this conclusion is presented in Section \ref{sec: discussion-flaw}.
+
+% First own contributions
+
+\begin{table}[H]
+\small
+\centering
+\begin{tabular}{lllcccc}
+\toprule
+\multicolumn{3}{c}{} & \multicolumn{2}{c}{Naive} & \multicolumn{2}{c}{LASSI} \\
+\cmidrule(rl){4-5} \cmidrule(rl){6-7}
+Dataset & Task & Sensitive attribute & {Acc} & {Fair} & {Acc} & {Fair} \\
+\cmidrule(rl){1-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+\multirow{16}{*}{\texttt{CelebA}} & \multirow{4}{*}{\texttt{Smiling}} & \texttt{Bald} & 85.3 & 42.6 & \textbf{85.4} & \textbf{96.0} \\
+& & \texttt{Big\_Lips} & \textbf{85.3} & 77.7 & \textbf{85.3} & \textbf{99.5} \\
+& & \texttt{Chubby} & 85.3 & 38.1 & \textbf{85.7} & \textbf{98.4} \\
+& & \texttt{Narrow\_Eyes} & 85.3 & 9.0 & \textbf{87.2} & \textbf{98.4} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+& \multirow{4}{*}{\texttt{Wearing\_Hat}} & \texttt{Bald} & 96.0 & 31.9 & \textbf{97.9} & \textbf{99.8} \\
+& & \texttt{Big\_Lips} & 96.2 & 98.1 & \textbf{97.4} & \textbf{100.0} \\
+& & \texttt{Chubby} & 96.0 & 65.2 & \textbf{98.1} & \textbf{99.7} \\
+& & \texttt{Narrow\_Eyes} & 96.2 & 98.8 & \textbf{97.6} & \textbf{99.8} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+& \multirow{4}{*}{\texttt{Attractive}} & \texttt{Bald} & \textbf{74.2} & 0.0 & 72.9 & \colorbox{myred}{\textbf{10.9}} \\
+& & \texttt{Big\_Lips} & \textbf{77.4} & 6.9 & 76.9 & \textbf{89.4} \\
+& & \texttt{Chubby} & \textbf{74.7} & 0.0 & 71.3 & \colorbox{myred}{\textbf{5.6}} \\
+& & \texttt{Narrow\_Eyes} & 77.7 & 17.1 & \textbf{78.4} & \textbf{99.0} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+& \multirow{4}{*}{\texttt{Necklace}} & \texttt{Bald} & \textbf{84.8} & 0.8 & 84.3 & \textbf{98.7} \\
+& & \texttt{Big\_Lips} & \textbf{84.8} & 95.5 & 84.0 & \textbf{99.8} \\
+& & \texttt{Chubby} & \textbf{84.8} & 56.9 & 84.0 & \textbf{99.0} \\
+& & \texttt{Narrow\_Eyes} & \textbf{84.8} & 97.8 & 83.3 & \textbf{99.0} \\
+\cmidrule(rl){1-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7}
+\multirow{2}{*}{\texttt{FairFace}} & {\texttt{Age-2}} & \texttt{Race=Indian} & 68.1 & 8.5 & \textbf{69.7} & \textbf{97.5} \\
+& \texttt{Age-3} &  \texttt{Race=Indian} & \textbf{64.3} & 0.0 & 64.1 & \textbf{94.6} \\
+\bottomrule
+\end{tabular}
+\caption{\label{tab:new_results} Evaluation of the naive and LASSI models using a wider range of sensitive attributes and tasks. Highlighted in bold are the highest accuracy and fairness between the naive and LASSI model. Highlighted in red are two unexpected values, further discussed in Section \ref{subsec:vis}.}
+\end{table}
+
+\begin{table}[H]
+\small
+\centering
+\begin{tabular}{lcccccccccc}
+\toprule
+\multicolumn{1}{c}{Sensitive attrib.:} & \multicolumn{2}{c}{Pale Skin} & \multicolumn{2}{c}{Young}  & \multicolumn{2}{c}{Brown hair} & \multicolumn{2}{c}{Bags} \\
+\cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \cmidrule(rl){8-9}
+Transfer task & Acc & Fair & Acc & Fair & Acc & Fair & Acc & Fair \\
+\midrule
+\texttt{Oval\_Face} & 68.9 & 97.0 & 67.6 & 97.3 & 67.9 & 97.8 & 68.8 & 98.7  \\
+\texttt{Wearing\_Hat} & 94.7 & 99.4 & 95.5 & 99.2 & 94.7 & 99.8 & 95.4 & 99.4  \\
+\bottomrule
+\end{tabular}
+\caption{\label{tab:new_results_translearning} Evaluation of the accuracy and fairness of LASSI using transfer learning, on two new unseen downstream tasks. These results strengthen the third claim made by Peychev et al. \cite{peychev2022latent}.}
+\end{table}
+
+% Evaluation of the accuracy and fairness of LASSI when the downstream tasks are not known, using transfer learning. The results from the Peychev et al. [10] are presented in \textit{italics}. The reproduced values that are similar to the original values ($\Delta \leq 5\%$) are marked in green.
+
+\subsubsection{Is LASSI flawed?}\label{subsec:vis}
+
+To understand the significant decline in certified individual fairness under specific settings, as documented in table \ref{tab:new_results}, we explore the impact of the input data (generated by the GLOW model) on LASSI. In order to do this, we select a random sample of faces and visualize the input generated by the GLOW model. In addition, we calculate the certified individual fairness scores for each face. \newline
+
+In figure \ref{fig:chubby_attractive} we compare this analysis for a setting of the LASSI model that results in a high individual fairness score of 98\% (trained on the \texttt{Smiling} task, using \texttt{Pale\_Skin} as sensitive attribute, see table \ref{tab:main_results}); to a setting of the LASSI model that results in a low individual fairness score of 5.6\% (trained on the \texttt{Attractive} task, using \texttt{Chubby} as sensitive attribute, see table \ref{tab:new_results}). \newline
+
+% To understand the significant decline in fairness observed in certain scenarios, as documented in Section \ref{subsec:robustness}, we explored the impact of the input data generated by the GLOW model on the LASSI model. Our methodology involved selecting a sample of faces at random and visualizing the input data of the LASSI model, followed by the calculation of the fairness score for each face. In order to observe the effect of the LASSI models with varying levels of fairness performance, we applied both a high-performing LASSI model (trained with the task \texttt{Attractive} and the perturbation \texttt{Chubby}) which demonstrated an overall fairness score of 5.6\% on test data (Shown in red in Table \ref{new_results}), and a low-performing LASSI model (trained with the task \texttt{Smiling} and \texttt{Pale\_Skin}) with a fairness score of approximately 98\%. The results of these analyses are depicted in Figure \ref{fig:chubby_attractive}. 
+
+A visual inspection of figure \ref{fig:chubby_attractive} reveals that the faces resulting in a 0\% fairness score are not only altered in their chubbiness, but also in various other facial features, such as gender and age. These distinct variations of faces, serving as a collection of representative input examples, suggest that the input data generated by the GLOW model can be inaccurate under certain settings. The resulting unwanted alterations of facial features may impact the classification task at hand. As an example, in figure \ref{fig:chubby_attractive} the faces are varied in a manner that likely affects their level of attractiveness. In comparison, the faces on the left are varied only in skin tone, serving as a more accurate sample of input data.
+
+% These distinct face variations, serving as a collection of representative input examples, suggest that the input data generated by GLOW for LASSI may not be optimal in some scenarios, and the drastic perturbations may impact the features being predicted (the task). For instance, as shown in Figure \ref{fig:chubby_attractive}, certain faces are perturbed in a manner that also likely affects their level of attractiveness. In comparison, the faces in the left plot are only varied in skin color, which serves as a better sample of input data for their perturbation and task.
+
+% As shown in the plot on the right side of Figure \ref{fig:chubby_attractive}, a visual inspection reveals that the faces resulting in zero-fairness are not only altered in their chubbiness, but also exhibit changes in various other facial features, such as gender and age. These distinct face variations, serving as a collection of representative input examples, suggest that the input data generated by GLOW for LASSI may not be optimal in some scenarios, and the drastic perturbations may impact the features being predicted (the task). For instance, as shown in Figure \ref{fig:chubby_attractive}, certain faces are perturbed in a manner that also likely affects their level of attractiveness. In comparison, the faces in the left plot are only varied in skin color, which serves as a better sample of input data for their perturbation and task.
+
+\begin{figure}[H]
+    \hspace*{-2.1cm}
+    \includegraphics[width=1.2\textwidth]{figures/bigvisualisation.png}
+    \caption{Visualization comparing face variations generated by GLOW and the resulting certified individual fairness scores of the LASSI model. On the left the model is trained on the smiling task, using pale\_face as sensitive attribute, resulting in high fairness scores; on the right the model is trained on the attractive task, using chubby as sensitive attribute, resulting in low fairness scores.}
+    \label{fig:chubby_attractive}
+\end{figure}
+
+\section{Discussion}\label{sec:discussion}
+%\subsection{Why does LASSI improve individual fairness?}
+In this reproducibility studies we conducted multiple experiments in an attempt to reproduce the main findings of the work done by Peychev et al. \cite{peychev2022latent}. As detailed in Section \ref{sec:reproduced_results}, the three main claims made in the original paper were found to be reproducible and supported by our own results. We showed that LASSI increases certified fairness on various sensitive attributes and attribute vectors, while keeping prediction accuracies high. In addition, the results indicate that LASSI achieves high certified individual fairness even when the downstream tasks are not known. 
+
+\subsubsection{Outliers of LASSI}\label{subsec:outliers} The additional experiments executed beyond the original paper investigated the robustness of the three main claims, by experimenting on a wider-range of sensitive attributes and tasks. Interestingly, the results from this analysis in Section \ref{sec:own_contrib} indicate a significant drop in LASSI's individual fairness scores under certain settings. \newline
+
+Further experiments into these surprising values show that these values do not necessarily compromise the robustness of LASSI. Two possible explanations we find are the high bias between certain tasks and sensitive attributes and the possibly corrupted input data generated by the GLOW model for certain attributes. A detailed study into these possible limitations of LASSI is given in Appendix \ref{sec:appendix_outliers}. In general, we conclude that the additional experiments we conducted support and even further strengthen the three main claims made in the original paper.
+
+\subsubsection{Conclusion} During this study resource limitations prevented us from reproducing every experiment done by Peychev et al. \cite{peychev2022latent}. In addition the lower amount of random seeds used by us might affect the results found in our studies. Despite these compromises, we find very similar results in all reproduced and additional experiments conducted. In this work, the three main claims made by the original authors are reproducible and found to be robust.
+
+
+% As detailed in Section \ref{sec:results}, the major experiments from \cite{peychev2022latent} are reproduced and additional experiments were conducted in this research. Our analysis confirms the reproducibility and robustness of the claims made in \cite{peychev2022latent}. The design of LASSI plays a crucial role in enhancing fairness. The GLOW model is capable of separating sensitive attributes in the latent space and generating faces along a specified sensitive attribute vector. By generating multiple samples from each face in the dataset along the sensitive attribute direction, a series of images can be created that vary in the intensity of the sensitive attribute. When these altered images are all given the same label during the training process, the model can become insensitive to that attribute.
+
+% \subsection{Why does LASSI give low fairness sometimes?}\label{sec:discussion-flaw}
+% Our analysis showed a significant drop in LASSI's fairness in certain scenarios where sensitive attributes are highly correlated with the predicted task (refer to the correlation visualization in Figure X in the appendix). If the LASSI model is trained on these tasks and attribute perturbations, the latent representations of faces that differ in the attribute are likely to diverge to a significant extent to ensure a higher prediction accuracy, because the faces that differ in the attribute must also differ in the class of the task given the above-mentioned strong correlation.  This leads to low fairness as the perturbation results in vastly divergent data representations. In contrast, attributes that are ethically neutral, such as high cheekbones and smiling, do not pose a concern in this regard. However, examples such as perturbations in chubbiness should not affect predictions of attractiveness from an ethical perspective. Our experiment with LASSI produced poor fairness due to the highly biased relation between chubbiness and attractiveness in the training dataset (only 3\% of chubby individuals were tagged as attractive). The lack of variance in these features may have also led the GLOW model to generate non-sensible face inputs for LASSI, contributing to the lack of fairness in certain cases (as documented in Section \ref{subsec: vis}). Nevertheless, as these issues are rooted in the defects of the CelebA dataset, further evidence is required if one wants to negate the claims made by the authors of \cite{peychev2022latent}. Therefore, we suggest that a more balanced dataset with more variations in the relation of the sensitive attributes and the tasks can be collected and implemented in future research on LASSI. \\ 
+% \\
+
+
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{Reflection}
+
+\subsubsection{What was easy} 
+
+In their original paper, the authors give a complete and detailed explanation of the theoretical background of their models and mathematics, giving us a deep understanding about the inner workings of the models and evaluation metrics presented. Together with the clear and well documented code on their GitHub repository \cite{peychev2022latent}, it was relatively straightforward to reproduce their experiments as accurately as our resource limits allowed.
+
+% Combined with their original paper, the authors presented a very extensive GitHub repository with clear and well documented code \cite{peychev2022latent}. Included in the repository was a step-by-step guide on how to reproduce their experiments, which made it easier for us to reproduce the experiments and alter their code to comply with some resource limits. \newline
+
+% In their paper the theoretical background of their models and mathematics is explained complete and detailed, giving us a good understanding about the inner workings of the models and evaluation metrics presented. To continue, all experimental settings and hyperparameters were described extensively, allowing us to reproduce their experiments as accurately as our resource limits allowed. 
+
+\subsubsection{What was difficult}
+
+% Although the code and the reproducibility process were clear and extensively documented, reproducing their experiments was made more challenging due to our usage of Windows systems. The usage of \texttt{.sh}-files meant an inability to train the model on our own systems. All \texttt{.sh}-files before training were executed manually or converted to \texttt{.bat}-files. The model itself was eventually trained on the LISA supercomputer, which runs on the required Linux operating system. \newline
+
+The main difficulty was found within the complex structure of the code files and the dependent functions across these files. In our additional experiments we tried to visualize random samples of faces and calculate the corresponding fairness scores of these samples. The code needed to do this correctly was complex and required us to alter many functions in the original code.
+
+% Combined with their original paper, the authors presented a very extensive GitHub repository with clear and well documented code \cite{peychev2022latent}. Included in the repository was a step-by-step guide on how to reproduce their experiments, which made it easier for us to reproduce the experiments and alter their code to comply with some resource limits. \newline
+
+% In their paper the theoretical background of their models and mathematics is explained complete and detailed, giving us a good understanding about the inner workings of the models and evaluation metrics presented. To continue, all experimental settings and hyperparameters were described extensively, allowing us to reproduce their experiments as accurately as our resource limits allowed. 
+
+% ORIGINIAL COMMENT: Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+%Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+% ORINGIAL COMMENT: List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+\subsection{Communication with original authors}
+
+Any questions we had could be answered by the extensive documentation or comments made by the original authors, and no reason to contact them was found. However, to keep the reproducibility report a fair assessment, this work has been sent to the original authors to ask for their feedback and comments. In addition, we would like to take this opportunity to thank them for their very interesting and well-documented research!
+
+% The original authors extensively described their code on the corresponding github repository \cite{peychev2022latent}, including a step-by-step guide on how to reproduce their experiments. The code was well structured and the comments were clear. As a result of this, any questions we had could be answered by their documentation. To keep the reproducibility report a fair assessment, this work has been sent to the original authors to ask their feedback and comments. 
+
+% ORIGINAL COMMENT Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 

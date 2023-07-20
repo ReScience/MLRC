@@ -1,0 +1,56 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+%This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+The aim of this work is to study the reproducibility of the paper \textit{'Latent Space Smoothing for Individually Fair Representations'} by Peychev et al., in which a novel representation learning method called LASSI is proposed. We aim to verify the three main claims made in the original paper: (1) LASSI increases certified individual fairness, while keeping prediction accuracies high, (2) LASSI can handle various sensitive attributes and attribute vectors and (3) LASSI representations can achieve high certified individual fairness even when downstream tasks are not known. In addition, we aim to test the robustness of their claims by conducting additional experiments.
+
+% In their paper \textit{'Latent Space Smoothing for Individually Fair Representations'}, Peychev et al. propose a novel representation learning method called LASSI. In this reproducibility study the three main claims by The claims 
+
+% In this paper the reproducibility of the paper \textit{'Latent Space Smoothing for Individually Fair Representations'} will be studied.  
+
+
+% The paper introduces a new representation learning method called LASSI, that ensures that individual fairness is taken into account.
+% In this paper there are 3 claims made about LASSI that we tried to reproduce. The first one is that LASSI enforces individual fairness and keeps the accuracy high. The second one is that LASSI handles various sensitive attributes and attribute vectors. And the last one is that LASSI representations can be transferred to unseen tasks. The results from this reproduction paper can be used to examine if the claims are valid. Besides that, we expand the paper by doing multiple experiments on our own to verify if the model is robust.
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+To reproduce the experiments, we use the step-by-step guidelines supplied by the original authors on their GitHub repository. We write additional code to run experiments beyond the scope of the work done by Peychev et al. In order to comply with resource limitations, we reproduce only the experiments relevant to the main claims. In total a budget of 45 hours on an NVIDIA Titan RTX GPU is used.
+
+% To reproduce the experiments, we use the step-by-step guidelines supplied by the original authors on their GitHub repository. The experimental setup and datasets used are identical to the work reported in the original paper. We write additional code to run experiments beyond the scope of the work done by Peychev et al. In order to comply with resource limitations, we reproduce only the experiments relevant to the main claims. In total a budget of 45 hours on an NVIDIA Titan RTX GPU is used.
+
+% For the reproduction we used the same code, pipeline, datasets and hyperparameters. These are all retrieved from the github : \url{https://github.com/eth-sri/lassi}. Since the authors tuned the parameters, we found it logical to use these parameters. To run the code we used the LISA cluster with a total GPU budget of 20 hours. We also run other experiments to see if the model is robust. Here we needed to change the original code a bit, to experiment with different features.
+
+\subsubsection*{Results}
+We are able to reproduce and verify the three main claims of the original paper, by reproducing the results within 5\% of the reported values. The additional experiments were successful and strengthen the claims that LASSI increases certified individual fairness compared to the baseline models. Outliers of the experiments are studied and found to be caused by biased and inaccurate input data.
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+Reproducing the original experiments was made possible by the extensive documentation and guidelines created by the authors in their code and public GitHub repository. The theoretical background provided in their paper was clear and detailed.
+
+% Reproducing the original experiments was made possible by the extensive documentation and guidelines created by the authors in their code and public GitHub repository. The theoretical background provided in their paper was clear and detailed, allowing a deeper understanding about the inner workings of their models and metrics.
+
+% The code for this project is publicly available in a GitHub repository. 
+
+% The GitHub was very easy to use, with a clear overview how to run their experiment. The code itself was adapt for our own experiments. This made it easier to change the sensitive attributes or prediction task.
+
+\subsubsection*{What was difficult}
+
+% The code had multiple entangled files, so it took a lot of time to understand what was happening. This made it difficult to change the code completely. Besides that, the code they provided was used for Linux, so some batch files needed to be changed bat files in order to run it on Windows.
+
+The main difficulty was found within the complex structure of the original code files and the related functions across these files. The code needed to perform our additional experiments was therefore also complex and required us to alter many different functions in the original code.
+
+\subsubsection*{Communication with original authors}
+
+To keep the reproducibility report a fair assessment, this work has been sent to the original authors to ask for their feedback and comments. 
