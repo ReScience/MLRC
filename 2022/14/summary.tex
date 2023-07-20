@@ -1,0 +1,49 @@
+
+
+% commented out for the 
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+%Go directly into the main claims that we are reproducing -> one sentence . 
+In this paper, we perform a reproduction study of the original work of \citet{gao2022dialsummeval} on the evaluation of automatic dialogue summarization metrics and models. They concluded that (1) few metrics are efficient across dimensions, (2) metrics perform differently in the dialogue summarization task than when evaluating conventional summarization, (3) models tailored for dialogue summarization capture
+\textit{coherence} and \textit{fluency} better than \textit{consistency} and \textit{relevance}.
+
+\subsubsection*{Methodology}
+%MENTION GPU HOURS
+%Three annotators evaluated the outputs of 13 summarization models applied over 100 dialogues, and their human reference summaries. The annotation process had a duration of 20 hours on average per annotator and followed the guidelines of \cite{gao2022dialsummeval}. The only deviation concerns the implementation of a new annotation tool developed and run locally to address the relative impracticality of the Excel interface. To avoid tampering with the reproduction, we conducted an ablation study with a subset of the data annotated with the original tool. Finally, we implemented modified parts of the author's code to apply the metrics over the summaries and compare their scores with our human judgments. 
+% possible shorter version
+Three annotators evaluated the outputs of 13 summarization models and their human reference summaries, following the guidelines of the original paper. This took on average 20 hours. A new annotation tool was developed to address the limitations of the Excel interface. An ablation study was conducted with a subset of data annotated with the original process. Finally, we implemented modified parts of the author's code to apply the metrics over the summaries and compare their scores with our human judgments. All experiments were run on CPU.
+% The authors' code was modified to apply metrics to the summaries and compare their scores with human judgments.
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+\subsubsection*{Results}
+
+%The original paper's claims were reproduced. The correlation between the metric scores and human judgments over the model and reference summaries led us to observe the same tendencies as in \cite{gao2022dialsummeval}. Our annotations correlate with the original ones at a Pearson score of 0.6, which is evidently sufficient for reproducing the main claims. Besides that, measuring the reproduction success with quantifiable means is not feasible in this study, since the original author's conclusions rely primarily on general observations. 
+The original paper's main claims were reproduced. While not all original authors' arguments were replicated (e.g. ROUGE scoring higher for \textit{relevance}), the correlation between metrics and human judgments showed similar tendencies as in \cite{gao2022dialsummeval}. The annotations correlated with the original at a Pearson score of 0.6, sufficient for reproducing main claims. 
+% Measuring reproduction success is not feasible since the original authors' conclusions rely on general observations.
+%Naturally, the reproduction of identical scores was not our goal considering the random factors of the models' stochastic architectures and the subjectivity of human judgment.
+%Therefore,  we argue that more fine-grained documentation of the main conclusions by the original paper would lead us to a more accurate and confident judgment as to the extent, to which these conclusions were reproduced. 
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgment to decide if your results support the original claim of the paper.
+
+\subsubsection*{What was easy}
+
+The reproducibility strengths of the original paper lie primarily in its profound methodological description. The rich and detailed incorporation of tables made the comparison with our reproduced results fairly easy. 
+
+
+\subsubsection*{What was difficult}
+
+The reimplementation of the original paper's code was relatively complex to navigate and required a fair amount of debugging when running the metrics. Certain deficiencies in the annotation guidelines also resulted in rather time-consuming decision-making for the annotators. Finally, the methodological description of the post-processing of the annotations was relatively unclear and the code calculating the inter-annotator agreement was missing.
+
+
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsubsection*{Communication with original authors}
+
+We contacted the paper's first author, twice, to request the annotation guidelines, the missing code parts, and clarifications regarding the annotation post-processing. Their responses were prompt and helpful.

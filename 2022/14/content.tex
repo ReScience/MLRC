@@ -1,0 +1,296 @@
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+
+\section{Introduction}
+
+As noted by \citet{reproducibility_in_nlp} in their survey of reproducibility research in Natural Language Processing (NLP), increased attention has been directed towards the reproduction of results in the field following a ``reproducibility crisis’’ in science \cite{baker2016reproducibility}. A great deal of NLP reproduction studies in recent years have focused on metric scores \cite{belz-etal-2021-reprogen}. However, even though human evaluations have been a central part of Natural Language Generation (NLG) research for years, little is known about their reproducibility. Some effort has been made to investigate the topic \cite{gehrmann2022repairing}. For example, \citet{iskender-etal-2021-reliability} investigate the reliability of human evaluations focusing on factors such as annotators’ demographics and the design of the task. 
+
+Dialogue summarization is a task in NLP that involves generating a summary of a conversation or dialogue. This task is important for applications such as chatbots, where a summary of a conversation can help users quickly understand its content and make informed decisions. The quality of dialogue summaries is typically evaluated using automatic evaluation metrics such as ROUGE \cite{lin2004rouge}, BLEU \cite{papineni2002bleu} or BARTScore \cite{yuan-etal-2021-bartscore}. However, these metrics seem to not accurately or sufficiently assess the performance of dialogue summarization models, as they do not consider the multifaceted nature of the task and  its  specific challenges. In other words, it appears that each of these metrics fails to capture one or more aspects determining the quality of a summary \cite{deutsch-roth-2021-understanding}.
+
+
+% The paper "DialSummEval: Revisiting Summarization Evaluation for Dialogues"~\cite{gao2022dialsummeval} is part of the ongoing research in the field of dialogue summarization, which aims to develop algorithms and techniques for automatically generating summaries of conversations. The paper specifically focuses on the evaluation of these algorithms, which is a critical aspect of dialogue summarization research. 
+% The work of \citet{gao2022dialsummeval} was chosen for the current reproduction study since establishing the validity of existent automatic evaluation metrics for Natural Language Generation (NLG) is vital to foster improvements in conversational agents \cite{zhou-etal-2022-deconstructing}. 
+The work of \citet{gao2022dialsummeval} investigates these shortcomings by re-evaluating a range of automatic evaluation metrics and correlating them with human evaluation to identify the strengths and weaknesses of current evaluation methods of dialogue summarization. Creating the DialSummEval dataset is a significant contribution of the paper, providing a valuable resource for evaluating dialogue summarization models.
+% and advancing research in this area.
+
+
+%Since the scope follows the literature review, maybe it's nice to put a sentence here that states explicitly the goal of our paper (at least for the course version). You can comment the following out if it seems unfit
+In this paper, we reproduce the methodology and main findings of \citet{gao2022dialsummeval}, which are more extensively introduced in Section \ref{sec:claims}. In addition, we reflect on the reproducibility process with respect to its determining factors and main challenges. 
+
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+The present study builds on the work of the original paper, "DialSummEval: Revisiting Summarization Evaluation for Dialogues" \cite{gao2022dialsummeval}, which proposed a re-evaluation of automatic evaluation metrics for dialogue summarization. \citet{gao2022dialsummeval} observed that current methods for evaluating the quality of summaries in dialogue summarization, such as relying on the SAMSum dataset \cite{gliwa2019samsum} and ROUGE \cite{lin2004rouge}, are flawed and may not accurately assess the performance of dialogue summarization models. The paper re-evaluates a range of automatic evaluation metrics in terms of \textit{coherence}, \textit{consistency}, \textit{fluency}, and \textit{relevance}. Additionally, they conducted a human evaluation of various summarization models based on the same four quality aspects. The human evaluation was the primary focus of the reproduction study, as the resulting dataset was used in the subsequent experiments to evaluate different evaluation metrics.
+
+%One of the key challenges in reproducing the experiments and results of the original paper was the use of human annotations for evaluating the performance of different summarization models. In the original paper, human annotations were used to evaluate the coherence, consistency, fluency, and relevance of different summaries, and these annotations were a critical part of the dataset used in the experiments. In our reproduction study, we were, therefore, faced with the task of re-annotating all of the human annotations in the original dataset.
+%I find it a bit difficult to follow the above paragraph. To me it made more sense to condense it and connect it with the one above, but feel free to reverese the change if you don't agree. 
+%
+The original paper presents the following main claims:
+\begin{enumerate}
+\item Few automatic evaluation metrics perform well in all dimensions of dialogue summarization. Recently proposed metrics, such as BARTScore and QA-based, are the best performers.
+\item There are some trends in the performance of different evaluation metrics for dialogue summarization that differ from those observed in conventional summarization tasks. 
+% --> claim is supported if different results for ROUGE, CHCR; in terms of claims about ROUGE increasing the n for the n-grams leads to lower scores in the original paper, also in ours; they also found that ROUGE got quite low scores for Relevance, this is not necessarily supported by our results as we get much higher scores for Relevance than them
+\item Models specifically designed for dialogue summarization perform well in terms of \textit{coherence }and \textit{fluency} but still have shortcomings in terms of \textit{consistency} and \textit{relevance}.
+\end{enumerate}
+
+% CURRENTLY THESE CLAIMS COULD BE SEEN AS "VAGUE"...
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+% \begin{itemize}
+%     \item Claim 1
+%     \item Claim 2
+%     \item Claim 3
+% \end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+The original paper selected dialogues and their corresponding human reference summaries from the SAMSum dataset and collected automatic summaries for each dialogue stemming from 13 summarization models (see Section \ref{models}). Six models already had SAMSum summaries included in their publication. Other models did not come with these specific summaries, so \citet{gao2022dialsummeval} generated them by applying the models to the dialogues in question. Once all dialogues and the 14 summaries for each dialogue (13 model outputs and one human summary) were collected, they were annotated by three human annotators. The annotators evaluated each summary on four dimensions. Aside from the human annotation, each summary was evaluated using 32 automatic metrics (see Section \ref{metrics}). The score of each metric was compared to the respective human annotation score for each quality dimension using Pearson's R correlation on both summary and system level, to assess the relatedness between automatic evaluation and human judgment.
+
+For the present reproduction, the same random selection of dialogues from the SAMSum dataset was used. The original authors provide all model-generated summaries that they used and the results of all automated metrics. We decided not to generate new model outputs or rerun the automatic evaluation metrics, as the main claims and contributions of \citet{gao2022dialsummeval} pertain to the outcome of the human annotation process. While the third claim does concern the performance of the models, it references only systems designed specifically for dialogue summarization which the authors of the original paper did not re-train themselves. Furthermore, reproducing only the human annotation part of \citet{gao2022dialsummeval} allows us to control for the variation within the model-produced summaries and metric scores. However, since the human evaluation was redone, the final correlation scores of the automated metrics and the human scores were recalculated.
+
+\subsection{Datasets}
+The SAMSum dataset is a collection of 16k chat dialogues written by linguists fluent in English and contains one summary per dialogue written by a language expert. The dataset consists of training, validation, and test sets of 14732, 818, and 819 dialogues, respectively. \citet{gao2022dialsummeval} sampled random 100 dialogues from the test portion of the SAMSum dataset \cite{gliwa2019samsum}. 
+
+\subsection{Model and metric descriptions}
+\subsubsection{Model descriptions} 
+\label{models}
+Each of the 100 dialogues was summarized using 13 models. Two models were extractive (LEAD-3 and LONGEST-3), two were neural summarization models (PGN \cite{see2017get} and Transformer \cite{vaswani2017attention}), and three were generic pre-trained generative models (BART \cite{lewis2019bart}, PEGASUS \cite{zhang2020pegasus} and UniLM \cite{dong2019unified}). The original paper retrained all these models to acquire their outputs. The present paper uses these generated outputs. 
+The remaining six models were designed for dialogue summarization, and their summaries for the SAMSum dataset were already available. These models were CODS \cite{wu2021controllable}, ConvoSumm \cite{fabbri2021convosumm}, MV-BART \cite{chen2020multi}, PLM-BART \cite{feng2021language}, Ctrl-DiaSumm \cite{liu2021controllable}, and S-BART \cite{chen2021structure}. 
+
+\subsubsection{Metrics}
+\label{metrics}
+\citet{gao2022dialsummeval} evaluated 32 automatic evaluation metrics, which fall into five categories. Examples of metrics in each category include (1) n-gram overlap (ROUGE \cite{lin2004rouge}, BLEU \cite{papineni2002bleu}, and METEOR \cite{banerjee-lavie:2005:ACL}), (2) pre-trained language models (BERTScore \cite{zhang-etal-2020-bertscore}, MoverScore \cite{zhao-etal-2019-moverscore}, and BARTScore \cite{yuan-etal-2021-bartscore}), (3) word embeddings (SMS \cite{clark-etal-2019-sentence}, Embedding average \cite{landauer1997solution}, and Vector extrema \cite{forgues2014automatic}), (4) question-answering (FEQA \cite{Durmus_2020}, SummaQA \cite{Scialom_2019}, and QuestEval \cite{Scialom_2021}), and (5) entailment classification (FactCC \cite{kryscinski-etal-2020-factcc}, DAE \cite{goyal-durrett-2020-dae}).
+
+% There are several different categories of metrics used to evaluate summarization systems. Examples of metrics in each category include (1) n-gram overlap (ROUGE, BLEU, and METEOR) \cite{lin2004rouge, papineni2002bleu, banerjee-lavie:2005:ACL}, (2) pre-trained language models (BERTScore, MoverScore , and BARTScore) \cite{zhang-etal-2020-bertscore, zhao-etal-2019-moverscore, yuan-etal-2021-bartscore}, (3) word embeddings (SMS, Embedding average, and Vector extrema) \cite{clark-etal-2019-sentence, landauer1997solution, forgues2014automatic}, (4) question-answering (FEQA, SummaQA, and QuestEval) \cite{Durmus_2020, Scialom_2019, Scialom_2021}, and (5) entailment classification (FactCC, DAE) \cite{kryscinski-etal-2020-factcc, goyal-durrett-2020-dae}.
+
+\subsection{Annotation}
+\label{annotation}
+The focus of this project was on the reproducibility of the original annotations and their correlation with automatic evaluations. Three of the present paper's authors annotated all of the summaries, which is the same number of annotators as employed in \citet{gao2022dialsummeval}. All three have a background in Linguistics and Natural Language Processing and were thus deemed adequate annotators. No annotation guidelines were present in the original paper, but the authors provided these upon request. These guidelines can be found in the Appendix in Section \ref{sec: annotation guidelines}. In line with \citet{gao2022dialsummeval}, all annotators were asked to annotate all data (i.e., 100 dialogues x 14 model outputs = 1400 instances) to maintain consistency within the annotations. The dialogue was first presented to the annotators; subsequently, the model outputs were shown one by one. The annotators were asked to score each summary on a Likert scale from 1 to 5 in four dimensions: \textit{consistency}, \textit{coherence}, \textit{fluency}, and \textit{relevance}. The explanation of these dimensions can be found in the annotation guidelines (see Appendix \ref{sec: annotation guidelines}). As in the original paper, the order of the model outputs was the same for every dialogue. The total time required per annotator to evaluate all summaries was between two and three full working days (16-24 hours). 
+
+We deviated from the original annotation procedure and guidelines on two minor points. Firstly, \citet{gao2022dialsummeval} employed an Excel sheet for annotating the dialogue summaries. For faster and easier annotation, we developed an annotation tool (see Appendix \ref{tool}) that can be used in a Jupyter Notebook. The code can be found on our \href{https://github.com/tricodex/Reproducing_DialSummEval}{Github}\footnote{\label{github}\href{https://github.com/tricodex/Reproducing_DialSummEval}{https://github.com/tricodex/Reproducing\_DialSummEval}}. An ablation study was conducted to investigate the possible influence of the tool, compared to using Excel (see Section \ref{add2}). 
+
+The second deviation concerns the scoring of the summaries on the category of \textit{coherence}, which pertained to the summaries that were composed of a non-complex sentence. These were challenging to score on \textit{coherence}, as this metric assesses the quality of all sentences in relation to one another. The original guidelines did not address this issue. An amendment was made to give these summaries a default \textit{coherence} score of 4.
+
+\subsection{Processing annotations} 
+\label{meth:ann_proc}
+ We followed the annotation processing procedure adopted by \cite{gao2022dialsummeval}. Before calculating the inter-annotator agreement using Krippendorf's Alpha, \citet{gao2022dialsummeval} clean the noise. Noise is defined as the outlier score when two of the three annotators agree. The noise then no longer influences the agreement negatively. Subsequently, the resulting annotations are aggregated into one set of four scores per summary (one per dimension). Thus, the majority vote was taken as the gold standard, and when none of the annotators agree the average score was used. All further experiments were performed on the cleaned annotations. The results of calculating the inter-annotator agreement are discussed in Section \ref{sec:results_beyond1}.
+
+
+\subsection{Experimental setup and code}
+% As the outputs of the summarization models are taken from the original paper, the only experiment that was 
+For details on the annotation set-up and tool see Section \ref{annotation}. We used the original paper's code to run the correlation calculations between our human evaluation scores and the automatic metrics. 
+The only necessary adjustment was to adhere to the different file formats in which the human evaluations were stored.
+The full code, including the annotation tool, Inter-annotator agreement calculations, and the correlation experiment can be found on \href{https://anonymous.4open.science/r/Reproducing_DialSummEval-7371/}{Github}\footnotemark[1]. All experiments could be run on a machine without a dedicated graphics card.
+
+% Add explanation of correlation (Pearson and Krippendorph Alpha)
+
+%Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). Provide a link to your code.
+
+
+
+% To execute the analysis, the \texttt{./reproduce/analysis/analysis.py} file must be run. The necessary libraries must be installed and the base directory must be set. Additionally, some of the local paths used by the original researchers may need to be modified. The primary analysis includes the calculation of Pearson correlations between human ratings and automatic evaluation scores for a specified rating dimension and a specified list of metrics. The type of correlation being calculated is determined by the input parameter \textbf{level}, which can be set to either "system" or "summary". The function:
+% \begin{itemize}
+%     \item Reads human ratings for the specified dimension and filters out noise ratings.
+%     \item Reads automatic evaluation scores for the specified list of metrics.
+%     \item Calculates Pearson correlations between the filtered human ratings and the automatic evaluation scores for each metric.
+%     \item If the level is set to "system", the function will calculate system-level correlations and print the correlation and p-value for each metric. If the level is set to "summary", the function will calculate summary-level correlations and print the mean correlation for each metric.
+% \end{itemize}
+
+% System-level correlation measures how well the scores produced by the automatic evaluation metrics and human evaluations are correlated with each other across all the dialogue summaries in the dataset. It is calculated by comparing the scores produced by the automatic evaluation metric and the human evaluation on the same set of dialogue summaries. The corresponding p-value is used to determine whether the correlation between the two evaluations is statistically significant.
+
+% Summary-level correlation, on the other hand, measures the correlation between the automatic evaluation metric scores and human evaluation scores for each dialogue summary individually and then takes the average of these correlations to get the summary-level correlation. 
+
+% \subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\section{Results}
+\label{sec:results}
+The results of our reproduction of each of the main claims (see Section \ref{sec:claims}) are given below. Additional experiments were conducted to further investigate the validity of the human annotations and the influence of our annotation tool. These results are discussed in Section \ref{sec:results_beyond1}.
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgment and discussion points for the next "Discussion" section. 
+
+
+\subsection{Results reproducing original paper}
+\label{sec:results_orig}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+
+\subsubsection{Result 1} 
+The results in this section concern the first main claim made in the original paper, namely (1) there are few automatic evaluation metrics that perform well in all dimensions of dialogue summarization and (2) recently proposed metrics such as BARTScore and QA-based metrics perform the best. 
+
+The first part of this claim is supported by the findings of the current reproduction study. The authors of the original paper state that a metric can be seen as a good performer when it shows significant strength in all four dimensions. As is visible in Table \ref{cor_human_automatic}, there is indeed no metric that has a significantly high correlation with the human judgments in all dimensions. Some metrics, such as BERTScore-f1 and BARTScore-r-h perform moderately well in three dimensions, but fail in one (\textit{consistency}). 
+
+The second part of the above-mentioned claim, that BARTScore and QA-based metrics outperform the other metrics, is supported by the findings of this study. It is difficult to define a threshold for when a model outperforms other models. Using the five highest correlating metrics on a system level as an indication, it is evident that a large share of these come from BARTScore or a QA-based metric, though to a lesser extent than in the original paper. Table \ref{cor_human_automatic} shows that on the system level, two out of five highest correlating metrics on \textit{coherence} are either a BARTScore or a QA-based metric, four out of five for \textit{consistency}, two out of five for \textit{fluency}, and three out of five on \textit{relevance}. Therefore, the results of this reproduction support the first main claim of the original paper.  
+
+
+
+\subsubsection{Result 2} % Aga
+%claim: ``The automatic evaluation metrics and their variants present some trends that differ from conventional summarization.''
+%elaboration from the discussion of the og paper: ``The characteristics presented by the automatic evaluation metrics on the dialogue summarization differ from those of the conventional summarization tasks. For ROUGE, we find that increasing the size of n in ROUGE-n is not better in almost all dimensions, which is different from the findings of Rankel et al. (2013) and Fabbri et al. (2021b). The ability of ROUGE to reflect content selection, i.e., relevance, as we usually believe, is also questionable. Compared to the results of Fabbri et al. (2021b), metrics based on n-gram overlap such as ROUGE and CHRF perform worse on dialogue summarization, while some metrics that use source documents such as BLANC perform better. We need to focus on the limitations of ROUGE and the role of the source dialogues in evaluating dialogue summaries.''
+
+This result pertains to the second claim outlined in Section \ref{sec:claims}, which states that the trends observed for the automatic evaluation metrics in the results of \citet{gao2022dialsummeval}, i.e. for dialogue summarization, differ from the patterns observed for conventional text summarization in previous studies. \citet{gao2022dialsummeval} base the assertion mostly on the results of ROUGE. More specifically, they note the following:
+\begin{itemize}
+    \item \textit{Increasing the size of n in ROUGE-n did not lead to improvement on almost all dimensions, contrasting the findings of \citet{rankel-etal-2013-decade} and \citet{fabbri2021convosumm}}. This result has been replicated in our reproduction. In fact, as can be seen in Table \ref{cor_human_automatic}, increasing the size of n led to lower results for every single ROUGE metric on all dimensions, both on system and summary level.
+    \item \textit{The scores obtained by ROUGE for the dimension of relevance were not as high as could be expected, given its commonly-believed ability to reflect content selection.} This result was \textbf{not} replicated in the current study. In fact, on the system level, out of the four dimensions, all ROUGE metrics obtained the best results for \textit{relevance}. Furthermore, also on the system level, ROUGE-1 and ROUGE-l obtained the second and the fourth highest score, respectively, out of all 32 metrics.
+    \item \textit{Metrics based on n-gram overlap such as ROUGE and CHRF obtained lower scores on dialogue summarization than they do on conventional text summarization in \citet{fabbri2021convosumm}, while metrics that make use of source documents such as BLANC performed better.} This result was \textbf{not} replicated in the current study. In the current reproduction, ROUGE has obtained higher scores than \citet{fabbri2021convosumm} for \textit{relevance} and \textit{coherence} (all sub-metrics), and \textit{fluency} (some sub-metrics). \citet{fabbri2021convosumm} observes better performance of ROUGE only for \textit{consistency}. Moreover, CHRF has scored higher than in \citet{fabbri2021convosumm} on two metrics of \textit{coherence} and \textit{relevance}. Finally, BLANC has obtained lower scores than those observed in \citet{fabbri2021convosumm}.
+\end{itemize}
+
+% two of the subarguments were not supported but the general tendencies etc. 
+% 'tendencies' is a nice term
+While not all individual results were replicated, the second main claim made by \citet{gao2022dialsummeval} can still be supported, as the observed results show differences in the performance of the automatic evaluation metrics on dialogue versus conventional summarization.
+
+
+
+\begin{table}[H]
+     \centering
+     %                            left bottom right top
+         \includegraphics[clip, trim=1.8cm 9cm 2.5cm 1.8cm, width=0.95\textwidth]{figures/corr_comp.pdf}
+         \caption{Best viewed in color. Orange values are scores below what the original paper reports and blue values are higher. The differences are shown numerically in Appendix \ref{numeric}. The following is taken from \citet{gao2022dialsummeval} due to identical table layout: The correlation (Pearson’s R) of annotations computed on system level and summary level along four quality dimensions between automatic metrics and human judgments. For evaluation, all metrics require at least the summaries to be evaluated as input. Metrics with + indicate that the source dialogues are used, metrics with - mean no other input is required, others need to use the reference summaries. The five most-correlated metrics in each column are bolded (For system level, **=significant for p ≤ 0.01, *=significant for p ≤ 0.05). Suffixes are added to distinguish the different variants of metrics. For BARTScore, h, r, and s are abbreviations of hypotheses, references, and source dialogues respectively. BARTScore-s-h measures the probability to generate hypotheses using source dialogues as inputs, while BARTScore-h measures the probability to generate hypotheses without other inputs, and so on. For BLANC, BLANC-tune refers to the way of fine-tuning on a generated summary and then conducting nature language understanding tasks on source dialogues, while BLANC-help refers to the way of inferring with a generated summary concatenated together. For SummaQA, SummaQA-fscore measures the average overlap between predictions and ground truth answers, and SummaQA-conf corresponds to the confidence of the predictions. }
+         \label{cor_human_automatic}
+\end{table}
+
+\subsubsection{Result 3}
+
+This final result concerns the third of the claims stated in Section \ref{sec:claims}, namely that models created specifically for dialogue summarization (i.e., CODS, ConvoSumm, MV-BART, PLM-BART, Ctrl-DiaSumm, and S-BART) obtain scores comparable to reference summaries on the dimensions of \textit{coherence} and \textit{fluency} but perform worse on \textit{consistency }and \textit{relevance}. This result was replicated. Table \ref{av_hum_model} shows that while the reference summary and the models obtained higher \textit{consistency} scores in the reproduction than in the original paper, in both studies, the best-performing model on that dimension still obtained a result at least 0.433 lower than the reference summary (0.433 for \citet{gao2022dialsummeval}; 0.434 for the current reproduction).
+
+
+\begin{table}[H]
+     \centering
+     %                            left bottom right top
+         \includegraphics[clip, trim=1.5cm 10cm 4.5cm 1.0cm, width=0.95\textwidth]{figures/model_score_comp.pdf}
+         \caption{Best viewed in color. Average human ratings across the four dimensions for each model output summary. Additional ROUGE-1,2,l scores were calculated using the present sampling data. The two best-performing summaries for each dimension are highlighted in bold. The blue values are scores higher than those reported in the original paper, and the orange scores are lower. All ROUGE scores are identical to the original paper. The differences are shown numerically in Appendix \ref{numeric}}
+         \label{av_hum_model}
+\end{table}
+
+
+
+\subsection{Results beyond original paper}
+\label{sec:results_beyond1}
+%Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+%In this section, we present the results of any analysis we carried overhead that goes beyond the main claims of the original paper.
+% \subsubsection{Additional Result 1} %possibly needs to become more condensed
+%After completing the annotating process and reflecting on the problematic aspects of the annotation guidelines, 
+\subsubsection{Additional Result 1} \label{add1}
+We perform a statistical comparison between the annotations performed by \citet{gao2022dialsummeval} and our annotations to examine their deviation. To estimate the impact of the noise removal, we first compare the inter-annotator agreement on uncleaned annotations, measured with Krippendorff's Alpha score. Our annotations have higher agreement across all dimensions with \textit{consistency} superseding the other three (see Table \ref{annotations_comp}). Given that a usually required Krippendorff's Alpha is around 0.80 and the lowest acceptable score is 0.67 \cite{krippendorff2004content}, it is clear that the uncleaned version of the original paper's annotations fails to meet this threshold. 
+%By contrast, our annotation process is characterized by greater agreement even before removing the noise, at least for the dimensions of coherence and consistency.
+Following the noise removal, we observe that our reproduction is left with a higher number of annotations throughout. This indicates that we had fewer cases in which all three annotators assigned different scores. Additionally, our cleaned annotations display a higher Krippendorff's Alpha with three of the dimensions scoring slightly below the recommended threshold (0.80)  and \textit{consistency} scoring well above (0.92). At the same time, the removal of noise increased the agreement results in the original paper, especially in the case of \textit{fluency}. However, even with the cleaning effort, the agreement on \textit{relevance} did not surpass the lowest threshold (0.67).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+& \textbf{Coherence} & \textbf{Consistency} & \textbf{Fluency} & \textbf{Relevance} \\ \hline
+\textbf{Total}    & 4200    & 4200    & 4200    & 4200               \\ \hline
+\textbf{Krippendorff's $\alpha$ (total)} & 0.38 \textrightarrow  0.61 & 0.49 \textrightarrow  0.79  & 0.13 \textrightarrow  0.52 & 0.39 \textrightarrow  0.52     \\ \hline
+\textbf{Cleaned}  & 3161 \textrightarrow 3607  & 3360 \textrightarrow 3754 & 3050 \textrightarrow 3625 & 3439\textrightarrow 3394     \\ \hline
+\textbf{Krippendorff's $\alpha$ (cleaned)} & 0.76 \textrightarrow 0.78   & 0.67 \textrightarrow 0.92   & 0.68 \textrightarrow  0.78  & 0.56 \textrightarrow  0.72    \\ \hline
+\end{tabular}
+\caption{Annotations and agreement: ``original paper  \textrightarrow reproduction results''. The first row represents the total amount of annotations, and the second represents the IAA on the total. The third row is the number of annotations left after cleaning, and the fourth row shows the IAA on the cleaned annotations.}
+\label{annotations_comp}
+\end{table}
+%---however, except for coherence, consistency and fluency touch the lowest threshold (0.67), while relevance falls below it.
+%Though the results in Table \ref{annotations_comp} are quite suggestive of the deviation between our and the original paper annotations, 
+We further calculated the Pearson's R correlation between annotations for each dimension, see Table \ref{corr}. We observe moderate correlation for\textit{coherence}(0.42) and \textit{fluency}(0.55), \textit{consistency} and \textit{relevance} show a higher uniformity. 
+
+
+% specify what data was used
+\subsubsection{Additional Result 2} \label{add2}
+We conducted an ablation study to examine the impact of the annotation tool on the annotation procedure. 140 summaries (14 summaries per 10 randomly selected dialogues) were annotated by the same three annotators as in our main annotation process. They used the same method as in \citet{gao2022dialsummeval}, working in Excel where each model's summaries were displayed on separate sheets. Table \ref{corr} reveals a strong correlation between the results obtained through the tool and the original annotation process, supporting the use of the tool.
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+                             & \textbf{Coherence} & \textbf{Consistency} & \textbf{Fluency} & \textbf{Relevance} \\ \hline
+\textbf{Reproduction-Original} & 0.42               & 0.77                 & 0.55             & 0.69               \\ \hline
+\textbf{Full Reproduction-Ablation} & 0.71               & 0.66                 & 0.77             & 0.51               \\ \hline
+
+
+\end{tabular}
+\caption{Row 1: Pearson's R correlation between the reproduction annotations and \citet{gao2022dialsummeval}. Row 2: Pearson's R correlation between the full reproduction annotations and the ablation results.}
+\label{corr}
+\end{table}
+
+%Pearson Correlation between the Present Paper's Annotations and the ablation Annotation \& Original Paper's Annotations
+% \begin{table}[]
+% \begin{tabular}{|c|c|c|c|c|}
+% \hline
+%                               & \textbf{Coherence} & \textbf{Consistency} & \textbf{Fluency} & \textbf{Relevance} \\ \hline
+% \textbf{Total}                & 4200               & 4200                 & 4200             & 4200               \\ \hline
+% \textbf{Krippendorff's Alpha (total)} & 0.61               & \textbf{0.79}        & 0.52             & 0.52               \\ \hline
+% \textbf{Cleaned}              & 3607               & \textbf{3754}        & 3625             & 3394               \\ \hline
+% \textbf{Krippendorff's Alpha (cleaned)} & 0.78               & \textbf{0.92}        & 0.78             & 0.72               \\ \hline
+% \end{tabular}
+% \caption{Our Annotations and Agreement}
+% \label{our_annotations}
+% \end{table}
+
+
+% \subsubsection{Additional Result 2}
+
+\section{Discussion} \label{discussion}
+
+%Give your judgment on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+
+\subsection{Discussion of the results}
+
+% (add something about the default coherence score of 4)
+
+The results of the current study exhibit the same tendencies as those observed by \citet{gao2022dialsummeval}, thus effectively replicating the paper's main claims outlined in Section \ref{sec:claims}. However, it can be observed that in our reproduction, for all four dimensions, the reference summaries were given higher scores than in \citet{gao2022dialsummeval}. The original authors note that the reference summaries often lack important information \cite{gao2022dialsummeval}, which is a statement that our annotators agree with. This is reflected in the relatively low score on the dimension of \textit{relevance} in both studies. Nevertheless, since despite the differences across the other dimensions we can observe the same general tendencies as the original authors, we can attribute this deviation to the subjectivity of the annotators and/or the ambiguity of the annotation guidelines. Another note to be made is that the annotators could become aware of `good' or `bad' models, due to the fixed order, and this may have resulted in them scoring the summaries differently than if the order had been randomized.
+
+
+
+
+
+% perhaps to be put in Additional Result 2 or Recommendations for reproducility? 
+% I believe we already motivate creating the tool in the first place within Methodology, so I deleted that part.
+% Lea: fits well here
+\subsubsection{New annotation tool}
+While we have deviated from the exact approach of \citet{gao2022dialsummeval} by utilizing a new annotation tool, the results of our ablation study show that this had no significant impact on our results. Thus, we recommend its implementation in future studies to increase the ease of annotation. Finally, reporting the exact code used to create such a tool contributes to ensuring reproducibility.
+
+
+% here or to be moved?
+% Lea: here
+\subsubsection{Annotation Noise Removal}
+Our final concern regarding the human evaluation process pertains to the authors' decision to treat the disagreement in the annotations as noise and remove it. We found this approach rather counterintuitive, as low agreement is usually interpreted as a sign that refinement of the annotation guidelines is needed. Although the original paper does not reference the motivation underlying this approach, when contacted, the authors cited \citet{bhandari-etal-2020-evaluating} as the inspiration. However, we found that this work displays some differences from the current study. In particular, the annotation process involves a binary label and four annotators, as opposed to a 5-point Likert scale and three annotators employed in our case. Thus, we believe that the suitability of the approach for this study design remains an open question.
+
+
+\subsubsection{What was easy}
+The reproducibility strengths of the original paper lie primarily in its profound methodological description. The rich and detailed incorporation of tables made the comparison with our reproduced results fairly easy. 
+
+\subsubsection{What was difficult}
+The reimplementation of the original paper's code was relatively complex to navigate and required a fair amount of debugging when running the metrics. Certain deficiencies in the annotation guidelines also resulted in rather time-consuming decision-making. Finally, the methodological description of the post-processing of the annotations was relatively unclear and the code calculating the inter-annotator agreement was missing.
+
+\subsubsection{Recommendations for reproducibility}
+
+When it comes to the original paper's final conclusions, it can be argued that some claims were rather vaguely expressed and, therefore, it was challenging to judge whether they were successfully reproduced. For instance, \citet{gao2022dialsummeval} concluded that very few metrics perform well across all dimensions. Regardless of its truthfulness, this argument requires a more fine-grained definition of efficient metric performance. By quantifying the latter and delimiting it inside a certain threshold, it would be substantially easier to compare our reproduction with the original results and make more confident conclusions.
+
+Additionally, based on the annotators' reflections and the results in Section \ref{sec:results_beyond1}, most notably the low correlation obtained for the dimension of \textit{coherence}, we believe that the annotation guidelines could benefit from a greater level of detail. Specifically, more fine-grained definitions and a section with examples of how to score ambiguous and borderline cases could increase the reproducibility of the task.
+
+\subsubsection{Limitations}
+% Lea: looks good!
+The main limitation of this paper pertains to annotators: the annotations were done by three of this paper's authors, due to the time constraints of the reproduction being a student project. The annotators had already read the original paper and thus may have had knowledge that may have influenced their annotations. Although there was a sufficient correlation between the annotations done for this paper and those of the original paper, the overlap in annotators and authors should be kept in mind when interpreting the results of this study. 
+
+\section{Communication with original authors}
+We contacted the first author of the original paper via email. They provided us with the exact annotation guidelines, the raw inter-annotator agreement scores before cleaning for our comparison in Section \ref{add1}, and the missing code for conducting the noise removal. On all emails, we received swift replies and we would like to thank the authors for the correspondence. 
+
