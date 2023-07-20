@@ -1,0 +1,282 @@
+\section{Introduction}
+Feature distribution matching is one of the most challenging learning tasks for visual inputs. Arbitrary Style Transfer (AST) and Domain Generalization (DG) are the common tasks in the literature where feature distribution matching can be considered as the solution. For example, in AST, the style information of input and target images can be interpreted as feature distributions and style can be transferred by cross-distribution feature matching \cite{huang2017arbitrary,li2017demystifying,li2019optimal,lu2019closed,mroueh2020wasserstein,zhou2020domain,kalischek2021light}. The first drawback in the previous studies is to use only the mean and standard deviation to match the feature distributions, which mainly relies on the assumption of that the feature distributions follow Gaussian. In real‐world scenarios, the feature distributions are often much more complicated than Gaussian, thus mean and standard deviation may not be fully representative to exactly match them. Secondly, although Exact Feature Distribution Matching (EFDM) can be achieved by directly matching the higher-order statistics of the image features, it is not practical for the current application areas due to the intensive computational overhead.
+
+This paper \cite{zhang2021exact} proposes to perform EFDM in a more effective way by exactly matching the empirical Cumulative Distribution Functions (eCDFs) of image features. As mentioned in the paper, Glivenko–Cantelli theorem \cite{van2000asymptotic} states that the empirical Cumulative Distribution Function (eCDF) asymptotically converges to the Cumulative Distribution Function (CDF) when the number of samples approaches infinity. Relying on this theorem, this study demonstrates that the feature distributions (\textit{i.e.}, mean, standard deviation, and higher-order statistics) can be exactly matched by using eCDFs. The authors claim that this can be achieved by employing a custom Exact Histogram Matching algorithm that implements Sort-Matching \cite{rolland2000fast}.
+
+In this reproducibility report, we studied EFDM via the Sort-Matching algorithm on two tasks related to feature distribution matching. In this study, we aimed to reproduce the experiments provided in the original paper on AST and DG, and reported the details and issues we encountered during this process. %During this study, we conducted the experiments done in the original paper on AST and DG, and reported the important details about certain issues encountered during the reproduction. 
+We have compared the results obtained in our experiments with the ones reported in the original paper. We have also extended the experiments to observe how much the performance changes when some hyperparameters of EFDM or EFDMix are modified. In addition to the experiments in the paper, we have investigated the EFDM have the capability of forming better style representations in the cases of modeling the subjects as style.
+
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+The main idea of the paper is to introduce a novel strategy that achieves to exactly match the feature distributions by using eCDFs of the input and target image features. This strategy is tested on two tasks related to feature distribution matching, namely Arbitrary Style Transfer (AST) and Domain Generalization (DG). 
+
+The proposed EFDM strategy claims that it shows superior performance to the existing state-of-the-art methods of AST and DG in terms of visual quality and quantitative measures. To validate these claims and further analyze the proposed strategy, we try to investigate the following questions:
+
+\begin{itemize}
+    \item Does EFDM work stably on AST and also more challenging photo-realistic style transfer scenarios?
+    \item How can the style information of multiple images, which is extracted by EFDM, be interpolated in the feature space?
+    \item Does the proposed feature augmentation method via EFDM (\textit{i.e.}, EFDMix) improve the generalization capability on category classification and cross-domain instance retrieval?
+    \item Does the performance of the proposed strategy change by modifying the weight of the style loss term used in the training of EFDM and the instance-wise mixing weight used for EFDMix?
+    \item Does EFDM have the capability of forming better style representations (\textit{e.g.}, modeling the lighting as style \cite{kinli2023modeling})?
+\end{itemize}
+
+%\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+
+The paper proposes a novel feature distribution matching strategy, namely EFDM via the Sort-Matching algorithm. We mainly focused on implementing the functionality of EFDM within the details described in the paper. For reproducing the results presented in the original paper, we have used the functional version of EFDM and the training pipelines of both AST and DG, as given in the official GitHub repository.  The overall training scheme of AST and the usage of EFDM instead of the common normalization methods (\textit{e.g.}, AdaIN \cite{huang2017arbitrary}) can be seen in Figure \ref{fig:ast-training}. For our additional experiments on forming style representations by EFDM, we have implemented the modular version of EFDM as a layer to replace it with the common  normalization modules. 
+
+We found that the paper is well-written and easy to follow. With the details given as supplementary material, the paper contains the important details required to reproduce all qualitative and quantitative results. However, the scripts provided in the official repository for t-SNE visualizations of higher-order statistics in the feature space does not work properly, and we could not achieve to fix it. 
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+
+% For reproducing the original paper we used author's code from their GitHub repository. The code was well written and they provided the necessary resources like datasets, images, libraries and pre-trained models. We followed the steps through for each task AST and DG. The authors have not forgotten the researchers who will reproduce the code while writing it. For computational resources we have used our local dual NVIDIA RTX 2080 Ti GPUs.
+
+In this section, we introduce the implementation details of EFDM and further proposed feature augmentation strategy, namely EFDMix. We present the important points for the reproduction of this study, the hyperparameters we used, and our experimental setup. 
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{EFDM_Design.png}
+    \caption{Overall training scheme of the proposed strategy in AST, including the EFDM of the image features. Obtained from the presentation of \cite{zhang2021exact}.}
+    \label{fig:ast-training}
+\end{figure}
+
+\subsection{Proposed Strategy}
+
+This study proposes to apply EFDM to tasks of AST and DG by exactly matching eCDFs with exact histogram matching via the Sort-Matching algorithm in feature space. Given the input vector $\mathbf{X} \in \mathbb{R}^{B \times C \times HW}$ and the style vector $\mathbf{Y} \in \mathbb{R}^{B \times C \times HW}$, EFDM can be applied by exact histogram matching in a channel-wise manner where $B, C, H, W$ refer to the batch size, number of channels, height, and width, respectively. First, the values in $\mathbf{X}$ and $\mathbf{Y}$ are sorted in ascending order. To obtain the required output, the sorted values of $\mathbf{X}$ are replaced with the values of sorted $\mathbf{Y}$ in corresponding positions, then it returns the unsorted values of $\mathbf{X}$ whose elements are replaced with the values of $\mathbf{Y}$. In this way, the output will share the identical feature distribution to $\mathbf{Y}$. Note that it requires applying the stop-gradient operation \cite{chen2021exploring} to the style features, as practiced in the previous studies \cite{huang2017arbitrary,zhou2020domain}, to ensure the flow of the gradients during back-propagation in deep models. The steps applied in practice are presented in Algorithm \ref{alg:efdm}.
+
+\begin{algorithm}[!t]
+    \caption{PyTorch-like pseudo-code for EFDM.}\label{alg:efdm}
+       $\mathbf{X}$: input vector, $\mathbf{Y}$: target vector\newline
+       \_, IndexX $=$ torch.sort($\mathbf{X}$)\newline
+       SortedY, \_ $=$ torch.sort($\mathbf{Y}$)\newline
+       InverseIndex $=$ IndexX.argsort($-1$)\newline
+       \textbf{return} $\mathbf{X} +$ SortedY.gather($-1$, InverseIndex) $- \mathbf{X}$.detach()
+\end{algorithm}
+
+The proposed strategy does not introduce any additional parameters and can be used in a plug-and-play manner with few lines of code and minimal cost. It is important to note that the Sort-Matching algorithm assumes that two vectors (\textit{i.e.}, $\mathbf{X}$ and $\mathbf{Y}$) should have the same number of dimensions in order to be directly applicable to this algorithm. 
+
+To extend this strategy for feature augmentation in DG, the authors introduce a style mixing method in feature space by interpolating the sorted vectors used in EFDM. This method is named as Exact Feature Distribution Mixing (EFDMix) in the paper. The main difference between EFDM and EFDMix is described in the following equation.
+
+\begin{equation}
+    \mathbf{O} = \mathbf{X}_{u} + (1-\lambda)\mathbf{Y}_{s} - (1-\lambda)\mathbf{X}_{d}
+    \label{eq:efdmix}
+\end{equation}
+where $\mathbf{O}$ stands for the required output, $\mathbf{X}_{u}$ is an unsorted input vector, $\mathbf{Y}_{s}$ is a sorted style vector, $\mathbf{X}_{d}$ refers to the gradient-stop operation applied to $\mathbf{X}_{u}$, and $\lambda$ is the instance-wise mixing coefficient, which is sampled from $Beta(\alpha,\alpha)$ where $\alpha \in (0, \infty)$.
+
+\subsection{Architecture Design}
+
+A lightweight encoder-decoder architecture is employed for AST task where the encoder $f$ is composed of the first 4 blocks of a pre-trained VGG-19 \cite{simonyan2014very}. The decoder part is designed as a custom convolutional network that contains 4 convolutional blocks following ReLU activations \cite{maas2013rectifier}. Given the content images $I_{c}$ and the style images $I_{s}$, both images are encoded into the feature space by using $f$. Note that the weights of $f$ are fixed, and not trained during the experiments. EFDM is applied to these features in order to extract a new feature vector of the content images whose distribution is matched to the distribution of the style images. To summarize, the content features from the distribution of the style features $S$ can be extracted by Equation \ref{eq:efdm}.
+
+\begin{equation}
+    S = EFDM(f(I_{c}), f(I_{s}))
+    \label{eq:efdm}
+\end{equation}
+
+Decoder network $g$ is responsible for projecting new stylized features $S$ into the image space. The final output $I_{o}$ can be generated by Equation \ref{eq:decode}.
+
+\begin{equation}
+    I_{o} = g(S)
+    \label{eq:decode}
+\end{equation}
+
+During the optimization of the weights of $g$, as a common practice in AST literature, the weighted combination of the content loss $\mathcal{L}_{c}$ and the style loss $\mathcal{L}_{s}$ is used, as shown in Equation \ref{eq:loss}.
+
+\begin{equation}
+   \mathcal{L} = \mathcal{L}_c + \omega \mathcal{L}_s
+   \label{eq:loss}
+\end{equation}
+
+Where $\omega$ is the balancing term for two components. The content loss refers to a simple Euclidean distance between the content images $I_c$ and the final output $I_o$. The style loss calculates the distribution divergence between VGG features of the style images $I_s$ and the final output $I_o$.
+
+For DG task, the original paper follows the prior work \cite{zhou2020domain}, and the only difference is to change the feature augmentation method used during training (\textit{i.e.}, using EFDMix, instead of MixStyle \cite{zhou2020domain}). ResNet-18 and ResNet-50 \cite{he2016deep} are picked as a backbone network, and started to train these networks with pre-trained weights. There are two different settings in DG. The first is the leave-one-domain-out setting that trains the model on three domains and tests on the remaining one, and the latter is the single source generalization training on a single domain and testing on the remaining three domains. 
+
+\begin{figure}[!t]  
+  \includegraphics[width=\textwidth]{figures/efdm_fig1.png}  
+  \caption{Visual comparison of the reported and our produced results on standard \cite{huang2017arbitrary} (the first two rows) and photo-realistic \cite{luan2017deep} (the last two rows) style transfer.}
+\label{fig:fig1}
+\end{figure}
+
+\subsection{Datasets}
+
+During our reproduction study, we used the same datasets and the same settings as mentioned in the original paper. The AST task is trained with the training set of MS-COCO \cite{lin2014microsoft} for the content images and WikiArt \cite{artgan2018} for the style images. The training set of MS-COCO dataset contains 118K unique images, while WikiArt contains 42K images for training and 10K images for testing, collected from the artworks of 195 artists. For DG task, PACS dataset \cite{li2017deeper} is employed for domain generalization performance on image classification. This dataset contains images from four different domains (\textit{i.e.}, Art Painting with 1.670 samples, Cartoon with 2.048 samples, Sketch with 2.344 samples, and Photo with 3.929 samples) with 7 shared categories. Moreover, Market1501 \cite{zheng2015scalable} and GRID \cite{loy2009multi} datasets are used for domain generalization on instance retrieval.
+
+% Market1501 dataset contains 13k training examples and 19k dev and test samples\cite{market1501}. GRID dataset contains 250 image pairs identified as the same person also there are a total of 775 images that do not belong to any of the probes. These extra images should be used in cross-validation testing. 
+
+\subsection{Hyperparameters}
+In our reproduction study, we used Adam optimizer \cite{kingma2014adam} during training with an initial learning rate of $1e-4$, decay of $5e-5$, and the batch size of $8$. The details for optimization are not available in the paper, and we have decided to use the default values as given in the official repository. In AST training, $\omega$ is set to $10$ to adjust the content and style trade-off in the objective function. For DG task, $\alpha$ is the parameter for Beta distribution sampling, and is set to $0.1$ during the experiments.
+
+% In the \textbf{EFDM} algorithm there is two hyperparameters. One of them is mentioned in the general loss function the $\omega$ coefficient before the $\mathcal{L}_c$. While changing the $\omega$ you can adjust the content and style trade-off additionally you can interpolate between content and style image space adjusting the $\lambda$ in \textbf{EFDMix}. The training completed with $\omega = 10$. 
+
+\subsection{Experimental setup and code}
+
+We have followed the same protocol described in the original paper for both AST and DG. For any missing information in the paper, we abided by the default values given in the official repository. We present a qualitative comparison to evaluate the performance of EFDM on AST. Following the original paper for DG task, the classification accuracy of the proposed strategy is reported in two specified settings (\textit{i.e.}, leave-one-out generalization and single source generalization) and also the retrieval accuracy in the cross-dataset setting. For the additional experiments on modeling the lighting as the style, which is extracted by EFDM, we have followed the same training pipeline as introduced in \cite{kinli2023modeling}, just replacing AdaIN layers with EFDM layers. Our implementation and the trained weights are available at the link\footnote{\url{https://anonymous.4open.science/r/efdm-pytorch-767F}}. % do not forget to add link!
+
+\begin{figure}[!t] 
+\centering
+  \includegraphics[width=0.75\textwidth]{figures/efdm_fig3.png}  
+  \caption{Illustration of style interpolation between a single content image and four style images.}
+\label{fig:fig3}
+\end{figure}
+
+\begin{table}[!t]
+\centering
+  \caption{Average running time of prior methods and proposed strategy used in AST on a 512px image. Note that the compared methods run on a single Tesla V100, while our measurement has been done on a single RTX 2080Ti.}
+  \label{tab:avg-runtime}
+    \begin{tabular}{c|cccccc}
+        \hline
+        \textbf{Method}  & \textbf{Gatys} \textit{et al.} \cite{gatys2016image}  &  \textbf{CMD} \cite{kalischek2021light}  & \textbf{HM}  & \textbf{AdaIN} \cite{huang2017arbitrary} & \textbf{EFDM} \cite{zhang2021exact} & \textbf{EFDM (ours)} \\
+        \hline
+        
+         Time (s)        &   25.61       & 19.84             & 0.33           & 0.0038       &    0.0039        &       0.0043 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Computational requirements}
+
+The experiments have been conducted on a single NVIDIA RTX 2080Ti GPU. A single training for AST task took approximately 12 hours, while all experiments for DG task has been completed in a single day. These experiments do not require any other significant resources, but GPU memory (\textit{i.e.}, ${\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}6$GB for training of both tasks with the batch size of $8$). The average running time of different methods used in AST to process a 512px image is shown in Table \ref{tab:avg-runtime}.
+
+\section{Results}
+\label{sec:results}
+
+We have conducted all experiments by following the descriptions given in the paper. In general, we were mostly able to reproduce the qualitative results on AST and photo-realistic style transfer, and quantitative results on DG. Reproduced results for both tasks support the claims made in the original paper. We can state that the overall performance seems robust to the changes in different hyper-parameters used for EFDM and EFDMix. Lastly, EFDM has the capacity to better represent the style information in the cases of modeling the lighting as style.
+
+% Our results for both AST and DG support the original claim of the paper. To compare the results between the original and reproduced images in AST difference between the images are very minimal. We have reproduced all content and style pairs in the paper and some other content and style pairs in the supplementary file provided. Results in the domain generalization are quantitative. 
+
+\begin{figure}[!t]  
+    \centering
+  \includegraphics[width=0.8\textwidth]{figures/efdm_fig2.png}  
+  \caption{Illustration of the content-style trade-off with different $\lambda$ values in Equation \ref{eq:efdmix}.}
+\label{fig:fig2}
+\end{figure}
+
+\begin{figure}[!t]  
+    \centering
+  \includegraphics[width=0.8\textwidth]{figures/efdm_fig4.png}  
+  \caption{Comparison of reproduced results of different feature distribution matching strategies applied in the original paper.}
+\label{fig:fig4}
+\end{figure}
+
+\subsection{Results reproducing original paper} 
+
+\subsubsection{Qualitative comparison on AST}
+As shown in Figure \ref{fig:fig1}, we were able to reproduce the AST (the first two rows) and photo-realistic style transfer (the last two rows) results of AdaIN and EFDM reported in the original study. Although there could be minor differences in the corresponding outputs, depending on the optimization process, our reproduced models have similar behaviors on the same stylistic changes. Therefore, we can validate our first claim, EFDM works stably on AST and photo-realistic style transfer scenarios.  
+
+\subsubsection{Mixing multiple styles}
+Figure \ref{fig:fig3} demonstrates the validation of our second claim. It is possible to blend more than one style information, instead of matching to a single one, to obtain novel styles by linearly combining their feature distributions. 
+
+\subsubsection{Partial utilization of style information}
+The paper points out that the formula of EFDMix, given in Equation \ref{eq:efdmix}, enables adjusting the amount of style information utilized during style transfer. Figure \ref{fig:fig2} illustrates that we were able to reproduce the content-style trade-off experiment conducted in the original study.
+
+\subsubsection{EFDM versus different order of statistics}
+Following the ablation on AST in the original study, we present our reproduced results in Figure \ref{fig:fig4}, where different feature distribution matching strategies are employed during AST training. AdaMean matches the dominant color scheme, while AdaStd tends to preserve the global structure more, instead of the stylistic details. AdaIN, by definition, can combine the behaviors of AdaMean and AdaStd. EFDM can effectively preserve the content details with the help of higher-order feature statistics.
+
+\subsubsection{Feature augmentation method via EFDM on DG}
+We present the domain generalization results of category classification in Table \ref{tab:dg-pacs} and cross-domain instance retrieval in Table \ref{tab:dg-reid}. We only report the results of the latest state-of-the-art \cite{zhou2020domain}, the original study \cite{zhang2021exact}, and our reproduction. We were able to reproduce the reported results of single source generalization experiments, while we could partially achieve to reproduce the reported results on the leave-one-domain-out generalization. Moreover, the original study claims that EFDMix outperforms the latest feature augmentation strategy for DG on cross-domain person re-identification, and our reproduced results can validate this claim.
+
+\begin{table}[!t]
+\centering
+\caption{DG results of category classification on PACS. (R) refers to our reproduced results.}
+\label{tab:dg-pacs}
+\resizebox{0.9\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+\multicolumn{1}{l|}{\textbf{Method}}                & \textbf{Art} & \textbf{Cartoon} & \textbf{Photo} & \textbf{Sketch} & \textbf{Average} \\ \hline
+\multicolumn{6}{c}{\textbf{Leave-one-domain-out generalization}}                                                                            \\ \hline
+\multicolumn{1}{l|}{R-18 w/ MixStyle \cite{zhou2020domain}}               & 83.1$\pm$0.8 & 78.6$\pm$0.9     & 95.9$\pm$0.4   & 74.2$\pm$2.7    & 82.9             \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix \cite{zhang2021exact}}                 & 83.9$\pm$0.4 & 79.4$\pm$0.7     & 96.8$\pm$0.4   & 75.0$\pm$0.7    & 83.9             \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R)}             & 80.6$\pm$1.5 & 78.1$\pm$0.6     & 94.1$\pm$0.9   & 72.3$\pm$1.2    & 81.3             \\ 
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R) $\alpha=0.5$} & 80.7$\pm$1.8 & 78.2$\pm$1.0     & 94.2$\pm$1.3   & 71.4$\pm$1.9    & 81.3 \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R) $\alpha=1.0$} & 80.9$\pm$1.4 & 78.1$\pm$0.9     & 94.1$\pm$1.3   & 71.4$\pm$2.1    & 81.1 \\ \hline
+\multicolumn{1}{l|}{R-50 w/ MixStyle \cite{zhou2020domain}}               & 90.3$\pm$0.3 & 82.3$\pm$0.7     & 97.7$\pm$0.4   & 74.7$\pm$0.7    & 86.2             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix \cite{zhang2021exact}}                 & 90.6$\pm$0.3 & 82.5$\pm$0.7     & 98.1$\pm$0.2   & 76.4$\pm$1.2    & 86.9             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R)}             & 87.4$\pm$1.6 & 81.8$\pm$1.6     & 94.3$\pm$2.2   & 73.7$\pm$1.7    & 84.3             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R) $\alpha=0.5$} & 87.6$\pm$1.7 & 81.1$\pm$1.3     & 94.5$\pm$1.7   & 73.9$\pm$1.5    & 84.3             \\ 
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R) $\alpha=1.0$} & 87.4$\pm$2.1 & 81.6$\pm$1.4     & 94.7$\pm$1.6   & 74.3$\pm$1.6    & 84.5 \\\hline
+\multicolumn{6}{c}{\textbf{Single source generalization}}                                                                                   \\ \hline
+\multicolumn{1}{l|}{R-18 w/ MixStyle \cite{zhou2020domain}}               & 61.9$\pm$2.2 & 71.5$\pm$0.8     & 41.2$\pm$1.8   & 32.2$\pm$4.1    & 51.7             \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix \cite{zhang2021exact}}                 & 63.2$\pm$2.3 & 73.9$\pm$0.7     & 42.5$\pm$1.8   & 38.1$\pm$3.7    & 54.4             \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R)}             & 63.5$\pm$3.4 & 72.9$\pm$1.2     & 41.9$\pm$1.4   & 36.3$\pm$3.1    & 53.7             \\ 
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R) $\alpha=0.5$} & 63.8$\pm$2.4 & 73.2$\pm$0.9     & 42.5$\pm$1.6   & 37.1$\pm$3.0    & 54.2 \\
+\multicolumn{1}{l|}{R-18 w/ EFDMix (R) $\alpha=1.0$} & 63.7$\pm$3.4 & 73.2$\pm$0.9     & 41.9$\pm$1.8   & 36.3$\pm$2.4    & 53.7 \\ \hline
+\multicolumn{1}{l|}{R-50 w/ MixStyle \cite{zhou2020domain}}               & 73.2$\pm$1.1 & 74.8$\pm$1.1     & 46.0$\pm$2.0   & 40.6$\pm$2.0    & 58.6             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix \cite{zhang2021exact}}                 & 75.3$\pm$0.9 & 77.4$\pm$0.8     & 48.0$\pm$0.9   & 44.2$\pm$2.4    & 61.2             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R)}             & 73.0$\pm$2.2 & 77.2$\pm$0.9     & 48.3$\pm$1.2   & 47.7$\pm$2.7    & 61.6             \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R) $\alpha=0.5$} & 73.8$\pm$1.6 & 77.6$\pm$1.3     & 47.9$\pm$1.2   & 46.7$\pm$3.2    & 61.5    \\
+\multicolumn{1}{l|}{R-50 w/ EFDMix (R) $\alpha=1.0$} & 73.7$\pm$1.2 & 77.8$\pm$0.4     & 47.9$\pm$0.7   & 46.0$\pm$4.2    & 61.4     
+\end{tabular}}
+\end{table}
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage{graphicx}
+\begin{table}[!t]
+\centering
+\caption{DG results on person re-ID task. (R) refers to our reproduced results.}
+\label{tab:dg-reid}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|cccc|cccc}
+\multirow{2}{*}{Methods} & \multicolumn{4}{c|}{\textbf{MarKet1501 $\rightarrow$ GRID}} & \multicolumn{4}{c}{\textbf{GRID $\rightarrow$ MarKet1501}} \\
+                         & mAP           & R1            & R5           & R10          & mAP          & R1            & R5           & R10          \\ \hline
+OSNet + MixStyle         & 33.8$\pm$0.9  & 24.89$\pm$1.6 & 43.7$\pm$2.0 & 53.1$\pm$1.6 & 4.9$\pm$0.2  & 15.4$\pm$1.2  & 28.4$\pm$1.3 & 35.7$\pm$0.9 \\
+OSNet + EFDMix           & 35.5$\pm$1.8  & 26.7$\pm$3.3  & 44.4$\pm$0.8 & 53.6$\pm$2.0 & 6.4$\pm$0.2  & 19.9$\pm$0.6  & 34.4$\pm$1.0 & 42.2$\pm$0.8 \\
+OSNet + EFDMix (R)       & 35.0$\pm$2.6  & 25.1$\pm$2.3  & 45.6$\pm$4.1 & 52.0$\pm$2.9 & 6.2$\pm$0.7  & 18.8$\pm$1.8  & 33.6$\pm$2.7 & 41.4$\pm$2.9
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Results beyond original paper}
+ 
+\subsubsection{Trade-off between content and style loss terms}
+We investigate how much EFDM is robust to the weighting of two components in the objective function. As previously induced for AdaIN \cite{huang2017arbitrary}, the model inevitably starts to vanish the content details when the weight of style loss term is increased.
+
+\subsubsection{Modifying the instance-wise mixing coefficient}
+As shown in Table \ref{tab:dg-pacs}, the range parameters $\alpha$ of the distribution of the mixing coefficient in EFDMix does not have significant impact on DG results of category classification. This was expected since the method still mixes the distributions, and intuitively modifying its coefficient just makes it another distribution to be matched. 
+
+\subsubsection{Forming better style representation}
+We further investigate the impact of using EFDM instead of AdaIN on a different domain. The approach \cite{kinli2023modeling} proposes to model the lighting as style to provide white-balance correction. This approach assumes that the illuminations in
+the scene basically stands for the additional style information injected to the scene, and tries to normalize this information in adaptive manner. In practice, we replaced AdaIN layers in this method with EFDM layers, which are implemented by us, and repeated the same experiment on mixed-illuminant evaluation set \cite{Afifi_2022_WACV}, as described in \cite{kinli2023modeling}. Table \ref{tab:awb} demonstrates that EFDM forms better style representations to be utilized by proposed style removal model to remove the illumination. 
+
+\section{Discussion}
+
+We can clearly say that the paper was well-written. Although there are some parts that we struggled in the official repository, we were able to run all necessary experiments requiring to reproduce this study. Overall, the reproduced results are similar to the reported results in the paper. As an exception, we could partially achieve to obtain comparable results on DG for category classification. In addition to this, we present the performance of the proposed method when some essential hyperparameters are slightly modified. Lastly, we extend the experiments to a different task in order to observe the impact of EFDM on forming style representations. 
+
+\begin{figure}[!t]  
+  \includegraphics[width=\textwidth]{figures/efdm_fig5.png}  
+  \caption{Ablation on the trade-off between content and style loss terms.}
+\label{fig:fig5}
+\end{figure}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage{graphicx}
+\begin{table}[!t]
+\centering
+\caption{White-balance correction results of the recent methods \cite{kinli2023modeling} and its variant with EFDM on mixed-illuminant evaluation set \cite{Afifi_2022_WACV}.}
+\label{tab:awb}
+\resizebox{0.9\textwidth}{!}{%
+\begin{tabular}{l|cccc|cccc}
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{4}{c|}{\textbf{MSE} $\downarrow$} & \multicolumn{4}{c}{$\Delta$\textbf{E 2000}$\downarrow$} \\
+           & \textbf{Mean}   & \textbf{Q1}     & \textbf{Q2}     & \textbf{Q3}      & \textbf{Mean}  & \textbf{Q1}   & \textbf{Q2}    & \textbf{Q3}    \\ \hline
+StyleWB \cite{kinli2023modeling} & 822.77 & 572.52 & 840.67 & 1025.26 & 11.65 & 10.63 & 11.86 & 13.02 \\
+SR + AdaIN & 818.99 & 527.34 & 875.56 & 1049.03 & 11.01 & 8.64 & 11.41 & 12.31 \\
+SR + EFDM  & 761.05 & 513.96 & 818.39 & 969.33  & 10.16 & 8.75 & 9.81  & 11.69
+\end{tabular}%
+}
+\end{table}
+
+\subsection{What was easy}
+The given code in the original repository was easy to follow, and it was well-written in general. The authors designed the documentation and the source code in a way that anyone who has fundamental knowledge of Python could run the experiments, or even generate their own stylized image from any content. %The author's were aware that their work should be reproducible and easy to follow. 
+
+\subsection{What was difficult}
+We would like to add the reproduced outputs by Histogram Matching (HM) along with the others, however the training of HM was based on CPU and the estimated time to complete a single training was around 15 days in our setup. Consequently, we could not include the reproduced outputs by HM to this report. Moreover, it could not be possible to add t-SNE visualizations to this report, as in the original paper, due to the lack of clarity in the documentation of its script.   
+
+\subsection{Communication with original authors}
+We were in contact with the authors, and asked for
+the original results as JPEG files to prepare the figures in this report.
