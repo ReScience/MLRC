@@ -1,0 +1,43 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+
+%State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+The paper presents a novel post-hoc regularization technique for tree-based models, called Hierarchical Shrinkage \cite{agarwal2022}. Our main goal is to confirm the claims that it substantially increases the predictive performance of both decision trees and random forests, that it is faster than other regularization techniques, and that it makes the interpretation of random forests simpler.
+
+\subsubsection*{Methodology}
+
+%Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments.
+
+%To reproduce the results we used the open‐source implementation of Hierarchical Shrinkage, provided by the authors on GitHub in the Python package, and their code for obtaining data sets. We tested their implementation by manually calculating for different data sets and tree sizes, and compared provided data sets with the ones found online to verify their validity. We coded the experiments from scratch and to the best of our abilities as the authors describe them.
+%To reproduce the results we used the open-source implementation of Hierarchical Shrinkage, provided by the authors in the Python package {\sf imodels} under classes {\sf HSTreeRegressor} and {\sf HSTreeClassifier}, and their code for obtaining data sets in function {\sf get\_clean\_dataset}. We tested their implementation by manually applying Hierarchical Shrinkage to different decision trees and comparing them to the official output, and compared provided data sets with the ones found online to verify their validity. We coded the experiments from scratch as the authors describe them.
+In our reproduction, we used the Hierarchical Shrinkage, provided by the authors in the Python package {\sf imodels}. We also used their function for obtaining pre-cleaned data sets. While the algorithm code and clean datasets were provided we re-implemented the experiments as well as added additional experiments to further test the validity of the claims. The results were tested by applying Hierarchical Shrinkage to different tree models and comparing them to the authors' results.
+
+\subsubsection*{Results}
+
+%Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+We managed to reproduce most of the results the authors get. 
+The method works well and most of the claims are supported. The method does increase the predictive performance of tree-based models most of the time, but not always. When compared to other regularization techniques the Hierarchical Shrinkage outperforms them when used on decision trees, but not when used on random forests. Since the method is applied after learning, it is extremely fast. And it does simplify decision boundaries for random forests, making them easier to interpret.
+
+\subsubsection*{What was easy}
+
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+The use of the official code for Hierarchical Shrinkage was straightforward and used the same function naming convention as other machine learning libraries. The function for acquiring already clean data sets saved a lot of time.
+%The function for acquiring already clean and pre-processed data sets saved a lot of time.
+
+\subsubsection*{What was difficult}
+
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+The authors also provided the code for their experiments in a separate library, but the code did not run out of the box and we had no success reproducing the results with it. The code was inconsistent with the paper methodology. We had the most problems with hyperparameter tuning. The authors did not specify how they tuned the hyperparameters for the used RF regularizers.
+
+\subsubsection*{Communication with original authors}
+
+%Briefly describe how much contact you had with the original authors (if any).
+
+We did not contact the authors of the original paper.
