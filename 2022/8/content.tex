@@ -1,0 +1,242 @@
+\section{Introduction}
+Deep Metric Learning (DML) is a crucial area of research in the field of computer vision, which tries to learn a feature embedding that maps input data into a feature space where the distance between the embeddings corresponds to the similarity between the inputs~\cite{xing2002distance,weinberger2009distance}. This is a key step for tasks such as image retrieval~\cite{feng2018hypergraph,wang2019multi,movshovitz2017no}, face recognition~\cite{schroff2015facenet,sun2014deep,liu2017sphereface}, and person re-identification~\cite{chen2017beyond,xiao2017joint,filkovic2016deep}. However, traditional pairwise~\cite{sohn2016improved} and triplet loss~\cite{hoffer2015deep} functions have limitations, e.g. slow convergence and lack of relations between data samples~\cite{sohn2016improved} when dealing with samples with similar visual appearances among the same and different classes. The proposed method demonstrated in~\cite{lim2022hypergraph} addressed these limitations by introducing the HIST loss function, designed to exploit multilateral semantic relations and leverage in-batched semantic relations for each sample and class by hypergraph modeling. Moreover, HIST loss outperforms the state-of-the-art techniques~\cite{zhu2020fewer,xu2021discrimination,zheng2021deep} on CUB-200-2011, CARS196, and SOP datasets under the standard evaluation settings~\cite{kim2020proxy,oh2016deep,qian2019softtriple, wang2019multi}. Our work aims to verify the performances and effectiveness of the HIST loss, as well as to confirm the main claims/results proposed in~\cite{lim2022hypergraph} in the context of image retrieval.
+
+% \vspace{-1.5mm}
+\section{Scope of reproducibility\label{claim5}}
+
+Our scope of this work focuses on verifying the effectiveness of the proposed HIST loss in~\cite{lim2022hypergraph}, which specifically addresses the problem of multilateral semantic relations for intra- and inter-classes samples in each mini-batched and utilizes a HGNN to model class-discriminative visual semantics. The main claims in~\cite{lim2022hypergraph} are:
+
+\begin{itemize}
+    \item \textbf{Claim 1}: The proposed HIST loss performs consistently performance regardless of mini-batch size $N_b$.
+    \item \textbf{Claim 2}: Regardless of the quantity of HGNN layers $L$, the HIST loss shows consistently performance.
+    \item \textbf{Claim 3}: The scaling factor $\alpha$ in constructing the HGNN, which controls the reflection ratio of negative samples, reveals that the positive value contributes to reliable performance on HIST loss for modeling semantic relations of samples.
+    \item \textbf{Claim 4}: Large temperature scaling parameter $\tau$ is effective in deep metric learning, and HIST loss is not sensitive to the scaling parameter $\lambda_s$ if $\tau$ >16.
+    \item \textbf{Claim 5}: The HIST loss achieves SOTA performances on CUB-200-2011, CARS196, and SOP datasets under the standard evaluation settings~\cite{kim2020proxy,oh2016deep,qian2019softtriple, wang2019multi}.
+\end{itemize}
+
+% \vspace{-1.5mm}
+\section{Methodology}
+Initially, we attempted to reproduce experiments and verify claims by utilizing the provided code repository\footnote{\url{https://github.com/ljin0429/HIST}} and configurations given in~\cite{lim2022hypergraph}, which were evaluated on three datasets, namely CUB-200-2011, CARS196 and SOP, with two backbones, ResNet-50\cite{he2016deep} and BN-Inception\cite{ioffe2015batch}, pretrained on ImageNet-1k~\cite{deng2009imagenet}. However, during conducting experiments, we found that only the performances on the CARS196 dataset can be fully reproduced, while the other datasets yielded inconsistent results to those proposed in~\cite{lim2022hypergraph}. In addition, the existing code repository did not contain the implementation of the multi-layer HGNN. Hence, we partially reimplemented and extended the existing code and conducted a hyperparameter search utilizing Bayesian optimization. Specifically, we performed approximately 200 runs on each backbone for CUB-200-2011 and CARS196 datasets, while for the SOP, due to its vast size and limited resources, we conducted 30 experiments on each backbone. In the end, we retrained the model based on the best configurations we found and compared our results to those proposed in~\cite{lim2022hypergraph}. All experiments were conducted using 2 Nvidia Tesla V100 16GB GPUs for approximately 1,108 GPU hours.
+
+% \vspace{-1.5mm}
+\subsection{Model descriptions}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[trim=0cm 0.0cm 0cm 0cm, clip, width=135mm]{figures/hist.pdf}
+    \caption{\textbf{Overview of the pipeline for Hypergraph-Induced Semantic Tuplet (HIST) loss~\cite{lim2022hypergraph}.}}
+   \label{fig:hist_archi}
+\end{figure}
+% \begin{figure}[t]
+% \centering
+% \subfloat{\includegraphics[trim=0cm 0.0cm 0cm 0cm, clip, width=135mm]{figures/hist.pdf}}
+% \caption{\textbf{Overview of the pipeline for Hypergraph-Induced Semantic Tuplet (HIST) loss~\cite{lim2022hypergraph}.}}
+%\label{fig:hist_archi}
+% \end{figure}
+ The proposed approach, as demonstrated in Figure~\ref{fig:hist_archi}, employs pretrained CNN as the backbone to extract features from an input image $x_i$ and output a D-dimensional feature map $f_i \in \mathbb{R}^{D}$. Then, given the $\mathcal{C}$ classes in the training set, the learnable distributions are applied to model the feature distribution for each class, which are denoted by $\mathbb{D} = \{ \mathcal{D}_1, ...,\mathcal{D_C} \}$. Accordingly, the distribution loss is defined by the equation~\ref{eq:dist_loss}, 
+\begin{equation}\label{eq:dist_loss}
+\mathcal{L}_{D} = \frac{1}{N_{b}}\sum_{i=1}^{N_{b}}-logP_{i}
+\end{equation}
+where $P_{i}$ is the probability for the $i_{th}$ sample to measure its assigning quality according to its true distribution and is defined by the equation~\ref{eq:dist_prob}, 
+\begin{equation}\label{eq:dist_prob}
+P_{i} = \frac{\exp(-\tau d_{m}^{2}(f_{i}, \mathcal{D_+}))}{\sum_{\mathcal{D_C} \in \mathcal{D}}\exp(-\tau d_{m}^{2}(f_{i}, \mathcal{D_C}))}
+\end{equation} 
+where $\tau$ is a hyperparameter~\cite{hinton2015distilling} to scale the contribution between positive/negative samples, $d_{m}^{2}$ is the squared Mahalanobis distance, in which the $\mathcal{D_+}$ works to measure the distance between the modeled true categorical centroid and the positive samples, while $\mathcal{D_C}$ is employed to calculate the distances among other classes. In this way, the distribution loss $\mathcal{L}_{D}$ can guide to assign samples in each mini-batch to their corresponding centroids and aim to model the true feature distributions and alleviate the intra-classes variations among samples from the same class, which are caused by different points of views, backgrounds or poses. Afterward, the semantic tuplets for each class $c$ will be constructed based on the measured distances between the learned distributions and feature embedding to model multilateral semantic relations using the equation~\ref{eq:semantic_tuplet}, 
+\begin{equation}\label{eq:semantic_tuplet}
+S_{ij} = \left\{\begin{matrix}
+1 &  & if \ y_{i} = \mathcal{C}_j, \\ 
+e^{-\alpha d_{m}^{2}(\textbf{f}_i,\mathcal{D}_{\mathcal{C}_j})}   & & otherwise,
+\end{matrix}\right.
+\end{equation}
+where $S_{ij}$ means the semantic relation between $i$-th sample in one mini-batch and $j$-th class in $\mathcal{C}$. 
+For each semantic tuplet $S_{ij}$ depicted in Figure~\ref{fig:hist_archi}, the weight of positive samples for class $\mathcal{C}_j$ will be assigned to 1; otherwise, the weight-relation will be regulated by the measured distance between learned distributions $\mathcal{D}_{\mathcal{C}_j}$ and extracted features $\textbf{f}_i$ from the backbone. $\alpha$ is a hyperparameter affecting the reflection ratio of negative samples. Then, a hypergraph $\mathcal{H} = (\mathcal{V}, \mathcal{E})$ will be constructed denoted by the equation~\ref{eq:hypergraph}, 
+\begin{equation}\label{eq:hypergraph}
+\mathcal{H}_{ij} = \left\{\begin{matrix}
+1 &  & if \ v_{i} \in e_j, \\ 
+0   & & otherwise,
+\end{matrix}\right.
+\end{equation} 
+where the nodes $v_i \in \mathcal{V}$ represent the embedding features and hyperedges $e_j \in \mathcal{E}$ denote the semantic tuplets, which reflect the semantic relation between positive and negative samples with incidence weights in $[0,1]$.
+
+In addition, according to the definition of semantic tuplets, if all the samples connected by one hyperedge belong to the same class $\mathcal{C}_j$, this hyperedge $e_j$ is a positive hyperedge; otherwise, it will be defined as a negative hyperedge. In detail, the dimension of the output from the constructed hypergraph is set to be the same as the dimension of semantic tuples, \textit{i.e.} $\textbf{Z}_{out} \in \mathbb{R}^{N_b \times C}$, where $\textbf{N}_b$ is the number of samples in each mini-batch and $\mathcal{C}$ is the number of classes. Afterward, output logits followed by a softmax function can then represent the final discriminative probabilities. During training, the CE loss between the ground truth and output of HGNN is defined by the equation~\ref{eq:ce_loss}.
+\begin{equation}\label{eq:ce_loss}
+\mathcal{L}_{CE} = -\frac{1}{N_{b}}\sum_{i=1}^{N_{b}}\sum_{j=1}^{C}Y_{ij}log\widehat{Y}_{ij}
+\end{equation}
+
+In the end, the HIST loss, which is applied to optimize the whole network, will be denoted by the equation~\ref{eq:hist_loss}, 
+\begin{equation}\label{eq:hist_loss}
+\mathcal{L}_{HIST} = \mathcal{L}_{D} + {\lambda}_s\mathcal{L}_{CE}
+\end{equation}
+where ${\lambda}_s$ is a hyperparameter to scale the CE loss and balance the contribution between the learned distributions and hypergraph.
+
+% \vspace{-1.5mm}
+\subsection{Datasets}
+We conducted our experiments on CUB‐200‐2011, CARS196, and Stanford Online Products(SOP) datasets in the context of image retrieval. In detail, CARS‐196 contains 16,185 car images with 196 different classes; CUB‐200‐2011 comprises 11,788 bird images from 200 distinct classes; SOP is the largest one of the three datasets, which consists of 120,053 product images and 22,634 classes. For each dataset, the experiments are conducted on two ImageNet pretrained backbones(ResNet‐50 and BN‐Inception). For the data-split, we followed the standard evaluation setting as proposed in~\cite{lim2022hypergraph}, which designates half of the total number of classes for training and the remainder for evaluation. Table~\ref{Dataset statistics} provides a summary of the overall statistics for each dataset.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{cccccc}
+\toprule[0.8pt]
+% \hline
+\multirow{2}{*}{\textbf{Dataset}} & \multirow{2}{*}{\textbf{URL}} & \multicolumn{2}{c}{\textbf{\#Images}} & \multicolumn{2}{c}{\textbf{\#Classes}} \\ \cline{3-6} 
+                        & & Train         & Test         & Train         & Test          \\ \hline \hline
+CUB-200-2011~\cite{wah2011caltech}    &\href{https://www.vision.caltech.edu/datasets/cub_200_2011/}{Link}                  & 5,864         & 5,924        & 100           & 100           \\
+CARS196~\cite{krause20133d}           &\href{http://ai.stanford.edu/~jkrause/cars/car_dataset.html}{Link}     & 8,054         & 8,131        & 98            & 98            \\
+SOP~\cite{oh2016deep}             &\href{https://cvgl.stanford.edu/projects/lifted_struct/}{Link} & 59,551        & 60,502       & 11,318        & 11,316        \\
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Dataset statistics for Train-Test Configuration.}
+\label{Dataset statistics}
+\end{table}
+
+% \vspace{-3mm}
+\subsection{Hyperparameters}
+Initially, we conducted experiments in accordance with the configurations and hyperparameters given in~\cite{lim2022hypergraph}. Unfortunately, we only obtained results consistent with those proposed in 
+\cite{lim2022hypergraph} on the CARS-196 dataset. For the SOP and CUB-200-2011 datasets, the performances based on the reported hyperparameters dropped significantly. More details are shown in Table~\ref{result_origin_paper}. Hence, we performed an extended hyperparameter search utilizing Bayesian optimization for the following factors, i.e. the scaling factor of HIST loss $\lambda_s$, the scaling factor of semantic tuplets $\alpha$, the mini-batch size $N_b$ and the temperature factor of the prototypical distributions $\tau$. More details about our parameter-search for each dataset and backbone are attached in the appendix, as Table~\ref{Hyperparameters_ResNet50} and Table~\ref{Hyperparameters_BN}. The proposed parameters in~\cite{lim2022hypergraph} and our best-searched parameters are shown in Table~\ref{hyper_params}. Additionally, we also visualize the embedding features from CARS196 on ResNet-50, as shown in Figure~\ref{fig:cars196TrainTSNE} and Figure~\ref{fig:cars196TestTSNE}.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ccccc}
+% \hline
+\toprule[0.8pt]
+                               &                                                                               & \multicolumn{3}{c}{\textbf{Datasets}}                             \\ \cline{3-5} 
+\multirow{-2}{*}{\textbf{Backbone}}     & \multirow{-2}{*}{\begin{tabular}[c]{@{}c@{}} \textbf{Hyper}-\\ \textbf{parameters}\end{tabular}} & CARS196                       & CUB-200-2011 & SOP       \\ \hline \hline
+                               & $\tau$                                                                           & {\color[HTML]{333333} 32(32)} & 32(\textcolor{red}{24})       & 16(\textcolor{red}{20})    \\
+                               & $b_s$                                                                        & 32(32)                      & 32(32)     & 32(32)  \\
+                               & $\alpha$                                                                         & 0.9(0.9)                      & 1.1(\textcolor{red}{1.15})    & 2.0(\textcolor{red}{2.1})  \\
+\multirow{-3}{*}{ResNet-50\cite{he2016deep}}     & $\lambda_s$                                                                        & 1.0(\textcolor{red}{0.8})                      & 1.0(1.0)     & 1.0(\textcolor{red}{0.5})  \\ \hline
+                               & $\tau$                                                                           & 24(\textcolor{red}{22})                        & 16(\textcolor{red}{20})       & 16(\textcolor{red}{12})    \\
+                               & $b_s$                                                                        & 32(32)                      & 32(32)     & 32(32)  \\
+                               & $\alpha$                                                                         & 0.9(0.9)                      & 1.0(\textcolor{red}{0.95})    & 1.6(\textcolor{red}{1.55}) \\
+\multirow{-3}{*}{BN-Inception\cite{ioffe2015batch}} & $\lambda_s$                                                                        & 1.0(\textcolor{red}{1.5})                      & 1.0(\textcolor{red}{1.2})     & 1.0(\textcolor{red}{1.5})  \\
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Hyperparameters proposed in~\cite{lim2022hypergraph} and our best-searched results(in bracket) when using ResNet-50/BN-Inception as the backbone. The values depicted in \textcolor{red}{\textbf{red}} are from our search, which are different from those in~\cite{lim2022hypergraph}.}
+\label{hyper_params}
+\end{table}
+% \vspace{-3mm}
+\subsection{Experimental setup and code}
+The existing code did not include the configurations to investigate the effect of HIST loss under the varied number of HGNN layers and distance metrics. Hence, we completed the code for our experiments based on the existing repository, which is available at this \href{https://anonymous.4open.science/r/MLRC2022_HIST-9598/}{repository}. To provide a fair comparison, we evaluate our results by the metrics proposed in~\cite{lim2022hypergraph}, namely \textit{Recall@K}(\textit{R@K}), and \textit{Normalized Mutual Information}(\textit{NMI}). Sec.\ref{results} and Sec.\ref{discussion} will provide more details about our reproduced results and a discussion of our results and findings.
+
+% \vspace{-2mm}
+\subsection{Computational requirements}
+All experiments were performed on our server with two Nvidia Tesla V100-16GB GPUs. Hyperparameter search by Bayesian Optimization took approximately a total of 1,050 GPU hours.  More details about running-time and configurations on each dataset and backbone are attached in Table~\ref{Running_time}, Table~\ref{training_params_ResNet}, and Table~\ref{training_params_BN} of the appendix.
+
+% \vspace{-3mm}
+\section{Results\label{results}}
+In this section, we will report our results for the aforementioned experiments and verify claims 1 - 5 in Sec.\ref{claim5}. Overall, not all the claims can be supported by our reproduced results. In addition, we conduct additional experiments to investigate the performance of HIST loss affected by other modules, e.g. the number of layers for HGNN, distinct distance metrics, and the embedding sizes, which were not included or not discussed in depth in~\cite{lim2022hypergraph}.
+
+
+\subsection{Results reproducing original paper}
+Based on our reproduced results, shown in Figure~\ref{hyperparmeters}, Figure~\ref{hyperparmeters2}(b), and Table~\ref{result_origin_paper}, claims 3, 4, and 5 can be fully supported. Oppositely, claims 1 and 2 can not be completely approved due to the inconsistent performance of HIST loss under distinct parameter settings.
+
+% \vspace{-5mm}
+\begin{figure}[htbp]
+    \centering
+    \subfigure[Impact of $N_b$]{
+        %\label{subfig:Nb}
+        \includegraphics[width=1.55in]{figures/batch._size.png}
+    }
+    \subfigure[Impact of $L$]{
+	\includegraphics[width=1.55in]{figures/hgnn_layers.png}
+        %\label{subfig:L}
+    }
+    \subfigure[Impact of $\alpha$]{
+        \includegraphics[width=1.55in]{figures/alpha.png}
+         %\label{subfig:alpha}
+    }
+ %    \subfigure[Impact of $\tau$]{
+	% \includegraphics[width=1.2in]{figures/tau.png}
+ %        %\label{subfig:tau}
+ %    }
+    \caption{Impact of distinct hyperparameters on CARS196 using ResNet-50 as Backbone.}
+   \label{hyperparmeters}
+\end{figure}
+
+
+\subsubsection{Claim 1: Performance of HIST loss is consistent regardless of mini-batch size $N_b$}
+Figure~\ref{hyperparmeters}(a) depicts the performances of HIST loss under various $N_b$. It indicates that when $N_b$ is larger than 32, the performances for learning the multilateral semantic relations by semantic tuplets and HIST loss are almost consistent. Accordingly, with small bach-size, such as 8 or 16, due to the limited number of learned features per batch, discriminative features between positive/negative samples can not be learned efficiently. Therefore, claim 1 can only be supported within a limited range, i.e. $N_b \geq 32$.
+% % \vspace{-3mm}
+\subsubsection{Claim 2: Performance of HIST loss is consistent regardless of HGNN layers $L$} To verify Claim 2, we conduct experiments with various layers of HGNN, i.e. $L\in\{1,2,3,4,5\}$. Figure~\ref{hyperparmeters}(b) indicates that when $L\geq 3$, the performances of HIST loss decrease significantly, by about -3\% R@1 for CARS196 using ResNet-50 as backbone compared to $L = 2$. Hence, claim 2 can not be fully supported based on our reproduced results.
+% % \vspace{-3mm}
+\subsubsection{Claim 3: Positive scaling factor $\alpha$ contributes reliable and consistent performance} Figure~\ref{hyperparmeters}(c) indicates that the performances of HIST loss differ slightly with diverse $\alpha$. It suggests that the hist loss is insensitive to positive $\alpha$, which can adjust the contributions of positive and negative samples while constructing semantic tuplets. This allows claim 3 to be supported.
+% \vspace{-3mm}
+\subsubsection{Claim 4: Large temperature scaling parameter $\tau$ is effective; if $\tau$ >16, HIST loss is insensitive to the scaling parameter $\lambda_s$} To verify the effectiveness of $\tau$ and $\lambda_s$, we set distinct values, i.e. $\tau\in\{8, 16, 24, 32\}$ and $\lambda_s\in\{0.6, 1.0, 1.5, 2.0\}$. Figure~\ref{hyperparmeters2}(b) demonstrates that our reproduced results are consistent with the claim 4 proposed in~\cite{lim2022hypergraph}, i.e. the performances are consistent if $\tau\geq 16$. Moreover, HIST loss is not sensitive to $\lambda_s$ .
+
+\begin{table}[ht!]
+\centering
+\setlength{\tabcolsep}{0.23mm}
+% \resizebox{\textwidth}{15mm}{
+\begin{tabular}{cccccccccccccc}
+\toprule[0.8pt]
+\multirow{2}{*}{\textbf{Backbone}}     & \multirow{2}{*}{\textbf{Method}} & \multicolumn{4}{c}{\textbf{CUB-200-2011}}                              & \multicolumn{4}{c}{\textbf{CARS-196}}                                  & \multicolumn{4}{c}{\textbf{SOP}}                                       \\ \cline{3-14} 
+                              &                         & R@1           & R@2           & R@4           & NMI           & R@1           & R@2           & R@4           & NMI           & R@1           & R@10          & R@100         & NMI           \\ \hline \hline
+\multirow{3}{*}{BN-Inception} & {[}OA{]}HIST            & \textbf{70.0} & \textbf{80.2} & \textbf{87.5} & \textbf{71.0} & 87.6          & \textbf{92.8}          & 95.5          & 73.2          & \textbf{79.8} & \textbf{91.2} & \textbf{96.4} & \textbf{92.5} \\
+                              & {[}RE{]}HIST            & 68.7          & 78.3          & 86.2          & 70.3          & 87.6          & \textbf{92.8}          & \textbf{95.7} & 73.1          & 77.4          & 89.6          & 95.4          & 89.9          \\
+                              & {[}TUNE{]}HIST          & \textbf{70.0}          & 79.4          & 86.6          & 70.8          & \textbf{88.1} & 92.7 & \textbf{95.7}          & \textbf{73.4} & 77.9          & 90.1          & 95.8          & 90.5          \\ \hline \hline
+\multirow{3}{*}{ResNet-50}     & {[}OA{]}HIST            & 71.6          & 81.4          & 88.3          & 74.3          & 89.8          & 94.0          & 96.5          & 75.5          & \textbf{81.6} & \textbf{92.2} & \textbf{96.8} & \textbf{93.0} \\
+                              & {[}RE{]}HIST            & 70.1          & 79.7          & 87.4          & 72.9          & 89.8          & 94.4          & 96.6          & 75.4          & 80.7          & 91.2          & 96.4          & 91.9          \\
+                              & {[}TUNE{]}HIST          & \textbf{72.3} & \textbf{81.8} & \textbf{88.5} & \textbf{75.6} & \textbf{90.2} & \textbf{94.5} & \textbf{96.8} & \textbf{75.8} & 81.0          & 91.6          & 96.3          & 92.2          \\ 
+\bottomrule[0.8pt]
+\end{tabular}
+% \vspace{-3mm}
+\caption{Reported, reproduced, and our fine-tuned Results under the standard evaluation settings as proposed in~\cite{lim2022hypergraph}. \textit{OA, RE, TUNE} denote the results were the highest scores quoted from~\cite{lim2022hypergraph}, reproduced based on the reported configurations in~\cite{lim2022hypergraph}, reproduced by our best-searched settings by Bayesian optimization. The best results are marked in \textbf{bold}.}
+\label{result_origin_paper}
+% \vspace{-5mm}
+\end{table}
+
+\subsubsection{Claim 5: The SOTA performances of HIST loss under the standard evaluation settings~\cite{kim2020proxy,oh2016deep,qian2019softtriple, wang2019multi}.}
+Table~\ref{result_origin_paper} shows the original([OA]HIST) and our reproduced results([RE]HIST) under standard evaluation settings. For CARS196 and CUB-200-2011 using ResNet50 as backbone, our results after tuning([TUNE]HIST) are improved by 0.7\% and 0.4\% R@1 than the reported results. For the SOP dataset, the reproduced results under proposed hyperparameters and configurations are not well compared to those in~\cite{lim2022hypergraph}. The differences are -2.4\% and -0.9\% @R1 using the backbone BN-Inception and ResNet-50, respectively. By utilizing our settings in Table~\ref{hyper_params}, the gap between the reported and our fine-tuned results are close to 1.9\% and 0.6\% R@1 on BN-Inception and ResNet-50. Given that the vast majority of reproduced results are compatible with the reported ones. Hence, claim 5 can be almost supported.
+
+% \vspace{-1.5mm}
+\subsection{Joint contribution from multi-parameters and Ablation study on distance metrics}
+In addition to the claimed impact of the reported hyperparameters in~\cite{lim2022hypergraph} above, other factors also play an important role in the robustness of HIST loss, e.g. the hidden-size of HGNN, the embedding size of the backbone, the various distance metrics, and their joint contribution to the HIST loss. Hence, we conduct additional experiments to investigate the robustness further.
+
+% \vspace{-5mm}
+\begin{figure}[htbp]
+    \centering
+    \subfigure[Impact of embedding size and HGNN hidden-size]{
+        %\label{subfig:Nb}
+        \includegraphics[width=2.5in]{figures/embed_size_hgnn.png}
+    }
+    \subfigure[Impact of $\tau$ and $\lambda_s$]{
+	\includegraphics[width=2.5in]{figures/tau_lambda_s.png}
+        %\label{subfig:L}
+    }
+    \caption{Joint contribution of hyperparameters on CARS196 using ResNet-50.}
+   \label{hyperparmeters2}
+\end{figure}
+
+\begin{table}[ht!]
+		\centering
+            \begin{tabular}{cccc}
+            \toprule[0.8pt]
+            \textbf{Distance Metrics} & \textbf{R@1}  & \textbf{R@2}  & \textbf{R@4}  \\ \hline
+            Euclidean        & 87.2 & 92.5 & 95.4 \\
+            Cosine           & 88.7 & 93.6 & 96.1 \\
+            Mahalanobis      & \textbf{90.2} & \textbf{94.5} & \textbf{96.8} \\
+            \bottomrule[0.8pt]
+            \end{tabular}
+        \captionof{table}{Robustness of HIST loss with various distance metrics on CARS196 using ResNet-50.}
+       \label{fig:distance metrices}
+\end{table}
+
+% \vspace{-3mm}
+\subsubsection{Joint contribution from the embedding sizes and HGNN hidden-size}Figure~\ref{hyperparmeters2}(a) indicates that HIST loss is consistent if the embedding or HGNN hidden-size is larger than 256. Moreover, both values should be compatible with each other, i.e the best performances are on the diagonal. Otherwise, if both are set to 256, the ability of the feature representation from the backbone and HGNN will be constrained.
+% \vspace{-3mm}
+\subsubsection{Ablation study on distance metrices}In addition, we conduct experiments with distinct distance metrics to investigate the robustness of HIST loss further. Table~\ref{fig:distance metrices} indicates that HIST loss performed insignificant deviations under various distance metrics for constructing semantic tuplets.
+
+% \vspace{-3mm}
+\section{Discussion\label{discussion}}
+Overall, by comparing our results shown in Sec.\ref{results} to those reported in~\cite{lim2022hypergraph}, we can conclude that 3 out of 5 claims presented in Sec.\ref{claim5} can be supported. However, the other two claims can not be fully supported. For claim 1, the performance of HIST loss dropped significantly when $N_b\textless 16$. This indicates that the small $N_b$ cannot contribute to effectively constructing positive/negative sample pairs. Hence, it will impact the quality of constructed semantic tuplets and reduce the effectiveness of HGNN; for claim 2, the impact of the number of HGNN layers $L$ is not isolated. Accompany with other hyperparameters, e.g. the number of HGNN hidden-size. Their interactions will contribute a cumulative effect on the performance of HIST. Due to the constrained resources, we cannot conduct additional experiments to investigate deeper in this direction. Regarding claims 3 and 4, our experiments are consistent with the results from~\cite{lim2022hypergraph}. Therefore, for constructing semantic tuplets, the positive scaling parameter $\alpha$ can yield consistent results for HIST loss. Finally, for claim 5, based on the standard settings proposed in~\cite{lim2022hypergraph}, we cannot reproduce comparable performances as those from~\cite{lim2022hypergraph}, which may be due to the versions of CUDA, cuDNN, etc. In addition, by using Bayesian optimization to search for hyperparameters, we achieved improved performance on CARS196 and CUB-200-2011 datasets; for the SOP dataset, with our configuration in Table~\ref{hyper_params}, the margin between our results after tuning and those from~\cite{lim2022hypergraph} has been decreased, but still are -0.6\% and -1.9\% R@1 on ResNet-50 and BN-Inception. Due to limited resources, we cannot perform larger-scale experiments to verify and improve the performance of the SOP dataset.
+
+% \vspace{-3mm}
+\subsection{What was easy}
+The paper\cite{lim2022hypergraph} is well‐structured and contains explicit theoretical derivations, which provided us with a clear understanding of the concepts for semantic tuplets, HGNN, and HIST loss underlying the proposed method. Benefiting from these, the reimplementation of the multi-layered HGNN, distinct distance metrics, and the reproducing of experiments are highly efficient.
+
+% \vspace{-3mm}
+\subsection{What was difficult}
+We tried many distinct experimental configurations to reproduce comparable results as those proposed in~\cite{lim2022hypergraph}. The performance of HIST loss might vary greatly according to the interaction of multiple parameters, such as the HGNN hidden size and HGNN layers. Due to the restricted computational capability, we cannot thoroughly investigate that. In addition, intuitively, a larger embedding size will bring more diverse learned feature representations;  nevertheless, due to the HGNN as a downstream module, their effects should be carefully balanced for the final learned features. Moreover, HGNN can guide the backbone to find discriminative features between positive/negative samples; accordingly, the backbone should contribute well-learned features that contribute to the high quality of semantic tuplets, which HGNN can then utilize to learn.
+
+% \vspace{-3mm}
+\subsection{Conclusion}
+In this study, we reproduce the effectiveness of HIST loss under various hyperparameters, e.g. the scaling parameter $\alpha$. the number of HGNN layers $L$, the temperature parameter $\tau$ and distinct modules, e.g. HGNN, distance metrics, and semantic tuplets. From our reproduced results in Sec.\ref{results}, we can conclude that the performances of HIST loss  cannot be fully reproduced by the reported experimental settings in~\cite{lim2022hypergraph}, but this point will not influence the effectiveness of HIST loss. Through hyperparameter search, we reproduce comparable and better performances than SOAT on CUB-200-2011 and CARS196 datasets. In addition, for the scalability of HIST loss to other large datasets, the constraints of the high demand of computing power from HGNN and similarity estimation need to be investigated and solved. Moreover, by introducing the HIST loss, multilateral semantic relations and the centroids across classes can be well constructed utilizing semantic tuplets and prototypical distributions. Finally, some factors, which are not investigated in depth in~\cite{lim2022hypergraph}, e.g. combined contributions from HGNN hidden-size, the embedding size of backbone, and various distance metrics, will affect the performance of the HIST loss as well. Hence, these factors need to be further investigated and adjusted for other downstream tasks.

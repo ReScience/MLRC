@@ -1,0 +1,124 @@
+\newpage
+
+\section{Appendix}
+
+\begin{table}[ht!]
+\centering
+\setlength{\tabcolsep}{0.25mm}
+\begin{tabular}{ccccc}
+\toprule[0.8pt]
+\multirow{2}{*}{\textbf{Datasets}} & \multicolumn{4}{c}{\textbf{Hyper-parameters}}                                                       \\ \cline{2-5} 
+                          & $\lambda_s$               & $\alpha$                      & $\tau$                   & $N_b$  \\ \hline \hline
+CARS196                   & \{0.5,0.8,1.0,1.2\}     & \{0.9,0.95,1.0,1.1,1.2\}   & \{16,20,24,28,32\}    & \{8,16,32\} \\
+CUB-200-2011              & \{0.5,0.8,1.0,1.2,1.5\} & \{0.9,0.95,1.0,1.05,1.15\} & \{16,20,24,28,32,36\} & \{8,16,32\} \\
+SOP                       & \{0.5,0.8,1.0,1.2,1.5\} & \{1.9,1.95,2.0,2.1,2.15\}  & \{12,14,16,20,22,24\} & \{8,16,32\} \\ 
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Hyper-parameters tuning on ResNet-50}
+\label{Hyperparameters_ResNet50}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\setlength{\tabcolsep}{0.25mm}
+\begin{tabular}{ccccc}
+\toprule[0.8pt]
+\multirow{2}{*}{\textbf{Datasets}} & \multicolumn{4}{c}{\textbf{Hyper-parameters}}                                                       \\ \cline{2-5} 
+                          & $\lambda_s$               & $\alpha$                      & $\tau$                   & $N_b$  \\ \hline \hline
+CARS196                   & \{0.5,0.8,1.0,1.2,1.5\} & \{0.9,0.95,1.0,1.1,1.15\}      & \{16,20,22,28,32\}    & \{8,16,32\} \\
+CUB-200-2011              & \{0.5,0.8,1.0,1.2,1.5\} & \{0.9,0.95,1.0,1.05,1.15\}     & \{16,20,24,28,32,36\} & \{8,16,32\} \\
+SOP                       & \{0.5,0.8,1.0,1.2,1.5\} & \{1.5,1.55,1.6,1.65,1.7,1.75\} & \{12,14,16,20,22,24\} & \{8,16,32\} \\ 
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Hyper-parameters tuning on BN-Inception}
+\label{Hyperparameters_BN}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ccccc}
+\toprule[0.8pt]
+\textbf{Dataset}                       & \textbf{Running-time}    & \textbf{Epochs} & \textbf{Batch-size}          & \textbf{Embedding-size}      \\ \hline \hline
+\multirow{2}{*}{CARS196}      & \textcolor{red}{\textasciitilde0.9 Ghour} & 60     & \multirow{6}{*}{32} & \multirow{6}{*}{32} \\
+                              & \textcolor{blue}{\textasciitilde0.6 Ghour} & 50     &                     &                     \\
+\multirow{2}{*}{CUB-200-2011} & \textcolor{red}{\textasciitilde1.1 Ghours} & 30     &                     &                     \\
+                              & \textcolor{blue}{\textasciitilde1.7 Ghours} & 40     &                     &                     \\
+\multirow{2}{*}{SOP}          & \textcolor{red}{\textasciitilde9.3 Ghours} & 60     &                     &                     \\
+                              & \textcolor{blue}{\textasciitilde7.2 Ghours} & 60     &                     &                     \\ 
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Running-time for each dataset based on the HIST configuration(Ghour is short for GPU-hour). \textcolor{blue}{Blue} values represent the runnings on BN-Inception; \textcolor{red}{Red} values stand for the runnings on ResNet-50.}
+\label{Running_time}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ccccc}
+\toprule[0.8pt]
+\textbf{Module}                                                & \textbf{Name}           & \textbf{CUB-200-2011} & \textbf{CARS196}      & \textbf{SOP}          \\ \hline \hline
+\multirow{3}{*}{HGNN}                                 & \#layers       & \multicolumn{3}{c}{2}                      \\
+                                                      & Hidden size    & \multicolumn{3}{c}{512}                    \\
+                                                      & lr-HGNN        & 5e-4         & 5e-4         & 1e-3         \\ \hline
+\multirow{2}{*}{$\mathbb{D}$}                                    & Initialization & \multicolumn{3}{c}{He-normal}              \\
+                                                      & lr-D           & 5e-2         & 1e-1         & 1e-2         \\ \hline
+\multicolumn{1}{l}{\multirow{3}{*}{Hyper-parameters}} & $\lambda_s$         & 1.2          & 1.5          & 1.5          \\
+\multicolumn{1}{l}{}                                  & $\tau$            & 20           & 22           & 12           \\
+\multicolumn{1}{l}{}                                  & $\alpha$          & 0.95         & 1.0          & 1.55         \\ \hline
+\multirow{8}{*}{Training}                             & Batch size     & \multicolumn{3}{c}{32}                     \\
+                                                      & Learning rate  & \multicolumn{3}{c}{1e-4}                   \\
+                                                      & Optimizer      & \multicolumn{3}{c}{AdamW}                  \\
+                                                      & Warm-up        & \multicolumn{3}{c}{True}                   \\
+                                                      & Epochs         & 30           & 60           & 60           \\
+                                                      & Weight decay   & 1e-4         & 5e-5         & 1e-4         \\
+                                                      & lr scheduler   & Step(5/0.5)  & Step(10/0.5) & Step(10/0.5) \\
+                                                      & BN freeze      & True         & True         & False        \\ 
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Configurations for training and evaluation on the backbone BN-Inception.}
+\label{training_params_BN}
+\end{table}
+
+\newpage
+
+\vspace{-10mm}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ccccc}
+\toprule[0.8pt]
+\textbf{Module}                                                & \textbf{Name}           & \textbf{CUB-200-2011} & \textbf{CARS196}      & \textbf{SOP}          \\ \hline \hline
+\multirow{3}{*}{HGNN}                                 & \#layers       & \multicolumn{3}{c}{2}                      \\
+                                                      & Hidden size    & \multicolumn{3}{c}{512}                    \\
+                                                      & lr-HGNN        & 6e-4         & 1e-3         & 1e-3         \\ \hline
+\multirow{2}{*}{$\mathbb{D}$}                                    & Initialization & \multicolumn{3}{c}{He-normal}              \\
+                                                      & lr-D           & 1e-1         & 1e-1         & 1e-2         \\ \hline
+\multicolumn{1}{l}{\multirow{3}{*}{Hyper-parameters}} & $\lambda_s$         & 1            & 0.8          & 0.5          \\
+\multicolumn{1}{l}{}                                  & $\tau$            & 24           & 32           & 20           \\
+\multicolumn{1}{l}{}                                  & $\alpha$          & 1.15         & 0.9          & 2.1          \\ \hline
+\multirow{8}{*}{Training}                             & Batch size     & \multicolumn{3}{c}{32}                     \\
+                                                      & Warm-up        & \multicolumn{3}{c}{True}                   \\
+                                                      & Optimizer      & \multicolumn{3}{c}{Adam}                   \\
+                                                      & Learning-rate  & 1.2e-4       & 1e-4         & 1e-4         \\
+                                                      & Epochs         & 40           & 50           & 60           \\
+                                                      & Weight decay   & 5e-5         & 1e-4         & 1e-4         \\
+                                                      & lr scheduler   & Step(5/0.5)  & Step(10/0.5) & Step(10/0.5) \\
+                                                      & BN freeze      & True         & True         & False        \\
+\bottomrule[0.8pt]
+\end{tabular}
+\caption{Configurations for training and evaluation on the backbone ResNet-50.}
+\label{training_params_ResNet}
+\end{table}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[trim=0cm 0.0cm 0cm 0cm, clip, width=135mm]{figures/tsne_cars196_train-min.pdf}
+\caption{Embedding visualization on CARS196 training-set using ResNet50 as backbone.}
+\label{fig:cars196TrainTSNE}
+\end{figure}
+
+\newpage
+\begin{figure}[ht!]
+\centering
+\includegraphics[trim=0cm 0.0cm 0cm 0cm, clip, width=135mm]{figures/tsne_cars196_test_-min.pdf}
+\caption{Embedding visualization on CARS196 test-set using ResNet50 as backbone.}
+\label{fig:cars196TestTSNE}
+\end{figure}

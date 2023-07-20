@@ -1,0 +1,22 @@
+\newcommand{\RNum}[1]{\lowercase\expandafter{\romannumeral #1\relax}}
+
+\section*{\centering Reproducibility Summary}
+\vspace{-1.8mm}
+\subsubsection*{Scope of Reproducibility}
+Our work reproduced the paper \textit{Hyper-graph-Induced Semantic Tuplet (HIST) Loss for Deep Metric Learning}~\cite{lim2022hypergraph} and investigate the HIST loss with the following five claims: (\RNum{1}) HIST loss performs consistently regardless of the batch size, (\RNum{2}) its performance is irrespective of the number of HGNN layers, (\RNum{3}) the positive scaling factor of semantic tuplets enhances semantic relation modeling, (\RNum{4}) a large temperature parameter $\tau$ is effective; if $\tau$ >16, HIST loss is insensitive to the scaling parameter, (\RNum{5}) the HIST achieved SOTA performances under the standard evaluation settings~\cite{kim2020proxy,oh2016deep}.
+\vspace{-1.8mm}
+\subsubsection*{Methodology}
+To verify above claims, we extended the experiments proposed in~\cite{lim2022hypergraph}. Our study involves: (a) reproducing the HIST loss performances as configurations proposed in~\cite{lim2022hypergraph}, (b) optimizing HIST loss using Bayesian optimization, and (c) investigating the impacts and robustnesses of key modules (prototypical distributions and semantic tuplets). These experiments were conducted on 2 NVIDIA V100 GPUs and took about 1,108 GPU hours.
+\vspace{-1.8mm}
+\subsubsection*{Results}
+Our study confirms three (\RNum{3}, \RNum{4} and \RNum{5}) claims from~\cite{lim2022hypergraph}. However, it cannot fully support the other claims (\RNum{1} and \RNum{2}). Using the configurations given in~\cite{lim2022hypergraph}, we achieved comparable performances on the CARS196 dataset, but large deviances were observed on other datasets, which dropped by 1.5\% and 1\% R@1 using ResNet50. By implementing Bayesian optimization, the performances are improved by 0.7\% and 0.4\% R@1 on CARS196 and CUB-200-2011. We also close the performance gap for SOP dataset from -1\% to -0.6\% compared to the proposed results in~\cite{lim2022hypergraph} using ResNet50.  
+\vspace{-1.8mm}
+\subsubsection*{What was easy}
+~\cite{lim2022hypergraph} is a well-structured and -written work, that allows us to clearly comprehend the primary concepts.
+\vspace{-1.8mm}
+\subsubsection*{What was difficult}
+~\cite{lim2022hypergraph} did not investigate joint contributions between various modules like hidden sizes and embedding sizes. Additionally, the performance of HIST cannot be fully reproduced with given configurations proposed in~\cite{lim2022hypergraph}. To address this, an additional hyperparameter search has to be performed, which is time-consuming.
+\vspace{-1.8mm}
+\subsubsection*{Communication with original authors}
+We attempted to contact the authors of ~\cite{lim2022hypergraph} for more details regarding the experimental configurations and hyperparameters. Unfortunately, before completing this report, we did not receive any responses.
+
