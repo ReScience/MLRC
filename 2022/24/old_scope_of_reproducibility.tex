@@ -1,0 +1,20 @@
+\label{sec:claims}
+
+    The authors introduce a method for applying common feature importance scoring methods (such as Shap) for unsupervised models. The method only applies to linear feature importance methods. This score $b_i(\boldmath{f},\boldmath{x})$ for the output of a model $\boldmath{f}$ and sample $\boldmath{x}$ at an input dimension (feature) $i$ is calculated with $b_i(\boldmath{f},\boldmath{x})=a_i(\sum_{j=1}^{d_Y}f_j(\boldmath{x})*f_j,\boldmath{x})$, where $a_i$ is the feature importance scoring method, $d_Y$ the number of output dimensions, and $f_j$ is the  the model $f$ at dimension $j$. In other words, the feature scoring method is applied to a weighted sum of the output dimension functions. 
+    
+    In the experiment, features are masked with $\boldmath{m} \in\{0,1\}^{d_X}$, and the \textit{representation shift} of the masked features $\bar{x}$ is considered with $||\boldmath{f}_e(\boldmath{x})-\boldmath{f}_e(\boldmath{m}\odot\boldmath{x}+(1-\boldmath{m})\odot\bar{x})||_\mathcal{H}$.
+    
+    \begin{itemize}
+ 
+    \item Claim 1: The three datasets MNIST, ECG5000 and Cifar-10, and their respective tasks of denoising, time series prediction and classification are considered. For these tasks, the average representation shift when perturbing n\% of the features classified as most important by the proposed method of feature importance aggregation $b_i(\boldmath{f},\boldmath{x})$, is changing the most for the smallest values of n, meaning that the features classified as most important cause the largest representation shift when perturbing. This will mean that the average representation shift will always be above the value for a random model. This is the case when applying the method to the feature importance scoring algorithms Gradient Shap, Integrated Gradients, and Saliency maps. 
+    \end{itemize}
+    The authors also introduce a method of scoring example importance called label free deep k-nearest neighbour example importance (DKNN). This method is computed by $c_n(\boldmath{x})=\boldmath{1}[n\in\text{KNN}(x)]*\kappa[\boldmath{f}_e(\boldmath{x}_n),\boldmath{f}_e(\boldmath{x})]$
+    \begin{itemize}
+    \item Claim 2: For the same tasks and datasets, when using example importance scoring methods Influence Functions, TracIn, SimplEx and DKNN, the ground truth of the examples classified as most important are compared to the labels predicted by the model. For the M examples classified as most important, the accuracy will be higher, and will drop off the closer M gets to the total number of examples. 
+    
+    \item Claim 3: For the MNIST data set, a model is trained on each of the three unsupervised tasks of reconstruction, denoising, and inpainting, and the supervised task of classification. When scoring the feature importance using the label-free gradient Shap $b_i(\boldmath{f},\boldmath{x})$ there will be a low to moderate correlation between the features classified as most important (.3 to 0.45). 
+
+    \item Claim 4: For the same dataset and tasks, the example importance amongst tasks is evaluated using DKNN. There will be a low correlation between the examples classified as most important (0.06 to 0.12).
+    
+    \item Claim 5: In a VAE, when using saliency maps for the MNIST and dSprites dataset, there is no change in the correlation of the saliency maps of the latent dimensions when increasing the disentanglement regularisation. (Still a bit unclear)
+\end{itemize}

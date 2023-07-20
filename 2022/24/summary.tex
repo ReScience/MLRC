@@ -1,0 +1,27 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+
+\vspace{1em}
+In this work, we present our reproducibility study of \textit{Label-Free Explainability for Unsupervised Models} \cite{crabbe2022label}, a paper that introduces two post-hoc explanation techniques for neural networks: (1) label-free feature importance and (2) label-free example importance. Our study focuses on the reproducibility of the authors' most important claims: (i) perturbing features with the highest importance scores causes higher latent shift than perturbing random pixels, (ii) label-free example importance scores help to identify training examples that are highly related to a given test example, (iii) unsupervised models trained on different tasks show moderate correlation among the highest scored features and (iv) low correlation in example scores measured on a fixed set of data points, and (v) increasing the disentanglement with $\beta$ in a $\beta$-VAE \cite{Higgins2016betaVAELB} does not imply that latent units will focus on more different features.
+
+\subsubsection*{Methodology}
+
+The authors uploaded their code when they published the paper. We reviewed the authors' code, checked if the implementation of experiments matched with the paper, and also ran all experiments. Moreover, we extended the codebase in order to run the experiments on more datasets, and to test the claims with other experiments. Our code is available at \url{https://anonymous.4open.science/r/5974660645}. 
+
+\subsubsection*{Results}
+
+We found that all of the main claims of the paper were reproducible. However, when we repeated the same experiments on two new datasets, we found that there was a much higher correlation in example scores across different tasks (point iv above). 
+
+\subsubsection*{What was easy}
+
+The published code was high quality, well-documented and ran the experiments end to end. The paper introduced the relevant theory well.
+
+\subsubsection*{What was difficult}
+
+The code contained a few minor bugs we needed to fix first. Some parts of the code were written specifically for MNIST and therefore we could not extend the experiments easily with new datasets.
+
+\subsubsection*{Communication with original authors}
+
+We contacted the authors to clarify our understanding of some details in the methods. They responded quickly and answered all questions.

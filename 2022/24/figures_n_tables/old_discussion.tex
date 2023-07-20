@@ -1,0 +1,21 @@
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+Overall, our reproducibility study shows that the main claims of  \textit{Label-Free Explainability for Unsupervised Models} \cite{crabbe2022label} hold. Even though we found minor bugs in the authors' code, by fixing those, the main trends and claims still hold on the named datasets. However, the claim that states unsupervised models trained by different tasks loss rely on different training examples is specific for MNIST and does not hold for other datasets.
+
+% \vspace{1em}
+
+% Interestingly, while we could not reproduce the SimCLR results on CIFAR10 exactly, we discovered that the original plot can be reproduced when using the same ResNet18\cite{he2016residual} architecture with random weights. We hypothesize the authors accidentally missed the loading of pretrained weights, because the relevant part of the code fails silently. % Nevertheless, it does not affect their claim. Actually, it extends the claim by stating example importance can be also used on randomly initialized networks.
+
+\vspace{1em}
+
+With extending the authors' example importance figures with cosine difference based KNN, we introduced another baseline which helps to better interpret the performance of SimplEx\cite{Crabbe2021Simplex}, a method the authors used for example importance. In this context, we found SimplEx achieves almost similar performance as cosine similarities.
+
+\vspace{1em}
+
+We further found that VAE focuses more on visual artefacts and classifiers more on semantics of an image, which explains the low correlation between the most important examples we conducted in Table \ref{tab:pretext_examples_pearson}. This was also expected, because VAE networks need to reconstruct the exact presence of an object with its size and orientation. Classifiers on the other are trained to be invariant on how an object is present.
+
+\vspace{1em}
+
+Furthermore, while the authors found $\beta$-VAE networks do not focus on different features by increasing $\beta$, we gave a visual explanation of how these networks differ in their latent space. We did not find however a clear explanation of how the authors' statistical and our visual findings are related.
+
+% The authors utilized a K-Nearest-Neighbor method to select the closest training examples to a chosen test data point. While the implementation was originally coded with Euclidean distance between the data points, we extended this baseline using cosine distance. We believe this is a more trustworthy baseline of similarities, as points close to the origin might have small Euclidean distance but might follow different directions.

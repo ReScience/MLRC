@@ -1,0 +1,87 @@
+
+\appendix
+\section{Top examples}
+\label{sec:vae_vs_classifier}
+
+Similarly to the original paper, we plot those training images that closest the highest example importance score with the test image. As it can be seen on Figure \ref{fig:topexamples}, VAE networks emphasize images that share spatial structure or colour, while the classifier only focuses on the semantic similarity.
+
+\section{Necessary changes to the code}
+\label{sec:changesincode}
+
+We had to make a number of small modifications to the code to replicate the results of the experiment. Each one is described below.
+
+\subsection{SimCLR}
+
+The most substantial differences between our study and the original were found when reproducing the consistency experiments for CIFAR10. We obtained a substantially different (though directionally similar graph) for each of these experiments.
+
+\hspace{1em}
+
+We discovered that the original plot can be reproduced when using the same ResNet18\cite{he2016residual} architecture with random weights. We hypothesize the authors accidentally missed the loading of pretrained weights, because there is a bug in the relevant part of the code which causes model loading to fail silently. The plot in our paper was obtained with this bug fixed. Nevertheless, it does not affect their claim.
+
+\hspace{1em}
+
+Also, when describing this experiment, the authors noted in their paper that they sampled 1000 train examples $x^n \in D_{train}$ and matched latent representation of test images against these (Section 4.1 in the original paper). Accidentally, however, they sampled every data point from the test set. While this is technically a mistake, we fixed the issue before replicating the experiment, and found that it made no difference to the results.
+
+\subsection{Distance function}
+
+In claim 2.2, the authors measured the Pearson correlation between DKNN-based example importance scores. However, when determining these scores, they used inverted squared Euclidean distances as their kernel function $k(x, y) = 1/(x-y)^2$. We thought that using a kernel that was more linear in distance would reduce noise in correlation analyses, and so replaced this function with the negative of the distance $k(x, y) = -\sqrt{(x-y)^2}$.  However, we found this change made no major difference in the results, and therefore we chose to keep the original distance function in our final code.
+
+\subsection{Data prefetching}
+
+Originally, the authors' code ran the data prefetching synchronously, with one worker. For this reason, we made changes in the authors' code in order to parallelize this process, which resulted in a significant speed-up.
+
+
+\begin{figure}[]
+    \begin{center}
+    \includegraphics[width=0.8\columnwidth]{img/extra/top_examples.pdf}   
+    \end{center}
+    \caption{Label-free top examples for VAE networks and the classifier.}
+    \label{fig:topexamples}
+\end{figure}
+
+\newpage
+
+\section{AutoEncoder of CIFAR10 and CIFAR100}
+\label{sec:autoencoderarch}
+
+For the classification, the same encoder was used but with an extra linear classifier head attached to the end of the network.
+
+\input{figures_n_tables/simclr_cifar_net.tex}
+
+\section{Hyperparameters}
+\label{sec:apphyper}
+\begin{table}[h]
+	\vskip -0.1in
+ 	\caption{Hyperparameters for each model used trained in conducted experiments.}
+	\vspace{-0.1in}
+	\label{tab:hyperparams}
+	\vskip 0.05in
+	\begin{center}
+		\begin{adjustbox}{width=\columnwidth}
+			\begin{small}
+				\begin{sc}
+                    \begin{tabular}{l | cccccccc}
+                    \toprule
+                    model               & learning rate & $\beta_1$ & $\beta_2$ & $\epsilon$               & weight decay             & momentum & epochs & patience \\
+                    \hline
+                    MNIST autoencoder   & .001          & .9      & .999    & 10\textasciicircum-8 & 10\textasciicircum-5 &          & 100    & 10       \\
+                    ECG5000 autoencoder & .001          & .9      & .999    & 10\textasciicircum-8 & 0                      &          & 150    & 10       \\
+                    CIFAR-10 SimCLR     & .6            &         &         &                        & 10\textasciicircum-6 & .9       & 100    & 10\\
+                    MNIST VAE           & .001          & .9      & .999    & 10\textasciicircum-8 & 10\textasciicircum-5 &          & 100    & 10       \\
+                    dSprites VAE       & .001          & .9      & .999    & 10\textasciicircum-8 & 10\textasciicircum-5 &          & 100    & 10      \\
+                    \bottomrule
+                    \end{tabular}
+				\end{sc}
+			\end{small}	
+		\end{adjustbox}
+	\end{center}
+\vspace{0in}
+\end{table}
+
+% Gergo TODO
+% 1. [x] Computation, collect data
+% 2. [x] Appendix on minor bug
+% 3. [ ] ECG rerun
+% 4. [x] Lucid LeakyRelu
+
+% \input{figures_n_tables/results3.tex}

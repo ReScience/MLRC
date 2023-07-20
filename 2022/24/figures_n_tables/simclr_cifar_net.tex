@@ -1,0 +1,53 @@
+\begin{table}[h]
+	\setstretch{1.5}
+	\begin{center}
+		\begin{adjustbox}{width=\columnwidth}
+			\begin{tabular}{c|cl} 
+				\toprule
+				Component & Layer Type & Hyperparameters\\
+				\hline
+				\multirow{18}*{Encoder} & Conv2d & \makecell[l]{Input Channels:3 ; Output Channels:32 ; Kernel Size:3 ; Stride:1 ; Padding:1 }  \\ 
+                    & LayerNorm & \makecell[l]{} \\
+                    & ReLU & \makecell[l]{} \\
+                    & MaxPool2D & \makecell[l]{Stride:2} \\
+
+                    & Conv2d & \makecell[l]{Input Channels:32 ; Output Channels:64 ; Kernel Size:3 ; Stride:1 ; Padding:1 } \\
+                    & LayerNorm & \makecell[l]{} \\
+                    & ReLU & \makecell[l]{} \\
+                    & MaxPool2D & \makecell[l]{Stride:2} \\
+
+                    & Conv2d & \makecell[l]{Input Channels:64 ; Output Channels:128 ; Kernel Size:3 ; Stride:1 ; Padding:1 } \\
+                    & LayerNorm & \makecell[l]{} \\
+                    & ReLU & \makecell[l]{} \\
+                    & MaxPool2D & \makecell[l]{Stride:2} \\
+
+                    & Conv2d & \makecell[l]{Input Channels:128 ; Output Channels:128 ; Kernel Size:3 ; Stride:1 ; Padding:1 } \\
+                    & ReLU & \makecell[l]{} \\
+                    & Flatten & \makecell[l]{Output Channels : 2048 (128*4*4) } \\
+                    
+				& Linear & Input Dimension: 2048 ; Output Dimension: 128  \\
+                    & ReLU   & \makecell[l]{} \\
+				& Linear & Input Dimension: 128 ; Output Dimension: 128  \\ 
+
+    
+				\hline
+
+    
+				\multirow{10}*{Decoder} & Linear & Input Dimension: 128 ; Output Dimension: 128  \\
+				& Linear & Input Dimension: 128 ; Output Dimension: 2048  \\
+				& Unflatten & Dimension:1 ; Unflatten Size:(128, 4, 4)  \\
+				& ConvTranspose2d & \makecell[l]{Input Channels:128 ; Output Channels:64 ; Kernel Size:3 ; Padding:1 ; Stride:2 ; Output Padding:1}   \\  
+				& LayerNorm &  \makecell[l]{} \\
+                    & ReLU &  \makecell[l]{} \\
+				& ConvTranspose2d & \makecell[l]{Input Channels:64 ; Output Channels:32 ; Kernel Size:3 ; Padding:1 ; Stride:2 ; Output Padding:1}  \\
+                    & LayerNorm &  \makecell[l]{} \\
+                    & ReLU &  \makecell[l]{} \\
+				& ConvTranspose2d & \makecell[l]{Input Channels:32 ; Output Channels:3 ; Kernel Size:3 ; Padding:1 ; Stride:2 ; Output Padding:1}  \\
+                    & Sigmoid &  \makecell[l]{} \\
+				\bottomrule
+			\end{tabular}
+		\end{adjustbox}
+	\end{center}
+        \caption{CIFAR-10 \& CIFAR-100 AutoEncoder Architecture.}
+	\label{tab:autoencoder_cifar}
+\end{table}
