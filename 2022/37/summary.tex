@@ -1,0 +1,35 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+Exponential family variational autoencoders struggle with reconstruction when encoders output limited information.
+
+We reproduce two experiments in which we first train the decoder and encoder separately. Then, we train both modules jointly using ELBO and observe the degradation of reconstruction.
+
+We verify how the theoretical insight into the design of the approximate posterior and decoder distributions for a discrete VAE in a semantic hashing application influences the choice of input features to improve overall performance.
+
+\subsubsection*{Methodology}
+
+We implement and train a synthetic experiment from scratch on a laptop. We use a mix of authors' code and publicly available code to reproduce a GAN reinterpreted as a VAE. We consult authors' code to reproduce semantic hashing experiment and make our own implementation. We train models the USI HPC cluster on machines with GTX 1080 Ti or A100 GPUs and 128 GiB of RAM. We spend under 100 GPU hours for all experiments.
+
+\subsubsection*{Results}
+
+We observe expected qualitative behavior predicted by the theory on all experiments. We improve the best semantic hashing model's test performance by 5 nats by using a modern method for gradient estimation of discrete random variables.
+
+\subsubsection*{What was easy}
+
+Following experiment recipes was easy once we worked out the theory.
+
+%Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+\subsubsection*{What was difficult}
+
+The paper enables verification of exponential family distributions VAE designs of arbitrary complexity, which require probabilistic modeling skills. We contribute elaboration on the implementation details of the synthetic experiment and provide code.
+%Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\subsubsection*{Communication with original authors}
+
+We are extremely grateful to the authors for discussing the paper, encouraging us to implement experiments on our own, and suggesting directions for improving results over e-mail.
