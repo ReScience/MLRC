@@ -1,0 +1,61 @@
+\appendix
+\section{Dataset examples}
+We give a few more examples from our social media datasets.
+
+\subsection{Trump's Tweets}
+\begin{itemize}
+    \item \textbf{Sentence}: ....What are they trying to hide. They know, and so does everyone else. EXPOSE THE CRIME! . (Flagged)
+    \item \textbf{Sentence}: Immigration reform really changes the voting scales for the Republicans—for the worse! . (Not flagged)
+    \item \textbf{Sentence} : The United States better address China's exchange rate before they steal our country and it is too late! China is laughing at us. . (Not flagged)
+    \item \textbf{Sentence}: Corrupt Election! https://t.co/MxNjfCEtKP . (Flagged)
+\end{itemize}
+
+\subsection{Debagreement}
+
+\begin{itemize}
+    \item \textbf{Comment}: Unfortunately I think they'll just move the voting to be virtual and proceed with the timeline they had planned. \newline \textbf{Reply}: So they cant. McConnell blocked … (Disagree)
+\item \textbf{Comment}: This will annoy the hell out of the liberals who regularly use Uber and Lyft. I see this as a good thing! \newline \textbf{Reply}: Looks like they pushed all their chips in the pot with a pair of deuces and it wasn't enough. LOL (Neutral)
+\item \textbf{Comment}: Perhaps the older generation want a return to the blitz, the time has warped their recollection of rationing. \newline \textbf{Reply}: I asked grandpa about the Blitz once! Indeed he said that rationing was important. (Agree)
+\item\textbf{Comment}: Why is that bad news? I hope other addicts will see that and know there is hope to get out. \newline \textbf{Reply}: Am I being down voted for suggesting that its a good thing for drug addicts recover? (Unsure)
+\end{itemize}
+
+\section{Labels Comparison between Models}
+
+We show the labels chosen using AMuLap for Roberta-large and BERT-base for the SST-2 dataset. It is interesting to see the difference between each model. It shows that they put importance on different words.
+
+\paragraph{RoBERTa}
+\begin{itemize}
+\item \textbf{positive}: Great, perfect, fun, brilliant, amazing, good, wonderful, beautiful, excellent, fantastic
+\item \textbf{Negative}: Terrible, awful, disappointing, not, horrible, obvious, funny, inevitable, bad, boring
+\end{itemize}
+\paragraph{BERT}
+\begin{itemize}
+\item \textbf{Positive}: perfect, fun, beautiful, good, great, amazing, wonderful, incredible, fantastic, successful, magnificent, awesome, nice, easy, spectacular, glorious
+\item \textbf{Negative}: horrible, true, awful, funny, stupid, brilliant, wrong, terrible, me, ridiculous, right, simple, crazy, there, real, him
+\end{itemize}
+
+
+
+% \section{Datasets and evaluation metrics} \label{A}
+
+% % 1. Same as paper: SST-2, MNLI
+% % 2. Data sets for extension: Donald Trump tweets flagged vs not flagged.
+% % 3. Prompt templates to try aand use
+% %       - "It was" appended at the end of text
+% %       - some new prompts
+% % 4. Metrics: accuracy (GLUE data), humman annotator 
+
+% We will use 2 of the GLUE Benchmark datasets used in the original paper [1] and two new datasets for the classification task. Given time and computational limitations, we will prioritize reproducing the results AMuLaP on the Stanford Sentiment Treebank (SST-2) and Multi-Genre Natural Language Inference (MNLI) datasets for the sentiment classification and natural language inference tasks, respectively. Our project will then extend the use of AMuLaP on two new datasets: Scale AI and Oxford's DEBAGREEMENT dataset \cite{pougue2021debagreement}, which contains a Reddit-sourced comment-reply dataset with 4 classes ("agree", "disagree", "neutral", and "unsure") and a manually compiled data of Donald Trump's tweets, classified into "flagged" and "safe". The two datasets are chosen to be parallels of the SST-2 and MNLI datasets that contain more sensitive text. We are interested in seeing how AMuLaP dissects the general labels into sub-labels and whether these labels reflect the nuances of the text.
+
+% \hfill \break
+% In our experiments, we will first use the fixed prompt template used by the paper. Following are examples of what a prompt would look like:
+
+% \begin{itemize}
+%   \item \textbf{Classification Task} Sentence 1. It is [MASK].
+%   \item \textbf{NLI and Comment-Reply Agreement Task} Sentence 1? [MASK], Sentence 2
+% \end{itemize}
+
+% We will then explore other hand-engineered prompting templates and soft prompts if we have enough computing power.
+
+% \hfill \break
+% We will evaluate our findings in two ways. First, we will check the capabilities of AMuLaP-generated labels by grouping them back into the original label class. For example, the paper stated that AMuLaP created the multi labels "great", "perfect", "fun" and "brilliant" in place of the original label "positive" in the SST-2 dataset. During the evaluation, all data points labeled as "great", "perfect", "fun" or "brilliant" will be considered as correctly labeled if the original data labeled it as positive. Secondly, we will show samples of our data and its respective AMuLaP-generated labels to human annotators, who will judge whether the label is suitable. We will ask a mix of literature professors and students to help us with this annotation section. These methods of evaluation are the two evaluation metrics used in the paper. 

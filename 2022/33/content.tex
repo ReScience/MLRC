@@ -1,0 +1,365 @@
+\section{Introduction}
+%Large pre-trained language models (LM) such as GPT3 \cite{GPT3} are known to be capable of achieving good few-shot performance on various tasks. This is particularly true with prompt-based learning, where the model is given input with the addition of special text to follow a template that allows the task to be treated as a masked language modeling problem. Much work has been done on trying to find effective templates to prompt the language model (i.e. prompt-engineering)\cite{Liu} but, when we desire the language model to fill in the mask from a finite set of words or labels, finding a good set of these label words are just as important (i.e. label engineering). Searching for high-performing label words usually requires either task expertise, enough knowledge of the internal LM workings, or enough computation for a brute-force search of the LM's vocabulary. To mitigate the need for this manual work and expense, Wang et al. \cite{Wang} proposed a novel technique for automatic multi-label map search through prompting. 
+
+%\subsection{AMuLaP and its Methodology}
+%Their proposed solution, AMuLaP can be described as using prompting on a set of same-class samples to find a group of label representatives for the class without the need for human effort. Following is an example of a positive/negative classification task (SST-2 dataset) \cite{SST2}:
+%\begin{center}No reason to watch. It was [MASK]. \end{center}\newline
+%The above sentence belongs in the "negative" class and has the original label "negative". Through prompting, AMuLaP found labels such as "terrible", "awful", or "bad" to fill the masks of prompts built using sentences from the "negative" class. Formally, for an original mapping function \(\mathcal{M} : \mathcal{Y} \rightarrow \mathcal{V}\), where \mathcal{Y} and \mathcal{V} denotes class and single label respectively, AMuLaP finds \(\mathcal{M}′ : \mathcal{Y} \rightarrow \mathcal{V}^k\), where \(\mathcal{V}^k\) a set of label words \(\mathcal{S}(y)\) with size \(k\). 
+
+%\hfill \break
+%For each class, we iterate through the training samples whose ground truth matches the class. They then use the pre-trained LM \(\mathcal{L}\) (RoBERTa \cite{roberta}) to predict the token probability of the masked token. The average of the predicted probabilities is assigned to \(z_i\), a vector over the whole vocabulary. For each word in the \(\mathcal{L}\) 's vocabulary, retrieve its probability value from the \(z_i\) vector of each class and assign the word to the class where it has the maximum probability value. Finally, choose the top-k tokens with the largest word probability value from the candidate set for each class.
+
+%\subsection{Limitations}
+%AMuLaP has the advantage of being parameter-free and simple while having competitive performance without accessing model weights. However, the model needs to be fine-tuned to achieve the best results. This can be harder with newer state-of-the-art models, which are comparatively larger than the model they used (RoBERTa \cite{roberta}) \cite{Wang}. Moreover, they only experimented on clean GLUE benchmark datasets \cite{GLUE}, which they recognize to have the potential to not translate well to real-world scenarios with more variations and noise. They also observed AMuLaP's tendency to output common words as multi-labels and stated this as a potential reason for its success. We want to explore the performance of AMuLaP on real-world data, whether its tendency to output common words holds, and whether these common words succeed in representing more nuanced data; we want to see how well the method extends on more noisy datasets. Finally, the code implementation provided in the paper is neither modular nor intuitive, with the majority of the code written in a single main function which makes the method less accessible to use for other purposes.
+
+
+
+Prompt-based learning with pre-trained large language models (PLM) such as GPT-3 \citep{GPT3} have recently gained popularity and much work has been done in searching for prompting templates (i.e. prompt-engineering) \citep{Liu} that best allow the PLM to treat tasks as masked language modeling problems. But when we want the PLM to fill in masks from a finite set of label words, which is a different approach to text classification, finding good label word sets is just as important (i.e. label engineering). The search for label words usually requires task expertise, knowledge of the internal PLM, or enough computation for a brute-forced search of the PLM's vocabulary.
+
+\hfill \break
+To mitigate the need for this manual work and expense, \citet{Wang} proposed a novel technique for automatic multi-label map search through prompting. Their proposed solution, AMuLaP, can be described as using prompting on a set of same-class samples to find a group of label representatives for the class without needing human effort. We want to pick the best label to get the best classification for a specific language model. For example, ``great'' and ``perfect'' are two labels that can be associated with a positive sentiment and ``awful'' and ``terrible'' to a negative sentiment. Given these labels, AMuLaP finds the probability given by the model to complete the mask for each label and uses them for classification. The method is summarized in Figure \ref{fig:amu} provided by the original paper. Using a group of labels reduces the noise brought by single labels when making predictions. On a high level, the authors claim competitive accuracy results on the GLUE dataset without fine-tuning nor access to model weights against majority voting and manual label zero-shot baselines. Its best performance is reached with fine-tuning, outperforming direct few-shot fine tuning on all GLUE datasets except for CoLA.
+
+\hfill \break
+Automatic label search using prompt-based learning is relatively new, with only two works parallel to AMuLaP preceding it, called AutoL \citep{gao-etal-2021-making} and PETAL \citep{schick-etal-2020-automatically}. In this work, we aim to verify their main claims by reproducing their results on 3 GLUE datasets with and without fine-tuning and test their ability to generalize to real-world tasks and other models.
+
+\section{Scope of Reproducibility}
+% \label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Fine-tuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise, and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+\subsection{Context and Original Claims}
+
+AMuLaP alleviates the need for manual label word search to optimize prompt-based learning with PLMs. Given a prompt template, AMuLaP uses a statistics-based selection method to choose multiple words to map as labels for a single class. As a result, the method's way of finding label mappings brings the advantage of being parameter-free and simple. The authors claim AMuLaP's ability to achieve competitive performance on GLUE tasks without accessing model weights, beating majority-vote and manual label zero-shot baselines across all GLUE datasets. Further, it reaches its best results with a fine-tuned model, outperforming direct few-shot fine-tuning on all GLUE datasets except for CoLA. AMuLaP's works as its one-to-many label mapping per class reduce the noise brought by limited few shot examples and PLM complexities during automatic label selection and inference. Finally, they suggest that the increase of supervision pairs when selecting multiple labels during fine-tuning resembles working with augmented data, possibly being another reason to why multi-labels work.
+
+\subsection{Experiment Scope}
+Our work verifies the following claims of the paper and expands on it by exploring its generalization to real-world tasks and models. We use the original code, with modifications to accommodate two new non-GLUE datasets and models, and outline our experiments below: 
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+\begin{itemize}
+     \item \textbf{GLUE performance reproduction: } We run AMuLaP under 2 settings (fine-tuned model and not) for MNLI, MNLI-mm, SST-2 and CoLA to verify claims of competitive performance on GLUE datasets. 
+     \label{claim:1}
+     \item \textbf{Performance on 2 real-world datasets: } We run AMuLaP on 2 new datasets (flagged and non-flagged Trump tweets and Reddit comment-reply pairs). This is done for 3 goals: (1) to test the method's robustness on unclean real-world data. (2) Verify the author's claims related to multi-labels and noise by examining generated multi-labels. (3) explore the possible use case of AMuLaP's multi-labels as a way to use PLMs to uncover insights about why datasets are classed a certain way. Particularly, we are interested in the multi labels as additional context behind why groups of Trump tweets were flagged, and as a clearer reason behind why a Reddit comment-reply pair falls in the "unsure" relation class. 
+     \label{claim:2}
+     \item \textbf{Testing different language models: } We try AMuLaP with PLMs other than its RoBERTa-Large backbone and new manual templates to test the claim that the method works due to its use of multi-labels. In particular, we want to see whether the method's success relies heavily on the choice of PLM/template rather than the idea of one-to-many label mappings.
+     \label{claim:3}
+     \item \textbf{Code modification: } The original implementation builds upon AutoL's \citet{gao-etal-2021-making} codebase, a related work preceding it. To improve its usability, we modified the codebase to be more modular and added information on how to use it on non-GLUE datasets. 
+     \label{claim:4}
+ \end{itemize}
+
+ The rest of our report proceeds as follows. We first go over related work in section \ref{sec:related}. This, section \ref{section:methodology} outlines our methodology, and we summarize how AMuLaP works in section \ref{section:model}. Section \ref{sec:results} shows our results. Section \ref{section:discussion} is a discussion of our insights from reproducing the work.
+
+\section{Related work}\label{sec:related}
+
+While in the past year, the principal method for learning natural language processing models was to pre-train them and fine-tune on a specific task, in the more recent years, there has been a shift with the use of prompting on pretrained models to predict masked tokens as explained by Liu et al. \cite{Liu} The original GPT3 paper \cite{GPT3} had few-shot learning as the main focus; they showed that the model could use in-context learning from a few examples to complete a text. This further encouraged prompt engineering for classification tasks, i.e., converting a task into a language model format to use with a language model. This method was first explored by Trinh and Lee in 2018 \cite{Trinh}. They substituted a pronoun with one of two words with the most probable sentence for a language model. While simple, this new method started using prompt engineering for text classification since it achieved excellent results. Shin et al. \cite{Shin} proposed a method for creating automatic prompting (AUTOPROMPT). They showed that we could use the masked language model "knowledge" without additional parameters or fine-tuning to perform sentiment analysis and natural language inference. This paper combines the original task inputs with a collection of trigger tokens learned using a gradient-based search method.
+
+\hfill \break
+In the original AMuLaP paper \cite{Wang}, the authors argue that finding optimal label sets is just as important as prompt template engineering to carry out prompting methods successfully on language models. Finding label maps would usually require task-specific expertise, and we can use the language model (LM) knowledge to find which words are ``understood'' well enough by the LM to be used as a label. Moreover, exhaustive trial and error approaches of all possible label mappings is intractable\cite{gao-etal-2021-making}. Automated Label Mapping approaches emerged as a solution to minimize the need for human involvement when selecting labels. The paper refers to two related works, and no other works have been released on automatic label mapping search between AMuLaP's publication on April 2022 and December 2022 as far as we know.
+
+\hfill \break
+Schick et al. \cite{schick2020automatically} proposed PETAL (Pattern-Exploiting Training with Automatic Labels) in 2020. This framework builds on one of their earlier works, PET (Pattern-Exploiting Training), which has a verbalizer component that maps a label to a token representing its meaning. The Automatic Label aspect of PETAL searches for optimal verbalization candidates (label meaning representative tokens) using maximum-likelihood-based approaches. They also recognized the need for multiple verbalizers of a label for certain tasks (aligned with AMuLaP's statement regarding the need for multi-labels). They implemented a solution that maps a single label to a set of tokens.
+
+\hfill \break
+In 2021, Gao et al. \cite{gao-etal-2021-making} used a variation of Schick's idea of automatic verbalizer search to find the optimal label words given a fixed prompting template. Their work varies from Schick's by relying on a more brute-force method of specifying label word search space and selecting the words. In particular, within the top-k conditionally likely words within a language model's vocabulary (where the condition is the input text), they search for the top n words that maximize zero shot accuracy of their training data and fine-tune on this n-sized set. Another variation comes in their final step of re-ranking the top n words using a development set. An important finding from both papers is that a good mapping from the original task labels to tokens is important to few-shot performance, which is why Wang et al. \cite{Wang} focused on label engineering in their work.
+
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+% %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+%As far as we know, there are no other reproductions of AMuLaP, and only two preceding works exploring similar techniques for automatic label mapping. As such, we will refer to their published AMuLaP code and re-implement it into a more expandable and modular format while verifying their implementation's correctness and reproducible factor of their results \cite{Wang}. This improvement should allow more people to work with that method as the research in automatic label prompting is still new. We will also explore the possibility of creating a python package. As we want the code to be accessible and easy to use, we will keep using Pytorch as it is the most well-known machine learning library. 
+
+%\hfill \break
+%To add to this work, we will test AMuLaP on new datasets closer to real-world scenarios. As described in Appendix \ref{A}, we will create a dataset based on Donald Trump's tweets, with whether or not Twitter has flagged the tweet as original classes (binary). We will also try a second dataset: Scale AI and Oxford's DEBAGREEMENT dataset \cite{pougue2021debagreement}, which contains reddit‐sourced comments and replies with four classes (agree, disagree, neutral and unsure). Since these prompts are not perfectly written, these datasets will challenge AMuLaP even more. We follow Wang et al. evaluation methods of measuring accuracy and human annotation of generated label suitability. We will also try a larger language model such as Bloom \cite{BLOOM}; a hypothesis is that this will make AMuLaP output rarer words than on a smaller model, which might add more nuance words and will provide additional insights to understand why this method works well. We also want to incorporate searching for prompt templates that work well with AMuLaP. Finally, we will try new manual prompts and analyze how changing the prompt template affects AMuLaP's performance.
+
+%We further test AMuLaP's applicability on real-world datasets instead of clean GLUE datasets and explore its generalization to models other than its backbone RoBERTa-Large PLM. Finally, realizing that their implementation builds upon a preceding work on automatic label search, we modify their code to improve modularity, usability, and relevance to newer packages. 
+
+\section{Methodology}
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+\label{section:methodology}
+
+We use the author's code with some modifications to handle non-BERT-based models and our two non-GLUE datasets. After these modifications, we follow the instructions in the README file to run experiments. We also use code from \citet{gao-etal-2021-making} to run an alternative automatic label search technique called AutoL on the Trump tweets and Debagreement. AutoL is an alternative to AMuLaP used by the authors as a comparison, which automatically finds single labels using prompts.
+
+\subsection{Model descriptions}
+\label{section:model}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+% This is the old explanation of AMuLaP if you want: Following is a given example on a positive/negative classification task (SST-2 dataset) \cite{SST2}:
+%\begin{center}No reason to watch. It was [MASK]. \end{center}\newline
+%The above sentence belongs in the "negative" class and has the original label "negative". Through prompting, AMuLaP found labels such as "terrible", "awful", or "bad" to fill the masks of prompts built using sentences from the "negative" class. Formally, for an original mapping function \(\mathcal{M} : \mathcal{Y} \rightarrow \mathcal{V}\), where \mathcal{Y} and \mathcal{V} denotes class and single label respectively, AMuLaP finds \(\mathcal{M}′ : \mathcal{Y} \rightarrow \mathcal{V}^k\), where \(\mathcal{V}^k\) a set of label words \(\mathcal{S}(y)\) with size \(k\). 
+
+%\hfill \break
+%For each class, we iterate through the training samples whose ground truth matches the class. They then use the pre-trained LM \(\mathcal{L}\) (RoBERTa \cite{roberta}) to predict the token probability of the masked token. The average of the predicted probabilities is assigned to \(z_i\), a vector over the whole vocabulary. For each word in the \(\mathcal{L}\) 's vocabulary, retrieve its probability value from the \(z_i\) vector of each class and assign the word to the class where it has the maximum probability value. Finally, choose the top-k tokens with the largest word probability value from the candidate set for each class.
+AMuLaP is a method that uses the whole vocabulary of the language model to find the best labels. Using \(n\) examples per class, we sum the predictions of the mask token over the whole vocabulary. Then, for each word, we assign it to the class with the highest probability. Finally, we select \(k\) labels with the highest probability for each class. When testing, we sum the prediction on the mask token of these multi-labels for each class to get the prediction class with the highest sum. Refer to the original paper and Figure \ref{fig:amu} for a formal description of the method \citep{Wang}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{images/amulap.png}
+    \caption{Illustration from the original paper of implementing AMuLaP on a binary sentiment classification task (SST-2). Each training sample with the task-specific template (the underlined text) is fed into a pre-trained language model L to get its own probability distribution over the vocabulary V. The obtained probability distributions are summed by class and normalized to get the probability distribution of each class. Then each token in V is assigned to the class with the highest probability (e.g., the token terrible is assigned to the class negative, and the token great to the class positive). Finally, we choose the top-k tokens as label words for each class \citep{Wang}}.
+    \label{fig:amu}
+\end{figure}
+
+\hfill \break
+The main model used is RoBERTa Large (355M parameters) \citep{roberta} with pretrained weights modified to do prompt fine-tuning. In Table \ref{table:othermodels}, we also used DerBERTa-V2 xlarge (900M) and xxlarge (1.5B) \citep{deberta}, RoBERTa Base (125M) \citep{roberta}, and BERT Large Uncased (340M) \citep{devlin-etal-2019-bert} for comparison. Similarly, the models were modified for prompt fine-tuning, and pretrained weights were used. From the original paper of each model, the results on the GLUE benchmark \citep{wang-etal-2018-glue} should be better the more parameters it has, apart from RoBERTta Base, which performs similar to and even outperforms BERT Large on certain tasks. A major limitation when choosing a model is that it has to have been trained with a mask token; otherwise we would need to fine-tune it, which might be resource expensive. To use a sequence-to-sequence model, we would need to modify the work extensively, and there is no say in whether the method would work as well.
+
+
+\subsection{Datasets}
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+We use 4 GLUE datasets (MNLI, MNLI-mm, SST-2, and CoLA), a set of Donald Trump tweets from The Trump Tweet Archive (\url{https://www.thetrumparchive.com}) and Reddit comment reply pairs from Debagreement (\url{https://scale.com/open-av-datasets/oxford})\citep{pougue2021debagreement}. All of them were processed into train, dev (validation), and test splits using the author's code to create k-shot data without any additional processing as we want to test the capacity of the method on ``unclean'' data. The code creates train and test files with \(n\) samples for each class, and we used \(n=16\) in our experiments. The test set is the dev set of an original GLUE dataset and the new dev set is the same length as the new train set. Below are details of each dataset:
+\begin{itemize}
+    \item \textbf{MNLI}: MNLI is a dataset composed of sentence pairs annotated with textual entailment information (Entailment, contradiction, neutral) with each class represented approximately equally \citep{MNLI}. Here is an example:
+    \hfill \break \break
+    Premise: Your gift is appreciated by each and every student who will benefit from your generosity. 
+    \hfill \break
+    Hypothesis: Hundreds of students will benefit from your generosity.
+    \hfill \break
+    Label: neutral
+    \item \textbf{SST-2}: The Stanford Sentiment Treebank regroups sentences labeled with a positive or negative sentiment. There are about the same amount of examples for each class \citep{sst2}. Here is an example:
+    \hfill \break \break
+    Positive example: a smile on your face
+    \hfill \break
+    Negative example: the action is stilted
+    \item \textbf{CoLA}: The Corpus of Linguistic Acceptability is a set of 10,657 English sentences labeled as grammatical or ungrammatical (acceptable or unacceptable) represented with 70.5\% acceptable \citep{warstadt-etal-2019-neural}.
+    \hfill \break \break
+    Example of an acceptable sentence: They made him president.
+    \hfill \break
+    Example of an unacceptable sentence: The car honked down the road.
+    \item \textbf{Trump Tweets}: Trump's tweets are either flagged or not flagged by Twitter; these are our classes. Since there were only 304 flagged tweets out of 50,000 tweets, we created a dataset using randomly chosen 694 ``ok'' tweets to get 1000 data points with an average of 38 tokens per tweet. From now on, ``ok'' tweets refer to tweets that were not flagged by 
+    Twitter. We split the training with a ratio of 0.3, and the dev set is 0.1 of the test set. \hfill \break \break
+    Here is an example of a flagged tweet: RIGGED ELECTION. WE WILL WIN!
+    \hfill \break Here is an example of an ok tweet: So great to watch this! https://t.co/pYoiLjM0pz.
+    \item \textbf{Debagreement}: It is a dataset composed 42,894 comment-reply pairs extracted from Reddit that are either agreeing, disagreeing, neutral or unsure \citep{pougue2021debagreement}. We removed the unsure examples for our testing. Each class is represented equally in the dataset. On average, each pair consists of 89 tokens (using RoBERTa-Large tokenizer).
+    \hfill \break \break
+    Example of a disagreement: Comment: I feel like the pictures should be reversed... Only one side is throwing a fit.	\hfill \break Reply: We've had months of leftists burning and looting, you think the right is throwing a fit?
+\end{itemize}
+
+\subsection{Hyperparameters}
+\label{section:hyper}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+We replicated the use of hyperparameters in the original paper as much as possible; we only tried one learning rate and one batch size instead of 3 as running the method when fine-tuning was computationally expensive. For all GLUE experiments, we tried five different seeds (13, 21, 42, 87, and 100) to generate the training split. For Trump and Debagreement, we only used a single set of training split. We used the same seeds for all experiments to get the standard deviation and average. We report results from the best-performing top-k parameter based on the accuracy of the dev set. We used top-k's of 1, 2, 4, 8, and 16 for fine-tuning, and 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, and 1024 for no fine-tuning. We used a batch size of 8 for all experiments and a learning rate of 1e-5 when fine-tuning. Figure \ref{fig:topk} shows the impact of the top-k on SST-2 and MNLI-mm. We found that depending on the template and the dataset, the best top-k can be large, but most of the time, there are no specific patterns to determine the best top-k. Larger top-k reduces the standard error on the results and with a good template, it should perform well compared to a small one.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=8cm]{images/topk.pdf}
+    \caption{Accuracy on SST-2 and MNLI-mm using AMuLaP with different top K's with no fine-tuning.}
+    \label{fig:topk}
+\end{figure}
+
+\subsection{Experimental setup and code}
+% Include a description of how the experiments were set up that is clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+The experiment can be run using a python file with arguments. We ran each dataset with the hyperparameters described in Section \ref{section:hyper} to report the best result based on the dev set. A file named prompt.py has a class containing multi-label prompting methods. New models that support mask modeling can easily be added in model.py by replicating the code used for the other classes. Every dataset was evaluated using accuracy, i.e. the percentage of correctly classified examples, but CoLA uses Matthews Correlation which is a metric that is used for imbalanced classes that is related to the F1-score (1 for perfect agreement, -1 for perfect disagreement). The code is available at \url{https://github.com/vicliv/AMuLaP-Reproduction}. 
+Refer to the README.md file for more information to run the code.
+
+\subsection{Computational requirements}
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+We primarily used RTX8000 for AMuLaP runs, which took 2 minutes per run without fine-tuning, and 10 minutes per run with fine-tuning on average. We took an average of 250 minutes for fine-tuning experiments and 110 minutes non fine-tuned experiments. When working with DeBERTa-V2-xxlarge, we used A100 with 80 GB of memory. AutoL experiments were run on standard Google Colab and Kaggle GPU, with single runs taking 2 and 10 hours for the Trump and Debagreement datasets, respectively. In total, with the ability to run over some experiments in parallel, our main AMuLaP experiments took a total of 125 hours.
+
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+Our results generally support the claim made by the original authors, of AMuLaP's competitive results on the GLUE datasets and the reduction of noise by using multiple labels. Further, our experiments on Trump tweets and Debagreement showed AMuLaP's potential in generalizing to real-world data. However, we found a large decline in performance when using non-default PLMs and templates.
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+% \subsubsection{Result 1}
+
+% \subsubsection{Result 2}
+
+We ran the experiments on SST-2, MNLI, MNLI-mm, and CoLA to reproduce the results from the original paper (first point in section \ref{claim:1}), the two of which are compared in Table \ref{table:GLUEResults}. The average results we got for AMuLaP without fine-tuning is within the standard deviation of the original work and slightly worse when fine-tuning. Overall, the results correspond to what was shown in the original paper.
+
+\begin{table}[h!]
+\centering
+{%
+\begin{tabular}{|l| c c c c|}
+
+ \hline
+  & MNLI & MNLI-mm & SST-2 & CoLA\\ 
+  & (acc) & (acc) & (acc) & (Matt.)\\[0.5ex] 
+ \hline
+ \multicolumn{5}{|l|}{Setting 2: Dtrain + Ddev ; No parameter update.} \\
+ \hline
+ Original AMuLaP & 50.8 ± 2.1 & 52.3 ± 1.8 & 86.9 ± 1.6 & 2.3 ± 1.4 \\
+ Reproduced AMuLaP & 51.3 ± 1.9 & 52.9 ± 2.3 & 86.9 ± 1.4 & 2.2 ± 2.9 \\
+ \hline
+ \multicolumn{5}{|l|}{Setting 3: Dtrain + Ddev ; Prompt-based fine-tuning.} \\
+ \hline
+ Original AMuLaP FT & 70.6 ± 2.7 & 72.5 ± 2.4 & 93.2 ± 0.7 & 18.3 ± 9.4 \\
+ Reproduced AMuLaP FT & 67.0 ± 2.7 & 69.1 ± 3.2 & 92.6 ± 1.4 & 17.0 ± 11.1 \\ [0.1ex] 
+ \hline
+\end{tabular}}
+\caption{Reproduced and original experiment results under two settings on some GLUE dataset using Roberta. For few-shot settings, n is set to 16 per class. For reproduction, we give the average and standard deviation over 5 runs (different seeds) for all experiments.}
+\label{table:GLUEResults}
+\end{table}
+
+We got slightly worse results when fine-tuning, which might be because we only tried a single learning rate. Trying multiple learning rates would have been too long and would have use much more computation resources.
+
+% This should go in discussion: (large variance of cola) which might explain the difference in the results since we only averaged over five runs. 
+
+\subsection{Results beyond original paper}
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+
+%The first two subsections below refer to the second point in section \ref{claim:2}.
+ 
+\subsubsection{Default AMuLaP on Trump tweets and Debagreement}
+
+Table \ref{table:TrumpDebResults} shows the results of running AMuLaP with RoBERTa-Large for the Trump and Debagreement datasets. We also ran AutoL to use as a comparison, similar to the original paper. We find relatively high accuracies for Trump: 77.3\% without fine-tuning and 86.7\% with, but unsatisfactory accuracies for Debagreement: 30.5\% without fine-tuning and 40.5\% with. 
+
+% This should go in discussion: The Trump tweet results exemplifies AMuLaP's potential on real-world data, but its weaker Debagreement results uncovers a crucial consideration needed for AMuLaP to work, which we show next.
+
+\begin{table}[h!]
+\centering
+{%
+\begin{tabular}{|l| c c|}
+
+ \hline
+  & Trump & Debagreement\\ 
+  & (acc) & (acc)\\[0.5ex] 
+ \hline
+ \multicolumn{3}{|l|}{Setting 2: Dtrain + Ddev ; No parameter update.} \\
+ \hline
+ AMuLaP & 77.3 & 30.5 \\
+ \hline
+ \multicolumn{3}{|l|}{Setting 3: Dtrain + Ddev ; Prompt-based fine-tuning.} \\
+ \hline
+ AMuLaP FT & 86.7 ± 2.7 & 40.5 ± 1.3 \\
+ Auto-L FT & 89.1 ± 1.1 & 36.4 \\ 
+ [0.1ex] 
+ \hline
+\end{tabular}}
+\caption{Experiment results under two settings for the Trump and Debagreement datasets using AMuLaP (multi-label) and AutoL (single label) with Roberta Large. For few-shot settings, k is set to 16 per class. We show the average and standard deviation over 5 runs with different seeds for all experiments apart from Auto-L on Debagreement, done on a single run.}
+\label{table:TrumpDebResults}
+\end{table}
+
+\subsubsection{AMuLaP for Trump tweets and Debagreement: Label and Template}
+
+Table \ref{table:multilabels} shows the multi-labels found using AMuLaP for the Trump and Debagreement datasets along with the fixed manual templates used to find them:
+
+\begin{table}[h!]
+    \centering
+    \
+    \begin{tabular}{|l|c|}
+        \hline & Generated Multi-Labels \\
+        \hline
+        \multicolumn{2}{|l|}{Trump Template 1: ``Sentence 1. It was [MASK].''}\\
+        \hline
+        Flagged tweets & rigged, awesome, close, disgusting, terrible, huge, over,
+        \\ & shocking, illegal, ridiculous \\
+        Ok tweets & fun, true, amazing, inevitable, not, great, beautiful,
+        \\ & funny, good, incredible \\
+        \hline
+        \multicolumn{2}{|l|}{Trump Template 2: ``Sentence 1. This is a [MASK] tweet.''}\\
+        \hline
+        Flagged tweets & false, TRUE, warning, lawful, FALSE, fraud, rigged, 
+        \\ & harassing, felony, panicked \\
+        Ok tweets & recent, real, new, live, deleted, related, verified, true,
+        \\ & great, sponsored  \\
+        \hline
+        \multicolumn{2}{|l|}{Debagreement Template 1: ``Sentence 1. [MASK]. Sentence 2.''}\\
+        \hline
+        Disagreeing pairs & Or, And, </s>, Mattis, Something, Like, *, Even, Wait, - \\
+        Agreeing pairs & But, The, If, and, Now, New, Assuming, US, Yes, Heck \\
+        Neutral pairs & So, It, Well, Maybe, Just, ., Also, <, Obviously, ...  \\
+        Unsure pairs & Oh, Why, I, Because, As, but, Ok, However, Not, OK \\
+        \hline
+    \end{tabular}
+    \caption{Multi labels found for each dataset class using a specific fixed manual template with AMuLaP and RoBERTa-Large}
+    \label{table:multilabels}
+\end{table}
+
+The table shows a higher amount of noise (non-word labels) chosen as multi labels for the Debagreement dataset compared to Trump tweets, which in fact, presents none.
+
+%The original paper works with a fixed manual template chosen from the results of a preceding work \cite{gao-etal-2021-making}. 
+\subsubsection{AMuLaP with Alternative PLMs}
+
+Following point 3 in section \ref{claim:3}, we test AMuLaP with PLMs other than its default RoBERTa-Large backbone and report results in Table \ref{table:othermodels}. In this experiment, we take the results using the backbone RoBERTa-Large as a baseline. We observe that the baseline model performs best for the Debagreement dataset in both settings and SST-2 in the fine-tuned setting. It is outperformed in the non-fine-tuned setting only by DeBERTa for the SST-2 and Trump datasets and in the fine-tuned setting by RoBERTa-Base for the Trump dataset.
+
+\begin{table}[h!]
+\centering
+{%
+\begin{tabular}{|l| c c c|}
+
+ \hline
+  & SST-2 & Trump & Debagreement\\ 
+  & (acc) & (acc) & (acc)\\[0.5ex] 
+ \hline
+ \multicolumn{4}{|l|}{Setting 2: Dtrain + Ddev ; No parameter update.} \\
+ \hline
+ AMuLaP RoBERTa-Large (Baseline) & 86.9 ± 1.6 & 77.3 & 30.5 \\
+ AMuLaP Deberta-V2-xxlarge & 89.3 ± 0.7 & 78.9 & 27.5 \\
+ AMuLaP Deberta-V2-xlarge & 81.9 ± 2.4 & 79.4 & 28.7 \\
+ AMuLaP Roberta-Base & 84.5 ± 0.6 & 63.0 & 25.0 \\
+ AMuLaP Bert-Large-Uncased & 73.8 ± 2.0 & 63.0 & 26.6 \\
+ \hline
+ \multicolumn{4}{|l|}{Setting 3: Dtrain + Ddev ; Prompt-based fine-tuning.} \\
+ \hline
+ AMuLaP RoBERTa-Large (Baseline) & 93.2 ± 0.7 & 86.7 ± 2.7 & 40.5 ± 1.3 \\
+ AMuLaP Roberta-Base & 89.5 ± 0.4 & 76.7 ± 1.7 & 39.0 ± 0.6 \\
+ AMuLaP Bert-Large-Uncased & 84.7 ± 1.6 & 82.9 ± 2.4 & 30.6 ± 0.5 \\
+ 
+ Auto-L Roberta-Base & - & 80.3 ± 2.1 & 31.1\\ [0.1ex] 
+ \hline
+\end{tabular}}
+\caption{Experimental results under two settings. Reproduction of results from using different models on SST-2, Trump, and Debagreement datasets for AMuLaP. For few-shot settings, n is set to 16 per class. We show the average and standard deviation over 5 runs for all experiments apart from Auto-L on Debagreement, which was done on a single run.}
+\label{table:othermodels}
+\end{table}
+
+\section{Discussion}
+\label{section:discussion}
+
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+Our work verifies the authors' claims about AMuLaP on the GLUE dataset, as our reproduced results fall within the standard deviation of the original report. Testing AutoL on Trump and Debagreement also supports the author's motivation for using multiple labels. Instead of multi-labels, Auto-L searches for good combinations of single labels per class and consistently achieves results lower than AMuLaP with the same PLM. 
+
+\hfill \break
+Our extended experiments uncover the potential use of AMuLaP and the factors needed for its success. AMuLaP's multi-labels can be used to find possible reasons behind classification, as common interpretations of the Trump multi-labels make sense as the reasoning behind why tweets were flagged (labeled ``false'' or ``rigged'') or not (labeled ``real'' or ``true''). Then, examining our poor Debagreement results uncovered a need to explore effective templates to support automatic label search. Table \ref{table:othermodels} shows PLM choices impact performance. Also, the 0.48 average standard deviation increase in our reproduction of GLUE dataset results in table \ref{table:GLUEResults} shows the significance of seeds in AMuLaP's performance. We elaborate on our observations regarding template significance and PLM choice below.
+
+\hfill \break
+In the classification task lens, AMuLaP's high accuracy on the Trump dataset is proof of its potential on real-world data, while its poor results on Debagreement raise new considerations. A closer look at the generated labels shows AMuLaP's fixed template aspect as a weakness. The generated labels (shown in table \ref{table:multilabels}) contain noise, and 90\% of them are conjunction words. The selection of these words makes sense as the template places the mask token between the comment and reply pair. But, the occurrences of similar purpose conjunctions (ex: ``Even'', ``But'', ``Heck'' and ``However'' across three different classes) suggest that they may not be informative enough for accurate classification. 
+
+\hfill \break
+Informed by this observation, we tested other manual templates that resemble successful Trump ones by putting the mask token at the prompt end. However, we could not find a template that reaches a higher accuracy. We attempted using the automatic template search functionalities of AutoL \citep{gao-etal-2021-making}, but needed more resources to complete it. Joint automatic template and label search remain a future task for us. 
+
+\hfill \break
+Using different PLMs, table \ref{table:othermodels} verify the authors' claim that AMuLaP achieves its best results with access to the model weights. All experiments under setting 3 outperform their equivalent in setting 2. We observe that larger PLMs do not consistently achieve better results, as shown by the baseline RoBERTa-Large model exceeding DeBERTa-V2-xlarge for SST-2 in setting 2. We are interested in how well AMuLaP can use larger models; as we have seen, DeBERTa-V2 achieved better results than RoBERTa while still being relatively small compared to OPT models of GPT-3. We wanted to use GPT-3, but it is currently impossible to get the predictions over the whole vocabulary as AMuLaP requires. This feature may be available in the future, or we will need to contact OpenAI.
+
+\hfill \break
+For future work, finding more appropriate baselines to measure our findings on Trump tweets and Debagreement would be helpful. Using human evaluation, where literature professors and student judge whether the automatically searched multiple labels are good representations of a class, would be a good baseline to improve upon.
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+The complete code implementation was available publicly with step-by-step instructions on how to get AMuLaP running with GLUE datasets. This made it easy to begin the reproduction of the work. Finding flagged and not flagged tweets from Donald Trump was also easier than we initially thought. We were able to easily create our dataset thanks to \url{thetrumparchive.com} which
+compiled the tweets and labeled each of them.
+
+\subsection{What was difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+We needed to understand the code before fully understanding the explanation of AMuLaP in the original paper. However, the code was built upon another paper's work and contained lengthy files, making it time-consuming to understand. Further, the implementation works only with GLUE datasets and BERT-based PLMs, without adequate documentation on what to change to work with new data and non-BERT PLMs. Most models were not trained with a mask token and, thus, were unsuitable for a prompt-based method with a mask, such as how AMuLaP was implemented. As we wanted to try a larger model than RoBERTa, we had to search to find a way to find one extensively. We used DeBERTa‐V2 for mask modeling, but the most recent version of Hugging-Face transformers had an issue loading the weight of the model head. Fortunately, the issue was being solved concurrently with our research, and we could use a branch directory. Because of time constraints and GPU memory limitations, we could not fine-tune DeBERTa-V2. Finally, the label engineering problem AMuLaP tries to solve is tied to prompt engineering, so we find template experimentation challenging without prior experience.  
+
+%\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To ensure the reproducibility report is a fair assessment of the original research, we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+%We did not need to reach out to the authors as
+%the method was well explained and simple to understand with basic probability knowledge after going through the code.
+% \section{Contributions}
+% \label{section:contribution}
+
+% Vidya worked on the baselines with Auto-L, compiled the new datasets, and wrote most part of the report. Victor worked on the code, ran the reproduction and new experiments with AMuLaP, and wrote some parts of the reports. They came up with an analysis of the results together.

@@ -1,0 +1,28 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+
+We reproduce the results in the paper Automatic Multi-Label Prompting: Simple and Interpretable Few-Shot Classification by Wang et al. \cite{Wang}. Using human prompt engineering can be long and expensive for text classification. In their paper they proposed an approach, called AMuLaP to do automatic label prompting for few-shot classification and claimed competitive performance on the GLUE benchmark. We reproduce their results on 3 GLUE datasets and extend them to 2 new datasets. 
+
+\subsubsection*{Methodology}
+
+We used the author's code with some additions to accommodate our new datasets and other models. We ran all experiments using a combination of hyperparameters given by the original authors over 5 seeds, mainly using RTX8000 for 125 hours.
+
+\subsubsection*{Results}
+
+We validate the original paper's claims by reproducing its metrics within the reported standard deviation, proving the method's competitiveness. Our extended trials highlight the method's potential applicability to real-world data and reveal new considerations about prompt template, language model, and seed for optimal performance.
+
+\subsubsection*{What was easy}
+
+The complete code implementation was available publicly with step-by-step instructions on how to get AMuLaP running with GLUE datasets. This made it easy to begin reproducing the work. Finding flagged and non-flagged tweets from Donald Trump to create our dataset was easy thanks to \url{thetrumparchive.com} which compiled this.
+
+\subsubsection*{What was difficult}
+
+The original code is lengthy and lacks information on implementation dependencies, making it time-consuming to understand. It is made only for GLUE tasks and RoBERTa models and needs modification to work on new experiments. Some language models are not built for mask completion, thus not directly suitable for AMuLaP, and required us to search for solutions extensively. Finally, as label engineering is also tied to prompt engineering, we find expanding the work through the template given in the code challenging without prior experience in manual prompt engineering.
+
+
+\subsubsection*{Communication with original authors}
+
+We did not feel the need to reach out to the authors as the method was well explained and simple to understand with basic probability knowledge and going through the code.
