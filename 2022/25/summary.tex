@@ -1,0 +1,26 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+In this work, we aim to reproduce the findings of the paper \textit{Explaining Deep Convolutional Neural Networks
+via Latent Visual-Semantic Filter Attention} (LaViSE). This paper presents a global post-hoc explanation framework for deep learning models that generates semantic explanations for CNN filters. To assess the reproducibility of this work, we verify the main claims made in the paper. More specifically, we evaluate whether the framework creates an accurate mapping to the semantic space, generates words which were not seen in the training data, and is able to generalize to any pre-trained CNN.
+
+\subsubsection*{Methodology}
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+To reproduce the experiments detailed in the original paper, we first obtained the author's code. However, we had to modify the code for the experiments to be executable, adding missing code, debugging, and making the code more maintainable. Additionally, we evaluated the model's generalizability to other CNNs. The project required a total of 62 GPU hours.
+
+\subsubsection*{Results}
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+Our recall scores and qualitative experiments validate all claims of the authors: the framework creates an accurate mapping between the visual and semantic space, can analyze any trained CNN regardless of original training data availability, and is able to generate novel out-of-dataset descriptions for filters.
+
+\subsubsection*{What was easy}
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The paper was well-written and easy to understand, with helpful figures illustrating the LaViSE framework that aided in the implementation process.
+
+\subsubsection*{What was difficult}
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to reproduce, or require a significant amount of work and resources to verify.
+The implementation of the methodology outlined in the paper was particularly challenging due to limited documentation and insufficient details about parts that were not implemented in the existing codebase. Additionally, some experiments could not be recreated because they would require a significant amount of resources to verify.
+
+\subsubsection*{Communication with original authors}
+% Briefly describe how much contact you had with the original authors (if any).
+We contacted the authors to clarify missing information and aspects that were not functioning as expected. However, we did not receive a response to our questions.
