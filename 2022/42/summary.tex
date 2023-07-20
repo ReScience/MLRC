@@ -1,0 +1,19 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+In this work, we attempt to reproduce the results of the NeurIPS 2022 paper ``Towards Understanding Grokking: An Effective Theory of Representation Learning'' \cite{understanding_grokking}. This study shows that the training process can happen in four regimes: memorization, grokking, comprehension and confusion. We first try to reproduce the results on the toy example described in the paper and then switch to the MNIST dataset. Additionally, we investigate the consistency of phases depending on data and weight initialization and propose smooth phase diagrams for better visual perception.
+
+\subsubsection*{Methodology}
+There is no open-source code for the paper. Therefore, we re-implemented all described experiments by ourselves. We also used the code provided by the authors to validate training hyperparameters not stated in the paper. As for the computational resources, we spent around $30$ CPU and $125$ GPU hours on the NVIDIA V100 GPU.
+
+\subsubsection*{Results}
+We succeeded in reproducing phase diagrams for the toy example. For the MNIST dataset, we observed a behavior similar to the one from the paper. We used a wider range of hyperparameters leading us to an extra area with the memorization phase. We also argue that the original memorization phase is even more delayed\break grokking. Therefore, the authors' findings about the MNIST phases are incomplete.
+
+\subsubsection*{What was easy}
+After receiving additional instructions from the authors about the details not mentioned in the paper, the reproduction of all results was easy because the authors put significant work into the setup description. Moreover, it was easy to suggest new experiments, as they followed logically from the previous.
+
+\subsubsection*{What was difficult}
+Generally, it was difficult to reproduce the results because some critical hyperparameters (the activation function for the toy model and the batch size for MNIST) were not stated in the paper. Considering MNIST, it took too much time to iterate over all hyperparameters' values, as grokking requires about $100$k training iterations, which is approximately $30$ minutes on the V100 GPU.
+
+\subsubsection*{Communication with original authors}
+We contacted the authors two times and asked for the validation of the setup. They responded quickly and were very helpful. The authors provided us with the code for the toy example and the MNIST dataset. We did not execute it for our experiments but used it for checking the training details and hyperparameters.
