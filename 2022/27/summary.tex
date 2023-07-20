@@ -1,0 +1,39 @@
+\section*{\centering Reproducibility Summary}
+
+%\textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.}
+
+\subsubsection*{Scope of Reproducibility}
+% {\color{red} State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper). This is meant to place the work in context, and to tell a reader the objective of the reproduction.}
+The original authors present CrossWalk, an edge-reweighting algorithm which can be used in conjunction with random walk based node representation learning methods. We validate their claims of CrossWalk being characterized by a fairness-enhancing property, meaning it significantly reduces disparity, a measure of group fairness, and performance-conserving property, meaning it has an insignificant effect on task performance.
+
+% On a theoretical note, we address shortcomings of the algorithm and propose an extension to alleviate them. We also prove a desirable theoretical property of the extended algorithm.
+
+
+\subsubsection*{Methodology}
+
+% {\color{red} Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments.}
+
+%The authors published a repository with their experiments including most of the datasets used. 
+To perform a robust validation of the original authors' claims, we develop an independent, highly-modular code-base with complete re-implementation of the original experiments. Our design enables its use by other researchers in the future to easily run ablation experiments with different datasets, experiments, or even algorithms that can be employed in conjunction with CrossWalk. Furthermore, we create an accessible implementation of CrossWalk itself under the MIT license.
+
+\subsubsection*{Results}
+
+% {\color{red} Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.}
+
+Our results provide solid evidence in favor of the performance-conserving property of CrossWalk. However, we find inconclusive evidence of the fairness-enhancing property of CrossWalk, mostly due to large variation in the reproduced disparity values. On the other hand, we find additional evidence in its favor by performing an experiment portraying the influence of the hyperparameters of CrossWalk.
+
+\subsubsection*{What was easy}
+
+The original authors provide a code-base implementing their methodology, which greatly helped us in understanding the material. Furthermore, their methodology is very modular, meaning we could test most parts of the pipeline independently. 
+
+\subsubsection*{What was difficult}
+
+% {\color{red} Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.}
+
+The original work contains discrepancies between specification of CrossWalk in the formulas, the pseudo-code, and the code-base. Also, we were unable to reproduce results for one of the datasets because of missing data. Finally, the original implementation is inadequately documented and its execution required numerous manual steps which were non-trivial and time consuming.
+
+\subsubsection*{Communication with original authors}
+
+%Briefly describe how much contact you had with the original authors (if any).
+
+To clarify some details regarding the original implementation and its structure, we reached out to the authors when beginning to reproduce their work. The authors were quick to respond and answered all of our questions.
