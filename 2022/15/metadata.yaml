@@ -1,0 +1,121 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] On the Reproducibility of \"FairCal: Fairness Calibration for Face Verification\""
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Marga Don
+    orcid: 0009-0001-5435-8935
+    email: margajdon@gmail.com
+    affiliations: 1,*
+    
+  - name: Satchit Chatterji
+    orcid: 0009-0003-8648-1158
+    email: satchit.chatterji@gmail.com
+    affiliations: 1
+  
+  - name: Milena Kapralova
+    orcid: 0009-0008-9601-6897
+    email: m.kapralova@uva.nl
+    affiliations: 1
+  
+  - name: Ryan Amaudruz
+    orcid: 0009-0004-7415-1941
+    email: ryan@maudruz.ch
+    affiliations: 1
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, The Netherlands
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x, machine learning, python, reproducibility, fairness, face verification, calibration, clustering, bias reduction
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/margajdon/reproduction-FAIRCAL
+  - doi: 10.5281/zenodo.7941382
+  - swh: swh:1:dir:875537f11cad3f77fcd8fc7b313d27605118a634
+
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "T. Salvador, S. Cairns, V. Voleti, N. Marshall, and A. M. Oberman. 'FairCal: Fairness Calibration for Face Verification.' In: International Conference on Learning Representations. 2022"
+ - bib: 2106.03761  # Bibtex key (if any) in your bibliography file
+ - url: https://openreview.net/pdf?id=nRj0NcmSuxb  # URL to the PDF, try to link to a non-paywall version
+ - doi: 10.48550/arXiv.2106.03761 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility — This paper aims to reproduce the study FairCal: Fairness Calibration for Face Verification by Salvador et al., focused on verifying three main claims: FairCal (introduced by the authors) achieves state‐of‐the‐art (i) global accuracy, (ii) fairness-calibrated probabilities and (iii) equality in false positive rates across sensitive attributes (i.e. predictive equality). The sensitive attribute taken into account is ethnicity. Methodology — Salvador et al. provide partial code via a GitHub repository. Additional code to generate image embeddings from three pretrained neural network models were based on existing repositories. All code was refactored to fit our needs, keeping extendability and readability in mind. Two datasets were used, namely, Balanced Faces in the Wild (BFW) and Racial Faces in the Wild (RFW). Additional experiments using Gaussian mixture models instead of K‐means clustering for FairCal validate the use of unsupervised clustering methods. The code was run on an AMD Ryzen 7 2700X CPU and NVIDIA GeForce GTX1080Ti GPU with a total runtime of around 3 hours for all experiments. Results — In most cases, we were able to reproduce results from the original paper to within 1 standard deviation, and observe similar trends. However, due to missing information about image pre‐processing, we were unable to reproduce the results exactly. What was easy — The original paper is clear and understandable. Furthermore, the authors provided a mostly working version of the code. Though the datasets are not freely available to the public, their authors supplied these to us swiftly after contacting them. What was difficult — While most of the code worked with slight changes, it was assumed there were files containing image embeddings available for both datasets, which the authors neither provided nor gave details about. We therefore pre‐processed and generated embeddings independent of the authors, which makes it more difficult to judge the overall reproducibility of their method. Additionally, we encountered difficulties while improving the efficiency and extendability of the code. Communication with original authors — We emailed the first author of the paper twice. First at the beginning of our undertaking, they were enthusiastic about our attempt, and clarified a few initial doubts about their implementation, the embeddings, and missing files. As per the writing of this paper, they have not responded to the second email."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=uVHUy7CWCL
+
+contributors:
+  - name: Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates: 
+  - received:  February 4, 2023
+  - accepted:  April 19, 2023
+  - published:  July 20, 2023
+
+# This information will be provided by the editor
+article:
+  - number: 15
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name: "ReScience C"
+  - issn: 2430-3658
+  - volume: 9
+  - issue: 2
