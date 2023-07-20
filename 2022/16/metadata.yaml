@@ -1,0 +1,158 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it shoudl be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+title: "[Re] Reproducibility Study: Label-Free Explainability for
+Unsupervised Models"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author
+authors:
+  - name: Sławomir Garcarz
+    orcid: 0009-0001-6360-1343
+    email: slawek.garcarz@gmail.com
+    affiliations: 1,2,*
+    
+  - name: Andreas Giorkatzi
+    orcid: 0009-0002-4837-8996
+    email: giorkatzi.andreas@gmail.com
+    affiliations: 1,2      # * is for contact author
+   
+  - name: Ana Ivășchescu
+    orcid: 0009-0003-6528-8332
+    email: anaiv9cs@gmail.com
+    affiliations: 1,2    
+    
+  - name: Theodora-Mara Pîslar
+    orcid: 0009-0008-8050-1978
+    email: pislarmara589@gmail.com
+    affiliations: 1,2    
+    
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    University of Amsterdam
+    address: Amsterdam, Netherlands
+    
+  - code:    2
+    name:    All authors contributed equally
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords: rescience c, rescience x, machine learning, label-free explainability, explainability
+
+# Code URL and DOI (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo,
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/ayiork/Label-Free-XAI
+  - doi: 
+  - swh: swh:1:dir:e76ce9ca64bef8b8ab34ef48336017ade33d40b9
+# Date URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: Crabbé, Jonathan, and Mihaela van der Schaar. "Label-free explainability for unsupervised models." arXiv preprint arXiv:2203.01928 (2022). # Full textual citation
+ - bib:  crabbé2022labelfree # Bibtex key (if any) in your bibliography file
+ - url:  https://arxiv.org/pdf/2203.01928.pdf # URL to the PDF, try to link to a non-paywall version
+ - doi:  https://doi.org/10.48550/arXiv.2203.01928 # Regular digital object identifier
+
+# Don't forget to surround abstract with double quotes
+abstract: "Scope of Reproducibility — This work studies the reproducibility of the paper ”Label-Free
+Explainability for Unsupervised Models” by Crabbé and van der Schaar to validate their
+main claims. These state that: (1) their extension of linear feature importance methods
+to the label-free setting is able to extract the key attributes of the data, (2) the adaptation
+of example importance methods to the unsupervised setting succeeds in highlighting
+the most influential examples, (3) different pretext tasks do not produce interchangeable
+representations and (4) the interpretability of saliency maps is uncorrelated to the level
+of disentanglement between individual latent units.
+
+Methodology — The authors provided the code written in PyTorch needed to reproduce all
+the experiments. Some parts of the code were modified in order to extend the original
+experiments. The total computation time required to perform the original and extended
+versions of the experiments is 103 GPU hours. Most of the experiments were performed
+on NVIDIA TITAN RTX GPU.
+
+Results — The plots supporting the label-free feature and example importance match the
+ones from the paper, except for the label-free feature importance experiment for CIFAR-
+10. Similarly, the Pearson correlation results were successfully reproduced. Due to the
+nature of the autoencoders used for evaluation, we could not obtain the exact numerical
+results. However, we visually and numerically compare the trends, and in most cases,
+we observe that our results are similar to the ones in the paper.
+
+What was easy — The paper comes with publicly available code and an extensive appendix
+containing the setup for all experiments. With that, we were able to reproduce all the
+experiments with only minor changes to the code.
+
+What was difficult — Despite the fact that running the original experiments was straight-
+forward, extending them to new datasets or models was more challenging. Moreover,
+some of the experiments are more resource‐consuming and require more time to run.
+
+Communication with original authors — We contacted the authors to resolve our concerns
+regarding some of the results. They were very helpful and answered all of our questions.
+Moreover, they provided us with a pre-trained SimCLR model. We used this model to
+validate our results."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+  
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+  
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review: 
+  - url: https://openreview.net/forum?id=sF_vYZSxSV
+
+contributors:
+  - name: Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2023
+  - accepted:  April 19, 2023
+  - published:  July 20, 2023
+
+# This information will be provided by the editor
+article: 
+  - number: 16
+  - doi:    # DOI from Zenodo
+  - url:    # Final PDF URL (Zenodo or rescience website?)
+
+# This information will be provided by the editor
+journal:
+  - name:   "ReScience C"
+  - issn:   2430-3658
+  - volume: 9
+  - issue: 2
+
