@@ -1,0 +1,45 @@
+% DO NOT EDIT - automatically generated from metadata.yaml
+
+\def \codeURL{https://github.com/MLReproHub/SMAE}
+\def \codeDOI{}
+\def \codeSWH{swh:1:dir:4d37d466bafc5dc45bf5ba68caa53f207e6d0702}
+\def \dataURL{}
+\def \dataDOI{}
+\def \editorNAME{Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav}
+\def \editorORCID{}
+\def \reviewerINAME{}
+\def \reviewerIORCID{}
+\def \reviewerIINAME{}
+\def \reviewerIIORCID{}
+\def \dateRECEIVED{04 February 2023}
+\def \dateACCEPTED{19 April 2023}
+\def \datePUBLISHED{20 July 2023}
+\def \articleTITLE{[Re] Masked Autoencoders Are Small Scale Vision Learners: A Reproduction Under Resource Constraints}
+\def \articleTYPE{Replication}
+\def \articleDOMAIN{ML Reproducibility Challenge 2022}
+\def \articleBIBLIOGRAPHY{bibliography.bib}
+\def \articleYEAR{2023}
+\def \reviewURL{https://openreview.net/forum?id=KXfjZPL5pqr}
+\def \articleABSTRACT{Scope of Reproducibility — The Masked Autoencoder (MAE) was recently proposed as aframework for efficient self-supervised pre-training in Computer Vision [1]. In this paper, we attempt a replication of the MAE under significant computational constraints. Specifically, we target the claim that masking out a large part of the input image yields a nontrivial and meaningful self-supervisory task, which allows training models that generalize well. We also present the Semantic Masked Autoencoder (SMAE), a novel yet simple extension of MAE which uses perceptual loss to improve encoder embeddings. Methodology — The datasets and backbones we rely on are significantly smaller than those used by [1]. Our main experiments are performed on Tiny ImageNet (TIN) [2] and transfer learning is performed on a low-resolution version of CUB-200-2011 [3]. We use a ViT-Lite [4] as backbone. We also compare the MAE to DINO, an alternative framework for self-supervised learning [5]. The ViT, MAE, as well as perceptual loss were implemented from scratch, without consulting the original authors’ code. Our code is available at https://github.com/MLReproHub/SMAE. The computational budget for our reproduction and extension was approximately 150 GPU hours. Results — This paper successfully reproduces the claim that the MAE poses a nontrivial and meaningful self-supervisory task. We show that models trained with this framework generalize well to new datasets and conclude that the MAE is reproducible with exception for some hyperparameter choices. We also demonstrate that MAE performs well with smaller backbones and datasets. Finally, our results suggest that the SMAE extension improves the downstream classification accuracy of the MAE on CUB (+5 pp) when coupled with an appropriate masking strategy. What was easy — Given prior experience with a deep learning framework, re-implementing the paper was relatively straightforward, with sufficient details given in the paper. What was difficult — We faced challenges implementing efficient patch shuffling and tuning hyperparameters. The hyperparameter choices from [1] did not translate well to a smaller dataset and backbone. Communication with original authors — We have not had contact with the original authors.}
+\def \replicationCITE{K. He, X. Chen, S. Xie, Y. Li, P. Dollár, and R. Girshick. "Masked autoencoders are scalable vision learners." In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2022, pp. 16000–16009}
+\def \replicationBIB{}
+\def \replicationURL{https://openaccess.thecvf.com/content/CVPR2022/papers/He_Masked_Autoencoders_Are_Scalable_Vision_Learners_CVPR_2022_paper.pdf}
+\def \replicationDOI{10.1109/CVPR52688.2022.01553}
+\def \contactNAME{Simon Ekman von Huth}
+\def \contactEMAIL{nomisevh@gmail.com}
+\def \articleKEYWORDS{rescience c, python, pytorch, machine learning, deep learning, computer vision, self-supervised learning, masked autoencoder, semantic, perceptual, reproduction, replication, reproducibility, image classification, small scale}
+\def \journalNAME{ReScience C}
+\def \journalVOLUME{9}
+\def \journalISSUE{2}
+\def \articleNUMBER{40}
+\def \articleDOI{}
+\def \authorsFULL{Athanasios Charisoudis, Simon Ekman von Huth and Emil Jansson}
+\def \authorsABBRV{A. Charisoudis, S.E.V. Huth and E. Jansson}
+\def \authorsSHORT{Charisoudis, Huth and Jansson}
+\title{\articleTITLE}
+\date{}
+\author[1,2,\orcid{0000-0003-4769-7813}]{Athanasios Charisoudis}
+\author[1,2,\orcid{0000-0001-5905-6162}]{Simon Ekman von Huth}
+\author[1,2,\orcid{0009-0000-7695-3543}]{Emil Jansson}
+\affil[1]{School of EECS, KTH Royal Institute of Technology, Stockholm, Sweden}
+\affil[2]{Equal contributions}

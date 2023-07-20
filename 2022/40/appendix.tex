@@ -1,0 +1,159 @@
+\section*{A Runtimes}
+\label{app: A}
+Table \ref{tab:runtime} reports the runtimes for our models on the TIN validation set without gradient computations. The SMAE does not increases the runtime significantly over the MAE.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}c|c|c@{}}
+\toprule
+\textbf{Model} & \textbf{Task}  & \textbf{Time (s)} \\ \midrule
+ViT-Lite       & Classification & 11                \\
+MAE            & Reconstruction & 5                 \\
+SMAE           & Reconstruction & 5                  \\ \bottomrule
+\end{tabular}
+\caption{The runtime of various models for the TIN validation set of 10\,000 images. The runtimes are reported for a batch size of 128 on a NVIDIA GTX 1080 Ti with no gradient computations.}
+\label{tab:runtime}
+\end{table}
+
+\section*{B Hyperparameters for DINO}
+\label{app: B}
+A non-exhaustive manual search was performed for learning rate ($1e{-4}$, $5e{-4}$) and last layer normalization. We also manually searched the momentum ($0.9995$, $0.9998$, $0.9960$), warm-up epochs ($0$, $30$) and temperature ($0.02$, $0.04$) for the teacher. Due to computational constraints, we had to disable multi-crop. The final hyperparameters for DINO are presented in Table \ref{tab:hparams_dino}.
+
+%##################################################################################################
+\begin{table}[h!]
+\tablestyle{6pt}{1.02}
+\scriptsize
+\begin{tabular}{y{96}|y{68}}
+config & \multicolumn{1}{c}{value} \\
+\shline
+base learning rate & $1e{-4}$ \\
+min learning rate & $1e{-6}$ \\
+weight decay & 0.04 \\
+max weight decay & 0.4 \\
+teacher momentum & 0.9995 \\
+batch size & 128 \\
+warmup epochs \cite{sgdwarmup} & 10 \\
+training epochs & 100 \\
+out dim & 1024 \\
+hidden dim & 512 \\
+bottleneck dim & 128 \\
+local crops number & 0 \\
+teacher warmup temperature & 0.02 \\
+teacher temperature & 0.04 \\
+teacher warmup episodes & 30 \\
+normalize last layer & \checkmark \\
+gradient clipping & 3 \\
+global crops scale & (0.6, 1)
+\end{tabular}
+\vspace{-.5em}
+\caption{\textbf{Hyperparameters for DINO.}}
+\label{tab:hparams_dino} \vspace{-.5em}
+\end{table}
+%##################################################################################################
+
+
+\section*{C Hyperparameters for SqueezeNet}
+\label{app: C}
+We performed a manual search for learning rate ($5e{-4}$, $1e{-3}$, $4e{-3}$) and weight decay ($0.05$, $0.15$, $0.1 $). The final parameters are presented in Table \ref{tab:hparams_squeeze}.
+
+%##################################################################################################
+\begin{table}[h!]
+\tablestyle{6pt}{1.02}
+\scriptsize
+\begin{tabular}{y{96}|y{68}}
+config & \multicolumn{1}{c}{value} \\
+\shline
+optimizer & AdamW \cite{adamw} \\
+base learning rate & $1e{-3}$ \\
+weight decay & 0.15 \\
+optimizer momentum ($\beta_1, \beta_2$) & $0.9, 0.999$ \cite{adam_betas} \\
+batch size & 128 \\
+learning rate schedule & cosine 
+decay \cite{SGDR} \\
+warmup epochs \cite{sgdwarmup} & 10 \\
+training epochs & 200 \\
+augmentation & RandAug (2, 9) \cite{randaugment} \\
+dropout rate & 0.5 \\
+\end{tabular}
+\vspace{-.5em}
+\caption{\textbf{Hyperparameters for SqueezeNet.}}
+\label{tab:hparams_squeeze} \vspace{-.5em}
+\end{table}
+%##################################################################################################
+
+\section*{D Hyperparameter Grid Search for MAE}
+\label{app: D}
+
+
+
+In order to find appropriate values for MAE hyperparameters we employed a grid search approach. As explained in subsection \ref{sec:hyperparameters}, the MAE encoder architecture follows that of ViT-Lite-7/4 \cite{hassani}. We employ sinusoidal position encoding \cite{attention}. The MAE decoder architecture follows the encoder but is lighter, according to \cite{mae}. We fix the decoder width to $128$ and the number of nodes in its attention layers to $256$ throughout all our experiments. 
+\\\\
+During the grid search, we pre-trained the ViT-Lite backbone for $200$ epochs and then linearly-probed it for $50$, both on TIN. The weight decay ($wd$) and learning rate ($lr$) for the AdamW optimizer were grid searched in the set $\{0.05, 0.15\}$ and $\{1e{-3}, 1.5e{-4}, 5e{-4}\}$ respectively. In addition, we repeated this grid search for two different decoder depths (i.e. number of layers in the decoder): $\{2, 3\}$. In Table \ref{tab:gridsearch} we present the validation set accuracy for different hyperparameter settings.
+
+\begin{table}[!htb]
+\centering
+\begin{tabular}{ cc }   % top level tables, with 2 columns
+% leftmost table of the top level table
+\begin{tabular}{ l|cc } 
+\toprule
+ & $wd{=}0.05$ & $wd{=}0.15$ \\\midrule
+$lr{=}1e{-3}$ & 28.07 & - \\
+$lr{=}1.5e{-4}$ & 13.75 & 27.15 \\
+$lr{=}5e{-4}$ & 11.89 & 32.04 \\
+\bottomrule  
+\end{tabular} \vspace{1mm} &  % starting rightmost sub table
+% table 2
+\begin{tabular}{ l|cc } 
+\toprule
+ & $wd{=}0.05$ & $wd{=}0.15$ \\\midrule
+$lr{=}1.5e{-4}$ & 13.75 & 27.15 \\
+$lr{=}5e{-4}$ & 11.89 & 32.04 \\
+\bottomrule  
+\end{tabular} \vspace{1mm} \\
+$dd=2$ & $dd=3$ \\  
+\end{tabular}
+\vspace{-2mm}
+\caption{Grid search results. Each sub-table contains the values for a single decoder depth; 2 (left) and 3 (right). Each cell contains the top-1 validation accuracy for linear probing of a model pre-trained under the corresponding optimizer settings.\label{tab:gridsearch}}
+\end{table}
+
+The hyperparameters used for pre-training, fine-tuning, and linear probing on TIN are presented in Table \ref{tab:hparams_tin}. When fine-tuning on CUB we use the same hyperparameters as for TIN, but halve the learning rate to account for the difference in dataset sizes.
+
+%##################################################################################################
+\begin{table}[h!]
+\tablestyle{6pt}{1.02}
+\scriptsize
+\begin{tabular}{y{96}|y{68}|y{68}|y{68}}
+\multirow{2}{*}{config} & \multicolumn{3}{c}{value} \\
+& Pre-Training & Fine-Tuning & Linear-Probing \\
+\shline
+optimizer & AdamW \cite{adamw} & AdamW & Adam \cite{adam} \\
+base learning rate & $5e{-4}$ & $1e{-3}$ & $1e{-3}$ \\
+weight decay & 0.15 & 0.05 & - \\
+optimizer momentum ($\beta_1, \beta_2$) & $0.9, 0.95$ \cite{adam_betas} & $0.9, 0.999$ & $0.9, 0.95$ \\
+batch size & 128 & 128 & 128 \\
+learning rate schedule & cosine 
+decay \cite{SGDR} & cosine decay & cosine decay  \\
+warmup epochs \cite{sgdwarmup} & 20 & 5 & 2 \\
+training epochs & 400 & 100 & 50 \\
+augmentation & - & RandAug (2, 9) \cite{randaugment} & - \\
+\end{tabular}
+\vspace{-.5em}
+\caption{Training settings for the different training tasks on TIN.}
+\label{tab:hparams_tin} \vspace{-.5em}
+\end{table}
+%##################################################################################################
+\section*{E Perceptual loss (SMAE with $\alpha=1$)}
+\label{app: E}
+We observe that when applying uniform random masking using only perceptual loss (SMAE with $\alpha=1$), the downstream classification performance notably decreases. When instead using block masking, we observe a notable performance improvement, especially when transferring to CUB. The results of the corresponding runs are given in Table \ref{tab:percpeptual}. We remark that pre-training with only perceptual loss appears to be a viable self-supervised training scheme.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ l|cc } 
+    \toprule
+     & TIN & CUB \\\midrule
+    random & \textbf{52.70} & 39.67 \\
+    block & 51.05 & \textbf{42.90} \\
+    \bottomrule  
+    \end{tabular}
+    \caption{Top-1 validation accuracy for image classification on TIN and CUB with SMAE($\alpha=1$), i.e only using perceptual loss.}\label{tab:percpeptual}
+\end{table}
