@@ -1,0 +1,109 @@
+\section{Appendix} \label{sec:appendix}
+
+\subsection{\textit{UFRGS Entrance Exam and GPA} dataset}\label{sec:appendix1}
+
+The following section contains the results considering the second dataset used for reproduction of the original experiments as described in section \ref{sec:datasets} and \ref{sec:experiments}. In this dataset sex is used as the fairness attribute, and race as the demographic attribute. 
+
+The hyperparameters values used for these experiments are summarised in Table \ref{tab:brazil_hyperparams}.
+
+\begin{table}[ht]
+\centering
+\footnotesize
+    \begin{tabular}{l|c|c|c|c|c|c}
+    Constraint & $\epsilon$ & train / test & Dc / Df & n-iters & $\delta$ & $\alpha$* \\\hline 
+    DI & -0.8 & 0.4 & 0.4 &  2000 & 0.05 & 0.25\\
+    DP & 0.1 & 0.4 & 0.4 & 2000 & 0.05 & 0.25 \\
+    \end{tabular}
+    \caption{Hyperparameter values for the experiments run with the \textit{UFRGS GPA} dataset specified for Disparate Impact (DI) or Demographic Parity (DP) for both a known and unknown demographic shift. $\alpha$ is only used in the case of an unknown shift.}
+    \label{tab:brazil_hyperparams}
+\end{table}
+
+Shown in figure \ref{fig:brazil_k_shift} are the results under a known demographic shift with DP and DI as the fairness constraints. Results under unknown demographic shift considering DP and DI as the fairness constraints are shown in figure \ref{fig:brazil_unk_shift}.
+
+\begin{figure}[ht]
+    \begin{subfigure}{\linewidth}
+      \centering
+      \includegraphics[scale=0.5]{figures/iclr_fixed_demographic_shift_brazil_rl/iclr_brazil_fixed_ds_rl_dp.png}
+      \caption{Demographic Parity}
+      \label{fig:brazil_k_dp}
+    \end{subfigure}
+    \begin{subfigure}{\linewidth}
+      \centering
+      \includegraphics[scale=0.5]{figures/iclr_fixed_demographic_shift_brazil_rl/iclr_brazil_fixed_ds_rl_di.png}
+      \caption{Disparate Impact}
+      \label{fig:brazil_k_di}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \includegraphics[width=\linewidth]{figures/iclr_antag_demographic_shift_brazil_rl/iclr_legend.png}
+    \end{subfigure}
+    
+    \caption{Results when enforcing fairness constraints under known demographic shift using the \textit{UFRGS GPA} dataset. For both fairness constraints DP and DI, the leftmost graph shows the probability of \texttt{NO\_SOLUTION\_FOUND}, the middle column shows the accuracies, and the rightmost column shows the failure rates.}
+    \label{fig:brazil_k_shift}
+\end{figure}
+
+
+
+\begin{figure}[ht]
+    \begin{subfigure}{\linewidth}
+      \centering
+      \includegraphics[scale=0.5]{figures/iclr_antag_demographic_shift_brazil_rl/iclr_brazil_antag_ds_rl_dp.png}
+      \caption{Demographic Parity}
+      \label{fig:brazil_unk_dp}
+    \end{subfigure}
+    \begin{subfigure}{\linewidth}
+      \centering
+      \includegraphics[scale=0.5]{figures/iclr_antag_demographic_shift_brazil_rl/iclr_brazil_antag_ds_rl_di.png}
+      \caption{Disparate Impact}
+      \label{fig:brazil_unk_di}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+    \includegraphics[width=\linewidth]{figures/iclr_antag_demographic_shift_brazil_rl/iclr_legend.png}
+    \end{subfigure}
+    
+    \caption{Results when enforcing fairness constraints under unknown demographic shift using the \textit{UFRGS GPA} dataset. For both fairness constraints DP and DI, the leftmost graph shows the probability of \texttt{NO\_SOLUTION\_FOUND}, the middle column shows the accuracies, and the rightmost column shows the failure rates.} 
+    \label{fig:brazil_unk_shift}
+\end{figure}
+
+\subsection{\textit{UCI - Adult Census} Failure Rates} \label{sec:failure_rates_appendix}
+In this section, the failure rates for each algorithm with the \textit{UCI Adult Census} dataset, as mentioned in section \ref{sec:discussion_fail}, are provided in Figures \ref{fig:adult_fr_unk} and \ref{fig:adult_fr_k}.
+
+\begin{figure}[!h]
+    \begin{subfigure}{0.5\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_adult_antag_ds_rl_dp.png}
+      \caption{Demographic Parity}
+    \end{subfigure}
+    \begin{subfigure}{0.5\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_adult_antag_ds_rl_di.png}
+      \caption{Disparate Impact}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+    \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_legend.png}
+    \end{subfigure}
+    \caption{Failure rates for each algorithm under unknown demographic shift for fairness constraints DP and DI with the \textit{UCI Adult Census} dataset. The confidence bound is indicated with the dotted line.} 
+    \label{fig:adult_fr_unk}
+\end{figure}
+
+
+\begin{figure}[ht]
+    \begin{subfigure}{0.5\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_adult_fixed_ds_rl_dp.png}
+      \caption{Demographic Parity}
+    \end{subfigure}
+    \begin{subfigure}{0.5\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_adult_fixed_ds_rl_di.png}
+      \caption{Disparate Impact}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+    \includegraphics[width=\linewidth]{figures/adult_failure_rates/iclr_legend.png}
+    \end{subfigure}
+    \caption{Failure rate (in percentages) for each algorithm under known demographic shift for fairness constraints DP and DI with the \textit{UCI Adult Census} dataset. The confidence threshold is indicated with the dotted line.} 
+    \label{fig:adult_fr_k}
+\end{figure}
+
+\subsection{Numerical Results}\label{sec:app_num_results}
+The tables in this section (tables \ref{tab:uci_num_k_DP}, \ref{tab:uci_num_k_DI}, \ref{tab:uci_num_unk_DP}, and \ref{tab:uci_num_unk_DI}) provide numerical results of the accuracy scores on the experiments run with the \textit{UCI Adult Census} dataset, as set out in section \ref{sec:discussion_accuracy}.
+\input{tablesappendix.tex}

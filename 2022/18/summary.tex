@@ -1,0 +1,37 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+This work studies the reproducibility of the paper \textit{Fairness guarantees under demographic shift} (2022) by \citeauthor{giguere2022fairness}. Specifically, the authors discuss \texttt{Shifty}, an algorithm that provides high-confidence guarantees that a user-specified fairness constraint will hold in the case of a demographic shift between training and deployment data. The authors claim that \textit{Shifty} achieves this without any significant loss of accuracy when compared to a number of other baseline algorithms.
+
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+Using the open-source code provided by the authors, experiments were conducted to collect the results of \texttt{Shifty} and a number of other baseline algorithms when deployed on three different datasets. Results were collected in the form of accuracy, failure rate, and the probability of not finding a fair solution. The experiments in this reproducibility study were conducted on a total of 115 CPU hours. 
+
+\subsubsection*{Results}
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+The claim that \texttt{Shifty} guarantees fairness with high confidence is strongly confirmed by the reproduction results of this study. It was also found in this reproducibility study that \texttt{Shifty} achieves accuracy scores comparable to those of other fairness algorithms.
+
+%It is further confirmed that only a minor decrease in accuracy with \texttt{Shifty} occurs when compared to the other Seldonian algorithms. except when considering an unknown shift with Disparate Impact as the fairness constraint. In that case, \texttt{Shifty} has a decrease in accuracy of 10\% when compared to the other algorithms. 
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The open-source code was structured in a way that allowed us to make alterations to the experimental setup or the implementations of the models. The original datasets were also provided in a structured manner and were already standardized.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+Modifications to the code were necessary in order to run this code efficiently and without errors; in the original code, there were packages missing, redundant functions and files, and mistakes in the handling of the user-specified fairness constraints. 
+
+\subsubsection*{Communication with original authors}
+
+% Briefly describe how much contact you had with the original authors (if any).
+The authors did not respond to our inquiries, resulting in no communication with the original authors.
