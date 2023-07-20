@@ -1,0 +1,88 @@
+\newpage
+
+\title{\textbf{Appendix}}
+\newline
+
+\chapter{\textbf{A \quad Image captioning models}}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Default value: 1
+    \setlength{\tabcolsep}{6.25pt} % Default value: 6pt
+    \begin{tabular}{p{0.65in}p{3.1in}p{1.5in}}
+    \toprule
+        Model & Description \\
+        \hline
+        NIC \cite{NIC:2015} & \textbf{N}eural \textbf{I}mage \textbf{C}aption generator combines a convolutional neural network (CNN) encoder and a long short-term memory (LSTM) decoder \\
+        
+        SAT \cite{SAT:2015} & \textbf{S}how, \textbf{A}ttend and \textbf{T}ell: Neural image caption generation with visual attention\\
+        
+        FC \cite{Att2inFC:2016} &  Encodes input images using a deep CNN and embeds it through a linear projection with word one-hot vectors that are embedded linearly \\
+        
+        Att2in \cite{Att2inFC:2016} & Attention model that dynamically re-weights the input spatial (CNN) features to focus on specific regions of the image \\
+        
+        UpDn \cite{UpDn:2017} & Combined bottom-\textbf{up} and top-\textbf{down} attention mechanism that enables attention to be calculated at the level of objects \\
+        
+        Transformer \cite{transformer:2017} & Network architecture based solely on attention mechanisms \\
+        
+        OSCAR \cite{OSCAR:2020} & \textbf{O}bject-\textbf{S}emanti\textbf{c}s \textbf{A}ligned P\textbf{r}e-training, which uses object tags detected in images as anchor points to ease the learning of alignments \\
+        
+        NIC+ \cite{NICplusNICEqualizer:2018} & Version of NIC that is trained on both the MSCOCO and MSCOCO-Bias dataset consisting of images of male/female \\
+        
+        NIC+ Equalizer \cite{NICplusNICEqualizer:2018} & NIC+ with a gender bias mitigation loss forcing the model to predict gender words based only on the area of the person \\
+        
+    \bottomrule 
+    \end{tabular}
+    \caption{A full overview of all nine evaluated image captioning models}
+    \label{table:overview-caption-models}
+\end{table}
+
+\chapter{\textbf{B \quad Language models}}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1} % Default value: 1
+    \begin{tabular}{p{0.8in}p{0.8in}p{0.8in}p{0.79in}p{1in}}
+    \toprule
+        Model & Pre-trained/Fine-tuned & Total parameters & Trainable parameters & Hidden dimension size \\
+        \hline
+        LSTM \cite{6795963} & Fine-tuned & 2,372,157 & Same as total & 256\\
+        BERT-pre \cite{bertpaper} & Pre-trained & 109,681,666 & 199,426 & 256 \\
+        BERT-ft \cite{bertpaper} & Fine-tuned & 109,681,666 & Same as total & 256 \\
+        
+    \bottomrule 
+    \end{tabular}
+    \caption{Overview of the language models}
+    \label{table:languagueModels}
+\end{table}
+
+\newpage
+\chapter{\textbf{C \quad Attribution scores for the fine-tuned BERT}}
+
+\begin{table}[H]
+\begin{center}
+\setlength{\tabcolsep}{4.25pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.25} % Default value: 1
+\begin{tabular}{lrrr}
+\toprule
+\multicolumn{1}{c}{} & 
+\multicolumn{3}{c}{BERT-ft}
+
+\\
+\cmidrule(r){2-4}
+Model & Female & Male & Sum \\
+\hline
+NIC \cite{NIC:2015} & $1.08$ & $0.86$ & $1.95$ \\
+
+NIC+ \cite{NICplusNICEqualizer:2018} & $0.98$ & $1.13$ & $2.11$\\
+
+NIC+Equalizer \cite{NICplusNICEqualizer:2018} & $1.07$ & $1.09$ & $2.16$ \\
+
+\bottomrule
+\end{tabular}
+\caption{Attribution scores for the BERT-ft model run on a seed 0. }
+\label{table:attributionSumsBert}
+\end{center}
+\end{table}
+
+
