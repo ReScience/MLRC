@@ -1,0 +1,25 @@
+\section*{\centering Reproducibility Summary}
+
+\subsubsection*{Scope of Reproducibility}
+
+The original paper claims that, due to numerical precision, the value of ReLU'(0) plays a bigger role than what we might expect, especially during half-precision training. We try to analyze the impact of the choice of the subgradient, as well as the behaviour of the models for admissible values. Code available on GitHub.
+
+\subsubsection*{Methodology}
+
+The original paper provides some code for reproducibility, so our focus has been on confirming the paper's claims with different tests in the same direction. After we reproduced the first experiment, we run experiments to understand if the original claim generalizes and could be applied to real-life hyperparameter tuning scenarios.
+
+\subsubsection*{Results}
+
+The results that we got were very coherent with the ones exposed in the paper. Although we were not able to run many experiments with large models, we got a big insight into the topic. Something that is somehow negligible in theory, combined with finite-precision arithmetics and the bad election of the subgradient, might lead to chaotic behaviour. This gives big support to the default values and gives a solid answer to the question: What would it be the best subgradient election?  The theory says: it doesn't matter, yet it does.
+
+\subsubsection*{What was easy}
+
+Thanks to PyTorch's built-in functions and backpropagation method, customizing the functions was easy because we just had to make the parameters customizable. Model building was also a simple task both for the fully-connected model and MobileNet (our implementation is a customization of PyTorch's built-in version with a customizable activation function). 
+
+\subsubsection*{What was difficult}
+
+Reproducing many experiments was perhaps one of the biggest challenges, as we need time and computational resources to train several models for a better comparison. One approach we took was to make smaller, yet meaningful experiments to get the most out of our data and time. We also used a simple dataset (MNIST). Due to the stochastic nature of neural network training, controlling the behaviour of the different RNGs used within PyTorch was essential to make comparisons and make the experiments reproducible, which was especially puzzling with MobileNet.
+
+\subsubsection*{Communication with original authors}
+
+No contact with the authors yet.
