@@ -1,0 +1,76 @@
+\section*{\centering Reproducibility Summary}
+
+% \textit{Template and style guide to \href{https://paperswithcode.com/rc2022}{ML Reproducibility Challenge 2022}. The following section of Reproducibility Summary is \textbf{mandatory}. This summary \textbf{must fit} in the first page, no exception will be allowed. When submitting your report in OpenReview, copy the entire summary and paste it in the abstract input field, where the sections must be separated with a blank line.
+% }
+
+
+
+\subsubsection*{Scope of Reproducibility}
+
+% State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+% This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+% Something about SOTA fairness and accuracy results with FairCal.
+
+% This reproducibility paper verifies the claim that the FairCal and Oracle methods are fair with respect to race and obtain SOTA accuracy results in face verification.
+% The aim is to reproduce the values in Tables 2, 3 and 4 of the original paper.
+This reproducibility paper verifies the claim by \citeauthor{salvador2022faircal} in ``\textit{FairCal: Fairness Calibration for Face Verification}''~\cite{salvador2022faircal} that the FairCal and Oracle methods are fair with respect to sensitive attributes and obtain SOTA accuracy results in face verification when compared to FSN and FTC.
+The aim is to reproduce the relative\break{}values in Tables 2, 3 and 4 of the original paper for these methods.
+We also provide and empirically support an intuitive explanation of why FairCal outperforms Oracle.
+
+\subsubsection*{Methodology}
+
+% Briefly describe what you did and which resources you used. For example, did you use author's code? Did you re-implement parts of the pipeline? You can use this space to list the hardware and total budget (e.g. GPU hours) for the experiments. 
+
+% The authors provided partial code to create these results.
+% This code required embeddings for which no code is provided.
+% The pre-processing also did not have code
+%%% but the lack of used hyperparameter values was more detrimental.
+%  and the hyperparameters of the models used in the preprocessing were not comprehensively described, increasing the difficulty of reproducing.
+% Hardware used were personal laptops and a personal computer with an MSI GeForce GTX 1060-3GB GPU. % cluster with a Titan RTX used for at most 20 GPU hours.
+
+The authors provided partial code to create the results;
+Code to create and preprocess embeddings was missing, but code to run the experiments on these embeddings was provided.
+Nevertheless, we re-implement the code from scratch, keeping the data structure identical.
+Hardware used are personal laptops without GPU and a desktop with an MSI GeForce GTX 1060-3GB GPU.
+% To set up the metadata for the experiments we wrote additional scripts.
+
+\subsubsection*{Results}
+
+% \textbf{TODO: Update with final results!}
+% Compared to the data reported in the original paper, the reproduced results vary across methods and metrics, where some methods perform very similarly to the original paper through some metric, yet deviate using a different metric.
+Compared to the data reported in the original paper, the reproduced results vary across embedding models and evaluation metrics, where some combinations perform very similarly to the original paper while other combinations deviate significantly.
+Despite this, the claims of the original paper have been confirmed, which include no loss of accuracy, fairly calibrated subgroups and predictive equality.
+
+% Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsubsection*{What was easy}
+
+% Describe which parts of your reproduction study were easy. For example, was it easy to run the author's code, or easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+% \textbf{TODO: Make this flow as one part}
+
+Some parts of the reproduction went smoothly such as the accessibility of the data and models and the quick execution of the experiments. Furthermore, the paper was clear about evaluation metrics. Finally, code for the figures worked straight out of the box.
+% As the proposed methods %in the original paper 
+% are post-hoc calibrators, running experiments was fast, which allowed for thorough debugging and testing of many minor changes.
+% The original paper was furthermore very clear in which evaluation metrics were used and these were easy to implement and compare.
+% Getting access to the data and used models was generally without hiccups.
+% The code for generating Figures and Tables like the original paper was provided and worked out of the box after filling in the appropriate information.
+
+\subsubsection*{What was difficult}
+
+% Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the data was not available and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the % original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+% Implementation details of the preprocessing were not comprehensively described 
+
+% The first and foremost constraint on reproducing the results is the use of a licensed dataset and lack of preprocessing code, which made reproducing the baseline already a challenge.  % Zirk disagrees with this...
+The exact steps of the original implementation were unclear to us\break{}because the provided code had few comments and its structure was not immediately\break{}obvious.
+Additionally, obtaining and correctly running the ArcFace model from its ONNX file was not successful because we never worked with ONNX and initially downloaded a broken instance.
+
+
+\subsubsection*{Communication with original authors}
+
+% We interacted with the author via email.
+% In the interaction, clarity was given about the structure of certain files that the author imported into the code of the original paper.  
+% Also, the author clarified some hyperparameters for models that were used in the preprocessing stage of the code. 
+We had indirect contact with the first author who provided an example of the required metadata structure and clarified that all unmentioned hyperparameters were kept at their default values.

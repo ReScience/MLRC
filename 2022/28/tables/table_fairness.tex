@@ -1,0 +1,67 @@
+% \begin{table}
+% \centering
+% \caption{Fairness calibration measured by the mean KS across the sensitive subgroups. Showing the Mean, Average Absolute Deviation (AAD), Maximum Absolute Deviation (MAD) and Standard Deviation (STD). Comparing original results (Sal.) with ours. (Lower is better in all cases.)}
+% \label{tab:fairness-full}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{lp{1.6cm}p{1.9cm}|rrr|rrr|rrr|rrr|}
+% \toprule
+%  &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+%  &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+% Dataset & Feature & Metric\scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  \\
+% \midrule
+% \multirow[c]{8}{*}{RFW} & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & Mean & 6.37 & 6.32 & -0.05 & 1.43 & 2.16 & +0.73 & 1.37 & 1.63 & +0.26 & 1.18 & 1.51 & +0.33 \\
+%  &  & AAD & 2.89 & 2.54 & -0.35 & 0.35 & 0.80 & +0.45 & 0.28 & 0.54 & +0.26 & 0.28 & 0.36 & +0.08 \\
+%  &  & MAD & 5.73 & 4.98 & -0.75 & 0.57 & 1.34 & +0.77 & 0.50 & 0.95 & +0.45 & 0.53 & 0.65 & +0.12 \\
+%  &  & STD & 3.77 & 3.25 & -0.52 & 0.40 & 0.90 & +0.50 & 0.34 & 0.61 & +0.27 & 0.33 & 0.43 & +0.10 \\
+% \cmidrule{2-3}
+%  & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & Mean & 5.55 & 5.53 & -0.02 & 2.49 & 2.34 & -0.15 & 1.75 & 1.72 & -0.03 & 1.35 & 1.79 & +0.44 \\
+%  &  & AAD & 2.48 & 2.32 & -0.16 & 0.84 & 0.69 & -0.15 & 0.41 & 0.47 & +0.06 & 0.38 & 0.34 & -0.04 \\
+%  &  & MAD & 4.97 & 4.64 & -0.33 & 1.19 & 1.23 & +0.04 & 0.64 & 0.86 & +0.22 & 0.66 & 0.57 & -0.09 \\
+%  &  & STD & 2.91 & 2.91 & -0.00 & 0.91 & 0.79 & -0.12 & 0.45 & 0.56 & +0.11 & 0.43 & 0.39 & -0.04 \\
+% \cmidrule{1-3}
+% \multirow[c]{4}{*}{BFW} & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & Mean & 6.77 & 4.24 & -2.53 & 2.76 & 2.62 & -0.14 & 3.09 & 2.81 & -0.28 & 2.23 & 1.71 & -0.52 \\
+%  &  & AAD & 3.63 & 2.68 & -0.95 & 1.38 & 1.60 & +0.22 & 1.34 & 1.22 & -0.12 & 1.15 & 0.76 & -0.39 \\
+%  &  & MAD & 5.96 & 7.65 & +1.69 & 2.67 & 4.61 & +1.94 & 2.48 & 2.93 & +0.45 & 2.63 & 1.88 & -0.75 \\
+%  &  & STD & 4.03 & 3.30 & -0.73 & 1.60 & 2.00 & +0.40 & 1.55 & 1.43 & -0.12 & 1.40 & 0.90 & -0.50 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+
+%%% Now with new embeddings and ftc
+
+\begin{table}[bp]
+\centering
+\caption{Fairness calibration measured by the mean KS across the sensitive subgroups. Showing the Mean, Average Absolute Deviation (AAD), Maximum Absolute Deviation (MAD) and Standard Deviation (STD). Comparing original results (Sal.) with ours. (Lower is better in all cases.)}
+\label{tab:fairness-full}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lp{1.6cm}p{1.9cm}|*{5}{r@{\hspace{2.5mm}}r@{\hspace{2.5mm}}r|}}
+\toprule
+ &  & \hfill Approach \scriptsize $\rightarrow$ & \multicolumn{3}{c|}{Baseline} & \multicolumn{3}{c|}{FTC} & \multicolumn{3}{c|}{FSN} & \multicolumn{3}{c|}{FairCal} & \multicolumn{3}{c|}{Oracle} \\
+ &  & \hfill By \scriptsize $\rightarrow$ & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. & Sal. & Our & diff. \\
+Dataset & Feature & Metric \scriptsize $\downarrow$ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+\multirow[c]{8}{*}{RFW} & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(VGGFace2)}} & Mean & 6.37 & 6.35 & -0.02 & 5.69 & 6.76 & +1.07 & 1.43 & 2.33 & +0.90 & 1.37 & 1.57 & +0.20 & 1.18 & 1.48 & +0.30 \\
+ &  & AAD & 2.89 & 2.55 & -0.34 & 2.32 & 3.01 & +0.69 & 0.35 & 0.81 & +0.46 & 0.28 & 0.43 & +0.15 & 0.28 & 0.38 & +0.10 \\
+ &  & MAD & 5.73 & 4.95 & -0.78 & 4.51 & 6.01 & +1.50 & 0.57 & 1.37 & +0.80 & 0.50 & 0.77 & +0.27 & 0.53 & 0.66 & +0.13 \\
+ &  & STD & 3.77 & 3.24 & -0.53 & 2.95 & 3.61 & +0.66 & 0.40 & 0.92 & +0.52 & 0.34 & 0.51 & +0.17 & 0.33 & 0.45 & +0.12 \\
+\cmidrule{2-3}
+ & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & Mean & 5.55 & 5.45 & -0.10 & 4.73 & 12.46 & +7.73 & 2.49 & 2.23 & -0.26 & 1.75 & 1.78 & +0.03 & 1.35 & 1.82 & +0.47 \\
+ &  & AAD & 2.48 & 2.32 & -0.16 & 1.93 & 4.11 & +2.18 & 0.84 & 0.71 & -0.13 & 0.41 & 0.52 & +0.11 & 0.38 & 0.33 & -0.05 \\
+ &  & MAD & 4.97 & 4.64 & -0.33 & 3.86 & 8.21 & +4.35 & 1.19 & 1.20 & +0.01 & 0.64 & 0.97 & +0.33 & 0.66 & 0.55 & -0.11 \\
+ &  & STD & 2.91 & 2.90 & -0.01 & 2.28 & 4.82 & +2.54 & 0.91 & 0.82 & -0.09 & 0.45 & 0.60 & +0.15 & 0.43 & 0.39 & -0.04 \\
+\cmidrule{1-3}
+\multirow[c]{8}{*}{BFW} & \multirow[c]{4}{*}{\pbox{1.8cm}{FaceNet\break(WebFace)}} & Mean & 6.77 & 4.11 & -2.66 & 6.64 & 52.73 & +46.09 & 2.76 & 2.95 & +0.19 & 3.09 & 3.29 & +0.20 & 2.23 & 1.82 & -0.41 \\
+ &  & AAD & 3.63 & 2.36 & -1.27 & 2.80 & 2.54 & -0.26 & 1.38 & 1.88 & +0.50 & 1.34 & 1.38 & +0.04 & 1.15 & 0.68 & -0.47 \\
+ &  & MAD & 5.96 & 6.58 & +0.62 & 5.61 & 5.57 & -0.04 & 2.67 & 5.19 & +2.52 & 2.48 & 2.74 & +0.26 & 2.63 & 1.83 & -0.80 \\
+ &  & STD & 4.03 & 2.90 & -1.13 & 3.27 & 3.08 & -0.19 & 1.60 & 2.27 & +0.67 & 1.55 & 1.55 & +0.00 & 1.40 & 0.84 & -0.56 \\
+\cmidrule{2-3}
+ & \multirow[c]{4}{*}{ArcFace} & Mean & 2.57 & 10.55 & +7.98 & 2.95 & N/A & N/A & 2.65 & 10.82 & +8.17 & 2.49 & 10.33 & +7.84 & 1.41 & 2.61 & +1.20 \\
+ &  & AAD & 1.39 & 2.75 & +1.36 & 1.48 & N/A & N/A & 1.45 & 2.78 & +1.33 & 1.30 & 2.51 & +1.21 & 0.59 & 1.34 & +0.75 \\
+ &  & MAD & 2.94 & 6.86 & +3.92 & 3.03 & N/A & N/A & 3.23 & 6.78 & +3.55 & 2.68 & 5.89 & +3.21 & 1.30 & 3.73 & +2.43 \\
+ &  & STD & 1.63 & 3.36 & +1.73 & 1.74 & N/A & N/A & 1.71 & 3.42 & +1.71 & 1.52 & 3.11 & +1.59 & 0.69 & 1.62 & +0.93 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

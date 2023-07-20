@@ -1,0 +1,134 @@
+# To be filled by the author(s) at the time of submission
+# -------------------------------------------------------
+
+# Title of the article:
+#  - For a successful replication, it should be prefixed with "[Re]"
+#  - For a failed replication, it should be prefixed with "[¬Re]"
+#  - For other article types, no instruction (but please, not too long)
+# Change the default title
+title: "[Re] Reproducing FairCal: Fairness Calibration for Face Verification"
+
+# List of authors with name, orcid number, email and affiliation
+# Affiliation "*" means contact author (required even for single-authored papers)
+authors:
+  - name: Jip Greven
+    orcid: 0009-0003-5763-5699
+    email: jip.greven@student.uva.nl
+    affiliations: 1,\textdagger
+
+  - name: Simon Stallinga
+    orcid: 0009-0009-2773-4200
+    email: simon.stallinga@student.uva.nl
+    affiliations: 1,\textdagger
+
+  - name: Zirk Seljee
+    orcid: 0009-0007-2829-1494
+    email: zirk.seljee@student.uva.nl
+    affiliations: 1,\textdagger,*    # * is for contact author
+
+# List of affiliations with code (corresponding to author affiliations), name
+# and address. You can also use these affiliations to add text such as "Equal
+# contributions" as name (with no address).
+affiliations:
+  - code:    1
+    name:    Informatics Institute, University of Amsterdam
+    address: The Netherlands
+
+  - code:    "{}\\textdagger"  # Required to add the {} to fix a problem in authblk package
+    name:    Equal contributions
+
+
+# List of keywords (adding the programming language might be a good idea)
+keywords:  rescience c, rescience x, machine learning, reproduction, deep learning, python, pytorch
+
+# Code URL and DOI/SWH (url is mandatory for replication, doi after acceptance)
+# You can get a DOI for your code from Zenodo, or an SWH identifier from
+# Software Heritage.
+#   see https://guides.github.com/activities/citable-code/
+code:
+  - url: https://github.com/zseljee/re-faircal
+  - doi:
+  - swh: swh:1:dir:95f2895ab0761e8a2341dc83e26cdcbbc5a0ecde
+
+# Data URL and DOI (optional if no data)
+data:
+  - url:
+  - doi:
+
+# data:
+#   - url:
+#   - doi: 10.1109/FG.2018.00020
+# # What to do if more than one data?
+# data:
+#   - url:
+#   - doi: 10.1007/978-3-319-46487-9_6
+# data:
+#   - url: http://arxiv.org/abs/1411.7923
+#   - doi:
+
+# Information about the original article that has been replicated
+replication:
+ - cite: "T. Salvador, S. Cairns, V. Voleti, N. Marshall, and A. M. Oberman. “FairCal: Fairness Calibration for Face Verification” International Conference on Learning Representations. 2022."
+ - bib:  salvador2022faircal
+ - url:  https://openreview.net/pdf?id=nRj0NcmSuxb
+ - doi:  10.48550/arXiv.2106.03761
+
+# Don't forget to surround abstract with double quotes
+abstract: "\\subsubsection*{Scope of Reproducibility} This reproducibility paper verifies the claim by \\citeauthor{salvador2022faircal} in ``\\textit{FairCal: Fairness Calibration for Face Verification}'' \\cite{salvador2022faircal} that the FairCal and Oracle methods are fair with respect to sensitive attributes and obtain SOTA accuracy results in face verification when compared to FSN and FTC. The aim is to reproduce the relative values in Tables 2, 3 and 4 of the original paper for these methods. We also provide and support an intuitive explanation of why FairCal outperforms Oracle. \\subsubsection*{Methodology} The authors provided partial code to create the results; Code to create and preprocess embeddings was missing, but code to run the experiments on these embeddings was provided. Nevertheless, we re-implement the code from scratch, keeping the data structure identical. Hardware used are personal laptops without GPU and a desktop with an MSI GeForce GTX 1060-3GB GPU.  \\subsubsection*{Results}Compared to the data reported in the original paper, the reproduced results vary across embedding models and evaluation metrics, where some combinations perform very similarly to the original paper while other combinations deviate significantly. Despite this, the claims of the original paper have been confirmed, which include no loss of accuracy, fairly calibrated subgroups and predictive equality.  \\subsubsection*{What was easy} Some parts of the reproduction went smoothly such as the accessibility of the data and models and the quick execution of the experiments. Also, the paper was clear about the evaluation metrics. Finally, the code for the figures worked straight out of the box. \\subsubsection*{What was difficult} Obtaining and running the correct ArcFace model from its ONNX file was difficult because we never worked with ONNX and initially also downloaded the wrong instance. Additionally, the exact steps of the original implementation were unclear to us because the provided code had few comments and its structure was not immediately obvious. \\subsubsection*{Communication with original authors} We had indirect contact with the first author who provided an example of the required metadata structure and clarified that all unmentioned hyperparameters were kept at their default values."
+
+# Bibliography file (yours)
+bibliography: bibliography.bib
+
+# Type of the article
+# Type can be:
+#  * Editorial
+#  * Letter
+#  * Replication
+type: Replication
+
+# Scientific domain of the article (e.g. Computational Neuroscience)
+#  (one domain only & try to be not overly specific)
+domain: ML Reproducibility Challenge 2022
+
+# Coding language (main one only if several)
+language: Python
+
+
+# To be filled by the author(s) after acceptance
+# -----------------------------------------------------------------------------
+
+# For example, the URL of the GitHub issue where review actually occured
+review:
+  - url: https://openreview.net/forum?id=jDBYRwDpeW
+
+contributors:
+  - name: Koustuv Sinha,\\ Maurits Bleeker,\\ Samarth Bhargav
+    orcid:
+    role: editor
+  - name:
+    orcid:
+    role: reviewer
+  - name:
+    orcid:
+    role: reviewer
+
+
+# This information will be provided by the editor
+dates:
+  - received:  February 4, 2023
+  - accepted:  April 19, 2023
+  - published:  July 20, 2023
+
+
+# This information will be provided by the editor
+article:
+  - number: 28
+  - doi:
+  - url:
+
+# This information will be provided by the editor
+journal:
+  - name: "ReScience C"
+  - issn: 2430-3658
+  - volume: 9
+  - issue: 2

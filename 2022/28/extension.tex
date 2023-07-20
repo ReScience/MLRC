@@ -1,0 +1,52 @@
+\subsection{Results beyond original paper}
+
+% Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that batch size was not specified, and so different batch sizes need to be evaluated to reproduce the original results. Include the results of any additional experiments here. Note: this won't be necessary for all reproductions.
+
+% With the results of the paper in mind, we wondered why FairCal outperformed Oracle while Oracle had access to sensitive attributes; you would expect that Oracle performs better.
+To support the result in the previous section we investigate why FairCal could be outperforming Oracle.
+With access to sensitive attributes, Oracle would be expect to perform better.
+We hypothesised Faircal is fairer because it can calibrate for subgroups within the ethical groups, whereas Oracle cannot take this into account.
+By only using the sensitive attributes for clustering Oracle misses out on information contained in the embeddings. 
+
+
+\subsubsection{FairCal cluster inspection}
+To verify our hypothesis we look into the distribution of ethnicities in the K-means clusters.
+% Then we could inspect the ethnically diverse clusters and see if the faces have a common feature.
+% This would support the hypothesis.
+If faces in ethnically diverse clusters have a common feature the hypothesis is supported.
+% We use the cluster assignment for each face in both the RFW and BFW dataset.
+% We counted how often each ethnicity occurred in each cluster as can be seen in \autoref{fig:cluster_facenet_rfw}. 
+We use the cluster assignment for faces on the RFW dataset and plot how often each ethnicity occurs in \autoref{fig:cluster_facenet_rfw}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/clusters_facenet_rfw2.0.png}
+    \caption{Sorted percentages of different ethnicities in the clusters on the RFW dataset. The clusters to the left are the most diverse clusters and the clusters get more homogeneous the more you move to the right. The red line displays the percentage of the largest ethnicity in the cluster}
+    \label{fig:cluster_facenet_rfw}
+\end{figure}
+
+% We inspected various clusters as can be seen in \autoref{fig:cluster_examples}.
+We inspect a diverse and a homogeneous cluster in \autoref{fig:cluster_examples}.
+% It is visible that the diverse cluster, \autoref{fig:cluster_example_diverse}, got the common denominator of older-looking males.
+% The homogeneous cluster, \autoref{fig:cluster_example_homogeneous}, has the common denominator that they are mostly Caucasian females with blond hair.
+The diverse cluster in \autoref{fig:cluster_example_diverse} has a common denominator of older-looking males and the homogeneous cluster in \autoref{fig:cluster_example_homogeneous} has a common denominator of Caucasian younger-looking blond-haired females.
+This illustrates that unsupervised clustering creates subgroups % within the sensitive attribute groups 
+for attributes that are also sensitive like age and sex.
+Note that only 25 images are shown with a relative high number of outliers compared to the full clusters.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/cluster_55.png}
+        \caption{Subset of cluster 55, this is the most diverse cluster of all clusters. The cluster mostly consists of older-looking males. }
+        \label{fig:cluster_example_diverse}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/cluster_85.png}
+        \caption{Subset of cluster 85, the most homogeneous Caucasian cluster. This cluster consists of Caucasian females with blonde hair.}
+        \label{fig:cluster_example_homogeneous}
+    \end{subfigure}
+    \caption{Clusters generated on the RFW dataset that does not contain gender-annotations. }
+    \label{fig:cluster_examples}
+\end{figure}

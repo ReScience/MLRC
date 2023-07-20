@@ -1,0 +1,394 @@
+% General notes?
+
+% \textit{\textbf{The following section formatting is \textbf{optional}, you can also define sections as you deem fit.
+% \\
+% Focus on what future researchers or practitioners would find useful for reproducing or building upon the paper you choose.\\
+% For more information of our previous challenges, refer to the editorials \cite{Sinha:2022,Sinha:2021,Sinha:2020,Pineau:2019}.
+% }}
+
+\section{Introduction}
+
+% A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work.
+
+Fairness of intelligent systems is a hot topic and the methods developed with fairness guarantees  should be thoroughly tested for reproducibility to verify their performance and generalizability.
+One instance in which fairness could be of life-impacting importance is face verification by police forces in arresting criminals, as a false arrest can be a traumatic experience.
+For recidivism estimation, face verification should also be unbiased to minority groups like Asians in the United States.
+
+\citeauthor{salvador2022faircal} introduce \textit{FairCal}, a post-training approach that increases the fairness of face calibration models~\cite{salvador2022faircal}.
+% To increase the robustness of the method, we aim to reproduce the findings of the authors%
+To support the improvement of this method, we aim to reproduce the findings of the authors%
+% , \textit{\textbf{and perform additional experiments}}%
+. We illustrate the difference in fairness between different models in \autoref{fig:roc_curve}.
+The next section describes what we aim to reproduce comprehensively.
+
+% Where is FTC in this figure?!
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/fpr-plot.png}
+    \caption{Illustration of how to inspect improved fairness measured by the FPRs evaluated on ethnicity pairs in the RFW dataset. Bias between subgroups is reduced with post-processing methods Fair Template Comparison (FTC)~\cite{terhorst2020comparison}, Fair Score Normalization (FSN)~\cite{terhorst2020post}, Faircal and Oracle. (Lines close together mean ethnicities have similar False Positive rates; they are treated similarly.)}
+    \label{fig:roc_curve}
+\end{figure}
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+% Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+\citeauthor{salvador2022faircal} 
+% estimate the fairness of two new calibration methods: FairCal and Oracle.
+% test the increase of fairness by their new calibration methods: FairCal and Oracle. 
+introduce two fairness calibration methods, FairCal and Oracle, and compare them to state-of-the-art fairness calibration models.
+The authors test their method with three face-embedding methods: Facenet~(VGGFace2), Facenet~(Webface)~\cite{facenetpytorch} and Arc\-Face~\cite{salvador_2021arcface}.
+They evaluate on two datasets BFW \cite{DBLP:journals/corr/abs-2002-06483bfw} and RFW \cite{Wang_2019_ICCVrfw1,wang2021metarfw2,wang2019skewnessrfw3,wang2018deeprfw4} according to three metrics: 
+\begin{enumerate*}[label=(\roman*)]
+    \item accuracy using true positive rate~(TPR) at fixed false positive rates~(FPR),
+    \item fairness calibration using the mean and deviation of the Kolmogorov-Smirnov calibration~(KS) error~\cite{gupta2021calibration}, and
+    \item deviation across subgroups (predictive equality) using FPR deviation across subgroups for fixed global FPR.
+\end{enumerate*}
+
+
+% A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pre-trained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+% This is concise and is something that can be supported by experiments.
+% An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+
+% This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+
+% Specifically, the claims to reproduce are:
+% \begin{itemize}
+%     \item FairCal obtains the highest accuracy on the RFW dataset and second highest accuracy, behind Oracle, on the BFW dataset for all metrics and models.
+%     \item Oracle obtains the median/fourth highest accuracy on the RFW dataset and the highest accuracy on the BFW dataset.
+%     \item FairCal and Oracle respectively obtain the second lowest and lowest KS mean and deviation.
+%     \item FairCal obtains lowest FPR deviation across subgroups on the RFW dataset and BFW with FaceNet WebFace embeddings, highest FPR deviation across subgroups on the BFW dataset with ArcFace embeddings and 0.1\% calibration FPR rate, and median/fourth lowest FPR deviation across subgroups on the BFW dataset with ArcFace embeddings and 1\% calibration FPR rate.
+%     \item Oracle obtains high deviation across subgroups on most combinations, lowest on BFW-FaceNet Webface-1\% calibration FPR and highest on BFW-ArcFace-1\% calibration error.
+% \end{itemize}
+This paper aims to prove the following claims, adapted from the original claims by \citeauthor{salvador2022faircal}~\cite{salvador2022faircal}:
+\begin{itemize}
+    \item FairCal obtains state-of-the-art accuracy compared to previous calibration methods on both datasets for all metrics and embeddings. Oracle achieves accuracy slightly lower than FairCal.
+    \item FairCal and Oracle respectively obtain the second lowest and lowest KS mean and deviation.
+    % \item Oracle obtains significantly lower deviation across subgroup FPR for all datasets and models when compared to the baseline, and FairCal performs significantly better compared to Oracle (significantly lower deviation).
+    \item FairCal and Oracle obtain low deviation across subgroup FPR for a fixed global threshold for all datasets and models. When compared to Oracle, FairCal obtains a significantly lower deviation. Both methods can be outperformed slightly on 0.1\% global FPR.
+\end{itemize}
+
+% Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+
+% %\jdcomment{To organizers: I asked my students to connect the main claims and the experiments that supported them. For example, in this list above they could have ``Claim 1, which is supported by Experiment 1 in Figure 1.'' The benefit was that this caused the students to think about what their experiments were showing (as opposed to blindly rerunning each experiment and not considering how it fit into the overall story), but honestly it seemed hard for the students to understand what I was asking for.}
+
+\section{Methodology}
+
+% Explain your approach - did you use the author's code, or did you aim to re-implement the approach from the description in the paper? Summarize the resources (code, documentation, GPUs) that you used.
+To verify the claims that were made in Section \ref{sec:claims}, we start with the provided open-source implementation on the Github page of the authors~\cite{salvador_2021}.
+
+The first step, image preprocessing and embedding, is not included in this repository and not described in detail in the paper, requiring a re-implementation.
+We start with a Python PyTorch implementation of MTCNN~\cite{facenetpytorch,zhang2016jointmtcnn} to detect and crop faces from the datasets.
+Each image is resized to square 400 pixel dimensions to accelerate the detection using batching.
+% Then we searched for faces that were not detected by the MTCNN and filtered face pairs out if one or both of the faces were not detected by the MTCNN.
+Pairs for which at least one of the faces does not get detected, are dropped from the datasets.
+The filtered images are then embedded using Facenet (trained on VGGFace2 and Webface) and ArcFace, which are described in detail below.
+% With help of the author, we were able to use the correct structure for processing the embeddings with FairCal.
+
+To start the experiments the code needs an undocumented csv file which we were able to recreate with help of the authors.
+% % begin Simons edit
+% However, it remained challenging for us to work with the codebase; we decided to rebuild the codebase.
+% % end Simons edit
+With this, it becomes possible to run the experiments through the original code, however, we re-implement all code from scratch.
+% We decreased the runtime for some important functions and found \dots \textbf{TODO}
+This re-implementation enables us to significantly decrease the runtime for important functions, like clustering embeddings for FairCal, from a shared total of hours to minutes.
+
+\subsection{Embedding model descriptions}
+% Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+The paper uses 4 pre-trained models to create image embeddings.
+MTCNN for face cropping, and three methods for the embeddings from these cropped images: Facenet (VGGFace2), Facenet (Webface) and ArcFace.
+% \textbf{TODO: Update which we managed to implement still!}
+
+\subsubsection{MTCNN}
+A Multi Task Convolutional Neural Network (MTCNN) uses three convolutional networks to detect faces and facial landmarks in a cascaded fashion~\cite{zhang2016jointmtcnn}.
+We use a Python implementation of the MTCNN that uses the PyTorch library, obtained from~\cite{facenetpytorch}.
+The MTCNN architecture and parameters for the networks should be identical to the original MATLAB implementation by \citeauthor{zhang2016jointmtcnn}.
+All hyperparameters are kept at their default values.
+
+\subsubsection{Facenet (VGGFace2) and Facenet (Webface)}
+The Facenet models are Convolutional Neural Networks (CNNs) that create 512 dimensional embeddings of input images containing aligned faces.
+These networks are based on an Inception v1 architecture~\cite{Schroff_2015_CVPRinception} and can be retrieved from the same Pyorch library as the MTCNN~\cite{facenetpytorch}.
+% The only difference between the models is the dataset on which they were trained.
+% The VGGFace2 \cite{cao2018vggface2} based model obtains a 99.05\% LFW accuracy and the Webface \cite{DBLP:journals/corr/YiLLL14awebface} based model obtains a 99.65\% LFW accuracy.
+The models were trained on the VGGFace2 dataset~\cite{cao2018vggface2} and the Webface dataset~\cite{DBLP:journals/corr/YiLLL14awebface} as indicated by the parenthesis.
+
+\subsubsection{ArcFace}
+The ArcFace model is another CNN that creates 512-dimensional embeddings of aligned faces.
+The specific ArcFace model used is % LResNet100E-IR\footnote{\url{https://github.com/onnx/models/tree/main/vision/body_analysis/arcface}} 
+based on a ResNet100 architecture~\cite{He_2016_CVPRresnet100}
+and can be retrieved from the ONNX model repository\footnote{Specifically, through an \href{https://s3.amazonaws.com/onnx-model-zoo/arcface/resnet100.onnx}{amazon cloud storage link}.}% found in a \href{https://github.com/onnx/models/blob/main/vision/body_analysis/arcface/dependencies/arcface_inference.ipynb}{notebook}.} 
+~\cite{salvador_2021arcface}.
+The model has been trained on the MS-Celeb-1M dataset~\cite{10.1007/978-3-319-46487-9_6msceleb1}.% and is based on the ResNet100 architecture \cite{He_2016_CVPRresnet100}.
+% arcface model moet van amazon afkomen,    added as footnote
+
+Due to implementation complications and computational constraints, we were unable to create and use appropriate embeddings with this model.
+See \autoref{tab:accuracy} in \autoref{sec:results} for the large discrepancy between our results and those obtained by \citeauthor{salvador2022faircal}.
+
+\subsection{Fairness calibrator descriptions}
+
+% In this subsection, we shortly describe the models that are compared to , as well as these methods.
+To prove the improved fairness of the new FairCal and Oracle methods they are compared to a baseline and two state-of-the-art approaches that need training: FTC and FSN. 
+% Since FSN performed best in the original paper and we are constrained by time, we chose to only implement FSN as a comparison of FairCal and Oracle to the state-of-the-art.
+Since FSN performed best in the original paper and FTC requires long neural network training, we chose to exclude FTC in combination with Arcface in the comparisons.
+
+\subsubsection{Baseline}
+The baseline method for face verification systems is to determine a threshold cosine similarity.
+To compare different methods on their fairness with KS calibration error, models should output probabilities.
+Thus, the similarities between faces are mapped to probabilities of a match using post-hoc beta calibration~\cite{patel2021multiclass-betacalibration}.
+
+\subsubsection{Fair Template Comparison (FTC)}
+The Fair Template Comparison (FTC) method uses a small Neural Network to %simulate the cosine similarity used as a scoring in the other approaches 
+estimate the similarity between embeddings~\cite{terhorst2020comparison}.
+The layer sizes of the original model % proposed by \citeauthor{terhorst2020comparison} 
+have been scaled by a factor $4$ to accommodate the $512$-dimensional embeddings.
+\citeauthor{salvador2022faircal} do not mention one of the layers% used by \citeauthor{terhorst2020comparison}%
+% , but the code in the supplementary material does use all (scaled) layers.
+, but do include this layer in their code.
+% connection
+% For this approach, \citeauthor{terhorst2020comparison} propose 
+The FTC method uses 
+a novel penalty score for individual fairness, which is used as a loss function when training the network.
+The output scores of this approach are not calibrated probabilities, and beta calibration is used to measure fairness-calibration.
+In this paper, we train the network for 50 epochs on the full training split with shuffling.
+From the validation results in \autoref{sec:results} we conclude this causes FTC to overfit.
+
+\subsubsection{Fair Score Normalization (FSN)}
+\citeauthor{terhorst2020post} later proposed Fair Score Normalization (FSN)~\cite{terhorst2020post}.
+% This method uses group-specific thresholds and unsupervised clusters. 
+% FSN then adjusts the thresholds for each clusters to give the same score per cluster as a predefined global FPR. 
+% This method uses unsupervised clusters to create group-specific thresholds on the cosine similarity.
+% These thresholds are adjusted to obtain the same score per cluster as a predefined global FPR. 
+This method uses unsupervised clusters obtained by K-means clustering and a predefined global FPR to create group-specific shifts to the cosine similarities of image embeddings.
+Again, the output scores are mapped to probabilities using beta calibration.
+
+\subsubsection{FairCal}
+% FairCal is a similar post-training calibration method to FSN that increases group fairness without sacrificing overall model performance or the need for access to sensitive attributes.
+% It does this by learning clusters on a training set of face embeddings and creating calibration methods for each of these clusters. 
+FairCal proposed by \citeauthor{salvador2022faircal} is a similar post-training calibration method to FSN that instead does the beta calibration on each K-means cluster separately~\cite{salvador2022faircal}.
+% Because the beta calibration is included in the method, taking the cluster-size-weighted average of the calibrated scores turns the output scores into probabilities.
+The calibrated scores are turned into output probabilities by taking the cluster-size-weighted average.
+
+\subsubsection{Oracle}
+% Oracle is almost the same as FairCal, the only difference is that Oracle uses sensitive attributes to learn clusters.
+% This means that Oracle also needs these attributes at testing time.
+Oracle is a supervised variant of FairCal that uses the sensitive attributes to create clusters~\cite{salvador2022faircal}.
+In itself, it should represent a gold standard of fairness baselines.
+Oracle is not applicable in real situations where the sensitive attributes are not known or cannot be used for inference.
+
+\subsection{Dataset descriptions}
+
+% For each dataset include 1) relevant statistics such as the number of examples and label distributions, 2) details of train / dev / test splits, 3) an explanation of any preprocessing done, and 4) a link to download the data (if available).
+
+The original paper uses two datasets for the main results.
+The Biased Faces in the Wild (BFW)~\cite{DBLP:journals/corr/abs-2002-06483bfw} and the Racial Faces in the Wild (RFW)~\cite{Wang_2019_ICCVrfw1,wang2021metarfw2,wang2019skewnessrfw3,wang2018deeprfw4} datasets.
+These datasets are designed to asses fairness of visual systems and were based on images from the larger VGGFace2~\cite{cao2018vggface2} and MS-Celeb-1M~\cite{10.1007/978-3-319-46487-9_6msceleb1} datasets respectively.
+Models trained on one of the latter datasets are not evaluated on the respective former dataset.
+Both datasets consist of four different racial subsets: African, Asian, Caucasian and Indian.\footnote{The BFW dataset uses the respective class names Black, Asian, White and Indian.}
+The BFW dataset also contains splits based on gender annotations.
+
+The preprocessing with MTCNN removes 234 and 77 faces from the BFW and RFW datasets respectively.
+This causes 21,495 and 94 image pairs to be respectively unusable.\footnote{A face may be identified by the MTCNN without being used if it is only paired with images where the MTCNN fails to identify the other face from the pair. The RFW dataset has 40,530 out of 40,607 identified faces, but 63 of these are not used due to their pairing.}
+
+A summary of these statistics is provided in \autoref{tab:dataset-details} on the next page.
+
+\begin{table}[ht]
+    \centering
+    \caption{Overview of the used fairness evaluation datasets.}
+    \label{tab:dataset-details}
+    % \scriptsize
+    \resizebox{\linewidth}{!}{
+    \begin{tabular}{cccccccc}
+    \toprule
+        \textbf{Dataset} & \textbf{Based on} & \textbf{Used imgs}
+        & \textbf{Used pairs} & \textbf{Subgroups} & \pbox{2cm}{\textbf{Inter-group}\\\textbf{pairings}} & \textbf{Folds} & \textbf{URL} \\
+    \midrule
+        BFW & VGGFace2 & 19,766 & 902,403 & Race, gender & \cmark & 5 & \href{https://github.com/visionjo/facerec-bias-bfw}{link} \\[1pt]
+        RFW & MS-Celeb-1M & 40,467 & 23,906 & Race & \xmark & 10 & \href{http://whdeng.cn/RFW/testing.html}{link} \\
+    \bottomrule
+    \end{tabular}
+    }
+\end{table}
+
+\subsection{Hyperparameters}
+% Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+% The paper does not describe many of the hyperparameters, because they were kept at their default values by the authors.
+% Where there are no defaults or the authors choose a different value, they mention this in the article or it can be inferred from their code.
+Most of the hyperparameters were kept at their default values, or the authors clarified their adjustments appropriately.
+
+The most important hyperparameter is the number of clusters, \textbf{$K$}, in the K-means clustering algorithm.
+The original paper provides code for a manual search across different cluster sizes $K$ and the results are shown in Figures 4 to 14 of \cite{salvador2022faircal}.
+The chosen value for the results in the paper and this reproducibility is $K=100$.
+
+\subsection{Experimental setup and code}  %Jip
+% Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+% Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, precision@K, BLEU score, etc.). 
+% Provide a link to your code.
+
+The results are obtained using 5-fold cross-validation.
+The BFW contains five folds and is split as expected: one fold is left out as validation data while the other four are used for training.
+% The RFW contains ten folds and is split in another way:
+% Results are obtained using cross-validation on the first five folds, yet it is not entirely clear how the remaining (train and validation) folds are used.
+The RFW contains ten folds and results are obtained using cross-validation on the first five folds.
+It is not entirely clear how the remaining (train and validation) folds are used.
+Either 
+\begin{enumerate*}[label=(\roman*)]
+    \item\label{list:folds-rfw} the last five folds were always included in the training split, which provides more training data while not validating on all data,%
+    \item the last five folds were combined with the first five folds, which expands the folds and includes all data for training and validating, or%
+    \item the last folds were excluded from all experiments, which discards a significant part of the data.
+\end{enumerate*}
+All three approaches were tested and compared, yet none gave any significant differences in validation results.
+For the results in \autoref{sec:results}, approach \ref{list:folds-rfw} is used as it includes all data and validates on the same data as presented in the code of the original paper.
+
+When running the K-means algorithm, the embeddings %of both images in all image pairs of
+of each image occurring at least once in
+a fold were included for clustering.
+% It is therefore possible for embeddings to be clustered in multiple different `runs' of the K-means algorithm for different folds, just as images are reused across folds.
+It is therefore possible that embeddings are clustered in multiple `runs' of the K-means algorithm for different folds, just as images are reused across folds.
+Each `run' of the K-means algorithm clusters the data ten times and returns the result with the minimal remaining inertia, as per the default parameters of the scikit-learn implementation~\cite{scikit-learn}.
+
+Code for this paper is available on \href{https://github.com/zseljee/re-faircal}{GitHub} and the \href{https://archive.softwareheritage.org/swh:1:dir:95f2895ab0761e8a2341dc83e26cdcbbc5a0ecde}{Software Heritage Archive}.
+
+\subsection{Computational requirements} 
+
+% Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+% For each model, include a measure of the average runtime (e.g. average time to predict labels for a given validation set with a particular batch size).
+% For each experiment, include the total computational requirements (e.g. the total GPU hours spent).
+% (Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+All methods in this paper can run in their entirety on a CPU, including preprocessing.
+The preprocessing can optionally be accelerated by utilising a GPU.
+Our timing measurements were obtained using an Intel i5 core CPU with 16GB RAM and a MSI GeForce GTX 1060-3GB GPU.
+
+% The MTCNN model may run on the CPU and the GPU.
+The face identification and cropping takes around 50 minutes with CPU on the RFW dataset.
+The smaller BFW dataset completes in approximately 20 minutes.
+A GPU can complete this in 10 minutes each.
+% Filtering the datasets when the recognised images are available does not form a bottleneck.
+
+% Creating the embeddings is the second bottleneck, which takes again approximately 50 minutes for RFW (including re-executing the MTCNN) when using the GPU-enabled PC.
+Creating the embeddings takes approximately a minute per 10,000 images with a GPU.
+Creating the ArcFace embeddings takes approximately 4.5 hours for the BFW images, we only managed to run this on a CPU.
+
+The experiments in their original state took multiple hours, but refactoring the code into only the strictly necessary components and caching temporary results significantly improved the run-time to a few minutes.
+The most intensive part of the experiments is creating the K-means clusters for FairCal, which takes 100 seconds per fold.
+Doing the FairCal calibration finishes near instantly and does not form a bottleneck.
+
+Lastly, training the FTC models is computationally expensive and takes 12 seconds and 2 minutes per epoch for RFW and BFW respectively.
+
+\section{Results}
+\label{sec:results}
+% Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next ``Discussion" section. 
+
+The accuracy improvement of FairCal and Oracle on the RFW dataset are proportionally equal compared to the original results.
+There is less accuracy improvement on the BFW dataset relative to the original results.
+
+We observe that the initial baseline is usually fairer than the original paper suggests and that FairCal and Oracle result in an equal fairness increase.
+
+
+\subsection{Results reproducing original paper}
+% For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+% For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+% Logically group related results into sections. 
+
+We separately confirm the results across the three claims described in \autoref{sec:claims}.
+
+\subsubsection{Accuracy}  % tpr @ 0.1 & 1.0 % FPR
+The first claim is that the TPR of FairCal is the best when compared to previous methods, with Oracle close behind.
+Our results in \autoref{tab:accuracy} highlight that this is the case independent of embeddings and global FPR.
+However, our results, including the baseline, also differ significantly from the results of \citeauthor{salvador2022faircal}.
+This is consistent across embeddings, which implies that the embeddings are significantly different.
+The results for ArcFace differ so significantly we infer our implementation to be wrong and refer to \autoref{sec:difficult} for possible explanations. Finally, the results of FTC on the BFW dataset are significantly different from the expected values.
+We suspect that this error comes from overfitting on the relatively small dataset in combination with many image pairs.
+This may also be the case for the RFW dataset, but it does not show in the results.
+We were not able to confirm the overfitting.
+
+\input{tables/table_accuracy.tex}
+
+
+\subsubsection{KS Fairness}  % mean + std
+The second claim is that FairCal and Oracle obtain the second lowest and lowest KS mean and deviation respectively. 
+Our results in \autoref{tab:fairness} confirm FairCal and Oracle are more fairly calibrated, as can be seen by the significantly lower KS mean and standard deviation compared to the baseline and mostly lower mean compared to FSN.
+Also, the bias within groups, as can be seen by the KS STD, is significantly lower for FairCal and Oracle, again confirming the original claims of the paper.
+However, it is important to note that in some aspects the reproduced results deviate significantly from the original.%, often giving less clear results.
+
+\input{tables/table_fairness_partial.tex}
+
+
+\subsubsection{Predictive equality}  % std
+The third and last claim is that FairCal and Oracle both obtain low FPR deviation across subgroups, but that FairCal obtains significantly better inter-sub\-group fairness compared to Oracle.
+Our results in \autoref{tab:predictive-equality} support the claim of low deviation, but do not convincingly show that FairCal is better than Oracle.
+The biggest difference in deviation is for 1.0\% global FPR on the BFW dataset, where all measured deviations, independent of approach, are lower.
+The deviation for 1.0\% global FPR on the RFW dataset with Facenet (VGGFace2) has doubled for FairCal; inspection shows that this is due to folds 1 and 4 being outliers with low Oracle and high FairCal deviation respectively.
+Excluding the outliers results in STD of 0.50 for FairCal and 0.61 for Oracle.
+This provides some evidence that supports the claim that FairCal is fairer than Oracle.
+
+\input{tables/table_predictive_equality_partial.tex}
+
+
+\input{extension.tex}
+
+
+
+\section{Discussion}
+% Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+The accuracy of our reproduced Faircal and Oracle is better than the baseline, FTC and FSN. This supports the claim that FairCal obtains significantly higher accuracy than the baseline and other models on both datasets for all metrics and models. Since Oracle is slightly lower than FairCal, the claim that Oracle is a close second is supported.
+Although our results support the statement of accuracy, our implementation is significantly off in two cases compared to the original paper, RFW (VGGFace2) and BFW (WebFace). We thoroughly compared the different implementations of the proposed methods looking for a difference that would explain this. We could not locate errors in our code that could justify the differences. Since the differences are stable across embeddings and different between embeddings, we expect the difference to originate from these or a subset of these embeddings. 
+
+The second claim is that FairCal and Oracle obtain the lowest KS mean and deviation is supported by the metrics in \autoref{tab:fairness}.
+FairCal and Oracle respectively score the lowest and second lowest; they are the best in fairness calibration. 
+% It is striking to see in \autoref{tab:fairness}, that the same pattern as in \autoref{tab:accuracy}, where RFW (WebFace) has similar results and significant differences on the other two features, is not present in this table. 
+The pattern from before, where RFW (WebFace) has the only similar results, is not present in \autoref{tab:fairness}, which highlights that the methods perform more fair regardless of differences in accuracy.
+% Another thing that was striking to us, was that there was a significant fluctuation in results over different runs. We believe this is due to the randomness in the K-means algorithm that is greater and also has more impact on the final results than previously thought. % Ik krijg volgens mij met dezelfde runs redelijk vergelijkbar resultaten? Ah ik dacht dat er fluctiatie was, heb ik dat verkeerd begrepen
+
+The third and final claim is that FairCal and Oracle obtain a low deviation across subgroups for all datasets
+and models and that FairCal is significantly lower than Oracle.
+When compared to the baseline both of the methods obtain lower deviation and as expected they are outperformed by FSN.
+% This is not fully supported as seen in \autoref{tab:predictive-equality}. Both parts of the claim are not supported even.
+% Contrary to the claim, Oracle is in half of the cases worse or as good as FSN. This is also the case for FairCal compared to FSN. 
+While the claim that FairCal obtains lower deviation than Oracle is not convincingly supported by the reported measure, we provide and support a hypothesis that aligns with this claim.
+% \autoref{tab:predictive-equality-full}
+
+
+\subsection{What was easy}
+% Give your judgement of what was easy to reproduce. Perhaps the author's code is written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+% Be careful not to give sweeping generalizations. Something easy for you might be difficult for others. But what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+%% in summary:
+% As the proposed methods in the original paper are post-hoc calibrators, running experiments was fast, which allowed for thorough debugging and testing of many minor changes.
+% The original paper was furthermore very clear in which evaluation metrics were used and these were easy to implement. % and compare.
+
+% \textbf{TODO: Make this flow as one part}
+
+%%% this was easy
+The data and the models were generally accessible, and the execution of the experiments was swift. This allowed for thorough debugging and testing of minor changes. Furthermore, the original paper was explicit about the way the evaluation metrics were used and these were easy to implement. The code for the creation of the tables and figures like the original paper was provided on GitHub and worked straight out of the box after the appropriate information had been provided.
+
+\subsection{What was difficult} \label{sec:difficult}
+% List part of the reproduction study that took more time than you anticipated or you felt was difficult. 
+
+% Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+% \textbf{TODO: Make this flow as one part}
+
+The exact steps of the original implementation were unclear to us because the provided code had few comments and its structure was not immediately obvious.
+
+
+%%% this was difficult
+% arcface model van git klopt niet
+Additionally, one of the most challenging parts was when we discovered that the initially used Arcface model on GitHub was incorrect. After some investigation, we discovered that the correct model was provided as an \textit{onnx} file. 
+As authors who had never worked with this specification before, we were required to test multiple options before running the model.
+Based on our results, we still suspect that we did not manage to implement it correctly. 
+% In the end, this was made more difficult by the model stored in the onnx model zoo GitHub being inappropriate.
+% \textit{for our task?}.
+% \textbf{Should we file a bug report about this?}
+
+
+\subsection{Communication with original authors}
+% Document the extent of (or lack of) communication with the original authors. To make sure the reproducibility report is a fair assessment of the original research we recommend getting in touch with the original authors. You can ask authors specific questions, or if you don't have any questions you can send them the full report to get their feedback before it gets published. 
+
+Indirectly, via fellow students reproducing this paper, we had e-mail contact with the first author, who responded fast and provided two example files for the required metadata structure and clarified that all unmentioned hyperparameters were kept at their default values.
+
